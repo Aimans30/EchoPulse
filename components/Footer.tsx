@@ -1,0 +1,208 @@
+'use client';
+
+import Link from 'next/link';
+
+const serviceLinks = [
+  'Video Editing', 'Automations', 'Personal Branding',
+  'Websites & Funnels', 'Lead Generation', 'Community Management',
+];
+
+const companyLinks = ['About', 'Our Work', 'Results', 'Pricing', 'Contact'];
+
+export default function Footer() {
+  return (
+    <footer
+      style={{
+        borderTop: '1px solid rgba(12,12,11,0.09)',
+        padding: '72px 56px 48px',
+        display: 'grid',
+        gridTemplateColumns: '1.6fr 1fr 1fr 1fr',
+        gap: '56px',
+      }}
+      className="site-footer"
+    >
+      <div>
+        <a
+          href="/"
+          style={{
+            fontFamily: 'Inter, sans-serif',
+            fontSize: '20px',
+            fontWeight: 800,
+            letterSpacing: '-0.3px',
+            marginBottom: '14px',
+            textDecoration: 'none',
+            color: '#0C0C0B',
+            display: 'block',
+          }}
+        >
+          Echo<span style={{ color: '#E8541A' }}>Pulse</span>
+        </a>
+        <p style={{ fontSize: '14px', color: '#6E6B63', lineHeight: 1.7, marginBottom: '28px', margin: '0 0 28px' }}>
+          Full-service content and growth agency for personal brands, creators, and online businesses ready to scale.
+        </p>
+        <div style={{ display: 'flex', gap: '10px' }}>
+          {[
+            { label: 'in', href: '#' },
+            { label: 'ig', href: '#' },
+            { label: 'yt', href: '#' },
+          ].map((s) => (
+            <a
+              key={s.label}
+              href={s.href}
+              style={{
+                width: '36px',
+                height: '36px',
+                borderRadius: '10px',
+                background: 'rgba(255,255,255,0.55)',
+                backdropFilter: 'blur(10px)',
+                border: '1px solid rgba(255,255,255,0.8)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '12px',
+                fontWeight: 800,
+                cursor: 'none',
+                transition: 'all 0.25s',
+                textDecoration: 'none',
+                color: '#0C0C0B',
+                boxShadow: '0 2px 8px rgba(12,12,11,0.07)',
+              }}
+              onMouseEnter={(e) => {
+                const el = e.currentTarget as HTMLElement;
+                el.style.background = '#0C0C0B';
+                el.style.color = '#F2EEE7';
+                el.style.borderColor = '#0C0C0B';
+              }}
+              onMouseLeave={(e) => {
+                const el = e.currentTarget as HTMLElement;
+                el.style.background = 'rgba(255,255,255,0.55)';
+                el.style.color = '#0C0C0B';
+                el.style.borderColor = 'rgba(255,255,255,0.8)';
+              }}
+            >
+              {s.label}
+            </a>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <h4
+          style={{
+            fontSize: '10px',
+            fontWeight: 700,
+            letterSpacing: '3px',
+            textTransform: 'uppercase',
+            color: '#A8A49B',
+            marginBottom: '20px',
+          }}
+        >
+          Services
+        </h4>
+        <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          {serviceLinks.map((s) => (
+            <li key={s}>
+              <a
+                href="#services"
+                style={{ color: '#6E6B63', textDecoration: 'none', fontSize: '14px', transition: 'color 0.2s' }}
+                onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.color = '#0C0C0B')}
+                onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.color = '#6E6B63')}
+              >
+                {s}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div>
+        <h4
+          style={{
+            fontSize: '10px',
+            fontWeight: 700,
+            letterSpacing: '3px',
+            textTransform: 'uppercase',
+            color: '#A8A49B',
+            marginBottom: '20px',
+          }}
+        >
+          Company
+        </h4>
+        <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          {companyLinks.map((c) => (
+            <li key={c}>
+              <a
+                href={`#${c.toLowerCase()}`}
+                style={{ color: '#6E6B63', textDecoration: 'none', fontSize: '14px', transition: 'color 0.2s' }}
+                onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.color = '#0C0C0B')}
+                onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.color = '#6E6B63')}
+              >
+                {c}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div>
+        <h4
+          style={{
+            fontSize: '10px',
+            fontWeight: 700,
+            letterSpacing: '3px',
+            textTransform: 'uppercase',
+            color: '#A8A49B',
+            marginBottom: '20px',
+          }}
+        >
+          Contact
+        </h4>
+        <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          {[
+            { label: 'echopulse.media', href: 'https://echopulse.media' },
+            { label: 'Instagram', href: '#' },
+            { label: 'LinkedIn', href: '#' },
+            { label: 'YouTube', href: '#' },
+          ].map((c) => (
+            <li key={c.label}>
+              <a
+                href={c.href}
+                target={c.href.startsWith('http') ? '_blank' : undefined}
+                rel={c.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                style={{ color: '#6E6B63', textDecoration: 'none', fontSize: '14px', transition: 'color 0.2s' }}
+                onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.color = '#0C0C0B')}
+                onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.color = '#6E6B63')}
+              >
+                {c.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div
+        style={{
+          gridColumn: '1/-1',
+          borderTop: '1px solid rgba(12,12,11,0.09)',
+          paddingTop: '32px',
+          marginTop: '16px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}
+      >
+        <p style={{ fontSize: '13px', color: '#A8A49B', margin: 0 }}>
+          © 2026 EchoPulse. All rights reserved.
+        </p>
+        <p style={{ fontSize: '13px', color: '#A8A49B', margin: 0 }}>
+          Built to grow your brand.
+        </p>
+      </div>
+
+      <style>{`
+        @media (max-width: 1200px) { .site-footer { grid-template-columns: 1fr 1fr !important; } }
+        @media (max-width: 768px) { .site-footer { grid-template-columns: 1fr !important; padding: 56px 28px 32px !important; } }
+      `}</style>
+    </footer>
+  );
+}
