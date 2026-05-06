@@ -3,14 +3,13 @@
 import { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { motion, AnimatePresence } from 'framer-motion';
+import { BOOK_CALL_URL, BOOK_CALL_LABEL, BOOK_CALL_LABEL_LONG } from '@/lib/links';
 
 const links = [
-  { label: 'Services', href: '#services' },
-  { label: 'Our Work', href: '#work' },
-  { label: 'Results', href: '#results' },
-  { label: 'Pricing', href: '#pricing' },
-  { label: 'Blog', href: '#blog' },
-  { label: 'FAQ', href: '#faq' },
+  { label: 'Services', href: '/#services' },
+  { label: 'Work', href: '/#work' },
+  { label: 'Pricing', href: '/#pricing' },
+  { label: 'FAQ', href: '/#faq' },
 ];
 
 export default function Nav() {
@@ -25,7 +24,10 @@ export default function Nav() {
   }, []);
 
   useEffect(() => {
-    gsap.fromTo(navRef.current, { y: -80, opacity: 0 }, { y: 0, opacity: 1, duration: 1, ease: 'power3.out', delay: 1.2 });
+    // Detect if a Loader is currently mounted (homepage). If so, hold the nav until it fades.
+    const hasLoader = typeof document !== 'undefined' && document.querySelector('[data-loader="true"]') !== null;
+    const delay = hasLoader ? 1.2 : 0.2;
+    gsap.fromTo(navRef.current, { y: -80, opacity: 0 }, { y: 0, opacity: 1, duration: 0.9, ease: 'power3.out', delay });
   }, []);
 
   const closeMobile = () => setMobileOpen(false);
@@ -119,9 +121,28 @@ export default function Nav() {
           .nav-links-list { display: none !important; }
           .nav-desktop-cta { display: none !important; }
           .nav-hamburger { display: flex !important; }
+          /* Compact mobile pill — fits content instead of stretching across screen */
+          .nav-pill {
+            width: auto !important;
+            min-width: 220px !important;
+            max-width: calc(100% - 24px) !important;
+            padding: 10px 14px 10px 20px !important;
+            gap: 18px !important;
+            border-radius: 100px !important;
+            box-shadow: 0 4px 24px rgba(12,12,11,0.08), inset 0 1px 0 rgba(255,255,255,0.9) !important;
+          }
+          .nav-pill > a[href="/"] { font-size: 15px !important; }
+          .nav-hamburger { width: 32px !important; height: 32px !important; }
+          .nav-hamburger.open span:nth-child(1) { transform: translateY(6px) rotate(45deg) !important; }
+          .nav-hamburger.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg) !important; }
         }
-        @media (max-width: 480px) {
-          .nav-pill { width: calc(100% - 40px) !important; }
+        @media (max-width: 380px) {
+          .nav-pill {
+            min-width: 200px !important;
+            padding: 9px 12px 9px 18px !important;
+            gap: 14px !important;
+          }
+          .nav-pill > a[href="/"] { font-size: 14px !important; }
         }
 
         /* Mobile dropdown menu */
@@ -195,13 +216,14 @@ export default function Nav() {
               </motion.a>
             ))}
             <a
-              href="https://echopulse.media"
+              href={BOOK_CALL_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="mobile-nav-cta"
               onClick={closeMobile}
+              aria-label={BOOK_CALL_LABEL_LONG}
             >
-              Book a Free Strategy Call
+              {BOOK_CALL_LABEL_LONG}
             </a>
           </motion.div>
         )}
@@ -263,12 +285,14 @@ export default function Nav() {
 
         {/* Desktop CTA */}
         <a
-          href="https://echopulse.media"
+          href={BOOK_CALL_URL}
           target="_blank"
           rel="noopener noreferrer"
           className="nav-cta-btn nav-desktop-cta"
+          aria-label={BOOK_CALL_LABEL_LONG}
+          data-cursor-hover
         >
-          <span>Book a Free Call</span>
+          <span>{BOOK_CALL_LABEL}</span>
         </a>
 
         {/* Mobile hamburger */}

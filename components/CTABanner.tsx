@@ -1,15 +1,17 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { BOOK_CALL_URL, BOOK_CALL_LABEL_LONG } from '@/lib/links';
 
 export default function CTABanner() {
   return (
-    <div className="cta-banner-wrap" style={{ margin: '0 56px 128px' }}>
+    <div id="book-call" className="cta-banner-wrap" style={{ margin: '0 56px 128px', scrollMarginTop: '80px' }}>
       <motion.div
         className="cta-banner-inner"
+        data-dark-bg="true"
         initial={{ opacity: 0, y: 40 }}
         whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
+        viewport={{ once: true, margin: '-100px' }}
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
         style={{
           background: '#0C0C0B',
@@ -24,7 +26,6 @@ export default function CTABanner() {
           flexWrap: 'wrap',
         }}
       >
-        {/* Glow */}
         <div
           style={{
             position: 'absolute',
@@ -49,8 +50,8 @@ export default function CTABanner() {
               color: '#F2EEE7',
             }}
           >
-            You have a brand to build.
-            <span style={{ color: '#E8541A', display: 'block' }}>Let us handle the content.</span>
+            You build the business.
+            <span style={{ color: '#E8541A', display: 'block' }}>We make it sound like you.</span>
           </motion.div>
           <motion.p
             initial={{ opacity: 0 }}
@@ -61,11 +62,11 @@ export default function CTABanner() {
               fontSize: '16px',
               color: 'rgba(242,238,231,0.4)',
               marginTop: '20px',
-              maxWidth: '480px',
+              maxWidth: '500px',
               lineHeight: 1.7,
             }}
           >
-            Book a free 45-minute strategy call. We'll map out exactly what your content system needs to start attracting the right people — no obligation, no pressure.
+            Free 45-minute strategy call. We audit your current content, run a 10-minute Voice Foundation preview, and send you a custom plan for video, LinkedIn, blogs, and ad creative. Whether or not you ever hire us.
           </motion.p>
         </div>
 
@@ -85,9 +86,11 @@ export default function CTABanner() {
           }}
         >
           <motion.a
-            href="https://echopulse.media"
+            href={BOOK_CALL_URL}
             target="_blank"
             rel="noopener noreferrer"
+            data-cursor-hover
+            aria-label={BOOK_CALL_LABEL_LONG}
             whileHover={{ scale: 1.04, boxShadow: '0 16px 60px rgba(232,84,26,0.5)' }}
             whileTap={{ scale: 0.98 }}
             style={{
@@ -105,11 +108,12 @@ export default function CTABanner() {
               display: 'inline-block',
               whiteSpace: 'nowrap',
               boxShadow: '0 8px 40px rgba(232,84,26,0.38)',
+              minHeight: '48px',
             }}
             onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = '#d94a14')}
             onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = '#E8541A')}
           >
-            Book Your Free Strategy Call
+            {BOOK_CALL_LABEL_LONG}
           </motion.a>
           <span style={{ fontSize: '12px', color: 'rgba(242,238,231,0.28)', textAlign: 'center' }}>
             No credit card. No contracts. Just a conversation.

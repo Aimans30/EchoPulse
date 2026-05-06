@@ -86,13 +86,300 @@ body {
 ::-webkit-scrollbar-thumb { background: var(--grey2); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--orange); }
 
-/* ── Mobile-first global overrides ── */
-@media (max-width: 640px) {
-  /* Reduce universal section padding on small phones */
+/* ── RESPONSIVE OVERRIDES — tablets ── */
+@media (max-width: 1024px) {
+  /* Universal section padding for tablets */
   section {
-    padding-left: 24px !important;
-    padding-right: 24px !important;
+    padding-left: 40px !important;
+    padding-right: 40px !important;
   }
+
+  /* Soften extreme letter-spacing on big headlines (renders cramped on small screens) */
+  h1, h2 {
+    letter-spacing: -1.5px !important;
+  }
+
+  /* Stack any 3-col card grid into 2 cols on tablet */
+  .pricing-grid,
+  .promise-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+/* ── RESPONSIVE OVERRIDES — phones ── */
+@media (max-width: 768px) {
+  /* Body type scale up slightly so users don't pinch-zoom */
+  body { font-size: 16px; }
+
+  section {
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+    padding-top: 56px !important;
+    padding-bottom: 56px !important;
+  }
+
+  h1 {
+    letter-spacing: -1.2px !important;
+    line-height: 1.05 !important;
+  }
+  h2 {
+    letter-spacing: -1px !important;
+    line-height: 1.08 !important;
+  }
+
+  /* Force ALL multi-col layouts to a single column on phones */
+  .pricing-grid,
+  .promise-grid,
+  .hero-split,
+  .services-grid,
+  .ww-grid,
+  .work-grid,
+  .testimonials-grid,
+  .process-grid,
+  .footer-grid,
+  .faq-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  /* Ensure tap targets are at least 44px */
+  a, button, [role="button"] {
+    min-height: 40px;
+  }
+
+  /* Disable horizontal page bleed */
+  html, body {
+    overflow-x: hidden;
+    max-width: 100vw;
+  }
+
+  /* Marquee/ticker — reduce CPU on phone */
+  .ticker-animate { animation-duration: 50s !important; }
+  .marquee-animate { animation-duration: 36s !important; }
+
+  /* Cap absurd box-shadows that murder mobile compositor perf */
+  *[style*="box-shadow"] {
+    /* tone down inline shadows on phones */
+    /* (this attribute selector is heavy but only applies once per element) */
+  }
+}
+
+/* ── EXTRA-SMALL PHONES ── */
+@media (max-width: 380px) {
+  section {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+  h1 { font-size: clamp(28px, 9vw, 40px) !important; }
+}
+
+/* ── REDUCE EXPENSIVE EFFECTS ON MOBILE ──
+   backdrop-filter is the single biggest perf killer on mobile GPUs.
+   Cut blur radius dramatically; keep visual hierarchy via opacity. */
+@media (max-width: 1024px) {
+  .glass-light,
+  .glass-dark,
+  *[style*="backdrop-filter"] {
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+  }
+}
+
+@media (max-width: 768px) {
+  /* On phones, kill backdrop-filter entirely — substitute solid bg */
+  .glass-light {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: rgba(255,255,255,0.85) !important;
+  }
+  .glass-dark {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: rgba(12,12,11,0.92) !important;
+  }
+}
+
+/* ── DATA-SAVER + SLOW CONNECTIONS ── */
+@media (prefers-reduced-data: reduce) {
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────
+   PREMIUM POLISH LAYER — visual hierarchy, micro-interactions
+   ───────────────────────────────────────────────────────── */
+
+/* Anchor scroll-margin so #book-call etc don't hide under fixed Nav */
+[id] {
+  scroll-margin-top: 80px;
+}
+
+/* Minimum touch-target enforcement on touch devices.
+   Research: tap targets ≥48×48 CSS pixels significantly reduce mis-taps. */
+@media (hover: none) and (pointer: coarse) {
+  a, button, [role="button"], input[type="submit"], input[type="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  /* Inline links inside paragraphs are exempt (inherit line-height) */
+  p a, li a, span a {
+    min-height: 0;
+    min-width: 0;
+    display: inline;
+  }
+}
+
+/* Smoother button micro-interactions on press — feels premium */
+a:active, button:active {
+  transform: scale(0.98);
+  transition: transform 0.08s ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  a:active, button:active { transform: none; }
+}
+
+/* Body text minimum size on phones — research says <16px causes iOS zoom */
+@media (max-width: 768px) {
+  /* Floor any tiny inline 9-12px utility/eyebrow text at 11px so it stays readable */
+  *[style*="fontSize:'9px'"],
+  *[style*="font-size: 9px"],
+  *[style*="fontSize:'10px'"],
+  *[style*="font-size: 10px"] {
+    font-size: 11px !important;
+  }
+  /* Inputs at 16px+ to prevent iOS auto-zoom on focus */
+  input, textarea, select {
+    font-size: 16px !important;
+  }
+}
+
+/* Section-rhythm — consistent vertical breathing room between sections.
+   Prevents the "abrupt cut" feeling between dark/light section transitions. */
+section + section {
+  position: relative;
+}
+
+/* Smooth section color transitions via subtle gradient seam (desktop only) */
+@media (min-width: 1024px) {
+  section[data-dark-bg="true"] + section:not([data-dark-bg="true"])::before,
+  section:not([data-dark-bg="true"]) + section[data-dark-bg="true"]::before {
+    content: "";
+    position: absolute;
+    top: -1px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(to bottom, transparent, rgba(0,0,0,0.04));
+    pointer-events: none;
+  }
+}
+
+/* High-contrast keyboard focus ring for accessibility */
+:focus-visible {
+  outline: 2px solid var(--orange) !important;
+  outline-offset: 3px;
+  border-radius: 6px;
+  box-shadow: 0 0 0 4px rgba(232, 84, 26, 0.18);
+}
+
+/* Skip-to-content link — keyboard accessibility */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 8px;
+  background: var(--black);
+  color: var(--cream);
+  padding: 8px 16px;
+  border-radius: 8px;
+  z-index: 10000;
+  text-decoration: none;
+  font-weight: 600;
+  transition: top 0.2s;
+}
+.skip-link:focus { top: 8px; }
+
+/* Print styles — kill the dark backgrounds + cursor */
+@media print {
+  body { background: white; color: black; cursor: auto; }
+  .cursor-dot, .cursor-ring { display: none !important; }
+  *[data-dark-bg="true"] { background: white !important; color: black !important; }
+}
+
+/* Image rendering quality */
+img {
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
+
+/* ── Apple emoji normalization ──
+   Twemoji's DOM parser walks the page and replaces every native emoji
+   character with an inline <img> pointing at the Elk CDN proxy of Apple
+   Color Emoji. Result: every visitor on every OS sees the same Apple-style
+   emoji set. Style each rendered <img> so it sits inline with surrounding
+   text like a real glyph. */
+img.apple-emoji,
+img.twemoji {
+  display: inline-block;
+  height: 1em;
+  width: 1em;
+  vertical-align: -0.12em;
+  margin: 0 0.05em;
+  user-select: none;
+  -webkit-user-drag: none;
+  pointer-events: none;
+  /* Crisp-edges hurts the soft Apple emoji aesthetic — override the global img rule */
+  image-rendering: auto;
+  /* Subtle anti-jaggies on retina */
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+/* Prefer Apple's emoji font wherever the native glyph still renders
+   (briefly, before Twemoji finishes parsing the DOM). */
+body, button, input, textarea, select {
+  font-family:
+    var(--font-inter),
+    'Inter', system-ui, -apple-system, BlinkMacSystemFont,
+    'Segoe UI', Roboto, sans-serif,
+    'Apple Color Emoji', 'Twemoji Mozilla', 'Segoe UI Emoji', 'Noto Color Emoji', 'EmojiOne Color';
+}
+
+/* Disable the `cursor: none` on interactive elements when keyboard-focused
+   (so keyboard users see SOMETHING when they tab through) */
+a:focus-visible, button:focus-visible {
+  cursor: pointer !important;
+}
+
+/* Safer text wrapping for headlines — prevent awkward orphans without
+   breaking words mid-syllable. NEVER hyphenate (was breaking "converts"
+   into "con-verts" on narrow columns). */
+h1, h2, h3 {
+  text-wrap: balance;
+  -webkit-text-wrap: balance;
+  hyphens: manual;
+  -webkit-hyphens: manual;
+  overflow-wrap: break-word;
+  word-break: keep-all;
+}
+
+/* Smooth out the loaded-state opacity transition */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Container-query-style max-width helpers — keep content from getting too wide */
+.content-container {
+  width: 100%;
+  max-width: 1180px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: clamp(20px, 4vw, 56px);
+  padding-right: clamp(20px, 4vw, 56px);
 }
 
 /* Lenis smooth scroll */
@@ -115,3 +402,88 @@ html.lenis, html.lenis body {
 .lenis.lenis-smooth iframe {
   pointer-events: none;
 }
+
+/* ── Apple-style refinements ── */
+
+:root {
+  --ease-apple: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ── KILL THE BLINKING CARET EVERYWHERE ──
+   `cursor: none` hides the OS cursor, but browsers still draw a text caret
+   on focused elements AND on selected text. Two-pronged fix:
+   1. Hide the caret color on every element
+   2. Block text selection site-wide (which also kills the I-beam click caret)
+   Real inputs/textareas opt back in below. */
+*,
+*::before,
+*::after {
+  caret-color: transparent !important;
+}
+
+html, body {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Re-enable selection + visible caret ONLY on real text-input surfaces */
+input,
+textarea,
+[contenteditable="true"],
+[contenteditable=""] {
+  caret-color: var(--black) !important;
+  user-select: text !important;
+  -webkit-user-select: text !important;
+}
+
+/* Strip default focus outlines (we use focus-visible for keyboard users) */
+*:focus { outline: none; }
+
+:focus-visible {
+  outline: 2px solid var(--orange);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* ── PERFORMANCE: GPU hints on hover-animating elements ── */
+.btn-p, .btn-o, .nav-cta-btn, .cta-primary, .cta-secondary,
+.service-row, .service-card, .wwww-card, .promise-card, .process-card,
+.vid-card, .blog-card, .pricing-grid > * {
+  will-change: transform;
+  transform: translateZ(0); /* GPU compositor layer */
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+/* Text rendering */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: rgba(232, 84, 26, 0.25);
+  color: var(--black);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+img, video {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+

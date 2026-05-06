@@ -3,16 +3,16 @@
 import { motion } from 'framer-motion';
 
 const painPoints = [
-  { before: 'Posting consistently but getting no traction', after: 'Content that compounds views every week' },
-  { before: 'Spending hours editing with no results', after: 'Done-for-you in 48 hrs, you just approve' },
-  { before: 'Chasing clients with paid ads', after: 'Inbound leads while you sleep via automation' },
-  { before: 'Launching to crickets every time', after: 'Pre-built audience ready to buy on day one' },
+  { before: 'LinkedIn posts that sound like every AI ghostwriter', after: 'Voice-driven posts your audience actually replies to' },
+  { before: 'Generic blogs with "delve" and "tapestry" everywhere', after: 'Long-form content that sounds like you wrote it' },
+  { before: 'Ad creative that goes stale every 14 days', after: 'Fresh static + video ads on a subscription' },
+  { before: 'A pretty website that nobody books from', after: 'Conversion-engineered pages that book calls' },
 ];
 
 const proofStats = [
-  { value: '$4.2M+', label: 'Revenue generated' },
-  { value: '200+', label: 'Brands scaled' },
-  { value: '22 days', label: 'Avg. time to results' },
+  { value: '200+', label: 'Videos edited' },
+  { value: '4 yrs', label: 'Motion design' },
+  { value: '48 hrs', label: 'Avg turnaround' },
 ];
 
 export default function ContentShowcase() {
@@ -76,7 +76,7 @@ export default function ContentShowcase() {
           >
             <span style={{ width:'22px', height:'1px', background:'#E8541A', display:'block' }} />
             <span style={{ fontSize:'10px', fontWeight:700, letterSpacing:'4px', textTransform:'uppercase', color:'#A8A49B' }}>
-              Stop Guessing. Start Growing.
+              The AI Slop Era is Over
             </span>
           </motion.div>
 
@@ -86,17 +86,17 @@ export default function ContentShowcase() {
             transition={{ duration:0.8, ease:[0.16,1,0.3,1] }}
             style={{ fontFamily:'Inter,sans-serif', fontSize:'clamp(38px,5vw,72px)', fontWeight:900, letterSpacing:'-2.5px', lineHeight:0.96, color:'#0C0C0B', margin:'0 0 24px' }}
           >
-            Your brand deserves<br />
-            a team that<br />
-            <span style={{ color:'#E8541A', fontStyle:'italic' }}>actually delivers.</span>
+            Your audience can<br />
+            tell when content<br />
+            <span style={{ color:'#E8541A', fontStyle:'italic' }}>wasn't written by you.</span>
           </motion.h2>
 
           <motion.p
             initial={{ opacity:0, y:16 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }}
             transition={{ delay:0.15, duration:0.7 }}
-            style={{ fontSize:'16px', color:'#6E6B63', lineHeight:1.75, maxWidth:'440px', margin:'0 0 40px' }}
+            style={{ fontSize:'16px', color:'#6E6B63', lineHeight:1.75, maxWidth:'460px', margin:'0 0 40px' }}
           >
-            One free strategy call. We map out your entire content and growth system — no fluff, no sales pitch. Just a clear plan you can use whether you work with us or not.
+            We run a 90-minute Voice Foundation interview with every founder so the LinkedIn posts, blogs, video scripts, and ad copy we produce sound like you. Not like a junior copywriter or ChatGPT. Free strategy call to see how it works.
           </motion.p>
 
           {/* Pain → Gain rows */}
@@ -150,7 +150,7 @@ export default function ContentShowcase() {
           >
             <div style={{ width:'7px', height:'7px', borderRadius:'50%', background:'#10b981', animation:'bdot 2s ease-in-out infinite', flexShrink:0 }} />
             <span style={{ fontSize:'12px', color:'#A8A49B', fontWeight:500 }}>
-              Only <strong style={{ color:'#0C0C0B' }}>3 client spots</strong> available this month — strategy calls are free, but limited.
+              <strong style={{ color:'#0C0C0B' }}>Now booking</strong> strategy calls. 45 minutes, free, zero pitch.
             </span>
           </motion.div>
         </div>
@@ -181,12 +181,12 @@ export default function ContentShowcase() {
               ))}
             </div>
 
-            {/* Transformation examples */}
+            {/* Service highlights */}
             <div style={{ display:'flex', flexDirection:'column', gap:'10px' }}>
               {[
-                { name:'Jake M.', result:'2K → 22K followers', time:'90 days', color:'#E8541A' },
-                { name:'Amira R.', result:'$80K course launch', time:'7 days', color:'#10b981' },
-                { name:'Laura B.', result:'20–30 leads/week', time:'60 days', color:'#8b5cf6' },
+                { name:'Voice Foundation', result:'90-min founder interview', time:'every client', color:'#E8541A' },
+                { name:'Multi-Stack', result:'6 services in-house',   time:'no vendor juggling', color:'#10b981' },
+                { name:'Standard SLA', result:'48-hour turnaround',     time:'every deliverable',  color:'#8b5cf6' },
               ].map((c, i) => (
                 <motion.div
                   key={c.name}
@@ -225,7 +225,7 @@ export default function ContentShowcase() {
               Ready to stop guessing?
             </div>
             <div style={{ fontSize:'13px', color:'#6E6B63', lineHeight:1.65, marginBottom:'22px' }}>
-              45-minute call. We audit your content, show you exactly what's missing, and give you a growth plan — free.
+              45-minute call. We audit your content, show you exactly what&apos;s missing, and give you a growth plan. Free.
             </div>
             <a
               href="https://echopulse.media"

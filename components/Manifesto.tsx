@@ -7,10 +7,10 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 gsap.registerPlugin(ScrollTrigger);
 
 const lines = [
-  { parts: [{ text: 'Great content', accent: true }, { text: ' builds empires.', muted: true }], arrow: true },
-  { parts: [{ text: 'Average content', muted: true }, { text: ' gets you ' }, { text: 'ignored.', accent: true }] },
-  { parts: [{ text: 'Everyone is ' }, { text: 'creating.', muted: true }, { text: ' Few are ' }, { text: 'growing.', accent: true }], arrow: true },
-  { parts: [{ text: 'We change that.', accent: true }] },
+  { parts: [{ text: 'Most content online', muted: true }, { text: ' sounds the same.', accent: true }], arrow: true },
+  { parts: [{ text: 'AI wrote it.' }, { text: ' Nobody', muted: true }, { text: ' reads it.', accent: true }] },
+  { parts: [{ text: 'Your ' }, { text: 'voice', accent: true }, { text: ' is your ' }, { text: 'edge.', accent: true }], arrow: true },
+  { parts: [{ text: 'We make sure it sounds like ' }, { text: 'you.', accent: true }] },
 ];
 
 export default function Manifesto() {
@@ -110,7 +110,24 @@ export default function Manifesto() {
                 </span>
               ))}
               {line.arrow && (
-                <span style={{ color: '#E8541A', fontSize: '0.55em', marginLeft: 'auto', opacity: 0.8 }}>↗</span>
+                <svg
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#E8541A"
+                  strokeWidth="2.4"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  style={{
+                    width: '0.55em',
+                    height: '0.55em',
+                    marginLeft: 'auto',
+                    opacity: 0.85,
+                    flexShrink: 0,
+                  }}
+                >
+                  <path d="M7 17L17 7M17 7H8M17 7V16" />
+                </svg>
               )}
             </div>
           </div>

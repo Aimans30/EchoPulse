@@ -2,46 +2,47 @@
 
 import { useRef } from 'react';
 import { motion } from 'framer-motion';
+import { BOOK_CALL_URL, BOOK_CALL_LABEL } from '@/lib/links';
 
 const cards = [
   {
-    num: '01', icon: '⚡', title: 'Personal Brands',
-    desc: 'Founders, speakers, and consultants building authority through video and content that commands premium rates.',
+    num: '01', icon: '🚀', title: 'B2B Founders',
+    desc: 'SaaS, consulting, and agency founders who want LinkedIn ghostwriting, blog content, and video that sounds like them. Not like a junior copywriter or ChatGPT.',
     tag: 'Our Specialty', tagColor: '#E8541A',
     gradient: 'radial-gradient(circle at 80% 20%, rgba(232,84,26,0.12) 0%, transparent 60%)',
     accentLine: '#E8541A',
   },
   {
-    num: '02', icon: '🎓', title: 'Course Creators',
-    desc: 'Educators who need content that pre-sells, launches, and fills their courses on repeat without burnout.',
+    num: '02', icon: '🏠', title: 'Real Estate & STR',
+    desc: 'Premium agents, brokerages, and Airbnb operators who need cinematic property reels, agent personal brand video, and listing content that books.',
+    tag: 'Cinematic Edge', tagColor: '#f59e0b',
+    gradient: 'radial-gradient(circle at 80% 20%, rgba(245,158,11,0.10) 0%, transparent 60%)',
+    accentLine: '#f59e0b',
+  },
+  {
+    num: '03', icon: '🎓', title: 'Course Creators',
+    desc: 'Educators who need pre-launch content systems, evergreen short-form, and conversion funnels that fill cohorts without manual selling.',
     tag: 'High ROI', tagColor: '#8b5cf6',
     gradient: 'radial-gradient(circle at 80% 20%, rgba(139,92,246,0.10) 0%, transparent 60%)',
     accentLine: '#8b5cf6',
   },
   {
-    num: '03', icon: '🏋️', title: 'Online Coaches',
-    desc: 'Fitness, business, and mindset coaches who need a system that brings in new clients every single month.',
-    tag: 'Fast Results', tagColor: '#10b981',
+    num: '04', icon: '🛍️', title: 'DTC Brands',
+    desc: 'Direct-to-consumer brands burning through ad creative every two weeks. We deliver fresh static + video ads on a subscription before fatigue kills your CPA.',
+    tag: 'Subscription', tagColor: '#10b981',
     gradient: 'radial-gradient(circle at 80% 20%, rgba(16,185,129,0.10) 0%, transparent 60%)',
     accentLine: '#10b981',
   },
   {
-    num: '04', icon: '🏠', title: 'Real Estate Agents',
-    desc: 'Agents who know that personal branding is the unfair advantage where trust wins deals and referrals multiply.',
-    tag: 'Growing Fast', tagColor: '#f59e0b',
-    gradient: 'radial-gradient(circle at 80% 20%, rgba(245,158,11,0.10) 0%, transparent 60%)',
-    accentLine: '#f59e0b',
-  },
-  {
-    num: '05', icon: '🚀', title: 'Agencies & Service Biz',
-    desc: 'Agency owners who want inbound leads from content instead of burning budget on cold outreach.',
+    num: '05', icon: '💼', title: 'Agencies & Consultancies',
+    desc: 'Agency owners and consultants who want inbound leads from content instead of cold outreach. Plus a website that converts the traffic when it comes.',
     tag: 'Scaling', tagColor: '#3b82f6',
     gradient: 'radial-gradient(circle at 80% 20%, rgba(59,130,246,0.10) 0%, transparent 60%)',
     accentLine: '#3b82f6',
   },
   {
     num: '?', icon: '💬', title: 'Sound Like You?',
-    desc: 'Building a brand online and need a team that handles content so you can focus on what you do best?',
+    desc: 'Building a premium brand and need a team that handles cinematic video, LinkedIn ghostwriting, blogs, ads, and websites. Without you having to manage 5 vendors.',
     tag: null, tagColor: '#E8541A',
     gradient: null,
     accentLine: '#E8541A',
@@ -152,11 +153,11 @@ export default function WhoWeWorkWith() {
         style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: '24px' }}
       >
         <h2 style={{ fontFamily: 'Inter, sans-serif', fontSize: 'clamp(36px, 4.5vw, 64px)', fontWeight: 900, letterSpacing: '-2.5px', lineHeight: 1.02, margin: 0 }}>
-          Built for people<br />
-          who <span style={{ color: '#E8541A' }}>create online.</span>
+          Built for premium<br />
+          <span style={{ color: '#E8541A' }}>founders & brands.</span>
         </h2>
-        <p style={{ maxWidth: '280px', color: '#6E6B63', fontSize: '14px', lineHeight: 1.75, margin: 0 }}>
-          One agency. Every type of creator. We specialise in turning expertise into content that compounds.
+        <p style={{ maxWidth: '290px', color: '#6E6B63', fontSize: '14px', lineHeight: 1.75, margin: 0 }}>
+          One studio. Every content discipline. We turn founder expertise into content that converts. Without the AI slop tax everyone else is charging.
         </p>
       </motion.div>
 
@@ -213,14 +214,16 @@ export default function WhoWeWorkWith() {
 
               {card.cta && (
                 <a
-                  href="https://echopulse.media"
+                  href={BOOK_CALL_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  style={{ display: 'inline-block', marginTop: '24px', background: '#E8541A', color: '#fff', border: 'none', padding: '12px 24px', borderRadius: '100px', fontSize: '13px', fontWeight: 700, cursor: 'none', transition: 'all 0.3s', textDecoration: 'none', fontFamily: 'Inter, sans-serif', boxShadow: '0 4px 20px rgba(232,84,26,0.3)' }}
+                  data-cursor-hover
+                  aria-label={BOOK_CALL_LABEL}
+                  style={{ display: 'inline-block', marginTop: '24px', background: '#E8541A', color: '#fff', border: 'none', padding: '12px 24px', borderRadius: '100px', fontSize: '13px', fontWeight: 700, cursor: 'none', transition: 'all 0.3s', textDecoration: 'none', fontFamily: 'Inter, sans-serif', boxShadow: '0 4px 20px rgba(232,84,26,0.3)', minHeight: '44px' }}
                   onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = '#d94a14'; (e.currentTarget as HTMLElement).style.transform = 'scale(1.03)'; }}
                   onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = '#E8541A'; (e.currentTarget as HTMLElement).style.transform = 'scale(1)'; }}
                 >
-                  Book a Free Call →
+                  {BOOK_CALL_LABEL} →
                 </a>
               )}
             </div>

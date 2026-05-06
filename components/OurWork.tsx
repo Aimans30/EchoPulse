@@ -2,15 +2,16 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
+import { BOOK_CALL_URL } from '@/lib/links';
 
 const tabs = [
   { label: 'All', key: 'all' },
-  { label: 'Speed Ramps', key: 'speed' },
+  { label: 'Cinematic', key: 'speed' },
   { label: 'Short Form', key: 'shortform' },
   { label: 'Talking Head', key: 'talking' },
   { label: 'Podcast Clips', key: 'podcast' },
   { label: 'Long Form', key: 'longform' },
-  { label: 'Course Edits', key: 'course' },
+  { label: 'Real Estate', key: 'course' },
 ];
 
 const thumbGrads = [
@@ -23,21 +24,21 @@ const thumbGrads = [
 ];
 
 const videos = [
-  { type: 'speed',     brand: '@FlexStudios',      label: 'Speed Ramp',   grad: 0, views: '2.1M', likes: '48K' },
-  { type: 'shortform', brand: '@MindsetPro',        label: 'Short Form',   grad: 1, views: '980K', likes: '31K' },
-  { type: 'talking',   brand: '@JordanMakes',       label: 'Talking Head', grad: 2, views: '540K', likes: '19K' },
-  { type: 'speed',     brand: '@RealEstateKing',    label: 'Speed Ramp',   grad: 4, views: '1.3M', likes: '42K' },
-  { type: 'podcast',   brand: '@ThePodcast',        label: 'Podcast Clip', grad: 3, views: '720K', likes: '22K' },
-  { type: 'shortform', brand: '@BusinessBlueprint', label: 'Short Form',   grad: 0, views: '1.8M', likes: '57K' },
-  { type: 'talking',   brand: '@NovaBrand',         label: 'Talking Head', grad: 1, views: '430K', likes: '14K' },
-  { type: 'speed',     brand: '@EliteMedia',        label: 'Speed Ramp',   grad: 2, views: '890K', likes: '28K' },
-  { type: 'course',    brand: '@CourseCreator',     label: 'Course Edit',  grad: 5, views: '310K', likes: '11K' },
-  { type: 'longform',  brand: '@GrowthYT',          label: 'Long Form',    grad: 4, views: '650K', likes: '23K' },
-  { type: 'shortform', brand: '@NovaBrand',         label: 'Short Form',   grad: 3, views: '2.4M', likes: '71K' },
-  { type: 'podcast',   brand: '@DeepDiveShow',      label: 'Podcast Clip', grad: 5, views: '480K', likes: '17K' },
-  { type: 'talking',   brand: '@SpeakerElite',      label: 'Talking Head', grad: 0, views: '760K', likes: '25K' },
-  { type: 'speed',     brand: '@ApexFit',           label: 'Speed Ramp',   grad: 3, views: '1.1M', likes: '38K' },
-  { type: 'course',    brand: '@MastermindHub',     label: 'Course Edit',  grad: 1, views: '290K', likes: '9K'  },
+  { type: 'speed',     brand: 'Cinematic',     label: 'Property Tour',  grad: 0, views: 'Reel', likes: '60s' },
+  { type: 'shortform', brand: 'LinkedIn',      label: 'Founder Post',   grad: 1, views: 'Post', likes: '4 min' },
+  { type: 'talking',   brand: 'Founder Reel',  label: 'Talking Head',   grad: 2, views: 'IG',   likes: '45s' },
+  { type: 'speed',     brand: 'Listing Reel',  label: 'Speed Ramp',     grad: 4, views: 'Reel', likes: '60s' },
+  { type: 'podcast',   brand: 'Podcast Clip',  label: 'Highlight Cut',  grad: 3, views: 'IG',   likes: '90s' },
+  { type: 'shortform', brand: 'Ad Creative',   label: 'Meta Ad',        grad: 0, views: 'Ad',   likes: '30s' },
+  { type: 'talking',   brand: 'B2B Brand',     label: 'Talking Head',   grad: 1, views: 'YT',   likes: '2 min' },
+  { type: 'speed',     brand: 'Cinematic',     label: 'Property Tour',  grad: 2, views: 'Reel', likes: '60s' },
+  { type: 'course',    brand: 'Real Estate',   label: 'Agent Reel',     grad: 5, views: 'Reel', likes: '45s' },
+  { type: 'longform',  brand: 'Long Form',     label: 'Brand Film',     grad: 4, views: 'YT',   likes: '3 min' },
+  { type: 'shortform', brand: 'LinkedIn',      label: 'Carousel',       grad: 3, views: 'Post', likes: '8 slides' },
+  { type: 'podcast',   brand: 'Podcast Clip',  label: 'Hook Cut',       grad: 5, views: 'IG',   likes: '60s' },
+  { type: 'talking',   brand: 'Founder Reel',  label: 'Talking Head',   grad: 0, views: 'IG',   likes: '45s' },
+  { type: 'speed',     brand: 'Cinematic',     label: 'Property Tour',  grad: 3, views: 'Reel', likes: '60s' },
+  { type: 'course',    brand: 'Real Estate',   label: 'Listing Reel',   grad: 1, views: 'Reel', likes: '45s' },
 ];
 
 const CARD_W = 230;
@@ -186,14 +187,31 @@ export default function OurWork() {
         }
         .tab-bar::-webkit-scrollbar { display: none; }
         .tab-btn {
+          position: relative;
           background: none; border: none; color: #6E6B63;
           padding: 9px 18px; font-size: 11px; font-weight: 700;
-          cursor: none; border-radius: 10px; transition: all 0.22s;
+          cursor: none; border-radius: 10px;
+          transition: color 0.22s ease;
           white-space: nowrap; letter-spacing: 1.5px; text-transform: uppercase;
           font-family: Inter, sans-serif;
+          isolation: isolate;
         }
-        .tab-btn.active { background: #0C0C0B; color: #F2EEE7; box-shadow: 0 2px 12px rgba(12,12,11,0.22); }
-        .tab-btn:not(.active):hover { color: #0C0C0B; background: rgba(255,255,255,0.6); }
+        .tab-btn.active { color: #F2EEE7; }
+        .tab-btn:not(.active):hover { color: #0C0C0B; }
+        .tab-btn-label {
+          position: relative;
+          z-index: 1;
+          display: inline-flex;
+          align-items: center;
+        }
+        .tab-pill-bg {
+          position: absolute;
+          inset: 0;
+          background: #0C0C0B;
+          border-radius: 10px;
+          box-shadow: 0 2px 12px rgba(12,12,11,0.22);
+          z-index: 0;
+        }
       `}</style>
 
       {/* Header */}
@@ -216,8 +234,8 @@ export default function OurWork() {
               transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
               style={{ fontFamily: 'Inter, sans-serif', fontSize: 'clamp(64px, 9vw, 120px)', fontWeight: 900, letterSpacing: '-4px', lineHeight: 0.88, margin: 0 }}
             >
-              Our<br />
-              <span style={{ color: '#E8541A' }}>Work.</span>
+              The<br />
+              <span style={{ color: '#E8541A' }}>Craft.</span>
             </motion.h2>
           </div>
 
@@ -227,11 +245,11 @@ export default function OurWork() {
             viewport={{ once: true }}
             transition={{ duration: 0.7 }}
           >
-            <p style={{ color: '#6E6B63', fontSize: '14px', lineHeight: 1.75, margin: '0 0 20px', maxWidth: '260px' }}>
-              Real content for real clients. Every clip crafted to perform, not just look good.
+            <p style={{ color: '#6E6B63', fontSize: '14px', lineHeight: 1.75, margin: '0 0 20px', maxWidth: '270px' }}>
+              Cinematic edits, motion graphics, talking-head reels, podcast cuts, and ad creative. Real samples coming as we ship paid client work.
             </p>
             <div style={{ display: 'flex', gap: '28px' }}>
-              {[{ n: `${videos.length}+`, l: 'Clips shown' }, { n: '500+', l: 'Produced total' }].map(s => (
+              {[{ n: '200+', l: 'Videos edited' }, { n: '6', l: 'Service formats' }].map(s => (
                 <div key={s.l}>
                   <div style={{ fontFamily: 'Inter', fontSize: '22px', fontWeight: 900, letterSpacing: '-1px', color: '#0C0C0B' }}>
                     {s.n}
@@ -254,20 +272,35 @@ export default function OurWork() {
         style={{ padding: '0 56px', marginBottom: '28px' }}
       >
         <div className="tab-bar">
-          {tabs.map(tab => (
-            <button
-              key={tab.key}
-              className={`tab-btn${activeTab === tab.key ? ' active' : ''}`}
-              onClick={() => setActiveTab(tab.key)}
-            >
-              {tab.label}
-              {tab.key !== 'all' && (
-                <span style={{ marginLeft: '5px', fontSize: '9px', opacity: 0.5, fontWeight: 600 }}>
-                  {videos.filter(v => v.type === tab.key).length}
+          {tabs.map(tab => {
+            const isActive = activeTab === tab.key;
+            return (
+              <button
+                key={tab.key}
+                className={`tab-btn${isActive ? ' active' : ''}`}
+                onClick={() => setActiveTab(tab.key)}
+                data-cursor-hover
+              >
+                {/* Magnetic pill — single shared motion.div that flies between buttons via layoutId.
+                   Spring physics give the satisfying bounce when the active tab changes. */}
+                {isActive && (
+                  <motion.span
+                    layoutId="active-tab-pill"
+                    className="tab-pill-bg"
+                    transition={{ type: 'spring', stiffness: 420, damping: 32, mass: 0.9 }}
+                  />
+                )}
+                <span className="tab-btn-label">
+                  {tab.label}
+                  {tab.key !== 'all' && (
+                    <span style={{ marginLeft: '5px', fontSize: '9px', opacity: 0.5, fontWeight: 600 }}>
+                      {videos.filter(v => v.type === tab.key).length}
+                    </span>
+                  )}
                 </span>
-              )}
-            </button>
-          ))}
+              </button>
+            );
+          })}
         </div>
       </motion.div>
 
@@ -351,17 +384,18 @@ export default function OurWork() {
         style={{ display: 'flex', justifyContent: 'center', marginTop: '48px', gap: '16px', flexWrap: 'wrap', alignItems: 'center', padding: '0 56px' }}
       >
         <a
-          href="https://echopulse.media"
+          href={BOOK_CALL_URL}
           target="_blank"
           rel="noopener noreferrer"
-          style={{ background: '#0C0C0B', color: '#F2EEE7', padding: '14px 32px', borderRadius: '100px', fontSize: '13px', fontWeight: 700, cursor: 'none', transition: 'all 0.3s', textDecoration: 'none', fontFamily: 'Inter, sans-serif', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+          data-cursor-hover
+          aria-label="Book a call to see more work"
+          style={{ background: '#0C0C0B', color: '#F2EEE7', padding: '14px 32px', borderRadius: '100px', fontSize: '13px', fontWeight: 700, cursor: 'none', transition: 'all 0.3s', textDecoration: 'none', fontFamily: 'Inter, sans-serif', display: 'inline-flex', alignItems: 'center', gap: '8px', minHeight: '44px' }}
           onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#E8541A'; }}
           onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#0C0C0B'; }}
         >
-          View Full Portfolio
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          Book a Call to See More
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </a>
-        <span style={{ fontSize: '12px', color: '#A8A49B', fontWeight: 500 }}>500+ videos produced across 12 countries</span>
       </motion.div>
 
       <style>{`

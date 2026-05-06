@@ -3,8 +3,8 @@
 import Link from 'next/link';
 
 const serviceLinks = [
-  'Video Editing', 'Automations', 'Personal Branding',
-  'Websites & Funnels', 'Lead Generation', 'Community Management',
+  'Video Editing', 'LinkedIn Ghostwriting', 'Blog Production',
+  'Ad Creatives', 'Websites & Funnels', 'Automations',
 ];
 
 const companyLinks = ['About', 'Our Work', 'Results', 'Pricing', 'Contact'];
@@ -38,7 +38,7 @@ export default function Footer() {
           Echo<span style={{ color: '#E8541A' }}>Pulse</span>
         </a>
         <p style={{ fontSize: '14px', color: '#6E6B63', lineHeight: 1.7, marginBottom: '28px', margin: '0 0 28px' }}>
-          Full-service content and growth agency for personal brands, creators, and online businesses ready to scale.
+          Full-stack content studio for premium founders and brands. Voice-driven video, LinkedIn ghostwriting, blogs, ad creatives, websites, and automations. Without the AI slop.
         </p>
         <div style={{ display: 'flex', gap: '10px' }}>
           {[
@@ -195,7 +195,7 @@ export default function Footer() {
           © 2026 EchoPulse. All rights reserved.
         </p>
         <p style={{ fontSize: '13px', color: '#A8A49B', margin: 0 }}>
-          Built to grow your brand.
+          Voice-driven content. Engineered to convert.
         </p>
       </div>
 

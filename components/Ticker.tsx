@@ -2,13 +2,13 @@
 
 const items = [
   'Video Editing',
-  'Personal Branding',
-  'Funnels & Websites',
-  'Lead Generation',
+  'LinkedIn Ghostwriting',
+  'Blog Production',
+  'Ad Creatives',
+  'Websites & Funnels',
   'Automations',
-  'Community Management',
-  'Course Production',
-  'Short Form Content',
+  'Voice Foundation',
+  'Short-Form Content',
 ];
 
 export default function Ticker() {

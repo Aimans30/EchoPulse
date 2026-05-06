@@ -4,38 +4,38 @@ import { motion } from 'framer-motion';
 
 const posts = [
   {
-    tag: 'Video Strategy',
-    title: 'How Coaches Can Get 10 New Clients Using Instagram Reels in 2026',
-    excerpt: 'Short-form video is the fastest way for coaches to attract new clients. Here is the exact system EchoPulse uses to turn views into booked calls.',
-    readTime: '8 min read',
-    date: 'Apr 18, 2026',
+    tag: 'AI Content',
+    title: 'The 17 Words That Scream "ChatGPT Wrote This" (And What to Use Instead)',
+    excerpt: 'Banned-phrase lists are the fastest way to make AI-assisted content sound human. Here is the list we run on every blog, LinkedIn post, and ad copy before it ships.',
+    readTime: '6 min read',
+    date: 'Coming soon',
     color: '#1c0e00',
     accent: '#E8541A',
   },
   {
-    tag: 'Lead Generation',
-    title: 'How to Build a Lead Generation System for Your Coaching Business Without Running Ads',
-    excerpt: 'Paid ads are expensive and unpredictable. The coaches winning in 2026 are doing it with content-led inbound systems — here\'s the blueprint.',
+    tag: 'Voice Foundation',
+    title: 'Why We Run a 90-Minute Voice Interview With Every Client (And How to Run Your Own)',
+    excerpt: 'The single biggest difference between content that converts and content that gets ignored is voice fidelity. Here is the interview script and encoder system we built.',
     readTime: '11 min read',
-    date: 'Apr 15, 2026',
+    date: 'Coming soon',
     color: '#001408',
     accent: '#22c55e',
   },
   {
-    tag: 'Personal Branding',
-    title: 'The Personal Brand System That Helped a Business Coach Go From 500 to 50,000 Followers',
-    excerpt: 'It wasn\'t luck. It was a repeatable system built on positioning, content architecture, and the right production workflow.',
-    readTime: '9 min read',
-    date: 'Apr 10, 2026',
+    tag: 'LinkedIn',
+    title: 'Why Most B2B LinkedIn Ghostwriters Charge $5K/Month for Slop',
+    excerpt: 'The market is full of agencies producing identical AI-generated LinkedIn content. Here is how to spot the difference between voice-driven and template-driven ghostwriting.',
+    readTime: '8 min read',
+    date: 'Coming soon',
     color: '#100012',
     accent: '#a855f7',
   },
   {
-    tag: 'Automation',
-    title: 'The 5 Automations Every Coaching Business Should Set Up in 2026',
-    excerpt: 'Stop manually following up. These five automation workflows will book more calls, nurture leads, and save you 15+ hours a week.',
+    tag: 'Video',
+    title: 'The 6-Second Rule: Why Most Real Estate Videos Lose Buyers in the First Frame',
+    excerpt: 'After editing 200+ property videos at a Canadian production company, the same three mistakes show up in 90% of agent reels. Here is the shot grammar that fixes them.',
     readTime: '7 min read',
-    date: 'Apr 5, 2026',
+    date: 'Coming soon',
     color: '#001520',
     accent: '#3b82f6',
   },
@@ -168,7 +168,7 @@ export default function Blog() {
               margin: 0,
             }}
           >
-            Insights that <span style={{ color: '#E8541A' }}>actually</span><br />grow your brand.
+            Notes from the <span style={{ color: '#E8541A' }}>studio.</span><br />Built, not borrowed.
           </motion.h2>
         </div>
         <motion.a
@@ -286,10 +286,10 @@ export default function Blog() {
         }}>
           <div>
             <div style={{ fontFamily: 'Inter, sans-serif', fontSize: '18px', fontWeight: 800, letterSpacing: '-0.3px', marginBottom: '4px' }}>
-              Get our weekly growth playbook.
+              Get the studio notes.
             </div>
             <div style={{ fontSize: '13px', color: '#6E6B63' }}>
-              Actionable strategies for coaches and personal brands. No fluff.
+              Voice systems, anti-AI editing, and content that converts. One email per week, no fluff.
             </div>
           </div>
           <div style={{ display: 'flex', gap: '10px', flexShrink: 0 }}>

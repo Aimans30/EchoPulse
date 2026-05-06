@@ -6,7 +6,7 @@ import { motion, AnimatePresence, useInView } from 'framer-motion';
 const statGroups = [
   [
     { num: 200, dec: 0, suffix: '+', label: 'Real Estate Videos Edited', sub: 'At Vizionary Focus production company' },
-    { num: 4, dec: 0, suffix: ' yrs', label: 'Motion Design Experience', sub: 'Freelance plus production studio' },
+    { num: 4, dec: 0, suffix: ' yrs', label: 'Motion Design Experience', sub: 'Freelance + production studio' },
     { num: 6, dec: 0, suffix: '', label: 'Core Services In-House', sub: 'No outsourcing, no vendor juggling' },
   ],
   [
@@ -16,7 +16,7 @@ const statGroups = [
   ],
   [
     { num: 48, dec: 0, suffix: ' hrs', label: 'Standard Turnaround', sub: 'On individual deliverables' },
-    { num: 0, dec: 0, suffix: '', label: 'Round Caps on Revisions', sub: 'Until you are satisfied, no upcharge' },
+    { num: 2, dec: 0, suffix: '', label: 'Revision Rounds Included', sub: 'Per piece, no upcharge' },
     { num: 14, dec: 0, suffix: ' days', label: 'Cancel Notice on Retainers', sub: 'Month-to-month, no lock-in' },
   ],
   [
@@ -60,6 +60,7 @@ function StatCard({ group, entryDelay, cycleOffset }: {
     rafRef.current = requestAnimationFrame(tick);
   }, []);
 
+  // Count up only on first entry
   useEffect(() => {
     if (!inView || entryDoneRef.current) return;
     entryDoneRef.current = true;
@@ -67,6 +68,7 @@ function StatCard({ group, entryDelay, cycleOffset }: {
     return () => clearTimeout(t);
   }, [inView, countTo, group, entryDelay]);
 
+  // Cycle stats — just swap the number instantly, let crossfade handle the transition
   useEffect(() => {
     if (!inView) return;
     const t = setTimeout(() => {
@@ -108,8 +110,10 @@ function StatCard({ group, entryDelay, cycleOffset }: {
       }}
       whileHover={{ background: 'rgba(255,255,255,0.065)' as any }}
     >
+      {/* Subtle corner glow */}
       <div style={{ position: 'absolute', top: 0, right: 0, width: '120px', height: '120px', background: 'radial-gradient(circle at top right, rgba(232,84,26,0.06) 0%, transparent 70%)', pointerEvents: 'none' }} />
 
+      {/* Progress segments */}
       <div style={{ display: 'flex', gap: '5px', marginBottom: '36px' }}>
         {group.map((_, i) => (
           <div
@@ -141,54 +145,53 @@ function StatCard({ group, entryDelay, cycleOffset }: {
         ))}
       </div>
 
-      <div style={{ minHeight: '170px', position: 'relative' }}>
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activeIdx}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.45, ease: 'easeInOut' }}
-            style={{ position: 'absolute', inset: 0 }}
-          >
-            <div style={{
-              fontFamily: 'Inter, sans-serif',
-              fontSize: 'clamp(46px, 5.5vw, 82px)',
-              fontWeight: 900,
-              letterSpacing: '-3px',
-              color: '#F2EEE7',
-              lineHeight: 1,
-              marginBottom: '18px',
-              minHeight: '82px',
-            }}>
-              {fmt(displayVal)}
-            </div>
+      {/* Cycling content */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={activeIdx}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.45, ease: 'easeInOut' }}
+        >
+          {/* Big number */}
+          <div style={{
+            fontFamily: 'Inter, sans-serif',
+            fontSize: 'clamp(46px, 5.5vw, 82px)',
+            fontWeight: 900,
+            letterSpacing: '-3px',
+            color: '#F2EEE7',
+            lineHeight: 1,
+            marginBottom: '18px',
+          }}>
+            {fmt(displayVal)}
+          </div>
 
-            <div style={{
-              fontSize: '13px',
-              fontWeight: 700,
-              color: 'rgba(242,238,231,0.65)',
-              letterSpacing: '-0.1px',
-              lineHeight: 1.4,
-              marginBottom: '6px',
-              minHeight: '36px',
-            }}>
-              {current.label}
-            </div>
+          {/* Label */}
+          <div style={{
+            fontSize: '13px',
+            fontWeight: 700,
+            color: 'rgba(242,238,231,0.65)',
+            letterSpacing: '-0.1px',
+            lineHeight: 1.4,
+            marginBottom: '6px',
+          }}>
+            {current.label}
+          </div>
 
-            <div style={{
-              fontSize: '10px',
-              color: 'rgba(242,238,231,0.22)',
-              fontWeight: 500,
-              letterSpacing: '0.3px',
-              minHeight: '14px',
-            }}>
-              {current.sub}
-            </div>
-          </motion.div>
-        </AnimatePresence>
-      </div>
+          {/* Sub-label */}
+          <div style={{
+            fontSize: '10px',
+            color: 'rgba(242,238,231,0.22)',
+            fontWeight: 500,
+            letterSpacing: '0.3px',
+          }}>
+            {current.sub}
+          </div>
+        </motion.div>
+      </AnimatePresence>
 
+      {/* Dot nav */}
       <div style={{ display: 'flex', gap: '5px', marginTop: '28px' }}>
         {group.map((_, i) => (
           <div
@@ -231,6 +234,7 @@ export default function Results() {
         Verifiable <span style={{ color: '#E8541A' }}>craft.</span>
       </motion.h2>
 
+      {/* Stat cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '16px' }} className="results-grid">
         {statGroups.map((group, i) => (
           <StatCard
@@ -242,6 +246,7 @@ export default function Results() {
         ))}
       </div>
 
+      {/* Case study rows */}
       <div style={{ marginTop: '40px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
         {caseStudies.map((c, i) => (
           <motion.div

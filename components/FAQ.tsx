@@ -5,28 +5,36 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 const faqs = [
   {
-    q: 'Why EchoPulse instead of hiring in-house?',
-    a: 'An in-house video editor in the US costs $60K–$80K per year before benefits. With EchoPulse you get a full team — editors, strategists, automation specialists, and a brand consultant — for a fraction of that. No hiring, no training, no HR overhead.',
+    q: 'What is the Voice Foundation and why does every client get one?',
+    a: 'A Voice Foundation is a 90-minute recorded interview we run with every founder before producing any LinkedIn post, blog, video script, or ad copy. We transcribe it, encode it into a structured Voice DNA document, and reference it on every deliverable. The result: content that sounds like you, not like ChatGPT or a junior copywriter. It is the single biggest reason our retention is high. Clients see their voice, not generic agency output.',
   },
   {
-    q: 'How fast will I see results?',
-    a: 'Most clients see meaningful engagement growth within 30 days and measurable lead flow increases within 60–90 days. Clients who commit to consistent content and follow our strategy framework see the strongest results.',
+    q: 'Why EchoPulse instead of hiring 3 different agencies for video, LinkedIn, and ads?',
+    a: 'Because most founders end up doing exactly that and managing the inconsistency between them. Our LinkedIn ghostwriter, blog writer, video editor, and ad creative team all reference the same Voice Foundation, the same brand pillars, and the same campaign goals. One studio means your message stays consistent across every channel without you playing project manager between vendors.',
   },
   {
-    q: 'Do you work with clients outside the US?',
-    a: 'Yes. We actively work with clients in the USA, UK, UAE, Australia, Canada, and Singapore. Our team is fully remote and timezone-flexible. Geography is never a barrier.',
+    q: 'How fast is your turnaround?',
+    a: '48 hours standard for individual deliverables (one LinkedIn post, one ad creative, one short-form video). Long-form blogs are 5 to 7 days end-to-end. Custom website projects are 3 to 4 weeks. Rush 24-hour delivery available for time-sensitive launches at a 30 percent surcharge.',
+  },
+  {
+    q: 'Do you actually use AI, or do you avoid it?',
+    a: 'We use AI as a tool, never as the writer. Every long-form piece runs through our multi-agent system for research and outline generation, but the final voice pass is human-edited against the Voice Foundation. The output gets scored against an Anti-AI-Tells checklist (banned words like "delve," "tapestry," "in today\'s fast-paced world") before it ships. Clients have called the result indistinguishable from their own writing.',
+  },
+  {
+    q: 'Do you work with clients outside India?',
+    a: 'Yes. Most of our work is for clients in Canada, the UK, USA, Western Europe, and Australia. The team operates from Bhopal, India, with strong time-zone overlap with European morning and Eastern North American morning. Async communication via Slack, Notion, and Loom keeps things tight regardless of geography.',
   },
   {
     q: 'What do you need from me to get started?',
-    a: 'Primarily your raw footage and a brief for each piece of content. After the onboarding call, we create brief templates so it takes less than 10 minutes per week on your side. We handle everything from there.',
+    a: 'A 90-minute recorded interview for the Voice Foundation, your existing brand assets (logo, colors, fonts, any prior content you love), and a 30-minute strategy call to align on goals and ICP. After onboarding, the typical client spends 30 to 60 minutes per week reviewing drafts and approving deliverables. We handle the rest.',
   },
   {
     q: 'Are there long-term contracts?',
-    a: 'No. We work month-to-month because our results should keep clients with us — not a contract. That said, most of our clients have been with us for 6 months or more.',
+    a: 'No. Every retainer is month-to-month with 14-day cancellation notice. We start every relationship with a paid Founder Pilot at our intro price of $299 (two weeks, a curated mix of LinkedIn posts, a video edit, and a long-form blog plus the founder interview) so you can see our quality before committing to a monthly engagement.',
   },
   {
     q: 'Who owns the content you produce?',
-    a: 'You do, 100%. Upon delivery, all content is yours to use however and wherever you want. No licensing fees, no restrictions.',
+    a: 'You do, in full. On delivery, all rights transfer to you including raw project files, source code, design assets, and master video files. No licensing fees, no usage restrictions, no surprise charges if you decide to leave.',
   },
 ];
 
