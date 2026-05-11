@@ -123,13 +123,19 @@ function InteractiveGraphic() {
 
   const servicePositions = services.map((_, i) => {
     const a = ((i / services.length) * 360 + angle) * (Math.PI / 180);
-    return { x: center + Math.cos(a) * innerR, y: center + Math.sin(a) * innerR };
+    return { 
+      x: Math.round((center + Math.cos(a) * innerR) * 1e10) / 1e10, 
+      y: Math.round((center + Math.sin(a) * innerR) * 1e10) / 1e10 
+    };
   });
 
   const flowPositions = flow.map((_, i) => {
     // Counter-rotate slower + offset so workflow waypoints don't sit on top of services
     const a = ((i / flow.length) * 360 - angle * 0.4 + 36) * (Math.PI / 180);
-    return { x: center + Math.cos(a) * outerR, y: center + Math.sin(a) * outerR };
+    return { 
+      x: Math.round((center + Math.cos(a) * outerR) * 1e10) / 1e10, 
+      y: Math.round((center + Math.sin(a) * outerR) * 1e10) / 1e10 
+    };
   });
 
   return (

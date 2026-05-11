@@ -48,7 +48,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={inter.variable}>
+    <html lang="en" className={inter.variable} data-scroll-behavior="smooth">
       <head>
         {/* Preconnect to font/script CDNs for faster handshake */}
         <link rel="preconnect" href="https://unpkg.com" crossOrigin="" />
