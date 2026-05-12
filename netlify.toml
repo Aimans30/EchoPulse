@@ -1,0 +1,17 @@
+# Netlify deploy config for EchoPulse (Next.js App Router).
+# The @netlify/plugin-nextjs plugin handles SSR, ISR, the /api/lead-magnet
+# route, and image optimization automatically — no manual rewrites needed.
+
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+# The plugin is auto-installed by Netlify but pinning it here is explicit.
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+# Node 20 LTS — matches what Vercel uses by default so behavior stays
+# consistent across both platforms.
+[build.environment]
+  NODE_VERSION = "20"
+  NEXT_TELEMETRY_DISABLED = "1"

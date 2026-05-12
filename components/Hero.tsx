@@ -3,23 +3,41 @@
 import { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { motion, AnimatePresence } from 'framer-motion';
+import {
+  Clapperboard,
+  PenLine,
+  FileText,
+  Target,
+  Globe,
+  Settings,
+  Mic,
+  ClipboardList,
+  Wrench,
+  Eye,
+  Rocket,
+  type LucideIcon,
+} from 'lucide-react';
 import { BOOK_CALL_URL, BOOK_CALL_LABEL_LONG } from '@/lib/links';
+import { trackPilotClick, trackCallClick } from '@/lib/analytics';
 
-const services = [
-  { icon: '🎬', name: 'Video Editing',         tag: 'Cinematic + Short-form', color: '#E8541A' },
-  { icon: '✍️', name: 'LinkedIn Ghostwriting', tag: 'Voice-driven posts',     color: '#8b5cf6' },
-  { icon: '📝', name: 'Blog Production',       tag: 'Long-form, SEO-built',   color: '#f59e0b' },
-  { icon: '🎯', name: 'Ad Creatives',          tag: 'Meta · TikTok · Google', color: '#3b82f6' },
-  { icon: '🌐', name: 'Websites & Funnels',    tag: 'Conversion-engineered',  color: '#10b981' },
-  { icon: '⚙️', name: 'Automations',           tag: 'Make · ManyChat · CRM',  color: '#E8541A' },
+type Service = { Icon: LucideIcon; name: string; tag: string; color: string };
+type FlowStep = { n: string; Icon: LucideIcon; label: string; sub: string; color: string };
+
+const services: Service[] = [
+  { Icon: Clapperboard, name: 'Video Editing',         tag: 'Cinematic + Short-form', color: '#E8541A' },
+  { Icon: PenLine,      name: 'LinkedIn Ghostwriting', tag: 'Voice-driven posts',     color: '#8b5cf6' },
+  { Icon: FileText,     name: 'Blog Production',       tag: 'Long-form, SEO-built',   color: '#f59e0b' },
+  { Icon: Target,       name: 'Ad Creatives',          tag: 'Meta · TikTok · Google', color: '#3b82f6' },
+  { Icon: Globe,        name: 'Websites & Funnels',    tag: 'Conversion-engineered',  color: '#10b981' },
+  { Icon: Settings,     name: 'Automations',           tag: 'Make · ManyChat · CRM',  color: '#E8541A' },
 ];
 
-const flow = [
-  { n: '01', icon: '🎙️', label: 'Founder Interview', sub: '90-min recorded session captures your voice', color: '#E8541A' },
-  { n: '02', icon: '📋', label: 'Strategy & Brief', sub: 'Topics, calendar, success metrics',     color: '#f59e0b' },
-  { n: '03', icon: '🛠️', label: 'We Produce',       sub: 'Video, LinkedIn, blogs, ad creative',   color: '#8b5cf6' },
-  { n: '04', icon: '👁️', label: 'You Review',       sub: 'Revisions until you are satisfied',     color: '#3b82f6' },
-  { n: '05', icon: '🚀', label: 'Ship & Refine',    sub: 'Performance review, iterate monthly',   color: '#10b981' },
+const flow: FlowStep[] = [
+  { n: '01', Icon: Mic,           label: 'Founder Interview', sub: '90-min recorded session captures your voice', color: '#E8541A' },
+  { n: '02', Icon: ClipboardList, label: 'Strategy & Brief',  sub: 'Topics, calendar, success metrics',           color: '#f59e0b' },
+  { n: '03', Icon: Wrench,        label: 'We Produce',        sub: 'Video, LinkedIn, blogs, ad creative',         color: '#8b5cf6' },
+  { n: '04', Icon: Eye,           label: 'You Review',        sub: 'Revisions until you are satisfied',           color: '#3b82f6' },
+  { n: '05', Icon: Rocket,        label: 'Ship & Refine',     sub: 'Performance review, iterate monthly',         color: '#10b981' },
 ];
 
 /* ──────────────────────────────────────────────────────────
@@ -72,9 +90,11 @@ function InteractiveGraphic() {
   const [wavePhase, setWavePhase] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Continuous orbit rotation — pauses when user hovers a node
+  // Continuous orbit rotation — pauses when user hovers a node OR when the
+  // user prefers reduced motion (a11y + battery saver on mobile).
   useEffect(() => {
     if (hovered !== null) return;
+    if (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     let raf = 0;
     let last = performance.now();
     const tick = (now: number) => {
@@ -88,9 +108,11 @@ function InteractiveGraphic() {
   }, [hovered]);
 
   // Wave-phase animation — only ticks while a service node is hovered.
-  // Drives the sine wave that travels along the connection line.
+  // Drives the sine wave that travels along the connection line. Also
+  // skipped under prefers-reduced-motion.
   useEffect(() => {
     if (hovered === null) return;
+    if (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     let raf = 0;
     let last = performance.now();
     const tick = (now: number) => {
@@ -276,40 +298,40 @@ function InteractiveGraphic() {
           ))}
 
           {/* Service nodes — interactive */}
-          {servicePositions.map((p, i) => (
-            <g
-              key={`svc-${i}`}
-              transform={`translate(${p.x},${p.y})`}
-              onMouseEnter={() => setHovered(i)}
-              onMouseLeave={() => setHovered(null)}
-              style={{ cursor: 'none' }}
-            >
-              {hovered === i && (
-                <circle r={34} fill={services[i].color} fillOpacity={0.18} filter="url(#ep-soft-glow)" />
-              )}
-              <circle
-                r={hovered === i ? 26 : 22}
-                fill={services[i].color}
-                style={{
-                  transition: 'r 0.3s cubic-bezier(0.16,1,0.3,1), filter 0.3s',
-                  filter:
-                    hovered === i
-                      ? `drop-shadow(0 8px 22px ${services[i].color}aa)`
-                      : `drop-shadow(0 2px 8px ${services[i].color}55)`,
-                }}
-              />
-              {/* invisible larger hit target */}
-              <circle r={32} fill="transparent" />
-              <text
-                textAnchor="middle"
-                dy="6"
-                fontSize="18"
-                style={{ pointerEvents: 'none', userSelect: 'none' }}
+          {servicePositions.map((p, i) => {
+            const ServiceIcon = services[i].Icon;
+            return (
+              <g
+                key={`svc-${i}`}
+                transform={`translate(${p.x},${p.y})`}
+                onMouseEnter={() => setHovered(i)}
+                onMouseLeave={() => setHovered(null)}
+                style={{ cursor: 'none' }}
               >
-                {services[i].icon}
-              </text>
-            </g>
-          ))}
+                {hovered === i && (
+                  <circle r={34} fill={services[i].color} fillOpacity={0.18} filter="url(#ep-soft-glow)" />
+                )}
+                <circle
+                  r={hovered === i ? 26 : 22}
+                  fill={services[i].color}
+                  style={{
+                    transition: 'r 0.3s cubic-bezier(0.16,1,0.3,1), filter 0.3s',
+                    filter:
+                      hovered === i
+                        ? `drop-shadow(0 8px 22px ${services[i].color}aa)`
+                        : `drop-shadow(0 2px 8px ${services[i].color}55)`,
+                  }}
+                />
+                {/* invisible larger hit target */}
+                <circle r={32} fill="transparent" />
+                {/* Lucide icon — nested SVG positioned via outer <g> translate.
+                   Using nested SVG (not foreignObject) for consistent rendering across browsers. */}
+                <g style={{ pointerEvents: 'none' }} transform="translate(-10,-10)">
+                  <ServiceIcon size={20} color="#fff" strokeWidth={2.2} aria-hidden="true" />
+                </g>
+              </g>
+            );
+          })}
 
           {/* Central core */}
           <circle cx={center} cy={center} r={56} fill="url(#ep-core-fill)" stroke="rgba(232,84,26,0.4)" strokeWidth={1} />
@@ -358,6 +380,7 @@ function InteractiveGraphic() {
             const p = servicePositions[hovered];
             const vx = p.x - center;
             const gap = 38; // node radius + breathing room
+            const HoveredIcon = services[hovered].Icon;
 
             // Horizontal-only placement — left for left-half nodes, right for right-half.
             // Avoids any case where vertical placement would push the chip across
@@ -402,8 +425,8 @@ function InteractiveGraphic() {
                   whiteSpace: 'nowrap',
                 }}
               >
-                <span className="emoji" style={{ fontSize: 13, lineHeight: 1, display: 'inline-flex' }}>
-                  {services[hovered].icon}
+                <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 16, height: 16, flexShrink: 0 }}>
+                  <HoveredIcon size={14} color={services[hovered].color} strokeWidth={2.2} aria-hidden="true" />
                 </span>
                 <span
                   style={{
@@ -630,12 +653,12 @@ export default function Hero() {
             <h1
               ref={headlineRef}
               className="hero-h1"
-              style={{ fontFamily: 'Inter, sans-serif', fontSize: 'clamp(40px, 5.4vw, 80px)', fontWeight: 900, lineHeight: 1, letterSpacing: 'clamp(-1.5px, -0.04em, -3px)', margin: '0 0 28px' }}
+              style={{ fontFamily: 'Inter, sans-serif', fontSize: 'clamp(36px, 4.4vw, 64px)', fontWeight: 900, lineHeight: 1.04, letterSpacing: 'clamp(-1px, -0.035em, -2.4px)', margin: '0 0 24px' }}
             >
               {[
-                <>Content that</>,
-                <><span style={{ color: '#E8541A', fontStyle: 'italic' }}>converts.</span></>,
-                <>No AI slop.</>,
+                <>We don&apos;t write content.</>,
+                <>We <span style={{ color: '#E8541A', fontStyle: 'italic' }}>clone your voice.</span></>,
+                <>Then write at scale.</>,
               ].map((line, i) => (
                 <span key={i} className="hl-wrap">
                   <span className="hl-inner">{line}</span>
@@ -643,30 +666,37 @@ export default function Hero() {
               ))}
             </h1>
 
-            <p ref={subRef} style={{ fontSize: '16px', color: '#6E6B63', maxWidth: '460px', lineHeight: 1.75, fontWeight: 400, margin: '0 0 36px', opacity: 0 }}>
-              Cinematic video, LinkedIn ghostwriting, blogs, ad creatives, and conversion sites.{' '}
-              <strong style={{ color: '#0C0C0B', fontWeight: 600 }}>Built for founders who want their voice in every word.</strong>{' '}
-              Six services. One team. No templates.
+            <p ref={subRef} style={{ fontSize: '16px', color: '#6E6B63', maxWidth: '520px', lineHeight: 1.75, fontWeight: 400, margin: '0 0 36px', opacity: 0 }}>
+              A 90-minute interview captures your voice. Then we ghostwrite your LinkedIn, edit your videos, and write your blogs in it &mdash;{' '}
+              <strong style={{ color: '#0C0C0B', fontWeight: 600 }}>saving you 20&ndash;30 hours a week on content,</strong>{' '}
+              for less than the cost of one full-time hire.
             </p>
 
             <div ref={actionsRef} className="hero-actions" style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '0', opacity: 0, alignItems: 'center' }}>
-              <a href={BOOK_CALL_URL} target="_blank" rel="noopener noreferrer" className="btn-p" aria-label={BOOK_CALL_LABEL_LONG} data-cursor-hover>
-                <span>{BOOK_CALL_LABEL_LONG}</span>
+              {/* PRIMARY — high-intent: book the call */}
+              <a
+                href={BOOK_CALL_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-p"
+                aria-label={BOOK_CALL_LABEL_LONG}
+                data-cursor-hover
+                onClick={() => trackCallClick('hero_primary')}
+              >
+                <span>Book a strategy call</span>
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
               </a>
-              <a href="#services" className="btn-o" data-cursor-hover>See Our Work</a>
+              {/* WARM — explore packages */}
+              <a
+                href="#pricing"
+                className="btn-o"
+                aria-label="See packages"
+                data-cursor-hover
+                onClick={() => trackPilotClick('hero_secondary_see_packages')}
+              >
+                See packages
+              </a>
             </div>
           </div>
 
-          <div ref={rightRef} className="hero-right" style={{ flexShrink: 0, width: '420px', opacity: 0 }}>
-            <InteractiveGraphic />
-          </div>
-        </div>
-
-        {/* Full-width stats band — lives on the main page now, no longer
-            tucked under the orbital panel */}
-        <StatsBand />
-      </section>
-    </>
-  );
-}
+   

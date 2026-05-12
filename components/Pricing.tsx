@@ -3,66 +3,70 @@
 import { motion } from 'framer-motion';
 import { useGeoPrice } from '@/lib/useGeoPrice';
 import { BOOK_CALL_URL } from '@/lib/links';
+import { trackPilotClick, trackCallClick } from '@/lib/analytics';
 
 export default function Pricing() {
   const { currency, prices, countryLabel, ready } = useGeoPrice();
 
   const plans = [
     {
-      tier: 'Founder Pilot',
+      tier: 'Pilot',
       price: `${currency}${prices.pilot}`,
       originalPrice: `${currency}${prices.pilotOriginal}`,
       per: 'one-off / 2 weeks',
-      badge: 'Limited · 50% off',
+      badge: 'Try us out · $299',
+      tagline: 'See real work in 14 days before you sign anything.',
       features: [
-        'Founder interview (90-min recorded session)',
-        'Up to 5 LinkedIn posts written in your voice',
-        'Up to 5 short-form video edits (Reels / TikToks / Shorts)',
-        'Up to 4 long-form blog drafts (1,500 words each, fully researched)',
-        'Curated to what your business actually needs',
+        '90-min recorded voice interview (your Voice DNA)',
+        '12 LinkedIn posts: 8 short-form + 2 long-form story posts + 2 carousels',
+        '3 short-form video edits (Reels / TikToks / Shorts)',
+        '5 long-form blog drafts (1,500 words each, fully researched)',
+        'One strategic deliverable: voice audit of your last 10 posts, or a 30-day content thesis',
+        'Curated to where your business actually needs content',
         '48-hour turnaround per deliverable',
         'Revisions until you are satisfied',
         'Live Loom walkthrough on delivery',
         'No retainer commitment. See the work first.',
       ],
       cta: 'Claim the Pilot',
-      featured: false,
+      featured: true,
     },
     {
       tier: 'Growth',
       price: `${currency}${prices.growth}`,
       per: '/month',
-      badge: 'Most Popular',
+      badge: 'Monthly · Most Popular',
+      tagline: 'The retainer most clients pick. One team, every channel, every month.',
       features: [
-        'Founder interview + quarterly Voice DNA refresh',
+        'Voice interview + quarterly Voice DNA refresh',
         '20 LinkedIn posts per month (5/week)',
         '4 long-form blogs per month (1,500 to 2,500 words each)',
         '12 short-form video edits + 2 long-form (YouTube, podcast highlights)',
         '6 ad creatives per month (static + video)',
-        'Website management + quarterly upgrades to your existing site',
+        'Full website revamp + ongoing optimization (rebuilt for conversions in month one, tuned monthly after)',
         'Funnel optimization with conversion tracking + A/B tests',
         'Monthly strategy call + 30-day content calendar',
         '48-hour standard turnaround on every deliverable',
         'Performance review with monthly reporting',
       ],
       cta: 'Book a Call',
-      featured: true,
+      featured: false,
     },
     {
       tier: 'Full System',
       price: `${currency}${prices.full}`,
       per: '/month',
-      badge: 'All-round for any profession',
+      badge: 'All-in. Fixed scope.',
+      tagline: 'For operators going all-in on content. Locked package, no upsells, no scaling tricks.',
       features: [
-        'Everything in Growth, scaled and unlimited within scope',
+        'Everything in Growth, scaled',
         'Long-form YouTube editing (vlogs, sponsored content, educational)',
-        'Podcast editing — full episodes + 8 to 12 highlight cuts each',
+        'Podcast editing: full episodes + 8 to 12 highlight cuts each',
         'Course module editing (Kajabi, Teachable, Thinkific, Skool)',
-        'Skool / Discord community management + moderation support',
         'Company process optimization (SOPs, workflows, internal automations)',
-        'Unlimited LinkedIn posts + 8 long-form blogs per month',
+        '30 LinkedIn posts + 8 long-form blogs per month',
         'Full ad creative engine across Meta, TikTok, YouTube, Google',
-        'Custom website / funnel build (one per quarter)',
+        'Custom website or funnel build each quarter (4 builds/year)',
         'Automation stack setup (Make.com, ManyChat, CRM)',
         'Dedicated account lead + bi-weekly strategy session',
         'Live performance dashboard + monthly reporting',
@@ -111,7 +115,8 @@ export default function Pricing() {
             transition={{ duration: 0.6, delay: 0.1 }}
             style={{ fontFamily: 'Inter, sans-serif', fontSize: 'clamp(28px, 3.4vw, 48px)', fontWeight: 900, letterSpacing: '-1.8px', margin: '0 0 10px', lineHeight: 1, color: '#0C0C0B' }}
           >
-            Pilot first. <span style={{ color: '#E8541A' }}>Retainer when ready.</span>
+            See real work in 14 days for <span style={{ color: '#E8541A' }}>$299.</span><br />
+            Decide retainer after.
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 12 }}
@@ -120,7 +125,7 @@ export default function Pricing() {
             transition={{ delay: 0.2 }}
             style={{ color: '#6E6B63', fontSize: '13.5px', maxWidth: '620px', lineHeight: 1.6, margin: '0 0 16px' }}
           >
-            Founder Pilot is 50% off — <span style={{ textDecoration: 'line-through', color: '#A8A49B' }}>{currency}{prices.pilotOriginal}</span> to <strong style={{ color: '#0C0C0B', fontWeight: 700 }}>{currency}{prices.pilot}</strong> for a limited time while we build out our case studies. Two weeks, a curated mix of LinkedIn posts, a video edit, and a long-form blog plus the founder interview. You decide if it earns a retainer. Cancel anytime.
+            We&apos;re running the Pilot <strong style={{ color: '#0C0C0B', fontWeight: 700 }}>at cost</strong> while we build out our first 50 case studies. <span style={{ textDecoration: 'line-through', color: '#A8A49B' }}>{currency}{prices.pilotOriginal}</span> down to <strong style={{ color: '#0C0C0B', fontWeight: 700 }}>{currency}{prices.pilot}</strong> for two weeks of real work: 12 LinkedIn posts, 3 short-form video edits, 5 long-form blogs, the voice interview, and one strategic deliverable. You decide if it earns a retainer. Cancel anytime.
           </motion.p>
 
           {/* Region indicator */}
@@ -164,14 +169,72 @@ export default function Pricing() {
               <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '1px', background: plan.featured ? 'linear-gradient(90deg,transparent,rgba(255,255,255,0.12),transparent)' : 'linear-gradient(90deg,transparent,rgba(255,255,255,1),transparent)', pointerEvents: 'none' }} />
 
               {plan.badge && (
-                <div style={{ display: 'inline-block', alignSelf: 'flex-start', marginBottom: '14px', background: '#E8541A', color: '#fff', padding: '3px 11px', borderRadius: '100px', fontSize: '9px', fontWeight: 800, letterSpacing: '1.8px', textTransform: 'uppercase' }}>
+                <div
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    alignSelf: 'flex-start',
+                    marginBottom: '14px',
+                    // Tier-specific badge treatment so positioning reads at a glance:
+                    //  • Pilot   → solid orange (entry / try us)
+                    //  • Growth  → solid black w/ orange dot (the default — earns the strongest visual weight)
+                    //  • Full    → outlined orange (serious, restrained, fixed scope)
+                    background:
+                      plan.tier === 'Growth'
+                        ? '#0C0C0B'
+                        : plan.tier === 'Full System'
+                        ? 'transparent'
+                        : '#E8541A',
+                    color:
+                      plan.tier === 'Full System' ? '#E8541A' : '#fff',
+                    border:
+                      plan.tier === 'Full System'
+                        ? '1px solid rgba(232,84,26,0.55)'
+                        : '1px solid transparent',
+                    padding: '5px 13px',
+                    borderRadius: '100px',
+                    fontSize: '9.5px',
+                    fontWeight: 800,
+                    letterSpacing: '1.4px',
+                    textTransform: 'uppercase',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {plan.tier === 'Growth' && (
+                    <span
+                      aria-hidden="true"
+                      style={{
+                        width: '6px',
+                        height: '6px',
+                        borderRadius: '50%',
+                        background: '#E8541A',
+                        boxShadow: '0 0 0 2px rgba(232,84,26,0.22)',
+                        flexShrink: 0,
+                      }}
+                    />
+                  )}
                   {plan.badge}
                 </div>
               )}
 
-              <div style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '3px', textTransform: 'uppercase', marginBottom: '14px', color: plan.featured ? 'rgba(242,238,231,0.38)' : '#6E6B63' }}>
+              <div style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '3px', textTransform: 'uppercase', marginBottom: '6px', color: plan.featured ? 'rgba(242,238,231,0.38)' : '#6E6B63' }}>
                 {plan.tier}
               </div>
+
+              {'tagline' in plan && plan.tagline && (
+                <div
+                  style={{
+                    fontSize: '12.5px',
+                    lineHeight: 1.5,
+                    color: plan.featured ? 'rgba(242,238,231,0.62)' : '#6E6B63',
+                    margin: '0 0 14px',
+                    maxWidth: '320px',
+                  }}
+                >
+                  {plan.tagline}
+                </div>
+              )}
 
               {/* Price block — single fluid timeline, no dead time:
                   • $599 visible big at price slot (initial)
@@ -336,7 +399,12 @@ export default function Pricing() {
                 href={BOOK_CALL_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label={`${plan.cta} — ${plan.tier} plan`}
+                aria-label={`${plan.cta}, ${plan.tier} plan`}
+                onClick={() =>
+                  plan.tier === 'Pilot'
+                    ? trackPilotClick(`pricing_${plan.tier.toLowerCase().replace(/\s+/g, '_')}`)
+                    : trackCallClick(`pricing_${plan.tier.toLowerCase().replace(/\s+/g, '_')}`)
+                }
                 style={{
                   display: 'block',
                   width: '100%',
@@ -370,6 +438,64 @@ export default function Pricing() {
             </motion.div>
           ))}
         </div>
+
+        {/* Add-ons row — sits under the 3 cards, inside the same rounded panel.
+           Spun out of Full System so the core tier stays focused on content
+           production and ops; community work is its own thing. */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.25 }}
+          style={{
+            marginTop: '20px',
+            padding: '16px 22px',
+            background: 'rgba(12,12,11,0.04)',
+            border: '1px solid rgba(12,12,11,0.06)',
+            borderRadius: '14px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '20px',
+            flexWrap: 'wrap',
+          }}
+        >
+          <span
+            style={{
+              fontSize: '9px',
+              fontWeight: 800,
+              letterSpacing: '2.5px',
+              textTransform: 'uppercase',
+              color: '#6E6B63',
+              flexShrink: 0,
+            }}
+          >
+            Add-ons
+          </span>
+          <span
+            style={{
+              flex: 1,
+              minWidth: 0,
+              fontSize: '12.5px',
+              color: '#0C0C0B',
+              lineHeight: 1.55,
+            }}
+          >
+            <strong style={{ fontWeight: 700 }}>Community moderation</strong>
+            <span style={{ color: '#6E6B63' }}> · Skool, Discord, or your existing forum · daytime member responses, weekly programming, sentiment reports</span>
+          </span>
+          <span
+            style={{
+              fontSize: '13px',
+              fontWeight: 900,
+              color: '#E8541A',
+              letterSpacing: '-0.3px',
+              flexShrink: 0,
+              whiteSpace: 'nowrap',
+            }}
+          >
+            +{currency}799/mo
+          </span>
+        </motion.div>
         </motion.div>
       </div>
 

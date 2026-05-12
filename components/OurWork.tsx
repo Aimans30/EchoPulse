@@ -23,17 +23,35 @@ const thumbGrads = [
   'linear-gradient(155deg,#001520 0%,#073650 60%,#001825 100%)',
 ];
 
-const videos = [
+// `orientation` controls the card aspect ratio inside the slider.
+//   - 'vertical'   (default): 9:16, like a Reel / Short / TikTok
+//   - 'horizontal':           16:9, like a YouTube / podcast clip / brand film
+// Card HEIGHT stays the same row-to-row; widths differ per orientation
+// so vertical and horizontal cards can coexist in a single auto-scroll track.
+type Orientation = 'vertical' | 'horizontal';
+type VideoItem = {
+  type: string;
+  brand: string;
+  label: string;
+  grad: number;
+  views: string;
+  likes: string;
+  orientation?: Orientation;
+};
+
+const videos: VideoItem[] = [
   { type: 'speed',     brand: 'Cinematic',     label: 'Property Tour',  grad: 0, views: 'Reel', likes: '60s' },
   { type: 'shortform', brand: 'LinkedIn',      label: 'Founder Post',   grad: 1, views: 'Post', likes: '4 min' },
   { type: 'talking',   brand: 'Founder Reel',  label: 'Talking Head',   grad: 2, views: 'IG',   likes: '45s' },
+  { type: 'longform',  brand: 'Brand Film',    label: 'Long Form',      grad: 4, views: 'YT',   likes: '3 min', orientation: 'horizontal' },
   { type: 'speed',     brand: 'Listing Reel',  label: 'Speed Ramp',     grad: 4, views: 'Reel', likes: '60s' },
   { type: 'podcast',   brand: 'Podcast Clip',  label: 'Highlight Cut',  grad: 3, views: 'IG',   likes: '90s' },
   { type: 'shortform', brand: 'Ad Creative',   label: 'Meta Ad',        grad: 0, views: 'Ad',   likes: '30s' },
+  { type: 'podcast',   brand: 'Podcast',       label: 'Full Episode',   grad: 5, views: 'YT',   likes: '12 min', orientation: 'horizontal' },
   { type: 'talking',   brand: 'B2B Brand',     label: 'Talking Head',   grad: 1, views: 'YT',   likes: '2 min' },
   { type: 'speed',     brand: 'Cinematic',     label: 'Property Tour',  grad: 2, views: 'Reel', likes: '60s' },
   { type: 'course',    brand: 'Real Estate',   label: 'Agent Reel',     grad: 5, views: 'Reel', likes: '45s' },
-  { type: 'longform',  brand: 'Long Form',     label: 'Brand Film',     grad: 4, views: 'YT',   likes: '3 min' },
+  { type: 'longform',  brand: 'Long Form',     label: 'Brand Film',     grad: 4, views: 'YT',   likes: '3 min', orientation: 'horizontal' },
   { type: 'shortform', brand: 'LinkedIn',      label: 'Carousel',       grad: 3, views: 'Post', likes: '8 slides' },
   { type: 'podcast',   brand: 'Podcast Clip',  label: 'Hook Cut',       grad: 5, views: 'IG',   likes: '60s' },
   { type: 'talking',   brand: 'Founder Reel',  label: 'Talking Head',   grad: 0, views: 'IG',   likes: '45s' },
@@ -41,10 +59,14 @@ const videos = [
   { type: 'course',    brand: 'Real Estate',   label: 'Listing Reel',   grad: 1, views: 'Reel', likes: '45s' },
 ];
 
-const CARD_W = 230;
 const CARD_H = 408;
+const CARD_W_VERTICAL = 230;                 // 9:16 portrait
+const CARD_W_HORIZONTAL = 726;               // 16:9 landscape (CARD_H * 16/9)
 const GAP = 12;
 const SPEED = 0.55; // px per frame
+
+const cardWidth = (o?: Orientation) =>
+  o === 'horizontal' ? CARD_W_HORIZONTAL : CARD_W_VERTICAL;
 
 export default function OurWork() {
   const [activeTab, setActiveTab] = useState('all');
@@ -57,7 +79,11 @@ export default function OurWork() {
   // Duplicate for seamless loop
   const doubled = [...filtered, ...filtered];
 
-  const halfWidth = (CARD_W + GAP) * filtered.length;
+  // Mixed orientations → sum each card's width, don't multiply.
+  const halfWidth = filtered.reduce(
+    (sum, v) => sum + cardWidth(v.orientation) + GAP,
+    0
+  );
 
   const startRAF = useCallback(() => {
     const track = trackRef.current;
@@ -89,7 +115,9 @@ export default function OurWork() {
     const track = trackRef.current;
     if (!track) return;
     pauseRef.current = true;
-    const target = track.scrollLeft + dir * (CARD_W + GAP);
+    // Step by the smallest card width so vertical cards never skip past.
+    const step = CARD_W_VERTICAL + GAP;
+    const target = track.scrollLeft + dir * step;
     track.scrollTo({ left: target, behavior: 'smooth' });
     setTimeout(() => { pauseRef.current = false; }, 1400);
   };
@@ -102,7 +130,8 @@ export default function OurWork() {
 
         .vid-card {
           position: relative; border-radius: 16px; overflow: hidden;
-          flex-shrink: 0; width: ${CARD_W}px; height: ${CARD_H}px;
+          flex-shrink: 0; height: ${CARD_H}px;
+          /* width comes from inline style — varies per orientation */
           cursor: none;
         }
         .vid-inner {
@@ -249,7 +278,7 @@ export default function OurWork() {
               Cinematic edits, motion graphics, talking-head reels, podcast cuts, and ad creative. Real samples coming as we ship paid client work.
             </p>
             <div style={{ display: 'flex', gap: '28px' }}>
-              {[{ n: '200+', l: 'Videos edited' }, { n: '6', l: 'Service formats' }].map(s => (
+              {[{ n: '48hrs', l: 'Standard turnaround' }, { n: '6', l: 'Service formats' }].map(s => (
                 <div key={s.l}>
                   <div style={{ fontFamily: 'Inter', fontSize: '22px', fontWeight: 900, letterSpacing: '-1px', color: '#0C0C0B' }}>
                     {s.n}
@@ -323,7 +352,8 @@ export default function OurWork() {
           {doubled.map((video, i) => (
             <div
               key={i}
-              className={`vid-card${playingIdx === i ? ' playing' : ''}`}
+              className={`vid-card${playingIdx === i ? ' playing' : ''}${video.orientation === 'horizontal' ? ' vid-card-h' : ''}`}
+              style={{ width: `${cardWidth(video.orientation)}px` }}
               onClick={() => setPlayingIdx(playingIdx === i ? null : i)}
             >
               <div className="vid-inner">

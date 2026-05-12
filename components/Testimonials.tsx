@@ -21,7 +21,7 @@ export default function Testimonials() {
         <div style={{ position: 'absolute', bottom: '-10%', right: '5%', width: '460px', height: '460px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(139,92,246,0.10) 0%, transparent 70%)', filter: 'blur(70px)' }} />
       </div>
 
-      <div className="founder-container" style={{ maxWidth: '900px', margin: '0 auto', padding: '0 56px', position: 'relative', zIndex: 1 }}>
+      <div className="founder-container" style={{ maxWidth: '1080px', margin: '0 auto', padding: '0 56px', position: 'relative', zIndex: 1 }}>
         {/* Eyebrow */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -64,7 +64,8 @@ export default function Testimonials() {
           <span style={{ color: '#E8541A' }}>Just the truth.</span>
         </motion.h2>
 
-        {/* Letter card */}
+        {/* Letter card — 2-column on desktop: portrait photo + signature on the left,
+           letter body on the right. Stacks on mobile. */}
         <motion.div
           className="founder-card"
           initial={{ opacity: 0, y: 24 }}
@@ -86,37 +87,89 @@ export default function Testimonials() {
           {/* Top accent line */}
           <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '2px', background: 'linear-gradient(90deg, #E8541A, transparent)' }} />
 
-          {/* Accent bar */}
-          <div style={{ width: '32px', height: '2px', background: '#E8541A', marginBottom: '24px', borderRadius: '2px' }} />
+          <div className="founder-card-grid" style={{ display: 'flex', gap: '40px', alignItems: 'flex-start' }}>
+            {/* LEFT — portrait photo + signature block */}
+            <div className="founder-portrait-col" style={{ flex: '0 0 240px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              <div
+                className="founder-portrait-frame"
+                style={{
+                  position: 'relative',
+                  width: '100%',
+                  aspectRatio: '4 / 5',
+                  borderRadius: '18px',
+                  overflow: 'hidden',
+                  background: 'linear-gradient(135deg, rgba(232,84,26,0.18), rgba(139,92,246,0.10))',
+                  border: '1px solid rgba(255,255,255,0.10)',
+                  boxShadow: '0 12px 36px rgba(0,0,0,0.35)',
+                }}
+              >
+                {/* Photo — drop your image into /public/founder.jpg and it appears here.
+                   If the file is missing the gradient + initials fallback shows through. */}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/founder.jpg"
+                  alt="Lakshya Soni, founder of EchoPulse"
+                  loading="lazy"
+                  decoding="async"
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    display: 'block',
+                  }}
+                  onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
+                />
+                {/* Subtle bottom shade for legibility of caption */}
+                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 45%)', pointerEvents: 'none' }} />
+                {/* Name plate */}
+                <div style={{ position: 'absolute', bottom: '12px', left: '14px', right: '14px' }}>
+                  <div style={{ fontFamily: 'Inter, sans-serif', fontWeight: 800, fontSize: '14px', color: '#F2EEE7', letterSpacing: '-0.2px' }}>Lakshya Soni</div>
+                  <div style={{ fontSize: '11px', color: 'rgba(242,238,231,0.78)', marginTop: '2px', fontWeight: 500 }}>Founder, EchoPulse</div>
+                </div>
+              </div>
 
-          {/* Letter body */}
-          <div className="founder-body" style={{ fontSize: '17px', color: 'rgba(242,238,231,0.85)', lineHeight: 1.85, fontWeight: 400 }}>
-            <p style={{ margin: '0 0 22px' }}>
-              I&apos;m Lakshya. I started EchoPulse because every &quot;AI content agency&quot; I saw was charging premium prices for ChatGPT slop. Clients kept paying for it because they didn&apos;t know better.
-            </p>
-            <p style={{ margin: '0 0 22px' }}>
-              Before this, I edited 200+ real estate videos at a Canadian production company, ran 4 years of freelance motion design on Upwork, and now lead marketing for <strong style={{ color: '#fff', fontWeight: 600 }}>MagicBNB</strong>, a Canadian SaaS for short-term rental operators. That mix of production craft, B2B founder work, and SaaS marketing is the lens we apply to every client.
-            </p>
-            <p style={{ margin: '0 0 22px' }}>
-              What makes EchoPulse different is the <strong style={{ color: '#fff', fontWeight: 600 }}>Voice Foundation</strong>. A 90-minute interview we run with every founder before we write a single word or cut a single frame. We capture your stories, your contrarian beliefs, your signature phrases. Then we build a Voice DNA document that every writer and editor on our team references on every deliverable.
-            </p>
-            <p style={{ margin: '0 0 22px' }}>
-              The result is content that sounds like <em>you</em>. Not like ChatGPT. Not like a junior copywriter. Not like every other agency shipping &quot;delve into the tapestry of synergy&quot; garbage.
-            </p>
-            <p style={{ margin: 0 }}>
-              We&apos;re six months old as EchoPulse. We don&apos;t have a glossy list of $80K case studies yet, and we won&apos;t pretend to. What we have is sharp craft, a system most agencies haven&apos;t built, and a willingness to start every relationship with a paid two-week Pilot so you see the work before committing. If that sounds like your kind of partner, let&apos;s talk.
-            </p>
-          </div>
-
-          {/* Signature */}
-          <div style={{ marginTop: '40px', display: 'flex', alignItems: 'center', gap: '14px', paddingTop: '28px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
-            <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'linear-gradient(135deg, #E8541A, #d94a14)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px', fontWeight: 800, color: '#fff', flexShrink: 0 }}>
-              LS
+              {/* Quick stats — give the portrait some weight */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', paddingTop: '6px' }}>
+                {[
+                  // Stack highlights the four disciplines the founder brings —
+                  // applies whether the client is a founder, coach, business
+                  // owner, or creator. No specific niche language here.
+                  { n: 'Scripts', l: 'For the people on camera' },
+                  { n: 'Direction', l: 'Brand films + campaigns' },
+                  { n: '4 yrs+', l: 'Across every format' },
+                ].map((s) => (
+                  <div key={s.l} style={{ display: 'flex', alignItems: 'baseline', gap: '10px', paddingLeft: '14px', borderLeft: '2px solid rgba(232,84,26,0.65)' }}>
+                    <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: 800, fontSize: '15px', color: '#F2EEE7', letterSpacing: '-0.3px' }}>{s.n}</span>
+                    <span style={{ fontSize: '11px', color: 'rgba(242,238,231,0.55)', fontWeight: 500 }}>{s.l}</span>
+                  </div>
+                ))}
+              </div>
             </div>
-            <div>
-              <div style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: '15px', color: '#F2EEE7' }}>Lakshya Soni</div>
-              <div style={{ fontSize: '12px', color: 'rgba(242,238,231,0.5)', marginTop: '2px' }}>
-                Founder, EchoPulse · Marketing Manager, MagicBNB
+
+            {/* RIGHT — letter body */}
+            <div style={{ flex: '1 1 0', minWidth: 0 }}>
+              {/* Accent bar */}
+              <div style={{ width: '32px', height: '2px', background: '#E8541A', marginBottom: '24px', borderRadius: '2px' }} />
+
+              <div className="founder-body" style={{ fontSize: '17px', color: 'rgba(242,238,231,0.85)', lineHeight: 1.85, fontWeight: 400 }}>
+                <p style={{ margin: '0 0 22px' }}>
+                  I&apos;m Lakshya. I&apos;ve spent years working the full content stack &mdash; cutting video across formats at a Canadian production studio, <strong style={{ color: '#fff', fontWeight: 600 }}>writing scripts the people on camera actually wanted to deliver</strong>, leading <strong style={{ color: '#fff', fontWeight: 600 }}>creative direction</strong> on brand films and campaigns across industries, running four years of freelance motion design on Upwork, and today running marketing for a SaaS company.
+                </p>
+                <p style={{ margin: '0 0 22px' }}>
+                  Editor, writer, creative director, marketer. That combined lens is what gets brought to every EchoPulse client &mdash; the script is written by someone who&apos;s edited the cut, the cut is shaped by someone who&apos;s briefed the campaign, the campaign is built by someone who&apos;s sat in the marketing seat.
+                </p>
+                <p style={{ margin: '0 0 22px' }}>
+                  I started EchoPulse because I kept seeing the same thing: agencies charging serious money and delivering garbage. No strategy, no craft, no accountability. Just deliverables for the sake of deliverables. Clients deserved actual work, not invoices dressed up as output.
+                </p>
+                <p style={{ margin: '0 0 22px' }}>
+                  What makes us different is the <strong style={{ color: '#fff', fontWeight: 600 }}>Voice Foundation</strong>: a 90-minute interview every client does before we write a word. We capture your stories, your beliefs, the phrases you actually use, and turn it into a Voice DNA doc every writer and editor on the team references on every deliverable.
+                </p>
+                <p style={{ margin: '0 0 22px' }}>
+                  The result is content that sounds like <em>you</em>. Not a content mill. Not a junior copywriter. Not every other agency on the internet.
+                </p>
+                <p style={{ margin: 0 }}>
+                  We&apos;re a young studio. We don&apos;t carry a glossy list of $80K case studies and we won&apos;t pretend to. What we do carry is years of craft across every format you need, a system most agencies haven&apos;t built, and a paid two-week Pilot so you see the work before you commit. If that sounds like your kind of partner, let&apos;s talk.
+                </p>
               </div>
             </div>
           </div>
@@ -195,6 +248,11 @@ export default function Testimonials() {
            Strip the nested padding (section + container + card) so paragraphs
            don't collapse to 3-words-per-line on phones. Tighten typography
            so the wall-of-text actually reads naturally. */
+        @media (max-width: 900px) {
+          /* Stack portrait + letter on tablets and below */
+          .founder-card-grid { flex-direction: column !important; gap: 28px !important; }
+          .founder-portrait-col { flex: 0 0 auto !important; width: 100% !important; max-width: 340px; align-self: center; }
+        }
         @media (max-width: 768px) {
           .founder-section { padding: 64px 0 !important; }
           .founder-container { padding: 0 16px !important; }

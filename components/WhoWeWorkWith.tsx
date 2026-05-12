@@ -1,47 +1,68 @@
 'use client';
 
-import { useRef } from 'react';
 import { motion } from 'framer-motion';
+import {
+  Rocket,
+  Home,
+  GraduationCap,
+  ShoppingBag,
+  Briefcase,
+  MessageCircle,
+  type LucideIcon,
+} from 'lucide-react';
 import { BOOK_CALL_URL, BOOK_CALL_LABEL } from '@/lib/links';
 
-const cards = [
+type Card = {
+  num: string;
+  Icon: LucideIcon;
+  title: string;
+  desc: string;
+  tag: string | null;
+  tagColor: string;
+  gradient: string | null;
+  accentLine: string;
+  dark?: boolean;
+  cta?: boolean;
+};
+
+const cards: Card[] = [
   {
-    num: '01', icon: '🚀', title: 'B2B Founders',
+    num: '01', Icon: Rocket, title: 'B2B Founders',
     desc: 'SaaS, consulting, and agency founders who want LinkedIn ghostwriting, blog content, and video that sounds like them. Not like a junior copywriter or ChatGPT.',
     tag: 'Our Specialty', tagColor: '#E8541A',
     gradient: 'radial-gradient(circle at 80% 20%, rgba(232,84,26,0.12) 0%, transparent 60%)',
     accentLine: '#E8541A',
   },
   {
-    num: '02', icon: '🏠', title: 'Real Estate & STR',
+    num: '02', Icon: Home, title: 'Real Estate & STR',
     desc: 'Premium agents, brokerages, and Airbnb operators who need cinematic property reels, agent personal brand video, and listing content that books.',
     tag: 'Cinematic Edge', tagColor: '#f59e0b',
     gradient: 'radial-gradient(circle at 80% 20%, rgba(245,158,11,0.10) 0%, transparent 60%)',
     accentLine: '#f59e0b',
   },
   {
-    num: '03', icon: '🎓', title: 'Course Creators',
+    num: '03', Icon: GraduationCap, title: 'Course Creators',
     desc: 'Educators who need pre-launch content systems, evergreen short-form, and conversion funnels that fill cohorts without manual selling.',
     tag: 'High ROI', tagColor: '#8b5cf6',
     gradient: 'radial-gradient(circle at 80% 20%, rgba(139,92,246,0.10) 0%, transparent 60%)',
     accentLine: '#8b5cf6',
   },
   {
-    num: '04', icon: '🛍️', title: 'DTC Brands',
+    num: '04', Icon: ShoppingBag, title: 'DTC Brands',
     desc: 'Direct-to-consumer brands burning through ad creative every two weeks. We deliver fresh static + video ads on a subscription before fatigue kills your CPA.',
     tag: 'Subscription', tagColor: '#10b981',
     gradient: 'radial-gradient(circle at 80% 20%, rgba(16,185,129,0.10) 0%, transparent 60%)',
     accentLine: '#10b981',
   },
   {
-    num: '05', icon: '💼', title: 'Agencies & Consultancies',
+    num: '05', Icon: Briefcase, title: 'Agencies & Consultancies',
     desc: 'Agency owners and consultants who want inbound leads from content instead of cold outreach. Plus a website that converts the traffic when it comes.',
     tag: 'Scaling', tagColor: '#3b82f6',
     gradient: 'radial-gradient(circle at 80% 20%, rgba(59,130,246,0.10) 0%, transparent 60%)',
     accentLine: '#3b82f6',
   },
   {
-    num: '?', icon: '💬', title: 'Sound Like You?',
+    num: '?', Icon: MessageCircle, title: 'Sound Like You?',
     desc: 'Building a premium brand and need a team that handles cinematic video, LinkedIn ghostwriting, blogs, ads, and websites. Without you having to manage 5 vendors.',
     tag: null, tagColor: '#E8541A',
     gradient: null,
@@ -197,7 +218,21 @@ export default function WhoWeWorkWith() {
               <div style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '3px', color: card.dark ? `${card.accentLine}60` : '#A8A49B', marginBottom: '24px', textTransform: 'uppercase' }}>
                 {card.num}
               </div>
-              <div style={{ fontSize: '30px', marginBottom: '14px', lineHeight: 1 }}>{card.icon}</div>
+              <div
+                style={{
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '10px',
+                  background: card.dark ? 'rgba(232,84,26,0.12)' : `${card.accentLine}12`,
+                  border: `1px solid ${card.accentLine}30`,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginBottom: '14px',
+                }}
+              >
+                <card.Icon size={18} strokeWidth={1.6} color={card.accentLine} aria-hidden="true" />
+              </div>
               <div style={{ fontFamily: 'Inter, sans-serif', fontSize: '18px', fontWeight: 800, marginBottom: '10px', letterSpacing: '-0.3px', color: card.dark ? '#F2EEE7' : '#0C0C0B' }}>
                 {card.title}
               </div>
@@ -233,3 +268,4 @@ export default function WhoWeWorkWith() {
     </section>
   );
 }
+                                

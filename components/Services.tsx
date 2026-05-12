@@ -3,6 +3,12 @@
 import { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import {
+  MessageCircle,
+  Target,
+  Check,
+  type LucideIcon,
+} from 'lucide-react';
 
 const services = [
   { num: '01', name: 'Video Editing',         slug: 'video-editing',         color: '#E8541A', desc: 'Retention-engineered short-form, long-form, and cinematic property reels.', pills: ['Cinematic', 'Short Form', 'Real Estate'] },
@@ -303,57 +309,160 @@ function WebsiteMini({ accent }: { accent: string }) {
 }
 
 function AutomationMini({ accent }: { accent: string }) {
+  // Three-stage automation pipeline: TRIGGER → AGENT → ACTION.
+  // A pulse dot travels along the connecting path on a loop, which is what
+  // reads as "automation running" instead of "static diagram."
   return (
-    <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+    <div
+      style={{
+        position: 'relative',
+        width: '100%',
+        height: '100%',
+        overflow: 'hidden',
+      }}
+    >
+      {/* Soft grid background — hints at "system / dashboard" without competing for attention */}
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          backgroundImage:
+            'linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px)',
+          backgroundSize: '14px 14px',
+          maskImage: 'radial-gradient(circle at center, black 0%, transparent 80%)',
+          WebkitMaskImage: 'radial-gradient(circle at center, black 0%, transparent 80%)',
+          pointerEvents: 'none',
+        }}
+      />
+
+      {/* SVG layer: connecting path + traveling pulse dot */}
       <svg
         width="100%"
         height="100%"
-        viewBox="0 0 100 100"
+        viewBox="0 0 200 100"
         preserveAspectRatio="none"
         style={{ position: 'absolute', inset: 0 }}
       >
-        {/* Connecting lines */}
-        <line x1="20" y1="30" x2="50" y2="20" stroke={accent} strokeOpacity="0.4" strokeWidth="0.5" strokeDasharray="2 2" />
-        <line x1="50" y1="20" x2="80" y2="30" stroke={accent} strokeOpacity="0.4" strokeWidth="0.5" strokeDasharray="2 2" />
-        <line x1="20" y1="30" x2="50" y2="65" stroke={accent} strokeOpacity="0.4" strokeWidth="0.5" strokeDasharray="2 2" />
-        <line x1="80" y1="30" x2="50" y2="65" stroke={accent} strokeOpacity="0.4" strokeWidth="0.5" strokeDasharray="2 2" />
-        <line x1="50" y1="65" x2="50" y2="92" stroke={accent} strokeOpacity="0.6" strokeWidth="0.6" />
+        <defs>
+          {/* Soft glow on the pulse so it reads as light, not just a dot */}
+          <radialGradient id="auto-pulse-glow">
+            <stop offset="0%"  stopColor={accent} stopOpacity="1" />
+            <stop offset="60%" stopColor={accent} stopOpacity="0.4" />
+            <stop offset="100%" stopColor={accent} stopOpacity="0" />
+          </radialGradient>
+        </defs>
+
+        {/* The pipeline rail — single smooth curve hitting each node */}
+        <path
+          id="auto-mini-path"
+          d="M 28 30 C 70 30, 80 50, 100 50 C 120 50, 140 70, 172 70"
+          stroke={accent}
+          strokeOpacity="0.32"
+          strokeWidth="1.4"
+          strokeLinecap="round"
+          fill="none"
+          strokeDasharray="3 3"
+        />
+
+        {/* Glow halo + bright pulse traveling along the same path */}
+        <circle r="9" fill="url(#auto-pulse-glow)">
+          <animateMotion dur="3.6s" repeatCount="indefinite" rotate="auto">
+            <mpath href="#auto-mini-path" />
+          </animateMotion>
+        </circle>
+        <circle r="2.5" fill={accent}>
+          <animateMotion dur="3.6s" repeatCount="indefinite" rotate="auto">
+            <mpath href="#auto-mini-path" />
+          </animateMotion>
+        </circle>
       </svg>
 
-      {[
-        { x: 20, y: 30, icon: '💬', label: 'DM' },
-        { x: 50, y: 20, icon: '🎯', label: 'Qualify' },
-        { x: 80, y: 30, icon: '📧', label: 'Email' },
-        { x: 50, y: 65, icon: '📅', label: 'Cal' },
-        { x: 50, y: 92, icon: '✓',  label: 'Done', primary: true },
-      ].map((node, i) => (
-        <div
-          key={i}
-          className="auto-mini-node"
-          style={{
-            position: 'absolute',
-            top: `${node.y}%`,
-            left: `${node.x}%`,
-            transform: 'translate(-50%, -50%)',
-            padding: '5px 9px',
-            borderRadius: '8px',
-            background: node.primary ? accent : 'rgba(255,255,255,0.06)',
-            border: node.primary ? `1px solid ${accent}` : '1px solid rgba(255,255,255,0.12)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '4px',
-            fontSize: '8px',
-            fontWeight: 700,
-            color: node.primary ? '#fff' : 'rgba(242,238,231,0.85)',
-            whiteSpace: 'nowrap',
-            transition: 'all 0.3s cubic-bezier(0.16,1,0.3,1)',
-            animationDelay: `${i * 0.1}s`,
-          }}
-        >
-          <span style={{ fontSize: '9px', lineHeight: 1 }}>{node.icon}</span>
-          <span>{node.label}</span>
-        </div>
-      ))}
+      {/* The three nodes — TRIGGER, AGENT, ACTION — placed on the path endpoints */}
+      {([
+        {
+          x: 14, y: 30, eyebrow: 'Trigger', label: 'DM in',
+          Icon: MessageCircle as LucideIcon, tone: 'soft',
+        },
+        {
+          x: 50, y: 50, eyebrow: 'AI agent', label: 'Qualify',
+          Icon: Target as LucideIcon, tone: 'feature',
+        },
+        {
+          x: 86, y: 70, eyebrow: 'Action', label: 'Booked',
+          Icon: Check as LucideIcon, tone: 'success',
+        },
+      ] as const).map((node, i) => {
+        const isFeature = node.tone === 'feature';
+        const isSuccess = node.tone === 'success';
+        return (
+          <div
+            key={i}
+            style={{
+              position: 'absolute',
+              top: `${node.y}%`,
+              left: `${node.x}%`,
+              transform: 'translate(-50%, -50%)',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'flex-start',
+              gap: '3px',
+              zIndex: 2,
+            }}
+          >
+            {/* Tiny eyebrow above each node, like a real automation builder */}
+            <div
+              style={{
+                fontSize: '7px',
+                fontWeight: 700,
+                letterSpacing: '1px',
+                textTransform: 'uppercase',
+                color: isSuccess ? accent : 'rgba(242,238,231,0.40)',
+                paddingLeft: '4px',
+              }}
+            >
+              {node.eyebrow}
+            </div>
+            <div
+              style={{
+                padding: '6px 10px',
+                borderRadius: '8px',
+                background: isSuccess
+                  ? accent
+                  : isFeature
+                    ? 'rgba(255,255,255,0.10)'
+                    : 'rgba(255,255,255,0.04)',
+                border: isSuccess
+                  ? `1px solid ${accent}`
+                  : isFeature
+                    ? '1px solid rgba(255,255,255,0.18)'
+                    : '1px solid rgba(255,255,255,0.10)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '5px',
+                fontSize: '8.5px',
+                fontWeight: 700,
+                color: isSuccess ? '#fff' : 'rgba(242,238,231,0.92)',
+                whiteSpace: 'nowrap',
+                boxShadow: isSuccess
+                  ? `0 6px 16px ${accent}50`
+                  : isFeature
+                    ? '0 2px 8px rgba(0,0,0,0.18)'
+                    : 'none',
+                backdropFilter: 'blur(4px)',
+                WebkitBackdropFilter: 'blur(4px)',
+              }}
+            >
+              <node.Icon
+                size={10}
+                strokeWidth={2.4}
+                color={isSuccess ? '#fff' : isFeature ? accent : 'rgba(242,238,231,0.85)'}
+                aria-hidden="true"
+              />
+              <span>{node.label}</span>
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -559,7 +668,11 @@ export default function Services() {
             transition={{ duration: 0.6, delay: i * 0.08, ease: [0.16, 1, 0.3, 1] }}
             data-dark-bg="true"
           >
-            <Link href={`/services/${service.slug}`} style={{ display: 'block', textDecoration: 'none' }} data-dark-bg="true">
+            <Link
+              href={`/services/${service.slug}`}
+              style={{ display: 'block', textDecoration: 'none' }}
+              data-dark-bg="true"
+            >
               <div
                 className="service-card service-magnet"
                 data-dark-bg="true"

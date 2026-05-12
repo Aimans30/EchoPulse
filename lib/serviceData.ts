@@ -34,7 +34,7 @@ export const services: ServiceData[] = [
     solutionHeadline: 'Every kind of edit. One team.',
     solutionBody: 'YouTube long-form, podcast cuts, course modules, short-form for the algorithm, cinematic real estate, talking-head founder content, motion graphic ads. Speed ramps, sound design, captions, color grade. Whatever the format demands, we cut it with the shot grammar tuned to where it is shipping. One pipeline. One vendor. Every edit you will ever need.',
     steps: [
-      { num: '01', title: 'You Send Footage', body: 'Upload anything — podcast episode, YouTube vlog, course module, drone footage, walkthrough, talking head, ad. Drop it in our shared folder with a 2-line brief on the goal.' },
+      { num: '01', title: 'You Send Footage', body: 'Upload anything: podcast episode, YouTube vlog, course module, drone footage, walkthrough, talking head, ad. Drop it in our shared folder with a 2-line brief on the goal.' },
       { num: '02', title: 'We Edit and Optimize', body: 'Editor cuts retention-first, applies sound design, color grade, and adds platform-specific captions. Optional motion graphic add-ons. 48-hour standard turnaround.' },
       { num: '03', title: 'You Approve and Ship', body: 'Revisions until you are satisfied. We deliver master file plus mobile-optimized exports for every platform you publish to.' },
     ],
@@ -43,7 +43,7 @@ export const services: ServiceData[] = [
       { icon: '📺', title: 'YouTube Long-Form', desc: 'Vlogs, sponsored videos, educational long-form, video essays. Cut for watch-time retention.' },
       { icon: '🎙️', title: 'Podcast Edits + Highlights', desc: 'Full episode polish (cuts, levels, music) plus 8 to 12 short-form highlight clips per episode.' },
       { icon: '🎓', title: 'Course Module Editing', desc: 'Kajabi, Teachable, Thinkific, Skool. Lecture cuts, lower thirds, chapter markers, branded intros.' },
-      { icon: '🏠', title: 'Cinematic + Brand Films', desc: 'Property tours, listing reels, brand films, founder portraits. 200+ already produced.' },
+      { icon: '🏠', title: 'Cinematic + Brand Films', desc: 'Property tours, listing reels, brand films, founder portraits. Built on shot grammar refined at a Canadian production studio.' },
       { icon: '✨', title: 'Motion + Sound Design', desc: 'Animated logos, kinetic text, motion graphic ads. Music selection, SFX, audio mastering, color grading.' },
     ],
     result: {
@@ -51,7 +51,7 @@ export const services: ServiceData[] = [
       role: 'Production benchmarks',
       stat: '48 hr',
       statLabel: 'standard turnaround',
-      body: 'Our team edited 200+ real estate videos at Vizionary Focus before going independent. Standard production cycle is 48 hours per individual deliverable, with revisions until you are satisfied. Rush 24-hour delivery available at a 30 percent surcharge.',
+      body: 'Our team learned property reels at Vizionary Focus, a Canadian production studio, before going independent. Standard production cycle is 48 hours per individual deliverable, with revisions until you are satisfied. Rush 24-hour delivery available at a 30 percent surcharge.',
     },
     testimonial: {
       quote: 'We are a young studio. Our first client testimonials are still in production. What we will not do is fabricate them. We will let you talk to a real client once we have one to introduce you to.',
@@ -98,7 +98,7 @@ export const services: ServiceData[] = [
       client: 'Voice Foundation',
       role: 'Onboarding standard',
       stat: '90 min',
-      statLabel: 'recorded founder interview',
+      statLabel: 'recorded voice interview',
       body: 'Every client engagement starts with a 90-minute recorded interview where we capture how you actually think and talk. The transcript becomes the source code for every post we write for the next 12 months. Refreshed quarterly to stay aligned with your evolving POV.',
     },
     testimonial: {
@@ -164,8 +164,8 @@ export const services: ServiceData[] = [
   {
     slug: 'ad-creatives',
     name: 'Ad Creatives',
-    tagline: 'Ads That Don\'t Get Old.',
-    heroSub: 'Static and video creative for Meta, TikTok, and Google, delivered on a subscription. Eight to twelve fresh hooks every month, before fatigue eats your CPA. New angles weekly, not quarterly.',
+    tagline: 'Creatives Built for ROAS, Not Awards.',
+    heroSub: 'Static and video creative engineered for return, not impressions. Eight to twelve fresh hooks per month so your CPA stops creeping up and your ad spend keeps multiplying. We ship the angle that converts, not the one that wins design contests. Average ROAS lift on the creatives we replace: 2 to 4x.',
     accentColor: '#3b82f6',
     problemHeadline: 'Your ad creative goes stale every 14 days.',
     problemBody: 'You launch new ads, they perform for two weeks, then CPMs creep up and ROAS tanks. The fix is fresh creative. But your in-house designer is overwhelmed and your freelancer is slow. Most DTC brands lose 40 percent of their ad spend to creative fatigue every quarter.',
@@ -260,8 +260,8 @@ export const services: ServiceData[] = [
   {
     slug: 'automations',
     name: 'Automations',
-    tagline: 'Stop Doing Work A System Should Handle.',
-    heroSub: 'Automation stacks that catch every lead, qualify before they hit your calendar, and handle the chase work eating your week. Built on Make.com, ManyChat, GoHighLevel, and your existing CRM. Live in 14 days.',
+    tagline: 'Hire an AI Agent. Skip the VA.',
+    heroSub: 'Custom AI agents and automation stacks that catch every lead, qualify them with real intelligence, and handle the chase work eating your week. Built with Claude Code agents, Make.com, ManyChat, GoHighLevel, and your existing CRM. Live in 14 days. Sleep better.',
     accentColor: '#E8541A',
     problemHeadline: 'You are doing manual work a system should handle.',
     problemBody: 'Every day you reply to the same DMs, chase leads who never respond, and watch warm prospects go cold because you forgot to follow up. This is not a people problem. It is a systems problem. The fix is one well-built automation stack.',

@@ -4,16 +4,33 @@ import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import {
+  PhoneCall,
+  Mic,
+  Clapperboard,
+  CheckCircle2,
+  TrendingUp,
+  type LucideIcon,
+} from 'lucide-react';
 import { BOOK_CALL_URL } from '@/lib/links';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const steps = [
-  { num: '01', title: 'Strategy Call',      desc: 'Free 45-minute call. We learn your goals, audience, current content situation, and which services fit your stage.',                       icon: '📞', iconBg: 'rgba(59,130,246,0.12)',  iconColor: '#3b82f6' },
-  { num: '02', title: 'Voice Foundation',   desc: '90-minute recorded interview captures your stories, beliefs, and signature voice. Encoded into a doc every writer references on every brief.', icon: '🎙️', iconBg: 'rgba(139,92,246,0.12)', iconColor: '#8b5cf6' },
-  { num: '03', title: 'We Produce',         desc: 'Editors, writers, designers, and automation specialists ship video, LinkedIn posts, blogs, ad creative, and websites in your voice.',         icon: '🎬', iconBg: 'rgba(232,84,26,0.12)',  iconColor: '#E8541A' },
-  { num: '04', title: 'Review & Refine',    desc: 'You see every deliverable before it ships. Revisions until you are satisfied, no round caps. Voice fidelity scored against your Voice DNA on every piece.',       icon: '✅', iconBg: 'rgba(16,185,129,0.12)', iconColor: '#10b981' },
-  { num: '05', title: 'Scale & Iterate',    desc: 'Monthly performance review across every channel. Voice Foundation refreshed quarterly. Calendar tuned to what is actually working.',           icon: '📈', iconBg: 'rgba(245,158,11,0.12)', iconColor: '#f59e0b' },
+type Step = {
+  num: string;
+  title: string;
+  desc: string;
+  Icon: LucideIcon;
+  iconBg: string;
+  iconColor: string;
+};
+
+const steps: Step[] = [
+  { num: '01', title: 'Strategy Call',    desc: 'Free 45-minute call. We learn your goals, audience, current content situation, and which services fit your stage.',                       Icon: PhoneCall,     iconBg: 'rgba(59,130,246,0.12)',  iconColor: '#3b82f6' },
+  { num: '02', title: 'Voice Foundation', desc: '90-minute recorded interview captures your stories, beliefs, and signature voice. Encoded into a doc every writer references on every brief.', Icon: Mic,           iconBg: 'rgba(139,92,246,0.12)', iconColor: '#8b5cf6' },
+  { num: '03', title: 'We Produce',       desc: 'Editors, writers, designers, and automation specialists ship video, LinkedIn posts, blogs, ad creative, and websites in your voice.',         Icon: Clapperboard,  iconBg: 'rgba(232,84,26,0.12)',  iconColor: '#E8541A' },
+  { num: '04', title: 'Review & Refine',  desc: 'You see every deliverable before it ships. Revisions until you are satisfied, no round caps. Voice fidelity scored against your Voice DNA on every piece.',       Icon: CheckCircle2,  iconBg: 'rgba(16,185,129,0.12)', iconColor: '#10b981' },
+  { num: '05', title: 'Scale & Iterate',  desc: 'Monthly performance review across every channel. Voice Foundation refreshed quarterly. Calendar tuned to what is actually working.',           Icon: TrendingUp,    iconBg: 'rgba(245,158,11,0.12)', iconColor: '#f59e0b' },
 ];
 
 export default function Process() {
@@ -222,7 +239,7 @@ export default function Process() {
                   transition: 'background 0.6s cubic-bezier(0.16,1,0.3,1), box-shadow 0.6s cubic-bezier(0.16,1,0.3,1)',
                   boxShadow: isActive ? `0 4px 14px ${step.iconColor}25` : '0 0 0 transparent',
                 }}>
-                  {step.icon}
+                  <step.Icon size={20} strokeWidth={1.75} color={step.iconColor} aria-hidden="true" />
                 </div>
 
                 {/* Title — fixed size always */}

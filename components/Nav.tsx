@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
 import { gsap } from 'gsap';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BOOK_CALL_URL, BOOK_CALL_LABEL, BOOK_CALL_LABEL_LONG } from '@/lib/links';
@@ -202,18 +203,22 @@ export default function Nav() {
             transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
           >
             {links.map((link, i) => (
-              <motion.a
+              <motion.div
                 key={link.label}
-                href={link.href}
-                className="mobile-nav-link"
-                onClick={closeMobile}
                 initial={{ opacity: 0, x: -16 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: i * 0.05, duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
               >
-                {link.label}
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#A8A49B" strokeWidth="2" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-              </motion.a>
+                <Link
+                  href={link.href}
+                  className="mobile-nav-link"
+                  onClick={closeMobile}
+                  scroll={true}
+                >
+                  {link.label}
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#A8A49B" strokeWidth="2" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </Link>
+              </motion.div>
             ))}
             <a
               href={BOOK_CALL_URL}
@@ -257,8 +262,8 @@ export default function Nav() {
           opacity: 0,
         }}
       >
-        {/* Logo */}
-        <a
+        {/* Logo — Link for soft client-side nav (no full reload) */}
+        <Link
           href="/"
           style={{
             fontFamily: 'Inter, sans-serif',
@@ -272,13 +277,14 @@ export default function Nav() {
           }}
         >
           Echo<span style={{ color: '#E8541A' }}>Pulse</span>
-        </a>
+        </Link>
 
-        {/* Desktop links */}
+        {/* Desktop links — Link gives soft client-side nav back to / + hash scroll,
+           so jumping back from /services/* doesn't trigger a full reload. */}
         <ul className="nav-links-list" style={{ display: 'flex', gap: '28px', listStyle: 'none', margin: 0, padding: 0 }}>
           {links.map((link) => (
             <li key={link.label}>
-              <a href={link.href} className="nav-link">{link.label}</a>
+              <Link href={link.href} className="nav-link" scroll={true}>{link.label}</Link>
             </li>
           ))}
         </ul>

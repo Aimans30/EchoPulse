@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { BOOK_CALL_URL, BOOK_CALL_LABEL_LONG } from '@/lib/links';
+import { trackCallClick } from '@/lib/analytics';
 
 export default function CTABanner() {
   return (
@@ -35,23 +36,25 @@ export default function CTABanner() {
           }}
         />
 
-        <div style={{ position: 'relative', zIndex: 1 }}>
+        <div className="cta-banner-text" style={{ position: 'relative', zIndex: 1, flex: '1 1 520px', minWidth: 0, maxWidth: '880px' }}>
           <motion.div
+            className="cta-banner-h"
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.7, delay: 0.2 }}
             style={{
               fontFamily: 'Inter, sans-serif',
-              fontSize: 'clamp(36px, 4.5vw, 68px)',
+              fontSize: 'clamp(30px, 3.6vw, 52px)',
               fontWeight: 900,
-              letterSpacing: '-1.5px',
-              lineHeight: 1.02,
+              letterSpacing: '-1.4px',
+              lineHeight: 1.06,
               color: '#F2EEE7',
             }}
           >
-            You build the business.
-            <span style={{ color: '#E8541A', display: 'block' }}>We make it sound like you.</span>
+            <span style={{ display: 'block' }}>Get back 20 to 30 hours a week.</span>
+            <span style={{ color: '#E8541A', display: 'block' }}>We run your content.</span>
+            <span style={{ display: 'block' }}>You run your business.</span>
           </motion.div>
           <motion.p
             initial={{ opacity: 0 }}
@@ -60,13 +63,13 @@ export default function CTABanner() {
             transition={{ duration: 0.7, delay: 0.4 }}
             style={{
               fontSize: '16px',
-              color: 'rgba(242,238,231,0.4)',
-              marginTop: '20px',
-              maxWidth: '500px',
+              color: 'rgba(242,238,231,0.55)',
+              marginTop: '24px',
+              maxWidth: '540px',
               lineHeight: 1.7,
             }}
           >
-            Free 45-minute strategy call. We audit your current content, run a 10-minute Voice Foundation preview, and send you a custom plan for video, LinkedIn, blogs, and ad creative. Whether or not you ever hire us.
+            That&apos;s what most founders and coaches lose every week. Writing posts. Editing clips. Briefing freelancers. Rewriting drafts that still don&apos;t sound like them. We do all of it, in your voice. Book a free 45-minute call. We&apos;ll review what you&apos;re publishing, run a 10-minute Voice Foundation preview, and send you a plan in writing. Hire us after. Or don&apos;t.
           </motion.p>
         </div>
 
@@ -91,6 +94,7 @@ export default function CTABanner() {
             rel="noopener noreferrer"
             data-cursor-hover
             aria-label={BOOK_CALL_LABEL_LONG}
+            onClick={() => trackCallClick('cta_banner')}
             whileHover={{ scale: 1.04, boxShadow: '0 16px 60px rgba(232,84,26,0.5)' }}
             whileTap={{ scale: 0.98 }}
             style={{
@@ -124,10 +128,13 @@ export default function CTABanner() {
       <style>{`
         @media (max-width: 900px) {
           .cta-banner-inner { padding: 60px 48px !important; }
+          .cta-banner-h { font-size: clamp(28px, 6vw, 44px) !important; letter-spacing: -1px !important; }
         }
         @media (max-width: 640px) {
           .cta-banner-wrap { margin: 0 16px 80px !important; }
           .cta-banner-inner { padding: 48px 28px !important; }
+          .cta-banner-h { font-size: 28px !important; letter-spacing: -0.8px !important; line-height: 1.1 !important; }
+          .cta-banner-text { flex-basis: 100% !important; }
         }
       `}</style>
     </div>

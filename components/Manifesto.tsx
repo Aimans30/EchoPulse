@@ -42,6 +42,7 @@ export default function Manifesto() {
   return (
     <section
       ref={sectionRef}
+      data-dark-bg="true"
       style={{
         padding: '128px 56px',
         background: '#0C0C0B',

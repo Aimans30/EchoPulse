@@ -5,17 +5,17 @@ import dynamic from 'next/dynamic';
 import Loader from '@/components/Loader';
 import Nav from '@/components/Nav';
 import Hero from '@/components/Hero';
-import Ticker from '@/components/Ticker';
 
 // Code-split below-the-fold sections — they don't ship in the initial bundle.
 // Each chunk loads as the user scrolls, dramatically improving first paint
 // on mobile/slow connections.
 const Manifesto = dynamic(() => import('@/components/Manifesto'), { ssr: true });
+const Testimonials = dynamic(() => import('@/components/Testimonials'), { ssr: true });
 const WhoWeWorkWith = dynamic(() => import('@/components/WhoWeWorkWith'), { ssr: true });
 const OurWork = dynamic(() => import('@/components/OurWork'), { ssr: true });
 const Services = dynamic(() => import('@/components/Services'), { ssr: true });
 const Process = dynamic(() => import('@/components/Process'), { ssr: true });
-const Testimonials = dynamic(() => import('@/components/Testimonials'), { ssr: true });
+const LeadMagnet = dynamic(() => import('@/components/LeadMagnet'), { ssr: true });
 const Pricing = dynamic(() => import('@/components/Pricing'), { ssr: true });
 const FAQ = dynamic(() => import('@/components/FAQ'), { ssr: true });
 const CTABanner = dynamic(() => import('@/components/CTABanner'), { ssr: true });
@@ -81,14 +81,21 @@ export default function Home() {
       {showLoader && <Loader onDone={handleLoaderDone} />}
       <div style={{ opacity: loaded ? 1 : 0, transition: 'opacity 0.5s ease' }}>
         <Nav />
+        {/*
+          Section order driven by the conversion-audit brief:
+          Hero (with built-in StatsBand) → Manifesto → Testimonials →
+          WhoWeWorkWith → OurWork → Services → Process →
+          LeadMagnet → Pricing → FAQ → CTABanner.
+          Ticker removed — StatsBand inside <Hero /> covers the same role.
+        */}
         <Hero />
-        <Ticker />
         <Manifesto />
+        <Testimonials />
         <WhoWeWorkWith />
         <OurWork />
         <Services />
         <Process />
-        <Testimonials />
+        <LeadMagnet />
         <Pricing />
         <FAQ />
         <CTABanner />

@@ -1,14 +1,36 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import dynamic from 'next/dynamic';
 import { motion, useScroll, useSpring } from 'framer-motion';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Link from 'next/link';
 import type { ServiceData } from '@/lib/serviceData';
-import { BOOK_CALL_URL, BOOK_CALL_LABEL_LONG } from '@/lib/links';
+import { BOOK_CALL_URL } from '@/lib/links';
 import Nav from './Nav';
-import ServiceHeroVisual from './ServiceHeroVisual';
+
+// ServiceHeroVisual is 2.4K lines of SVG / animation code per service.
+// Lazy-loading it strips ~80KB of JS off the initial chunk so the route
+// renders fast, then the visual fades in. A skeleton placeholder keeps
+// layout stable during the swap.
+const ServiceHeroVisual = dynamic(() => import('./ServiceHeroVisual'), {
+  ssr: false,
+  loading: () => (
+    <div
+      aria-hidden="true"
+      style={{
+        width: '100%',
+        height: '380px',
+        borderRadius: '20px',
+        background:
+          'linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 100%)',
+        backgroundSize: '200% 100%',
+        animation: 'svc-shimmer 1.4s ease-in-out infinite',
+      }}
+    />
+  ),
+});
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -39,7 +61,7 @@ const comparisonsByService: Record<string, ComparisonRow[]> = {
   'blog-production': [
     { feature: 'Research depth',      us: 'Multi-agent + human source verification',        them: 'ChatGPT one-shot, no review' },
     { feature: 'Sources',             us: 'Real verifiable links on every stat',            them: 'Fabricated metrics' },
-    { feature: 'Outline approval',    us: 'Required before drafting',                       them: 'Skipped — drafts arrive cold' },
+    { feature: 'Outline approval',    us: 'Required before drafting',                       them: 'Skipped. Drafts arrive cold' },
     { feature: 'Voice fidelity',      us: 'Scored 8/10 against Voice DNA',                  them: 'No fidelity audit' },
     { feature: 'Anti-AI tells',       us: '"Delve / navigate / tapestry" banned',           them: 'Industry standard' },
     { feature: 'Distribution pack',   us: 'LinkedIn + thread + newsletter + 3 quote graphics', them: 'Blog file only' },
@@ -49,7 +71,7 @@ const comparisonsByService: Record<string, ComparisonRow[]> = {
   'ad-creatives': [
     { feature: 'Output cadence',      us: '8 to 12 fresh creatives per month',              them: '2 to 3 per month' },
     { feature: 'Refresh cycle',       us: 'Weekly hook variations',                         them: 'Every 4 to 6 weeks' },
-    { feature: 'Hook variations',     us: '3 to 5 per top performer',                       them: 'None — one and done' },
+    { feature: 'Hook variations',     us: '3 to 5 per top performer',                       them: 'None. One and done' },
     { feature: 'Turnaround',          us: '48 hours per creative',                          them: '5 to 14 days' },
     { feature: 'Cost model',          us: 'Flat monthly subscription',                      them: 'Per-piece + per-hour fees' },
     { feature: 'Performance review',  us: 'Monthly with iteration brief',                   them: 'None, or quarterly only' },
@@ -99,9 +121,9 @@ const promises = [
   },
   {
     stat: '$299',
-    statLabel: 'Founder Pilot to start',
+    statLabel: 'Pilot to start',
     headline: 'Try first. Commit when convinced.',
-    body: 'Every relationship starts with a paid two-week Pilot at our intro price of $299. A curated mix of LinkedIn posts, a video edit, and a long-form blog plus the founder interview. See the quality before any monthly engagement.',
+    body: 'Every relationship starts with a paid two-week Pilot at our intro price of $299. 12 LinkedIn posts, 3 short-form video edits, 5 long-form blogs, the voice interview, and one strategic deliverable. See the quality before any monthly engagement.',
   },
 ];
 
@@ -289,11 +311,14 @@ export default function ServicePageClient({ service }: { service: ServiceData })
       <Nav />
       <StickyBottomCTA accentColor={service.accentColor} />
 
-      {/* Sliding content wrapper — full horizontal slide from right edge on mount */}
+      {/* Clean fade-up entrance — minimal, professional. Replaces the previous
+         horizontal slide which read as too theatrical for a content agency
+         site. Opacity does the heavy lifting; the 8px y travel just gives
+         the page a sense of "arriving" without any sideways motion. */}
       <motion.div
-        initial={{ x: '100%' }}
-        animate={{ x: 0 }}
-        transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
         style={{ background: '#F2EEE7', minHeight: '100vh', position: 'relative' }}
       >
 
@@ -1152,3 +1177,4 @@ function FAQItem({ item, i, color }: { item: { q: string; a: string }; i: number
     </motion.div>
   );
 }
+                      
