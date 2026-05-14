@@ -17,6 +17,7 @@ const services = [
   { num: '04', name: 'Ad Creatives',          slug: 'ad-creatives',          color: '#3b82f6', desc: 'Static and video ads on a subscription. Fresh hooks before fatigue hits.', pills: ['Meta', 'TikTok', 'Static + Video'] },
   { num: '05', name: 'Websites & Funnels',    slug: 'websites-funnels',      color: '#10b981', desc: 'Conversion-engineered sites that earn their pixels. Sub-2-second mobile.', pills: ['Websites', 'Funnels', 'Lead Pages'] },
   { num: '06', name: 'Automations',           slug: 'automations',           color: '#E8541A', desc: 'DM flows, email sequences, and CRM glue that catches every lead.', pills: ['Make.com', 'ManyChat', 'CRM'] },
+  { num: '07', name: 'Apps & Software',       slug: 'apps-software',         color: '#06b6d4', desc: 'Custom web apps, MVPs, course platforms, dashboards. Fixed-price builds by an engineer who ships daily.', pills: ['MVPs', 'Web Apps', 'PWAs'] },
 ];
 
 /* ──────────────────────────────────────────────────────────
@@ -30,6 +31,7 @@ function ServiceMiniVisual({ slug, accent }: { slug: string; accent: string }) {
     case 'ad-creatives':        return <AdsMini accent={accent} />;
     case 'websites-funnels':    return <WebsiteMini accent={accent} />;
     case 'automations':         return <AutomationMini accent={accent} />;
+    case 'apps-software':       return <AppsMini accent={accent} />;
     default:                    return null;
   }
 }
@@ -467,6 +469,129 @@ function AutomationMini({ accent }: { accent: string }) {
   );
 }
 
+function AppsMini({ accent }: { accent: string }) {
+  // Stylized browser window — code lines on top, working app dashboard
+  // beneath, with a soft pulse on the primary "deploy" pill. Signals
+  // "we ship code that becomes a working product."
+  return (
+    <div
+      style={{
+        position: 'relative',
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '4px',
+      }}
+    >
+      <div
+        style={{
+          width: '100%',
+          height: '92%',
+          borderRadius: '8px',
+          background: 'rgba(255,255,255,0.04)',
+          border: '1px solid rgba(255,255,255,0.10)',
+          overflow: 'hidden',
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
+        {/* Window chrome */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '4px',
+            padding: '6px 8px',
+            borderBottom: '1px solid rgba(255,255,255,0.06)',
+            background: 'rgba(255,255,255,0.03)',
+          }}
+        >
+          <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'rgba(255,255,255,0.25)' }} />
+          <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'rgba(255,255,255,0.25)' }} />
+          <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'rgba(255,255,255,0.25)' }} />
+          <span
+            style={{
+              marginLeft: '8px',
+              fontSize: '7px',
+              fontFamily: 'ui-monospace, Menlo, monospace',
+              color: 'rgba(255,255,255,0.45)',
+              letterSpacing: '0.4px',
+            }}
+          >
+            app.yourbrand.com
+          </span>
+        </div>
+
+        {/* App body — sidebar + main */}
+        <div style={{ display: 'flex', flex: 1, gap: '6px', padding: '8px' }}>
+          {/* Sidebar */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', width: '24%' }}>
+            {[1, 0.55, 0.55, 0.55].map((opacity, i) => (
+              <div
+                key={i}
+                style={{
+                  height: '6px',
+                  borderRadius: '2px',
+                  background: i === 0 ? accent : 'rgba(255,255,255,0.12)',
+                  opacity,
+                }}
+              />
+            ))}
+          </div>
+
+          {/* Main panel */}
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '5px' }}>
+            <div
+              style={{
+                height: '7px',
+                width: '60%',
+                borderRadius: '2px',
+                background: 'rgba(255,255,255,0.22)',
+              }}
+            />
+            <div style={{ display: 'flex', gap: '5px' }}>
+              <div style={{ flex: 1, height: '20px', borderRadius: '4px', background: `linear-gradient(135deg, ${accent}30, ${accent}10)`, border: `1px solid ${accent}40` }} />
+              <div style={{ flex: 1, height: '20px', borderRadius: '4px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.10)' }} />
+            </div>
+            <div style={{ height: '4px', width: '85%', borderRadius: '2px', background: 'rgba(255,255,255,0.10)' }} />
+            <div style={{ height: '4px', width: '70%', borderRadius: '2px', background: 'rgba(255,255,255,0.08)' }} />
+
+            {/* Pulsing deploy pill */}
+            <div style={{ marginTop: 'auto', display: 'flex', justifyContent: 'flex-end' }}>
+              <div
+                className="apps-mini-pill"
+                style={{
+                  fontSize: '7px',
+                  fontWeight: 800,
+                  padding: '3px 7px',
+                  borderRadius: '100px',
+                  background: accent,
+                  color: '#fff',
+                  letterSpacing: '0.6px',
+                  textTransform: 'uppercase',
+                  boxShadow: `0 0 0 0 ${accent}80`,
+                  animation: 'apps-mini-pulse 1.8s ease-in-out infinite',
+                }}
+              >
+                Deployed
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <style>{`
+          @keyframes apps-mini-pulse {
+            0%, 100% { box-shadow: 0 0 0 0 ${accent}80; }
+            50%      { box-shadow: 0 0 0 8px ${accent}00; }
+          }
+        `}</style>
+      </div>
+    </div>
+  );
+}
+
 /* ──────────────────────────────────────────────────────────
    Services section
    ────────────────────────────────────────────────────────── */
@@ -506,6 +631,16 @@ export default function Services() {
         }
         @media (max-width: 1100px) { .services-grid { grid-template-columns: repeat(2, 1fr) !important; } }
         @media (max-width: 700px)  { .services-grid { grid-template-columns: 1fr !important; } }
+
+        /* The 7th service (Apps & Software) is the newest offering — promote
+           it to a full-width "featured" card so the last row of the grid
+           reads as intentional instead of an orphan. */
+        .service-card-wide { grid-column: 1 / -1; }
+        .service-card-wide .service-card-visual {
+          /* On the wide card the visual sits beside the copy, not above. */
+          aspect-ratio: 16 / 7;
+          max-height: 220px;
+        }
 
         .service-card {
           position: relative;
@@ -644,7 +779,7 @@ export default function Services() {
             transition={{ duration: 0.7, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
             style={{ fontFamily: 'Inter, sans-serif', fontSize: 'clamp(28px, 3.4vw, 48px)', fontWeight: 900, letterSpacing: '-1.8px', lineHeight: 1, color: '#F2EEE7', maxWidth: '520px', margin: 0 }}
           >
-            Six services. One team.<br />
+            Seven services. One team.<br />
             <span style={{ color: '#E8541A' }}>Zero</span> AI slop.
           </motion.h2>
           <motion.p
@@ -667,6 +802,8 @@ export default function Services() {
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: i * 0.08, ease: [0.16, 1, 0.3, 1] }}
             data-dark-bg="true"
+            // The 7th card (Apps & Software) spans full row — featured slot.
+            className={service.slug === 'apps-software' ? 'service-card-wide' : undefined}
           >
             <Link
               href={`/services/${service.slug}`}

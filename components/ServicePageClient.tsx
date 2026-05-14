@@ -1177,4 +1177,3 @@ function FAQItem({ item, i, color }: { item: { q: string; a: string }; i: number
     </motion.div>
   );
 }
-                      

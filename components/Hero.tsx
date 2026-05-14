@@ -699,4 +699,16 @@ export default function Hero() {
             </div>
           </div>
 
-   
+          <div ref={rightRef} className="hero-right" style={{ flexShrink: 0, width: '420px', opacity: 0 }}>
+            <InteractiveGraphic />
+          </div>
+        </div>
+
+        {/* Full-width stats band — lives on the main page now, no longer
+            tucked under the orbital panel */}
+        <StatsBand />
+      </section>
+
+    </>
+  );
+}

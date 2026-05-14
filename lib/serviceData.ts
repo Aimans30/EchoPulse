@@ -305,8 +305,7 @@ export const services: ServiceData[] = [
       { q: 'Will the messages sound robotic?', a: 'No. We write all copy in your Voice Foundation and run test conversations before going live. Most clients say their audience cannot tell the difference between automation and a human reply.' },
     ],
   },
-];
-
-export function getService(slug: string): ServiceData | undefined {
-  return services.find(s => s.slug === slug);
-}
+  {
+    slug: 'apps-software',
+    name: 'Apps & Software',
+    tagline: 'Working product in weeks, not quarters. Built 

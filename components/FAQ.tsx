@@ -298,4 +298,20 @@ export default function FAQ() {
           box-shadow: 0 6px 18px rgba(12,12,11,0.05) !important;
         }
         .faq-card.open:hover {
-          background: linear-gradient(180deg, rgba(232,84,26,0.09) 0%, rgba(232,84,26,0.04) 100%) !im
+          background: linear-gradient(180deg, rgba(232,84,26,0.09) 0%, rgba(232,84,26,0.04) 100%) !important;
+        }
+
+        @media (max-width: 900px) {
+          .faq-grid { flex-direction: column !important; gap: 12px !important; }
+          .faq-header { flex-direction: column !important; align-items: flex-start !important; gap: 24px !important; }
+          .faq-sub { flex-basis: auto !important; max-width: 560px; }
+        }
+        @media (max-width: 640px) {
+          section#faq { padding: 80px 20px !important; }
+          .faq-h2 { font-size: 40px !important; letter-spacing: -1.5px !important; }
+          .faq-card { padding: 18px 20px !important; }
+        }
+      `}</style>
+    </section>
+  );
+}
