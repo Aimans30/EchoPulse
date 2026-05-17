@@ -308,4 +308,54 @@ export const services: ServiceData[] = [
   {
     slug: 'apps-software',
     name: 'Apps & Software',
-    tagline: 'Working product in weeks, not quarters. Built 
+    tagline: 'Working product in weeks, not quarters. Built by an engineer who ships daily.',
+    heroSub: 'You have an idea, an internal process, or a product feature that needs to actually exist. We build it. Custom web apps, internal tools, client portals, course platforms, member dashboards, MVPs, and full SaaS products. Built on a modern stack (React, Next.js, TypeScript, Supabase, Postgres) by a founder who currently writes production frontend code for a Canadian SaaS. No agency markup. No hourly billing. No three-month discovery phase.',
+    accentColor: '#3b82f6',
+    problemHeadline: 'Custom software should not cost six figures or take six months.',
+    problemBody: 'Most agencies treat custom builds as enterprise consulting. They scope for months, bill by the hour, and produce something a single engineer with the right stack could have shipped in weeks. We do the opposite: fixed scope, fixed price, real working code, shipped fast.',
+    problemPoints: [
+      'Dev shops quote $50K to $150K for what should be $10K to $30K',
+      'Hourly billing means slow builds, scope creep, and no end in sight',
+      'A communication gap between "developers" who cannot talk product and "consultants" who cannot write code',
+      'Three-month discovery phases for two-week problems',
+    ],
+    solutionHeadline: 'Fixed price. Fixed timeline. Real working product.',
+    solutionBody: 'We scope it, price it, ship it. MVPs in 4 to 6 weeks. Internal tools and dashboards in 2 to 4 weeks. Course platforms and member portals in 3 to 5 weeks. Built on a modern stack we use every day at MagicBNB, the Canadian SaaS we run frontend for. You get an engineer fluent in product, not a contractor billing by the hour.',
+    steps: [
+      { num: '01', title: 'Scope and Lock-In', body: 'One call. We talk through what you need, what users will do, and what success looks like. You leave with a written scope, a fixed price, and a delivery date. No 40-page discovery doc, no change-order pricing later.' },
+      { num: '02', title: 'Build in Public', body: 'We ship in one-week iterations. You see the product evolve every Friday with real screens and real interactions, not Figma mockups. Feedback runs through Slack or Loom, not formal change-orders.' },
+      { num: '03', title: 'Launch and Hand-Off', body: 'Your product goes live with hosting configured, source code transferred to your GitHub, and a full Loom walkthrough of every screen. You own everything from day one. Two weeks of post-launch fixes are included.' },
+    ],
+    deliverables: [
+      { icon: '🚀', title: 'SaaS MVPs for founders', desc: 'Working product in 4 to 6 weeks. Auth, payments via Stripe, database, admin dashboard, deployed live. Built on a stack that scales, not throwaway code.' },
+      { icon: '🎓', title: 'Course platforms for coaches', desc: 'Custom alternative to Kajabi or Teachable: branded landing, video lessons, progress tracking, member dashboards, payment flows. Stops the monthly platform tax.' },
+      { icon: '📋', title: 'Internal tools and dashboards', desc: 'Custom CRMs, reporting dashboards, workflow apps, booking systems. Replaces the spreadsheet stack you already outgrew.' },
+      { icon: '🔗', title: 'Client portals', desc: 'Login, file sharing, project tracking, billing visibility. Branded for your business, owned by you forever, no per-seat SaaS fees.' },
+      { icon: '📱', title: 'Mobile-first PWAs', desc: 'Progressive web apps that install on phones like native apps. One codebase, every device, no App Store gatekeeping or 30 percent fees.' },
+      { icon: '⚙️', title: 'API integrations and custom backends', desc: 'Stripe, OpenAI, Anthropic, webhooks, third-party data syncing. The plumbing that makes the rest of your stack actually talk to each other.' },
+    ],
+    result: {
+      client: 'Build Pricing',
+      role: 'Fixed-price tiers',
+      stat: '$4,997+',
+      statLabel: 'starting at',
+      body: 'Build pricing is fixed and transparent. Small builds (single-page apps, simple dashboards, internal tools): $4,997 to $9,997, 2 to 3 weeks. Mid-tier builds (course platforms, client portals, custom CRMs): $9,997 to $19,997, 3 to 5 weeks. Full MVP and SaaS builds (multi-user product with auth, payments, dashboards): $19,997 to $49,997, 4 to 8 weeks. Growth retainer clients get 20 percent off any build. Full System clients get one small build included per quarter plus 30 percent off larger builds. All code transfers to your GitHub on delivery.',
+    },
+    testimonial: {
+      quote: 'You should not need a Series A round to ship a working product. A modern stack plus a real engineer plus fixed scope means we build in weeks what agencies still quote in quarters.',
+      name: 'Lakshya Soni',
+      role: 'Founder, EchoPulse',
+    },
+    faq: [
+      { q: 'What stack do you build on?', a: 'Next.js, React, TypeScript, Tailwind for frontend. Supabase, Postgres, or Firebase for backend. Stripe for payments. Vercel or Netlify for hosting. The same stack we ship at MagicBNB every day, so we know its edges, not just its docs.' },
+      { q: 'Do you do mobile apps?', a: 'We build mobile-first progressive web apps (PWAs) that install on phones like native apps. For full native iOS or Android, we partner with a specialist studio. PWAs cover 90 percent of what most clients actually need at a fraction of the cost and timeline.' },
+      { q: 'What if I need changes after launch?', a: 'Two weeks of post-launch fixes are included free. After that, you can hire us hourly, pay for a scoped change, or take the codebase and hand it to any developer. We ship clean, documented code so any engineer can pick it up.' },
+      { q: 'How does this work with the Growth or Full System retainer?', a: 'Growth retainer clients get 20 percent off any app build. Full System clients get one small build (up to $9,997 scope) included per quarter at no extra cost, plus 30 percent off larger builds. Standalone clients can also buy a build without any retainer commitment.' },
+      { q: 'Do you take equity instead of cash?', a: 'No. Fixed pricing keeps incentives aligned. We charge a fair rate, ship working software, and move on.' },
+    ],
+  },
+];
+
+export function getService(slug: string): ServiceData | undefined {
+  return services.find(s => s.slug === slug);
+}
