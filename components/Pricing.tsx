@@ -332,10 +332,8 @@ export default function Pricing() {
                 ))}
               </ul>
 
-              <a
-                href={BOOK_CALL_URL}
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                onClick={() => (window as any).openBookCallModal && (window as any).openBookCallModal()}
                 aria-label={`${plan.cta} — ${plan.tier} plan`}
                 style={{
                   display: 'block',
@@ -366,7 +364,7 @@ export default function Pricing() {
                 }}
               >
                 {plan.cta}
-              </a>
+              </button>
             </motion.div>
           ))}
         </div>

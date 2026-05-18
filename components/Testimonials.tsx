@@ -130,10 +130,8 @@ export default function Testimonials() {
           transition={{ duration: 0.8, delay: 0.35 }}
           style={{ marginTop: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '14px', flexWrap: 'wrap' }}
         >
-          <a
-            href={BOOK_CALL_URL}
-            target="_blank"
-            rel="noopener noreferrer"
+          <button
+            onClick={() => (window as any).openBookCallModal && (window as any).openBookCallModal()}
             data-cursor-hover
             style={{
               background: '#E8541A',
@@ -158,7 +156,7 @@ export default function Testimonials() {
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
               <path d="M5 12h14M12 5l7 7-7 7" />
             </svg>
-          </a>
+          </button>
           <a
             href="https://www.linkedin.com/in/lakshyasoni/"
             target="_blank"

@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BOOK_CALL_URL, BOOK_CALL_LABEL, BOOK_CALL_LABEL_LONG } from '@/lib/links';
+import { BOOK_CALL_LABEL, BOOK_CALL_LABEL_LONG } from '@/lib/links';
 
 const links = [
   { label: 'Services', href: '/#services' },
@@ -216,16 +216,13 @@ export default function Nav() {
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#A8A49B" strokeWidth="2" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
               </motion.a>
             ))}
-            <a
-              href={BOOK_CALL_URL}
-              target="_blank"
-              rel="noopener noreferrer"
+            <button
               className="mobile-nav-cta"
-              onClick={closeMobile}
+              onClick={() => { closeMobile(); (window as any).openBookCallModal && (window as any).openBookCallModal(); }}
               aria-label={BOOK_CALL_LABEL_LONG}
             >
               {BOOK_CALL_LABEL_LONG}
-            </a>
+            </button>
           </motion.div>
         )}
       </AnimatePresence>
@@ -258,21 +255,10 @@ export default function Nav() {
           opacity: 0,
         }}
       >
-        {/* Logo */}
-        <a
-          href="/"
-          style={{
-            fontFamily: 'Inter, sans-serif',
-            fontSize: '16px',
-            fontWeight: 800,
-            letterSpacing: '-0.3px',
-            textDecoration: 'none',
-            color: '#0C0C0B',
-            whiteSpace: 'nowrap',
-            flexShrink: 0,
-          }}
-        >
-          Echo<span style={{ color: '#E8541A' }}>Pulse</span>
+        {/* Logo: prefer an image from public/logo.png if present */}
+        <a href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0, textDecoration: 'none' }}>
+          <img src="/logo.png" alt="" aria-hidden="true" width="126" height="28" style={{ height: 28, width: 'auto', display: 'block' }} onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} />
+          <span style={{ fontFamily: 'Inter, sans-serif', fontSize: '16px', fontWeight: 800, letterSpacing: '-0.3px', color: '#0C0C0B', display: 'block' }}>Echo<span style={{ color: '#E8541A' }}>Pulse</span></span>
         </a>
 
         {/* Desktop links */}
@@ -285,16 +271,14 @@ export default function Nav() {
         </ul>
 
         {/* Desktop CTA */}
-        <a
-          href={BOOK_CALL_URL}
-          target="_blank"
-          rel="noopener noreferrer"
+        <button
           className="nav-cta-btn nav-desktop-cta"
           aria-label={BOOK_CALL_LABEL_LONG}
           data-cursor-hover
+          onClick={() => (window as any).openBookCallModal && (window as any).openBookCallModal()}
         >
           <span>{BOOK_CALL_LABEL}</span>
-        </a>
+        </button>
 
         {/* Mobile hamburger */}
         <button

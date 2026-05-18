@@ -1,10 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
-import Script from "next/script";
 import "./globals.css";
 import SmoothScroll from "@/components/SmoothScroll";
 import Cursor from "@/components/Cursor";
 import EmojiNormalizer from "@/components/EmojiNormalizer";
+import BookCallModal from "@/components/BookCallModal";
 
 // Slim font weights — only what we actually use, with display:swap for fast first paint
 const inter = Inter({
@@ -49,28 +49,15 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={inter.variable} data-scroll-behavior="smooth">
-      <head>
-        {/* Preconnect to font/script CDNs for faster handshake */}
-        <link rel="preconnect" href="https://unpkg.com" crossOrigin="" />
-        {/* Shery.js stylesheet — only loaded on devices that can hover (skipped via media on mobile) */}
-        <link
-          rel="stylesheet"
-          href="https://unpkg.com/sheryjs/dist/Shery.css"
-          media="(hover: hover) and (pointer: fine)"
-        />
-      </head>
+      <head />
       <body>
         <SmoothScroll>
-          <Cursor />
-          {children}
+            <Cursor />
+            <main id="main-content">{children}</main>
+            <BookCallModal />
         </SmoothScroll>
         {/* Normalizes every emoji in the DOM to Twemoji SVGs — Apple-emoji-style consistency across every OS */}
         <EmojiNormalizer />
-        {/* Shery loads after hydration AND only on desktop pointer devices */}
-        <Script
-          src="https://unpkg.com/sheryjs/dist/Shery.js"
-          strategy="lazyOnload"
-        />
       </body>
     </html>
   );

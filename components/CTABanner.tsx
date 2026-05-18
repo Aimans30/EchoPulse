@@ -85,10 +85,8 @@ export default function CTABanner() {
             zIndex: 1,
           }}
         >
-          <motion.a
-            href={BOOK_CALL_URL}
-            target="_blank"
-            rel="noopener noreferrer"
+          <motion.button
+            onClick={() => (window as any).openBookCallModal && (window as any).openBookCallModal()}
             data-cursor-hover
             aria-label={BOOK_CALL_LABEL_LONG}
             whileHover={{ scale: 1.04, boxShadow: '0 16px 60px rgba(232,84,26,0.5)' }}
@@ -114,7 +112,7 @@ export default function CTABanner() {
             onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = '#E8541A')}
           >
             {BOOK_CALL_LABEL_LONG}
-          </motion.a>
+          </motion.button>
           <span style={{ fontSize: '12px', color: 'rgba(242,238,231,0.28)', textAlign: 'center' }}>
             No credit card. No contracts. Just a conversation.
           </span>

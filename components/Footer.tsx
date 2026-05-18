@@ -40,54 +40,39 @@ export default function Footer() {
         <p style={{ fontSize: '14px', color: '#6E6B63', lineHeight: 1.7, marginBottom: '28px', margin: '0 0 28px' }}>
           Full-stack content studio for premium founders and brands. Voice-driven video, LinkedIn ghostwriting, blogs, ad creatives, websites, and automations. Without the AI slop.
         </p>
-        <div style={{ display: 'flex', gap: '10px' }}>
-          {[
-            { label: 'in', href: '#' },
-            { label: 'ig', href: '#' },
-            { label: 'yt', href: '#' },
-          ].map((s) => (
-            <a
-              key={s.label}
-              href={s.href}
-              style={{
-                width: '36px',
-                height: '36px',
-                borderRadius: '10px',
-                background: 'rgba(255,255,255,0.55)',
-                backdropFilter: 'blur(10px)',
-                border: '1px solid rgba(255,255,255,0.8)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '12px',
-                fontWeight: 800,
-                cursor: 'none',
-                transition: 'all 0.25s',
-                textDecoration: 'none',
-                color: '#0C0C0B',
-                boxShadow: '0 2px 8px rgba(12,12,11,0.07)',
-              }}
-              onMouseEnter={(e) => {
-                const el = e.currentTarget as HTMLElement;
-                el.style.background = '#0C0C0B';
-                el.style.color = '#F2EEE7';
-                el.style.borderColor = '#0C0C0B';
-              }}
-              onMouseLeave={(e) => {
-                const el = e.currentTarget as HTMLElement;
-                el.style.background = 'rgba(255,255,255,0.55)';
-                el.style.color = '#0C0C0B';
-                el.style.borderColor = 'rgba(255,255,255,0.8)';
-              }}
-            >
-              {s.label}
-            </a>
-          ))}
+        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+          <a
+            href="https://www.instagram.com/echopulse.media?igsh=bnY4Z2Zza2k4Njgw"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="EchoPulse on Instagram"
+            style={{ display: 'inline-flex', width: '36px', height: '36px', borderRadius: 10, alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.9)', border: '1px solid rgba(0,0,0,0.05)' }}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+              <rect x="2" y="2" width="20" height="20" rx="5" stroke="#0C0C0B" strokeWidth="1" fill="none" />
+              <path d="M12 7.25a4.75 4.75 0 1 0 0 9.5 4.75 4.75 0 0 0 0-9.5z" stroke="#0C0C0B" strokeWidth="1" fill="none" />
+              <circle cx="17" cy="7" r="0.8" fill="#0C0C0B" />
+            </svg>
+          </a>
+
+          <a
+            href="https://www.linkedin.com/company/echo-pulse-media/"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="EchoPulse on LinkedIn"
+            style={{ display: 'inline-flex', width: '36px', height: '36px', borderRadius: 10, alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.9)', border: '1px solid rgba(0,0,0,0.05)' }}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+              <path d="M4.98 3.5C4.98 4.88 3.86 6 2.48 6S0 4.88 0 3.5 1.12 1 2.5 1 4.98 2.12 4.98 3.5z" transform="translate(4 5)" stroke="#0C0C0B" strokeWidth="0.6" fill="none" />
+              <rect x="2" y="3" width="3" height="8" rx="0.5" transform="translate(9 5)" stroke="#0C0C0B" strokeWidth="0.6" fill="none" />
+              <path d="M2 3h3v8H2z" transform="translate(15 5)" stroke="#0C0C0B" strokeWidth="0.6" fill="none" />
+            </svg>
+          </a>
         </div>
       </div>
 
       <div>
-        <h4
+        <h3
           style={{
             fontSize: '10px',
             fontWeight: 700,
@@ -98,7 +83,7 @@ export default function Footer() {
           }}
         >
           Services
-        </h4>
+        </h3>
         <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {serviceLinks.map((s) => (
             <li key={s}>
@@ -116,7 +101,7 @@ export default function Footer() {
       </div>
 
       <div>
-        <h4
+        <h3
           style={{
             fontSize: '10px',
             fontWeight: 700,
@@ -127,7 +112,7 @@ export default function Footer() {
           }}
         >
           Company
-        </h4>
+        </h3>
         <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {companyLinks.map((c) => (
             <li key={c}>
@@ -145,7 +130,7 @@ export default function Footer() {
       </div>
 
       <div>
-        <h4
+        <h3
           style={{
             fontSize: '10px',
             fontWeight: 700,
@@ -156,7 +141,7 @@ export default function Footer() {
           }}
         >
           Contact
-        </h4>
+        </h3>
         <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {[
             { label: 'echopulse.media', href: 'https://echopulse.media' },

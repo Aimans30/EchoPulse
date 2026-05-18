@@ -3,7 +3,7 @@
 // before going live. Every CTA across the site reads from here, so updating
 // one constant updates the whole site.
 
-export const BOOK_CALL_URL = 'https://cal.com/lakshyasoni/intro';
+export const BOOK_CALL_URL = 'https://calendly.com/echopulsemedia/content-strategy-and-introduction';
 export const BOOK_CALL_LABEL = 'Book a Free Call';
 export const BOOK_CALL_LABEL_LONG = 'Book a Free 45-min Call';
 

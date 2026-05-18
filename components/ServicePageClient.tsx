@@ -112,30 +112,22 @@ function StickyProgress() {
   return (
     <motion.div
       style={{
-        scaleX,
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        height: '2px',
-        background: 'linear-gradient(90deg, #E8541A, #ff8c5a)',
-        transformOrigin: 'left',
-        zIndex: 600,
-      }}
-    />
-  );
-}
-
-function StickyBottomCTA({ accentColor }: { accentColor: string }) {
-  const [show, setShow] = useState(false);
-  const [finalCtaInView, setFinalCtaInView] = useState(false);
-
-  useEffect(() => {
-    let raf = 0;
-    const onScroll = () => {
-      if (raf) return;
-      raf = requestAnimationFrame(() => {
-        setShow(window.scrollY > 700);
+        <button
+          onClick={() => (window as any).openBookCallModal && (window as any).openBookCallModal()}
+          style={{
+            background: accentColor,
+            color: '#fff',
+            padding: '10px 22px',
+            borderRadius: '100px',
+            fontSize: '12px',
+            fontWeight: 700,
+            textDecoration: 'none',
+            fontFamily: 'Inter,sans-serif',
+            display: 'inline-flex',
+          }}
+        >
+          Book a Free Strategy Call
+        </button>
         raf = 0;
       });
     };
@@ -204,10 +196,8 @@ function StickyBottomCTA({ accentColor }: { accentColor: string }) {
       <span style={{ fontSize: '13px', fontWeight: 600, color: '#F2EEE7', whiteSpace: 'nowrap' }}>
         Ready to start?
       </span>
-      <a
-        href={BOOK_CALL_URL}
-        target="_blank"
-        rel="noopener noreferrer"
+      <button
+        onClick={() => (window as any).openBookCallModal && (window as any).openBookCallModal()}
         style={{
           background: accentColor,
           color: '#fff',
@@ -225,7 +215,7 @@ function StickyBottomCTA({ accentColor }: { accentColor: string }) {
       >
         Book a Call
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
-      </a>
+      </button>
     </motion.div>
   );
 }
@@ -373,10 +363,8 @@ export default function ServicePageClient({ service }: { service: ServiceData })
                 transition={{ duration: 0.6, delay: 1.5 }}
                 style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center' }}
               >
-                <a
-                  href={BOOK_CALL_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <button
+                  onClick={() => (window as any).openBookCallModal && (window as any).openBookCallModal()}
                   style={{
                     background: service.accentColor,
                     color: '#fff',
@@ -394,7 +382,7 @@ export default function ServicePageClient({ service }: { service: ServiceData })
                 >
                   Book a Free Strategy Call
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
-                </a>
+                </button>
                 <a
                   href="#deliverables"
                   style={{
@@ -925,10 +913,8 @@ export default function ServicePageClient({ service }: { service: ServiceData })
             <span style={{ fontSize: '14px', color: 'rgba(242,238,231,0.7)', flex: 1, lineHeight: 1.5 }}>
               Free 45-minute call. No commitment. We send a custom plan whether or not you ever hire us.
             </span>
-            <a
-              href={BOOK_CALL_URL}
-              target="_blank"
-              rel="noopener noreferrer"
+            <button
+              onClick={() => (window as any).openBookCallModal && (window as any).openBookCallModal()}
               style={{
                 background: service.accentColor,
                 color: '#fff',
@@ -942,7 +928,7 @@ export default function ServicePageClient({ service }: { service: ServiceData })
               }}
             >
               Book a Call →
-            </a>
+            </button>
           </motion.div>
         </div>
 
@@ -1030,10 +1016,8 @@ export default function ServicePageClient({ service }: { service: ServiceData })
           </motion.p>
 
           <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap' }}>
-            <a
-              href={BOOK_CALL_URL}
-              target="_blank"
-              rel="noopener noreferrer"
+            <button
+              onClick={() => (window as any).openBookCallModal && (window as any).openBookCallModal()}
               style={{
                 background: service.accentColor,
                 color: '#fff',
@@ -1051,7 +1035,7 @@ export default function ServicePageClient({ service }: { service: ServiceData })
             >
               Book a Free Strategy Call
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
-            </a>
+            </button>
             <Link
               href="/#services"
               style={{

@@ -2,7 +2,6 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { BOOK_CALL_URL } from '@/lib/links';
 
 const tabs = [
   { label: 'All', key: 'all' },
@@ -41,6 +40,27 @@ const videos = [
   { type: 'course',    brand: 'Real Estate',   label: 'Listing Reel',   grad: 1, views: 'Reel', likes: '45s' },
 ];
 
+// External craft video sources provided by content owner
+const sourcesByType: Record<string, string[]> = {
+  longform: [
+    'https://player.cloudinary.com/embed/?cloud_name=du6yx2h01&public_id=vsl1_1_aagaus',
+    'https://player.cloudinary.com/embed/?cloud_name=du6yx2h01&public_id=Untitled_video_-_Made_with_Clipchamp_1_1_spvlnf',
+    'https://res.cloudinary.com/dqqd9rq8s/video/upload/f_mp4,q_auto/fn_1_xy7wfm.mp4',
+  ],
+  podcast: [
+    'https://player.cloudinary.com/embed/?cloud_name=du6yx2h01&public_id=17_feb_xngenr',
+    'https://res.cloudinary.com/du6yx2h01/video/upload/v1765363520/Ep1_Clip18_corrected_xn2szx.mp4',
+    'https://res.cloudinary.com/dqqd9rq8s/video/upload/f_mp4,q_auto/EP4_trailer_l6atpc.mp4',
+    'https://res.cloudinary.com/dqqd9rq8s/video/upload/f_mp4,q_auto/mian_hlymvc.mp4',
+    'https://res.cloudinary.com/du6yx2h01/video/upload/v1779111471/Clip_2_sy4gp8.mp4',
+  ],
+  talking: [
+    'https://player.cloudinary.com/embed/?cloud_name=du6yx2h01&public_id=patern_intrupt_sdrd8w',
+    'https://res.cloudinary.com/dqqd9rq8s/video/upload/f_mp4,q_auto/sample_1_j1b05r.mp4',
+    'https://res.cloudinary.com/dqqd9rq8s/video/upload/f_mp4,q_auto/c5_p3qm4j.mp4',
+  ],
+};
+
 const CARD_W = 230;
 const CARD_H = 408;
 const GAP = 12;
@@ -49,6 +69,7 @@ const SPEED = 0.55; // px per frame
 export default function OurWork() {
   const [activeTab, setActiveTab] = useState('all');
   const [playingIdx, setPlayingIdx] = useState<number | null>(null);
+  const [autoScrollEnabled, setAutoScrollEnabled] = useState(true);
   const trackRef = useRef<HTMLDivElement>(null);
   const pauseRef = useRef(false);
   const rafRef = useRef<number | undefined>(undefined);
@@ -60,6 +81,7 @@ export default function OurWork() {
   const halfWidth = (CARD_W + GAP) * filtered.length;
 
   const startRAF = useCallback(() => {
+    if (!autoScrollEnabled) return;
     const track = trackRef.current;
     if (!track) return;
 
@@ -75,15 +97,77 @@ export default function OurWork() {
 
     if (rafRef.current) cancelAnimationFrame(rafRef.current);
     rafRef.current = requestAnimationFrame(tick);
-  }, [halfWidth]);
+  }, [halfWidth, autoScrollEnabled]);
+
+  useEffect(() => {
+    const mm = window.matchMedia('(max-width: 900px), (pointer: coarse)');
+    const update = () => setAutoScrollEnabled(!mm.matches);
+    update();
+    mm.addEventListener('change', update);
+    return () => mm.removeEventListener('change', update);
+  }, []);
 
   useEffect(() => {
     const track = trackRef.current;
     if (track) track.scrollLeft = 0;
     setPlayingIdx(null);
-    startRAF();
+    if (autoScrollEnabled) startRAF();
     return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); };
-  }, [filtered.length, startRAF]);
+  }, [filtered.length, startRAF, autoScrollEnabled]);
+
+  // Modal for playing actual craft videos
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalSrc, setModalSrc] = useState<string | null>(null);
+  const [modalType, setModalType] = useState<string | null>(null);
+
+  const openVideo = (i: number) => {
+    const idx = i % filtered.length;
+    const v = filtered[idx];
+    const list = sourcesByType[v.type] || [];
+    const src = list.length ? list[idx % list.length] : null;
+    if (src) {
+      setModalSrc(src);
+      setModalType(v.type);
+      setModalOpen(true);
+      pauseRef.current = true;
+      // Pause carousel videos when modal opens
+      const videoEls = trackRef.current?.querySelectorAll('video');
+      if (videoEls) {
+        videoEls.forEach(el => {
+          if (el instanceof HTMLVideoElement) el.pause();
+        });
+      }
+    } else {
+      // fallback: toggle playing indicator on card
+      setPlayingIdx(playingIdx === i ? null : i);
+    }
+  };
+
+  const getVideoSrc = (videoIdx: number) => {
+    const idx = videoIdx % filtered.length;
+    const v = filtered[idx];
+    const list = sourcesByType[v.type] || [];
+    if (list.length) {
+      const src = list[idx % list.length];
+      // Extract video ID from Cloudinary URLs
+      if (src.includes('player.cloudinary.com/embed')) {
+        const url = new URL(src);
+        const publicId = url.searchParams.get('public_id');
+        if (publicId) {
+          return `https://res.cloudinary.com/du6yx2h01/video/upload/c_scale,w_400,f_auto/${publicId}.mp4`;
+        }
+      }
+      // Direct video URL
+      if (src.includes('.mp4')) return src;
+    }
+    return null;
+  };
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') { setModalOpen(false); setModalSrc(null); pauseRef.current = false; } };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
 
   const scrollBy = (dir: number) => {
     const track = trackRef.current;
@@ -181,9 +265,10 @@ export default function OurWork() {
           -webkit-backdrop-filter: blur(20px);
           border: 1px solid rgba(255,255,255,0.82);
           border-radius: 14px; padding: 5px;
-          display: inline-flex; gap: 2px;
+          display: inline-flex; gap: 2px; flex-wrap: wrap;
           box-shadow: 0 4px 20px rgba(12,12,11,0.07), inset 0 1px 0 rgba(255,255,255,0.9);
           max-width: 100%; overflow-x: auto; scrollbar-width: none;
+          justify-content: center;
         }
         .tab-bar::-webkit-scrollbar { display: none; }
         .tab-btn {
@@ -195,6 +280,11 @@ export default function OurWork() {
           white-space: nowrap; letter-spacing: 1.5px; text-transform: uppercase;
           font-family: Inter, sans-serif;
           isolation: isolate;
+          flex-shrink: 0;
+        }
+        @media (max-width: 768px) {
+          .tab-bar { flex-wrap: wrap; justify-content: center; padding: 3px; gap: 1px; }
+          .tab-btn { padding: 6px 12px; font-size: 10px; letter-spacing: 1px; }
         }
         .tab-btn.active { color: #F2EEE7; }
         .tab-btn:not(.active):hover { color: #0C0C0B; }
@@ -317,18 +407,33 @@ export default function OurWork() {
         <div
           ref={trackRef}
           className="work-track"
-          onMouseEnter={() => { pauseRef.current = true; }}
-          onMouseLeave={() => { pauseRef.current = false; }}
+          onMouseEnter={() => { if (autoScrollEnabled) pauseRef.current = true; }}
+          onMouseLeave={() => { if (autoScrollEnabled) pauseRef.current = false; }}
         >
           {doubled.map((video, i) => (
             <div
               key={i}
               className={`vid-card${playingIdx === i ? ' playing' : ''}`}
-              onClick={() => setPlayingIdx(playingIdx === i ? null : i)}
+              onClick={() => openVideo(i)}
             >
-              <div className="vid-inner">
-                <div style={{ position: 'absolute', inset: 0, background: thumbGrads[video.grad] }} />
-                <div style={{ position: 'absolute', inset: 0, backgroundImage: 'radial-gradient(rgba(255,255,255,0.04) 1px, transparent 1px)', backgroundSize: '20px 20px' }} />
+                  <div className="vid-inner">
+                    {(() => {
+                      const vidSrc = getVideoSrc(i);
+                      return vidSrc ? (
+                        <video
+                          src={vidSrc}
+                          muted
+                          autoPlay
+                          loop
+                          playsInline
+                          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', background: '#0C0C0B' }}
+                        />
+                      ) : (
+                        <div style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', background: '#0C0C0B' }} />
+                      );
+                    })()}
+                    <div style={{ position: 'absolute', inset: 0, background: thumbGrads[video.grad], mixBlendMode: 'multiply' }} />
+                    <div style={{ position: 'absolute', inset: 0, backgroundImage: 'radial-gradient(rgba(255,255,255,0.04) 1px, transparent 1px)', backgroundSize: '20px 20px' }} />
 
                 {/* Playing pulse */}
                 {playingIdx === i && (
@@ -368,6 +473,32 @@ export default function OurWork() {
           ))}
         </div>
 
+        {/* Video modal (full-screen) */}
+        {modalOpen && modalSrc && (
+          <div
+            style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.72)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100001 }}
+            onClick={() => { setModalOpen(false); setModalSrc(null); pauseRef.current = false; }}
+          >
+            <div
+              role="dialog"
+              aria-modal="true"
+              onClick={(e) => e.stopPropagation()}
+              style={{ width: 'min(1100px, 95vw)', aspectRatio: '16 / 9', background: '#000', borderRadius: 10, overflow: 'hidden' }}
+            >
+              {modalSrc.includes('player.cloudinary.com/embed') ? (
+                <iframe
+                  title="Craft Video"
+                  src={modalSrc}
+                  style={{ width: '100%', height: '100%', border: 0 }}
+                  allowFullScreen
+                />
+              ) : (
+                <video style={{ width: '100%', height: '100%', display: 'block' }} controls src={modalSrc} />
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Right arrow */}
         <button className="work-arrow work-arrow-right" onClick={() => scrollBy(1)} aria-label="Next">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F2EEE7" strokeWidth="2.5" strokeLinecap="round">
@@ -383,10 +514,8 @@ export default function OurWork() {
         viewport={{ once: true }}
         style={{ display: 'flex', justifyContent: 'center', marginTop: '48px', gap: '16px', flexWrap: 'wrap', alignItems: 'center', padding: '0 56px' }}
       >
-        <a
-          href={BOOK_CALL_URL}
-          target="_blank"
-          rel="noopener noreferrer"
+        <button
+          onClick={() => (window as any).openBookCallModal && (window as any).openBookCallModal()}
           data-cursor-hover
           aria-label="Book a call to see more work"
           style={{ background: '#0C0C0B', color: '#F2EEE7', padding: '14px 32px', borderRadius: '100px', fontSize: '13px', fontWeight: 700, cursor: 'none', transition: 'all 0.3s', textDecoration: 'none', fontFamily: 'Inter, sans-serif', display: 'inline-flex', alignItems: 'center', gap: '8px', minHeight: '44px' }}
@@ -395,7 +524,7 @@ export default function OurWork() {
         >
           Book a Call to See More
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-        </a>
+        </button>
       </motion.div>
 
       <style>{`
@@ -405,7 +534,8 @@ export default function OurWork() {
         }
         @media(max-width:640px) {
           .work-arrow { display:none !important; }
-          .work-track { padding: 0 16px !important; }
+          .work-track { padding: 0 16px !important; overflow-x: auto !important; scroll-snap-type: x mandatory; }
+          .vid-card { scroll-snap-align: start; }
           .work-header { padding: 0 24px !important; }
           .work-tabs { padding: 0 16px !important; }
         }

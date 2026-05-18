@@ -133,10 +133,10 @@ export default function ContentShowcase() {
             transition={{ delay:0.5 }}
             style={{ display:'flex', gap:'12px', flexWrap:'wrap', alignItems:'center' }}
           >
-            <a href="https://echopulse.media" target="_blank" rel="noopener noreferrer" className="cta-primary">
+            <button onClick={() => (window as any).openBookCallModal && (window as any).openBookCallModal()} className="cta-primary" aria-label="Book a Free Strategy Call">
               <span>Book a Free Strategy Call</span>
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-            </a>
+            </button>
             <a href="#work" className="cta-secondary">
               See Our Work
             </a>

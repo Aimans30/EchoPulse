@@ -186,7 +186,7 @@ function InteractiveGraphic() {
 
           {/* Pulse rings — emanating from core every couple seconds */}
           {[0, 1, 2].map((i) => (
-            <motion.circle
+            <circle
               key={`pulse-${i}`}
               cx={center}
               cy={center}
@@ -194,8 +194,8 @@ function InteractiveGraphic() {
               fill="none"
               stroke="#E8541A"
               strokeWidth={1.2}
-              animate={{ r: [70, 200], opacity: [0.45, 0] }}
-              transition={{ duration: 3, delay: i * 1, repeat: Infinity, ease: 'easeOut' }}
+              className="ep-pulse-ring"
+              style={{ animationDelay: `${i * 1}s` }}
             />
           ))}
 
@@ -237,34 +237,27 @@ function InteractiveGraphic() {
 
           {/* Data-flow particles — visualize work flowing into the core */}
           {servicePositions.map((p, i) => (
-            <motion.circle
+            <circle
               key={`pt-${i}`}
+              cx={p.x}
+              cy={p.y}
               r={2.5}
               fill={services[i].color}
-              animate={{
-                cx: [p.x, center],
-                cy: [p.y, center],
-                opacity: [0, 1, 0],
-              }}
-              transition={{
-                duration: 2.4,
-                delay: i * 0.4,
-                repeat: Infinity,
-                ease: 'easeIn',
-              }}
+              className="ep-flow-dot"
+              style={{ animationDelay: `${i * 0.4}s` }}
             />
           ))}
 
           {/* Workflow waypoints (outer ring) — subtle pulse in sequence */}
           {flowPositions.map((p, i) => (
             <g key={`wf-${i}`}>
-              <motion.circle
+              <circle
                 cx={p.x}
                 cy={p.y}
                 r={4}
                 fill={flow[i].color}
-                animate={{ opacity: [0.25, 1, 0.25], r: [4, 6, 4] }}
-                transition={{ duration: 2.5, delay: i * 0.5, repeat: Infinity, ease: 'easeInOut' }}
+                className="ep-waypoint"
+                style={{ animationDelay: `${i * 0.5}s` }}
               />
               <text
                 x={p.x}
@@ -319,15 +312,14 @@ function InteractiveGraphic() {
 
           {/* Central core */}
           <circle cx={center} cy={center} r={56} fill="url(#ep-core-fill)" stroke="rgba(232,84,26,0.4)" strokeWidth={1} />
-          <motion.circle
+          <circle
             cx={center}
             cy={center}
             r={56}
             fill="none"
             stroke="#E8541A"
             strokeOpacity={0.6}
-            animate={{ r: [56, 66], opacity: [0.6, 0] }}
-            transition={{ duration: 2.4, repeat: Infinity, ease: 'easeOut' }}
+            className="ep-core-ring"
           />
 
           <text
@@ -608,11 +600,20 @@ export default function Hero() {
         .scroll-hint{position:absolute;bottom:24px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:6px;color:#A8A49B;font-size:9px;letter-spacing:3px;text-transform:uppercase;font-weight:600;}
         .scroll-line{width:1px;height:28px;background:linear-gradient(to bottom,#E8541A,transparent);animation:sline 1.8s ease-in-out infinite;}
         @keyframes sline{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+        .ep-pulse-ring,.ep-core-ring,.ep-waypoint,.ep-flow-dot{transform-box: fill-box; transform-origin: center;}
+        .ep-pulse-ring{animation: ep-pulse 3s ease-out infinite;}
+        .ep-core-ring{animation: ep-core 2.4s ease-out infinite;}
+        .ep-waypoint{animation: ep-waypoint 2.5s ease-in-out infinite;}
+        .ep-flow-dot{animation: ep-flow 2.4s ease-in infinite;}
+        @keyframes ep-pulse{0%{transform:scale(1);opacity:.45}100%{transform:scale(2.85);opacity:0}}
+        @keyframes ep-core{0%{transform:scale(1);opacity:.6}100%{transform:scale(1.18);opacity:0}}
+        @keyframes ep-waypoint{0%,100%{transform:scale(1);opacity:.25}50%{transform:scale(1.5);opacity:1}}
+        @keyframes ep-flow{0%{opacity:0;transform:scale(1)}50%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1)}}
         @media(max-width:860px){.hero-right{display:none!important;}.hero-inner{gap:0!important;}}
         @media(max-width:640px){
           .hero-inner{padding:88px 20px 40px!important;}
-          .hero-actions{gap:10px!important;margin-bottom:24px!important;width:100%;}
-          .hero-actions .btn-p,.hero-actions .btn-o{width:100%;justify-content:center;padding:16px 24px!important;font-size:14px!important;}
+          .hero-actions{gap:10px!important;margin-bottom:24px!important;width:100%;justify-content:center!important;}
+          .hero-actions .btn-p,.hero-actions .btn-o{flex:1;min-width:140px;justify-content:center;padding:16px 24px!important;font-size:14px!important;}
           .hero-actions .hero-trust{order:-1;width:100%;justify-content:flex-start;margin-bottom:4px;}
           .scroll-hint{display:none!important;}
         }
@@ -656,10 +657,10 @@ export default function Hero() {
             </p>
 
             <div ref={actionsRef} className="hero-actions" style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '0', opacity: 0, alignItems: 'center' }}>
-              <a href={BOOK_CALL_URL} target="_blank" rel="noopener noreferrer" className="btn-p" aria-label={BOOK_CALL_LABEL_LONG} data-cursor-hover>
+              <button onClick={() => (window as any).openBookCallModal && (window as any).openBookCallModal()} className="btn-p" aria-label={BOOK_CALL_LABEL_LONG} data-cursor-hover>
                 <span>{BOOK_CALL_LABEL_LONG}</span>
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-              </a>
+              </button>
               <a href="#services" className="btn-o" data-cursor-hover>See Our Work</a>
             </div>
           </div>

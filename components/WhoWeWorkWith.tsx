@@ -213,10 +213,8 @@ export default function WhoWeWorkWith() {
               )}
 
               {card.cta && (
-                <a
-                  href={BOOK_CALL_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <button
+                  onClick={() => (window as any).openBookCallModal && (window as any).openBookCallModal()}
                   data-cursor-hover
                   aria-label={BOOK_CALL_LABEL}
                   style={{ display: 'inline-block', marginTop: '24px', background: '#E8541A', color: '#fff', border: 'none', padding: '12px 24px', borderRadius: '100px', fontSize: '13px', fontWeight: 700, cursor: 'none', transition: 'all 0.3s', textDecoration: 'none', fontFamily: 'Inter, sans-serif', boxShadow: '0 4px 20px rgba(232,84,26,0.3)', minHeight: '44px' }}
@@ -224,7 +222,7 @@ export default function WhoWeWorkWith() {
                   onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = '#E8541A'; (e.currentTarget as HTMLElement).style.transform = 'scale(1)'; }}
                 >
                   {BOOK_CALL_LABEL} →
-                </a>
+                </button>
               )}
             </div>
           </motion.div>

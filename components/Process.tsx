@@ -266,9 +266,8 @@ export default function Process() {
           initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
           style={{ marginTop: '48px', display: 'flex', justifyContent: 'center' }}
         >
-          <a
-            href={BOOK_CALL_URL}
-            target="_blank" rel="noopener noreferrer"
+          <button
+            onClick={() => (window as any).openBookCallModal && (window as any).openBookCallModal()}
             data-cursor-hover
             style={{ background: '#E8541A', color: '#fff', padding: '15px 32px', borderRadius: '100px', fontSize: '13px', fontWeight: 700, cursor: 'none', transition: 'all 0.3s', textDecoration: 'none', fontFamily: 'Inter, sans-serif', display: 'inline-flex', alignItems: 'center', gap: '8px', boxShadow: '0 8px 32px rgba(232,84,26,0.3)' }}
             onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#d94a14'; (e.currentTarget as HTMLElement).style.transform = 'scale(1.03)'; }}
@@ -276,7 +275,7 @@ export default function Process() {
           >
             Start with a Free Strategy Call
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          </a>
+          </button>
         </motion.div>
       </div>
     </section>
