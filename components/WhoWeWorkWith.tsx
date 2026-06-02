@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import {
   Rocket,
@@ -10,7 +11,7 @@ import {
   MessageCircle,
   type LucideIcon,
 } from 'lucide-react';
-import { BOOK_CALL_URL, BOOK_CALL_LABEL } from '@/lib/links';
+import { BOOK_CALL_LABEL } from '@/lib/links';
 
 type Card = {
   num: string;
@@ -27,43 +28,43 @@ type Card = {
 
 const cards: Card[] = [
   {
-    num: '01', Icon: Rocket, title: 'B2B Founders',
-    desc: 'SaaS, consulting, and agency founders who want LinkedIn ghostwriting, blog content, and video that sounds like them. Not like a junior copywriter or ChatGPT.',
-    tag: 'Our Specialty', tagColor: '#E8541A',
+    num: '01', Icon: Rocket, title: 'Founders & Operators',
+    desc: 'SaaS, agency, and consulting founders who want LinkedIn, blogs, video, and ads handled by one team. So you can stop reviewing five freelancers and run the business.',
+    tag: 'Our Core', tagColor: '#E8541A',
     gradient: 'radial-gradient(circle at 80% 20%, rgba(232,84,26,0.12) 0%, transparent 60%)',
     accentLine: '#E8541A',
   },
   {
-    num: '02', Icon: Home, title: 'Real Estate & STR',
-    desc: 'Premium agents, brokerages, and Airbnb operators who need cinematic property reels, agent personal brand video, and listing content that books.',
-    tag: 'Cinematic Edge', tagColor: '#f59e0b',
+    num: '02', Icon: Home, title: 'Real Estate Agents',
+    desc: 'Solo agents, brokerages, and short-term-rental operators who need cinematic property reels, personal-brand video, listing content, and ads that actually book viewings.',
+    tag: 'Big Lift', tagColor: '#f59e0b',
     gradient: 'radial-gradient(circle at 80% 20%, rgba(245,158,11,0.10) 0%, transparent 60%)',
     accentLine: '#f59e0b',
   },
   {
-    num: '03', Icon: GraduationCap, title: 'Course Creators',
-    desc: 'Educators who need pre-launch content systems, evergreen short-form, and conversion funnels that fill cohorts without manual selling.',
+    num: '03', Icon: GraduationCap, title: 'Coaches & Course Creators',
+    desc: 'Educators and coaches who need pre-launch content, evergreen short-form, ad creative, and funnels that fill cohorts and coaching slots without manual selling.',
     tag: 'High ROI', tagColor: '#8b5cf6',
     gradient: 'radial-gradient(circle at 80% 20%, rgba(139,92,246,0.10) 0%, transparent 60%)',
     accentLine: '#8b5cf6',
   },
   {
-    num: '04', Icon: ShoppingBag, title: 'DTC Brands',
-    desc: 'Direct-to-consumer brands burning through ad creative every two weeks. We deliver fresh static + video ads on a subscription before fatigue kills your CPA.',
+    num: '04', Icon: ShoppingBag, title: 'DTC & E-Commerce',
+    desc: 'Brands burning through ad creative every two weeks. Fresh static + video ads on a subscription so fatigue stops killing your CPA. Plus the store, the funnels, the email.',
     tag: 'Subscription', tagColor: '#10b981',
     gradient: 'radial-gradient(circle at 80% 20%, rgba(16,185,129,0.10) 0%, transparent 60%)',
     accentLine: '#10b981',
   },
   {
-    num: '05', Icon: Briefcase, title: 'Agencies & Consultancies',
-    desc: 'Agency owners and consultants who want inbound leads from content instead of cold outreach. Plus a website that converts the traffic when it comes.',
+    num: '05', Icon: Briefcase, title: 'Business Owners',
+    desc: 'Local businesses, service operators, agencies, and consultancies who need inbound leads from content instead of cold outreach. Plus a site that converts the traffic.',
     tag: 'Scaling', tagColor: '#3b82f6',
     gradient: 'radial-gradient(circle at 80% 20%, rgba(59,130,246,0.10) 0%, transparent 60%)',
     accentLine: '#3b82f6',
   },
   {
-    num: '?', Icon: MessageCircle, title: 'Sound Like You?',
-    desc: 'Building a premium brand and need a team that handles cinematic video, LinkedIn ghostwriting, blogs, ads, and websites. Without you having to manage 5 vendors.',
+    num: '?', Icon: MessageCircle, title: 'Something Else?',
+    desc: 'If you have an offer, an audience, and no time to chase five vendors, we can probably help. Tell us what you do and what you want to ship. We will give you a plan.',
     tag: null, tagColor: '#E8541A',
     gradient: null,
     accentLine: '#E8541A',
@@ -82,8 +83,64 @@ const cardVariants = {
 };
 
 export default function WhoWeWorkWith() {
+  const gridRef = useRef<HTMLDivElement>(null);
+
+  // Mobile-only slow auto-scroll. Drifts the card carousel rightward at ~12px/s,
+  // loops cleanly by jumping back to start when end is reached. Pauses while
+  // the user is touching the strip + for 2.5s after they let go — gives them
+  // full agency without stealing it back too soon.
+  useEffect(() => {
+    const grid = gridRef.current;
+    if (!grid) return;
+    if (typeof window === 'undefined') return;
+    // Desktop: this carousel doesn't even render as a scroll strip — skip.
+    if (window.innerWidth > 640) return;
+    // Reduced-motion: respect the preference.
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    let raf = 0;
+    let last = performance.now();
+    let paused = false;
+    let resumeTimer: number | null = null;
+
+    const tick = (now: number) => {
+      const dt = Math.min(now - last, 50);
+      last = now;
+      if (!paused) {
+        const max = grid.scrollWidth - grid.clientWidth - 2;
+        // ~12 px/sec — slow, easy to read, never feels like it's running away
+        grid.scrollLeft += dt * 0.012;
+        if (grid.scrollLeft >= max) grid.scrollLeft = 0; // loop
+      }
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+
+    const pause = () => {
+      paused = true;
+      if (resumeTimer) window.clearTimeout(resumeTimer);
+    };
+    const scheduleResume = () => {
+      if (resumeTimer) window.clearTimeout(resumeTimer);
+      resumeTimer = window.setTimeout(() => { paused = false; }, 2500);
+    };
+    grid.addEventListener('touchstart', pause, { passive: true });
+    grid.addEventListener('touchend', scheduleResume, { passive: true });
+    grid.addEventListener('mousedown', pause, { passive: true });
+    grid.addEventListener('mouseup', scheduleResume, { passive: true });
+
+    return () => {
+      cancelAnimationFrame(raf);
+      if (resumeTimer) window.clearTimeout(resumeTimer);
+      grid.removeEventListener('touchstart', pause);
+      grid.removeEventListener('touchend', scheduleResume);
+      grid.removeEventListener('mousedown', pause);
+      grid.removeEventListener('mouseup', scheduleResume);
+    };
+  }, []);
+
   return (
-    <section style={{ padding: '128px 56px', position: 'relative', overflow: 'hidden' }}>
+    <section className="wwww-section" style={{ padding: '128px 56px', position: 'relative', overflow: 'hidden' }}>
       {/* Subtle background gradient */}
       <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 60% 50% at 50% 0%, rgba(232,84,26,0.04) 0%, transparent 70%)', pointerEvents: 'none' }} />
 
@@ -151,12 +208,117 @@ export default function WhoWeWorkWith() {
           margin-top: 64px;
         }
         @media(max-width:1200px){ .icp-grid{ grid-template-columns:repeat(2,1fr)!important; } }
-        @media(max-width:640px){ .icp-grid{ grid-template-columns:1fr!important; } }
-        @media(max-width:768px){ section{ padding:80px 28px!important; } }
+
+        /* Swipe cue — mobile only */
+        .wwww-swipe-cue {
+          display: none;
+          align-items: center;
+          justify-content: center;
+          gap: 6px;
+          margin-top: 14px;
+          font-size: 10px;
+          letter-spacing: 1.5px;
+          text-transform: uppercase;
+          color: rgba(110,107,99,0.55);
+          font-weight: 700;
+        }
+        .wwww-swipe-cue .dot {
+          width: 5px; height: 5px; border-radius: 50%;
+          background: rgba(232,84,26,0.55);
+          animation: wcue 1.6s ease-in-out infinite;
+        }
+        .wwww-swipe-cue .dot:nth-child(2) { animation-delay: 0.2s; }
+        .wwww-swipe-cue .dot:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes wcue { 0%,100% { opacity: 0.3 } 50% { opacity: 1 } }
+
+        /* ── Mobile polish ──
+           Scoped to .wwww-section so it doesn't accidentally restyle every
+           other <section> on the site (the previous selector did). */
+        @media(max-width:900px){
+          .wwww-section { padding: 96px 28px !important; }
+          .wwww-header {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 16px !important;
+          }
+          .wwww-headline { font-size: clamp(32px, 7.5vw, 44px) !important; letter-spacing: -1.6px !important; }
+          .wwww-subhead { max-width: none !important; font-size: 13.5px !important; }
+        }
+        @media(max-width:640px){
+          /* Tight section padding so headline + carousel both fit in one viewport */
+          .wwww-section { padding: 40px 0 32px !important; }
+
+          .icp-grid {
+            display: grid !important;
+            grid-auto-flow: column !important;
+            grid-template-columns: none !important;
+            grid-auto-columns: 68% !important;
+            grid-template-rows: 1fr !important;
+            gap: 10px !important;
+            margin-top: 20px !important;
+            overflow-x: auto !important;
+            scroll-snap-type: x mandatory !important;
+            -webkit-overflow-scrolling: touch !important;
+            scrollbar-width: none !important;
+            padding: 4px 18px 12px !important;
+          }
+          .icp-grid::-webkit-scrollbar { display: none !important; }
+          .icp-grid > * { scroll-snap-align: start !important; min-width: 0 !important; }
+
+          /* Cards: shorter, with tight typography. Description trimmed to
+             2 lines max via line-clamp so cards stay short and uniform. */
+          .wwww-card { padding: 14px 12px !important; border-radius: 14px !important; height: auto !important; }
+          .wwww-card h3 { font-size: 15px !important; letter-spacing: -0.3px !important; margin: 6px 0 4px !important; }
+          .wwww-card p {
+            font-size: 11.5px !important;
+            line-height: 1.45 !important;
+            display: -webkit-box !important;
+            -webkit-line-clamp: 2 !important;
+            -webkit-box-orient: vertical !important;
+            overflow: hidden !important;
+          }
+          .wwww-card .wwww-num,
+          .wwww-card > div:first-child { font-size: 9.5px !important; }
+          .wwww-card .wwww-icon,
+          .wwww-card svg { width: 28px !important; height: 28px !important; }
+
+          /* Headline + subhead tightened so the carousel sits closer */
+          .wwww-headline {
+            font-size: 22px !important;
+            letter-spacing: -0.8px !important;
+            line-height: 1.08 !important;
+            margin-bottom: 6px !important;
+          }
+          /* Subhead REMOVED on phone — the headline does the work; the
+             3-line description was eating most of the viewport. */
+          .wwww-subhead { display: none !important; }
+          .wwww-eyebrow { margin-bottom: 8px !important; font-size: 9px !important; letter-spacing: 3px !important; }
+          .wwww-header { margin-bottom: 14px !important; }
+          /* Header column collapses so headline sits tight to the top */
+          .wwww-header > div { gap: 8px !important; }
+          /* Card width: 68% lets 1.5 cards show — next card clearly peeks in
+             affordance that the strip slides. */
+          .icp-grid { grid-auto-columns: 76% !important; margin-top: 22px !important; }
+          /* Disable the float animation on phones — saves paint and stops
+             cards bobbing while the user is trying to read them. */
+          .float-a, .float-b { animation: none !important; }
+
+          .wwww-swipe-cue { display: flex !important; }
+
+          /* Keep header text padded to the side — only the carousel goes edge-to-edge */
+          .wwww-section > .wwww-eyebrow, .wwww-section > .wwww-header { padding-left: 20px !important; padding-right: 20px !important; }
+        }
+        @media(max-width:380px){
+          .wwww-section { padding: 56px 0 40px !important; }
+          .wwww-card { padding: 20px 18px !important; }
+          .wwww-headline { font-size: 28px !important; }
+          .icp-grid { grid-auto-columns: 86% !important; padding: 4px 16px 16px !important; }
+        }
       `}</style>
 
       {/* Header */}
       <motion.div
+        className="wwww-eyebrow"
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
@@ -167,23 +329,25 @@ export default function WhoWeWorkWith() {
       </motion.div>
 
       <motion.div
+        className="wwww-header"
         initial={{ opacity: 0, y: 24 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
         style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: '24px' }}
       >
-        <h2 style={{ fontFamily: 'Inter, sans-serif', fontSize: 'clamp(36px, 4.5vw, 64px)', fontWeight: 900, letterSpacing: '-2.5px', lineHeight: 1.02, margin: 0 }}>
-          Built for premium<br />
-          <span style={{ color: '#E8541A' }}>founders & brands.</span>
+        <h2 className="wwww-headline" style={{ fontFamily: 'Inter, sans-serif', fontSize: 'clamp(36px, 4.5vw, 64px)', fontWeight: 900, letterSpacing: '-2.5px', lineHeight: 1.02, margin: 0 }}>
+          Built for people who<br />
+          <span style={{ color: '#E8541A' }}>have a business to run.</span>
         </h2>
-        <p style={{ maxWidth: '290px', color: '#6E6B63', fontSize: '14px', lineHeight: 1.75, margin: 0 }}>
-          One studio. Every content discipline. We turn founder expertise into content that converts. Without the AI slop tax everyone else is charging.
+        <p className="wwww-subhead" style={{ maxWidth: '290px', color: '#6E6B63', fontSize: '14px', lineHeight: 1.75, margin: 0 }}>
+          Founders, coaches, business owners, real estate agents. If you sell something and you need to show up online, we run the content side so you can run the actual business.
         </p>
       </motion.div>
 
       {/* Grid */}
       <motion.div
+        ref={gridRef}
         className="icp-grid"
         variants={containerVariants}
         initial="hidden"
@@ -248,23 +412,30 @@ export default function WhoWeWorkWith() {
               )}
 
               {card.cta && (
-                <a
-                  href={BOOK_CALL_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <button
+                  type="button"
                   data-cursor-hover
                   aria-label={BOOK_CALL_LABEL}
+                  onClick={() => {
+                    (window as unknown as { openBookCallModal?: () => void }).openBookCallModal?.();
+                  }}
                   style={{ display: 'inline-block', marginTop: '24px', background: '#E8541A', color: '#fff', border: 'none', padding: '12px 24px', borderRadius: '100px', fontSize: '13px', fontWeight: 700, cursor: 'none', transition: 'all 0.3s', textDecoration: 'none', fontFamily: 'Inter, sans-serif', boxShadow: '0 4px 20px rgba(232,84,26,0.3)', minHeight: '44px' }}
                   onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = '#d94a14'; (e.currentTarget as HTMLElement).style.transform = 'scale(1.03)'; }}
                   onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = '#E8541A'; (e.currentTarget as HTMLElement).style.transform = 'scale(1)'; }}
                 >
                   {BOOK_CALL_LABEL} →
-                </a>
+                </button>
               )}
             </div>
           </motion.div>
         ))}
       </motion.div>
+
+      {/* Swipe hint — mobile only via CSS */}
+      <div className="wwww-swipe-cue" aria-hidden="true">
+        <span className="dot" /><span className="dot" /><span className="dot" />
+        <span style={{ marginLeft: 6 }}>Swipe</span>
+      </div>
     </section>
   );
 }

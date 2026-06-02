@@ -21,9 +21,110 @@ export default function ServiceHeroVisual({ slug, accent }: { slug: string; acce
       return <WebsiteVisual accent={accent} />;
     case 'automations':
       return <AutomationVisual accent={accent} />;
+    case 'apps-software':
+      return <GradientVisual accent={accent} />;
     default:
-      return <VideoEditingVisual accent={accent} />;
+      return <GradientVisual accent={accent} />;
   }
+}
+
+/**
+ * Minimal animated gradient panel. Used as the hero visual for Apps & Software
+ * (where any literal product mockup would be misleading — we build dozens of
+ * different things) and as a sane default for any service that doesn't have a
+ * bespoke visual yet. Pure CSS animation, no JS — looks expensive, runs cheap.
+ */
+function GradientVisual({ accent }: { accent: string }) {
+  return (
+    <div
+      aria-hidden="true"
+      style={{
+        position: 'relative',
+        width: '100%',
+        height: '100%',
+        minHeight: '420px',
+        borderRadius: '24px',
+        overflow: 'hidden',
+        background: '#0C0C0B',
+      }}
+    >
+      {/* Primary accent blob — drifts slowly */}
+      <div
+        style={{
+          position: 'absolute',
+          top: '-20%',
+          left: '-10%',
+          width: '70%',
+          height: '70%',
+          borderRadius: '50%',
+          background: `radial-gradient(circle, ${accent}aa 0%, ${accent}00 70%)`,
+          filter: 'blur(60px)',
+          animation: 'grad-drift-a 14s ease-in-out infinite alternate',
+        }}
+      />
+      {/* Secondary cool-tone blob — counter-orbits */}
+      <div
+        style={{
+          position: 'absolute',
+          bottom: '-15%',
+          right: '-10%',
+          width: '65%',
+          height: '65%',
+          borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(139,92,246,0.55) 0%, rgba(139,92,246,0) 70%)',
+          filter: 'blur(70px)',
+          animation: 'grad-drift-b 18s ease-in-out infinite alternate',
+        }}
+      />
+      {/* Subtle highlight blob, very low opacity, slow pulse */}
+      <div
+        style={{
+          position: 'absolute',
+          top: '40%',
+          left: '40%',
+          width: '40%',
+          height: '40%',
+          borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0) 70%)',
+          filter: 'blur(40px)',
+          animation: 'grad-pulse 9s ease-in-out infinite',
+        }}
+      />
+      {/* Fine grain noise overlay so the gradient doesn't look flat / banded */}
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          backgroundImage:
+            'radial-gradient(rgba(255,255,255,0.025) 1px, transparent 1px)',
+          backgroundSize: '3px 3px',
+          opacity: 0.6,
+          mixBlendMode: 'overlay',
+          pointerEvents: 'none',
+        }}
+      />
+      <style>{`
+        @keyframes grad-drift-a {
+          0%   { transform: translate(0, 0) scale(1); }
+          100% { transform: translate(8%, 6%) scale(1.08); }
+        }
+        @keyframes grad-drift-b {
+          0%   { transform: translate(0, 0) scale(1.05); }
+          100% { transform: translate(-6%, -8%) scale(1); }
+        }
+        @keyframes grad-pulse {
+          0%, 100% { opacity: 0.4; transform: scale(1); }
+          50%      { opacity: 0.7; transform: scale(1.15); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          [aria-hidden="true"] [style*="grad-drift"],
+          [aria-hidden="true"] [style*="grad-pulse"] {
+            animation: none !important;
+          }
+        }
+      `}</style>
+    </div>
+  );
 }
 
 const cardBase = {

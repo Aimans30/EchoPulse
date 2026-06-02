@@ -17,7 +17,7 @@ import {
   Rocket,
   type LucideIcon,
 } from 'lucide-react';
-import { BOOK_CALL_URL, BOOK_CALL_LABEL_LONG } from '@/lib/links';
+import { BOOK_CALL_LABEL_LONG } from '@/lib/links';
 import { trackPilotClick, trackCallClick } from '@/lib/analytics';
 
 type Service = { Icon: LucideIcon; name: string; tag: string; color: string };
@@ -25,7 +25,7 @@ type FlowStep = { n: string; Icon: LucideIcon; label: string; sub: string; color
 
 const services: Service[] = [
   { Icon: Clapperboard, name: 'Video Editing',         tag: 'Cinematic + Short-form', color: '#E8541A' },
-  { Icon: PenLine,      name: 'LinkedIn Ghostwriting', tag: 'Voice-driven posts',     color: '#8b5cf6' },
+  { Icon: PenLine,      name: 'LinkedIn & Social',     tag: 'Posts, carousels, copy', color: '#8b5cf6' },
   { Icon: FileText,     name: 'Blog Production',       tag: 'Long-form, SEO-built',   color: '#f59e0b' },
   { Icon: Target,       name: 'Ad Creatives',          tag: 'Meta · TikTok · Google', color: '#3b82f6' },
   { Icon: Globe,        name: 'Websites & Funnels',    tag: 'Conversion-engineered',  color: '#10b981' },
@@ -33,9 +33,9 @@ const services: Service[] = [
 ];
 
 const flow: FlowStep[] = [
-  { n: '01', Icon: Mic,           label: 'Founder Interview', sub: '90-min recorded session captures your voice', color: '#E8541A' },
+  { n: '01', Icon: Mic,           label: 'Discovery Call',    sub: 'We learn your business, audience, and offer', color: '#E8541A' },
   { n: '02', Icon: ClipboardList, label: 'Strategy & Brief',  sub: 'Topics, calendar, success metrics',           color: '#f59e0b' },
-  { n: '03', Icon: Wrench,        label: 'We Produce',        sub: 'Video, LinkedIn, blogs, ad creative',         color: '#8b5cf6' },
+  { n: '03', Icon: Wrench,        label: 'We Produce',        sub: 'Video, content, ads, sites, software',        color: '#8b5cf6' },
   { n: '04', Icon: Eye,           label: 'You Review',        sub: 'Revisions until you are satisfied',           color: '#3b82f6' },
   { n: '05', Icon: Rocket,        label: 'Ship & Refine',     sub: 'Performance review, iterate monthly',         color: '#10b981' },
 ];
@@ -455,11 +455,10 @@ function InteractiveGraphic() {
    with a subtle "active" highlight that cycles through them.
    ────────────────────────────────────────────────────────── */
 const BAND_STATS = [
-  { value: '48h',      label: 'turnaround per deliverable' },
-  { value: '6',        label: 'services under one roof' },
-  { value: '∞',        label: 'revisions until satisfied' },
-  { value: '2 weeks',  label: 'Pilot to first work shipped' },
-  { value: '0',        label: 'templates · 100% custom' },
+  { value: '48h',     label: 'turnaround per deliverable' },
+  { value: '7',       label: 'services under one roof' },
+  { value: '∞',       label: 'revisions until satisfied' },
+  { value: '20-30h',  label: 'back to you every week' },
 ];
 
 function StatsBand() {
@@ -499,36 +498,12 @@ function StatsBand() {
           borderRadius: '100px',
           boxShadow: '0 8px 32px rgba(12,12,11,0.06), inset 0 1px 0 rgba(255,255,255,0.95)',
           flexWrap: 'wrap',
-          justifyContent: 'space-between',
+          // Centered: the "By the numbers" eyebrow + green dot were removed,
+          // so the four remaining stats are the only thing in this pill.
+          justifyContent: 'center',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
-          <motion.span
-            animate={{ scale: [1, 1.4, 1], opacity: [0.5, 1, 0.5] }}
-            transition={{ duration: 2, repeat: Infinity }}
-            style={{
-              width: '7px',
-              height: '7px',
-              borderRadius: '50%',
-              background: '#10b981',
-              boxShadow: '0 0 10px #10b981',
-            }}
-          />
-          <span
-            style={{
-              fontSize: '10px',
-              fontWeight: 800,
-              letterSpacing: '2.5px',
-              color: '#6E6B63',
-              textTransform: 'uppercase',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            By the numbers
-          </span>
-        </div>
-
-        <div className="stats-band-items" style={{ display: 'flex', alignItems: 'center', gap: '32px', flexWrap: 'wrap', justifyContent: 'center' }}>
+        <div className="stats-band-items" style={{ display: 'flex', alignItems: 'center', gap: '36px', flexWrap: 'wrap', justifyContent: 'center', width: '100%' }}>
           {BAND_STATS.map((s, i) => {
             const isActive = i === activeIdx;
             return (
@@ -571,8 +546,13 @@ function StatsBand() {
       <style>{`
         @media (max-width: 900px) {
           .stats-band { padding: 0 24px 48px !important; }
-          .stats-band > div { flex-direction: column; gap: 14px; padding: 18px 22px !important; border-radius: 24px !important; }
-          .stats-band-items { gap: 16px 22px !important; justify-content: flex-start !important; }
+          .stats-band > div { flex-direction: column; gap: 14px; padding: 18px 22px !important; border-radius: 24px !important; align-items: flex-start !important; }
+          .stats-band-items { gap: 14px 22px !important; justify-content: flex-start !important; width: 100%; }
+        }
+        /* Hidden on phone — the hero stays clean. The stats reappear inside
+           dedicated sections lower on the page anyway. */
+        @media (max-width: 640px) {
+          .stats-band { display: none !important; }
         }
       `}</style>
     </motion.div>
@@ -589,12 +569,16 @@ export default function Hero() {
 
   useEffect(() => {
     const lines = headlineRef.current?.querySelectorAll('.hl-inner');
-    const tl = gsap.timeline({ delay: 1.2 });
-    tl.fromTo('#grid-bg',      { opacity: 0 }, { opacity: 1, duration: 1.5 })
-      .fromTo(eyebrowRef.current,  { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7, ease: 'power3.out' }, '-=0.9')
-      .fromTo(lines ?? [],         { y: '110%' },          { y: '0%', duration: 0.95, ease: 'power3.out', stagger: 0.1 }, '-=0.4')
-      .fromTo([subRef.current, actionsRef.current], { y: 16, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7, ease: 'power3.out', stagger: 0.12 }, '-=0.4')
-      .fromTo(rightRef.current,    { x: 24, opacity: 0 }, { x: 0, opacity: 1, duration: 0.9, ease: 'power3.out' }, '-=0.9');
+    // SHORT timeline — total play time ~0.85s. Starts immediately on mount
+    // so by the time the loader (1.4s) is done, the Hero animation has
+    // finished. The page is in its final settled state when revealed.
+    const tl = gsap.timeline();
+    tl.fromTo('#grid-bg',      { opacity: 0 }, { opacity: 1, duration: 0.6 })
+      .fromTo(eyebrowRef.current,  { y: 12, opacity: 0 }, { y: 0, opacity: 1, duration: 0.35, ease: 'power2.out' }, '-=0.5')
+      .fromTo(lines ?? [],         { y: '105%' },          { y: '0%', duration: 0.5, ease: 'power3.out', stagger: 0.05 }, '-=0.25')
+      .fromTo([subRef.current, actionsRef.current], { y: 10, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4, ease: 'power2.out', stagger: 0.06 }, '-=0.25')
+      .fromTo(rightRef.current,    { x: 16, opacity: 0 }, { x: 0, opacity: 1, duration: 0.5, ease: 'power2.out' }, '-=0.55');
+    return () => { tl.kill(); };
   }, []);
 
   return (
@@ -625,17 +609,234 @@ export default function Hero() {
         .scroll-hint{position:absolute;bottom:24px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:6px;color:#A8A49B;font-size:9px;letter-spacing:3px;text-transform:uppercase;font-weight:600;}
         .scroll-line{width:1px;height:28px;background:linear-gradient(to bottom,#E8541A,transparent);animation:sline 1.8s ease-in-out infinite;}
         @keyframes sline{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
-        @media(max-width:860px){.hero-right{display:none!important;}.hero-inner{gap:0!important;}}
+        /* Mobile-only elements are hidden on desktop by default */
+        .hero-mobile-only { display: none; }
+        /* Tablet: stack vertically — text on top, orbital graphic below, both centered */
+        @media(max-width:860px){
+          .hero-inner{flex-direction:column!important;gap:36px!important;align-items:stretch!important;}
+          .hero-right{width:100%!important;display:flex!important;justify-content:center!important;}
+        }
+        /* ── Phone redesign ──
+           Below 640px the hero is rebuilt for portrait-touch context. We tighten
+           the type stack, restructure the headline into clean 2-line form, swap
+           the orbital graphic for a native mobile service grid + trust strip,
+           and give CTAs full-width tap targets. */
         @media(max-width:640px){
-          .hero-inner{padding:88px 20px 40px!important;}
-          .hero-actions{gap:10px!important;margin-bottom:24px!important;width:100%;}
-          .hero-actions .btn-p,.hero-actions .btn-o{width:100%;justify-content:center;padding:16px 24px!important;font-size:14px!important;}
-          .hero-actions .hero-trust{order:-1;width:100%;justify-content:flex-start;margin-bottom:4px;}
-          .scroll-hint{display:none!important;}
+          .hero-inner{
+            padding: 96px 20px 40px !important;
+            gap: 0 !important;
+          }
+          .hero-eyebrow-m{
+            display:inline-flex !important;
+            align-items:center;
+            gap:8px;
+            padding:6px 12px 6px 8px;
+            background:rgba(232,84,26,0.08);
+            border:1px solid rgba(232,84,26,0.20);
+            border-radius:100px;
+            font-family:Inter,sans-serif;
+            font-size:10.5px;
+            font-weight:700;
+            letter-spacing:0.3px;
+            color:#E8541A;
+            margin-bottom:22px;
+          }
+          .hero-eyebrow-m .ep-pulse{
+            width:6px;height:6px;border-radius:50%;background:#10b981;
+            box-shadow:0 0 8px rgba(16,185,129,0.6);
+            animation:bdot 2s ease-in-out infinite;
+          }
+          /* Restructure h1 into a clean 2-line stack: we hide the original
+             3-span layout and render a mobile-native 2-line version inside
+             .hero-h1-mobile (just below). */
+          .hero-h1-desktop{ display:none !important; }
+          .hero-h1-mobile{
+            display:block !important;
+            font-family:Inter,sans-serif;
+            font-weight:900;
+            font-size: clamp(34px, 9.2vw, 44px) !important;
+            line-height: 1.06 !important;
+            letter-spacing: -1.4px !important;
+            color:#0C0C0B;
+            margin: 0 0 18px !important;
+          }
+          .hero-h1-mobile .accent{
+            color:#E8541A;
+            font-style:italic;
+          }
+          .hero-sub{
+            font-size: 15.5px !important;
+            line-height: 1.6 !important;
+            color:#5A574F !important;
+            margin: 0 0 24px !important;
+          }
+          .hero-sub .desktop-only{ display:none; }
+          /* Buttons share one row, centered. Both pill-shaped and compact —
+             no longer full-width "stadium" rectangles which felt heavy. */
+          .hero-actions{
+            gap:10px !important;
+            margin-bottom:0 !important;
+            width:100% !important;
+            flex-direction:row !important;
+            align-items:center !important;
+            justify-content:flex-start !important;
+            flex-wrap:wrap !important;
+          }
+          .hero-actions .btn-p,
+          .hero-actions .btn-o{
+            width:auto !important;
+            flex:0 0 auto !important;
+            justify-content:center !important;
+            padding:12px 22px !important;
+            font-size:13px !important;
+            min-height:44px !important;
+            box-sizing:border-box !important;
+            border-radius:100px !important;
+            display:inline-flex !important;
+            align-items:center !important;
+            gap:8px !important;
+          }
+          .hero-actions .btn-o{
+            background: transparent !important;
+            border: 1px solid rgba(12,12,11,0.16) !important;
+            color: #0C0C0B !important;
+            padding:12px 20px !important;
+          }
+          .scroll-hint{ display:none !important; }
+          /* Hide the orbital entirely — replaced by mobile service grid below */
+          .hero-right{ display:none !important; }
+
+          /* Mobile-only blocks: service chips + trust strip */
+          .hero-mobile-only{ display:block; }
+
+          .hero-trust-strip{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:8px;
+            margin-top:24px;
+            padding:14px 14px;
+            background:rgba(255,255,255,0.55);
+            backdrop-filter: blur(14px) saturate(180%);
+            -webkit-backdrop-filter: blur(14px) saturate(180%);
+            border:1px solid rgba(12,12,11,0.08);
+            border-radius:14px;
+            box-shadow:0 4px 18px rgba(12,12,11,0.04), inset 0 1px 0 rgba(255,255,255,0.9);
+          }
+          .hero-trust-item{
+            display:flex; flex-direction:column; align-items:center; gap:2px;
+            flex:1 1 0;
+            min-width:0;
+            text-align:center;
+          }
+          .hero-trust-item .v{
+            font-family:Inter,sans-serif;
+            font-size:15px;
+            font-weight:900;
+            letter-spacing:-0.4px;
+            color:#0C0C0B;
+          }
+          .hero-trust-item .v.accent{ color:#E8541A; }
+          .hero-trust-item .k{
+            font-size:9.5px;
+            font-weight:700;
+            letter-spacing:0.8px;
+            text-transform:uppercase;
+            color:#8A857B;
+            white-space:nowrap;
+          }
+          .hero-trust-sep{
+            width:1px;
+            height:28px;
+            background:rgba(12,12,11,0.08);
+            flex-shrink:0;
+          }
+
+          /* Service grid — 2 columns × 3 rows of premium-feeling chips */
+          .hero-services-label{
+            display:flex;
+            align-items:center;
+            gap:10px;
+            margin: 28px 0 12px;
+            font-family:Inter,sans-serif;
+            font-size:10px;
+            font-weight:800;
+            letter-spacing:2.5px;
+            text-transform:uppercase;
+            color:#8A857B;
+          }
+          .hero-services-label::before{
+            content:'';
+            width:18px; height:1px; background:#E8541A;
+            display:block;
+          }
+          .hero-services-grid{
+            display:grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap:10px;
+          }
+          .hero-svc-chip{
+            display:flex;
+            align-items:center;
+            gap:10px;
+            padding:13px 12px;
+            background:rgba(255,255,255,0.5);
+            border:1px solid rgba(12,12,11,0.08);
+            border-radius:14px;
+            transition: transform 0.2s, border-color 0.2s, background 0.2s;
+          }
+          .hero-svc-chip:active{
+            transform: scale(0.98);
+            background:rgba(255,255,255,0.75);
+            border-color: rgba(232,84,26,0.30);
+          }
+          .hero-svc-chip .svc-ico{
+            width:34px; height:34px; border-radius:10px;
+            display:flex; align-items:center; justify-content:center;
+            flex-shrink:0;
+          }
+          .hero-svc-chip .svc-text{
+            display:flex; flex-direction:column; gap:1px;
+            min-width:0; flex:1;
+          }
+          .hero-svc-chip .svc-name{
+            font-family:Inter,sans-serif;
+            font-size:12.5px;
+            font-weight:800;
+            color:#0C0C0B;
+            letter-spacing:-0.2px;
+            line-height:1.1;
+            white-space:nowrap;
+            overflow:hidden;
+            text-overflow:ellipsis;
+          }
+          .hero-svc-chip .svc-tag{
+            font-size:10px;
+            color:#8A857B;
+            font-weight:500;
+            line-height:1.2;
+            white-space:nowrap;
+            overflow:hidden;
+            text-overflow:ellipsis;
+          }
         }
         @media(max-width:380px){
-          .hero-inner{padding:80px 16px 48px!important;}
-          h1{letter-spacing:-1.5px!important;}
+          .hero-inner{ padding:88px 16px 36px !important; }
+          .hero-h1-mobile{
+            font-size: 30px !important;
+            letter-spacing: -1.1px !important;
+          }
+          .hero-sub{
+            font-size: 14.5px !important;
+            margin: 0 0 22px !important;
+          }
+          .hero-trust-item .v{ font-size:13.5px !important; }
+          .hero-trust-item .k{ font-size:8.5px !important; letter-spacing:0.6px !important; }
+          .hero-services-grid{ gap:8px !important; }
+          .hero-svc-chip{ padding:11px 10px !important; }
+          .hero-svc-chip .svc-ico{ width:30px; height:30px; }
+          .hero-svc-chip .svc-name{ font-size:11.5px !important; }
+          .hero-svc-chip .svc-tag{ font-size:9.5px !important; }
         }
       `}</style>
 
@@ -650,15 +851,15 @@ export default function Hero() {
           <div style={{ flex: '1 1 0', minWidth: 0 }}>
             <div ref={eyebrowRef} />
 
+            {/* Desktop headline — original 3-line stacked structure. Hidden on phone. */}
             <h1
               ref={headlineRef}
-              className="hero-h1"
+              className="hero-h1 hero-h1-desktop"
               style={{ fontFamily: 'Inter, sans-serif', fontSize: 'clamp(36px, 4.4vw, 64px)', fontWeight: 900, lineHeight: 1.04, letterSpacing: 'clamp(-1px, -0.035em, -2.4px)', margin: '0 0 24px' }}
             >
               {[
-                <>We don&apos;t write content.</>,
-                <>We <span style={{ color: '#E8541A', fontStyle: 'italic' }}>clone your voice.</span></>,
-                <>Then write at scale.</>,
+                <>Marketing without</>,
+                <>the <span style={{ color: '#E8541A', fontStyle: 'italic' }}>agency tax.</span></>,
               ].map((line, i) => (
                 <span key={i} className="hl-wrap">
                   <span className="hl-inner">{line}</span>
@@ -666,26 +867,35 @@ export default function Hero() {
               ))}
             </h1>
 
-            <p ref={subRef} style={{ fontSize: '16px', color: '#6E6B63', maxWidth: '520px', lineHeight: 1.75, fontWeight: 400, margin: '0 0 36px', opacity: 0 }}>
-              A 90-minute interview captures your voice. Then we ghostwrite your LinkedIn, edit your videos, and write your blogs in it &mdash;{' '}
-              <strong style={{ color: '#0C0C0B', fontWeight: 600 }}>saving you 20&ndash;30 hours a week on content,</strong>{' '}
-              for less than the cost of one full-time hire.
+            {/* Mobile headline — clean 2-line structure that reads naturally at 375px.
+                Hidden on desktop via the CSS above. */}
+            <h1 className="hero-h1-mobile hero-mobile-only" aria-hidden="true">
+              Marketing without<br />
+              the <span className="accent">agency tax.</span>
+            </h1>
+
+            <p ref={subRef} className="hero-sub" style={{ fontSize: '16px', color: '#6E6B63', maxWidth: '540px', lineHeight: 1.7, fontWeight: 400, margin: '0 0 36px' }}>
+              <span>One owner-operated studio. Video, content, ads, sites, and code &mdash; replied to in 3 hours, re-done until you&rsquo;d ship it under your own name.</span>{' '}
+              <strong style={{ color: '#0C0C0B', fontWeight: 600 }}>Get 20 hours of your week back.</strong>
             </p>
 
-            <div ref={actionsRef} className="hero-actions" style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '0', opacity: 0, alignItems: 'center' }}>
-              {/* PRIMARY — high-intent: book the call */}
-              <a
-                href={BOOK_CALL_URL}
-                target="_blank"
-                rel="noopener noreferrer"
+            <div ref={actionsRef} className="hero-actions" style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '0', alignItems: 'center' }}>
+              {/* PRIMARY — opens the BookCallModal (Calendly iframe) so visitors
+                 stay on the page instead of getting yanked to a new tab. */}
+              <button
+                type="button"
                 className="btn-p"
                 aria-label={BOOK_CALL_LABEL_LONG}
                 data-cursor-hover
-                onClick={() => trackCallClick('hero_primary')}
+                onClick={() => {
+                  trackCallClick('hero_primary');
+                  (window as unknown as { openBookCallModal?: () => void }).openBookCallModal?.();
+                }}
+                style={{ border: 'none', cursor: 'none' }}
               >
                 <span>Book a strategy call</span>
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-              </a>
+              </button>
               {/* WARM — explore packages */}
               <a
                 href="#pricing"
@@ -697,15 +907,15 @@ export default function Hero() {
                 See packages
               </a>
             </div>
+
           </div>
 
-          <div ref={rightRef} className="hero-right" style={{ flexShrink: 0, width: '420px', opacity: 0 }}>
+          <div ref={rightRef} className="hero-right" style={{ flexShrink: 0, width: '420px' }}>
             <InteractiveGraphic />
           </div>
         </div>
 
-        {/* Full-width stats band — lives on the main page now, no longer
-            tucked under the orbital panel */}
+        {/* Full-width stats band */}
         <StatsBand />
       </section>
 

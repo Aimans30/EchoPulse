@@ -14,7 +14,7 @@ EchoPulse is the alternative to hiring three separate freelancers and managing t
 - **Ad creatives** — static and video ad creatives for Meta, TikTok, YouTube, Google. Subscription model — fresh hooks before fatigue hits.
 - **Websites and funnels** — conversion-engineered sites and lead pages. Sub-2-second mobile loads.
 - **Automations** — DM flows, email sequences, CRM workflows. Built on Make.com, ManyChat, and modern AI agents (Claude Code, GPT, custom orchestration).
-- **Apps & Software** — Custom web apps, MVPs, course platforms, client portals, internal dashboards, member sites. Built by the founder (a working frontend engineer at a Canadian SaaS). Fixed-price tiers, not hourly billing. Stack: Next.js, React, TypeScript, Supabase, Stripe, Vercel/Netlify.
+- **Apps & Software** — Custom web apps, MVPs, immersive 3D Three.js websites (WebGL product visualizers, scroll-driven brand stories), AI tools and agents (GPT chatbots, RAG pipelines, custom embeddings), course platforms, client portals, internal dashboards, member sites, mobile-first PWAs. Built by the founder (a working frontend engineer shipping production React + Three.js daily at a Canadian SaaS). Fixed-price tiers, not hourly billing. All code transfers to the client's GitHub on delivery. Stack: Next.js, React, TypeScript, Three.js, React Three Fiber, GSAP, Supabase, Stripe, OpenAI, Anthropic, Vercel/Netlify.
 
 ## The Voice Foundation
 

@@ -33,14 +33,15 @@ export default function LeadMagnet() {
 
   // Teaser hooks above the form — blurred to hint at "more inside"
   const teaserHooks = [
-    'Most LinkedIn ghostwriters can\'t name your last 10 stories.',
-    'I cut video professionally at a production studio before going independent.',
+    'Most agencies can\'t name your last 10 wins, your top 3 buyers, or what makes you different.',
     'Property reels are 90% formula. Three patterns most editors miss:',
+    'A coaching offer earns 4x more replies when the content names the buyer\'s real problem.',
   ];
 
   return (
     <section
       data-dark-bg="true"
+      className="lead-magnet"
       style={{
         padding: '128px 56px',
         background: '#0C0C0B',
@@ -72,6 +73,7 @@ export default function LeadMagnet() {
         </motion.div>
 
         <motion.h2
+          className="lm-h2"
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -92,6 +94,7 @@ export default function LeadMagnet() {
         </motion.h2>
 
         <motion.p
+          className="lm-sub"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
@@ -123,6 +126,7 @@ export default function LeadMagnet() {
           {teaserHooks.map((h, i) => (
             <div
               key={i}
+              className="lm-teaser"
               style={{
                 padding: '12px 16px',
                 background: 'rgba(255,255,255,0.04)',
@@ -154,6 +158,7 @@ export default function LeadMagnet() {
 
         {/* Email form */}
         <motion.form
+          className="lm-form"
           onSubmit={onSubmit}
           initial={{ opacity: 0, y: 12 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -173,6 +178,7 @@ export default function LeadMagnet() {
             onChange={(e) => setEmail(e.target.value)}
             placeholder="founder@yourcompany.com"
             disabled={status === 'submitting' || status === 'sent'}
+            className="lm-input"
             style={{
               flex: '1 1 240px',
               minHeight: '48px',
@@ -181,7 +187,8 @@ export default function LeadMagnet() {
               background: 'rgba(255,255,255,0.06)',
               border: '1px solid rgba(255,255,255,0.12)',
               color: '#F2EEE7',
-              fontSize: '14px',
+              // 16px prevents iOS Safari auto-zoom on focus
+              fontSize: '16px',
               fontFamily: 'Inter, sans-serif',
               outline: 'none',
             }}
@@ -189,6 +196,7 @@ export default function LeadMagnet() {
           <button
             type="submit"
             disabled={status === 'submitting' || status === 'sent'}
+            className="lm-btn"
             style={{
               minHeight: '48px',
               padding: '14px 22px',
@@ -196,7 +204,7 @@ export default function LeadMagnet() {
               background: '#E8541A',
               border: 'none',
               color: '#fff',
-              fontSize: '14px',
+              fontSize: '15px',
               fontWeight: 700,
               fontFamily: 'Inter, sans-serif',
               cursor: status === 'submitting' || status === 'sent' ? 'default' : 'pointer',
@@ -220,6 +228,31 @@ export default function LeadMagnet() {
           </p>
         )}
       </div>
+
+      <style>{`
+        @media (max-width: 900px) {
+          .lead-magnet { padding: 96px 28px !important; }
+        }
+        @media (max-width: 640px) {
+          .lead-magnet { padding: 72px 18px !important; }
+          .lm-h2 { font-size: 30px !important; letter-spacing: -1px !important; line-height: 1.1 !important; }
+          .lm-sub { font-size: 14px !important; margin-bottom: 28px !important; }
+          .lm-teaser { font-size: 12.5px !important; padding: 11px 14px !important; }
+          /* Stack form vertically on phone, full-width controls */
+          .lm-form { gap: 10px !important; }
+          .lm-input,
+          .lm-btn {
+            flex: 1 1 100% !important;
+            width: 100% !important;
+            min-height: 52px !important;
+          }
+          .lm-btn { font-size: 15px !important; }
+        }
+        @media (max-width: 380px) {
+          .lead-magnet { padding: 60px 14px !important; }
+          .lm-h2 { font-size: 26px !important; }
+        }
+      `}</style>
     </section>
   );
 }

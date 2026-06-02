@@ -1,17 +1,15 @@
 import type { MetadataRoute } from 'next';
 import { services } from '@/lib/serviceData';
+import { getAllPosts } from '@/lib/blog';
 
 /**
  * Sitemap — generated at build time. Lists the homepage + every service
- * detail page so search engines and AI crawlers can discover the full
- * site without crawling JS-rendered links.
- *
- * Update SITE_URL via env or replace the constant if the production
- * domain ever changes.
+ * detail page + every published blog post so search engines and AI crawlers
+ * can discover the full site without crawling JS-rendered links.
  */
 const SITE_URL = 'https://echopulse.media';
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
 
   const home: MetadataRoute.Sitemap[number] = {
@@ -21,6 +19,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 1.0,
   };
 
+  const blogIndex: MetadataRoute.Sitemap[number] = {
+    url: `${SITE_URL}/blog`,
+    lastModified: now,
+    changeFrequency: 'weekly',
+    priority: 0.85,
+  };
+
   const serviceRoutes: MetadataRoute.Sitemap = services.map((service) => ({
     url: `${SITE_URL}/services/${service.slug}`,
     lastModified: now,
@@ -28,5 +33,20 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.8,
   }));
 
-  return [home, ...serviceRoutes];
+  // Blog posts from Sanity — wrapped in try so a Sanity outage never breaks
+  // the build. If Sanity is down, the sitemap drops the post URLs gracefully.
+  let blogPosts: MetadataRoute.Sitemap = [];
+  try {
+    const posts = await getAllPosts();
+    blogPosts = posts.map((post) => ({
+      url: `${SITE_URL}/blog/${post.slug}`,
+      lastModified: post.publishedAt ? new Date(post.publishedAt) : now,
+      changeFrequency: 'monthly' as const,
+      priority: 0.75,
+    }));
+  } catch {
+    // Sanity unreachable — sitemap continues without blog posts.
+  }
+
+  return [home, blogIndex, ...serviceRoutes, ...blogPosts];
 }

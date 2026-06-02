@@ -6,9 +6,12 @@ import { GoogleAnalytics } from "@next/third-parties/google";
 import SmoothScroll from "@/components/SmoothScroll";
 import Cursor from "@/components/Cursor";
 import EmojiNormalizer from "@/components/EmojiNormalizer";
-import MobileStickyCTA from "@/components/MobileStickyCTA";
 import PilotPopup from "@/components/PilotPopup";
 import AnalyticsProvider from "@/components/AnalyticsProvider";
+import BookCallModal from "@/components/BookCallModal";
+import PuneInquiryModal from "@/components/PuneInquiryModal";
+import { GeoProvider } from "@/components/GeoProvider";
+import { getServerGeo } from "@/lib/geoServer";
 
 const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
 
@@ -32,28 +35,31 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL("https://echopulse.media"),
   title: {
-    default: "EchoPulse — We clone your voice, then write at scale.",
+    default: "EchoPulse — Marketing without the agency tax.",
     template: "%s | EchoPulse",
   },
   description:
-    "EchoPulse is a content studio that records a 90-minute voice interview, builds a Voice DNA document, then ghostwrites your LinkedIn, edits your video, drafts your blogs, and runs your ad creative — in your voice. Saves 20–30 hours a week. Starts with a $299 14-day Pilot.",
+    "Full-service content studio for founders, coaches, business owners, and real estate agents. Video edits, LinkedIn posts, blogs, ad creative, websites, and custom software — handled by one team. 20 to 30 hours back a week. One bill instead of five. No contracts. Starts with a $299 14-day Pilot.",
   applicationName: "EchoPulse",
   authors: [{ name: "Lakshya Soni", url: "https://www.linkedin.com/in/lakshyasoni/" }],
   creator: "Lakshya Soni",
   publisher: "EchoPulse",
   keywords: [
+    "content studio",
     "content agency",
-    "voice cloning agency",
-    "LinkedIn ghostwriting",
     "video editing agency",
-    "blog production",
+    "real estate video editing",
+    "real estate marketing agency",
+    "LinkedIn content agency",
+    "blog production agency",
     "ad creatives agency",
     "conversion website design",
-    "B2B content marketing",
-    "founder content agency",
-    "coach content agency",
-    "AI content human-in-the-loop",
-    "Voice Foundation",
+    "coach marketing agency",
+    "business owner marketing",
+    "agency for founders",
+    "agency for coaches",
+    "agency for real estate agents",
+    "custom app development agency",
     "EchoPulse",
     "Lakshya Soni",
   ],
@@ -61,9 +67,9 @@ export const metadata: Metadata = {
     canonical: "/",
   },
   openGraph: {
-    title: "EchoPulse — We clone your voice, then write at scale.",
+    title: "EchoPulse — Marketing without the agency tax.",
     description:
-      "Content studio for founders, coaches, and business owners. Saves 20–30 hours a week on content. Voice Foundation interview · LinkedIn · video · blogs · ad creative · websites · automations. $299 14-day Pilot.",
+      "Full-service content studio for founders, coaches, business owners, and real estate agents. Video, content, ads, websites, custom software. Done-for-you. One team, one bill. $299 14-day Pilot.",
     url: "https://echopulse.media",
     siteName: "EchoPulse",
     type: "website",
@@ -71,9 +77,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "EchoPulse — We clone your voice, then write at scale.",
+    title: "EchoPulse — Marketing without the agency tax.",
     description:
-      "Content studio for founders, coaches, and operators. Saves 20–30 hours a week. Voice Foundation interview, then LinkedIn, video, blogs, ads, websites — all in your voice.",
+      "Full-service content studio for founders, coaches, business owners, and real estate agents. Video, content, ads, websites, custom software. Done-for-you. Get 20-30 hours a week back.",
     creator: "@lakshyasoni",
   },
   robots: {
@@ -109,7 +115,7 @@ const structuredData = {
       alternateName: "EchoPulse Studio",
       url: "https://echopulse.media",
       description:
-        "Content studio that records a 90-minute voice interview, builds a Voice DNA document, then ghostwrites LinkedIn, edits video, drafts blogs, and runs ad creatives in the client's voice. Founded to do the opposite of every 'AI content agency' shipping ChatGPT slop.",
+        "Full-service content studio for founders, coaches, business owners, and real estate agents. Video edits, social posts, blogs, ad creative, websites, automations, and custom software — one team, one bill, every channel. Built to give clients 20 to 30 hours back every week.",
       foundingDate: "2025",
       founder: { "@id": "https://echopulse.media/#founder" },
       areaServed: [
@@ -117,13 +123,14 @@ const structuredData = {
         { "@type": "Country", name: "United States" },
         { "@type": "Country", name: "United Kingdom" },
         { "@type": "Country", name: "Australia" },
+        { "@type": "Country", name: "India" },
         { "@type": "Place", name: "Western Europe" },
       ],
       sameAs: ["https://www.linkedin.com/in/lakshyasoni/"],
       makesOffer: [
-        { "@type": "Offer", name: "Pilot", price: "299", priceCurrency: "USD", description: "14-day paid trial: voice interview, 12 LinkedIn posts, 3 short-form video edits, 5 long-form blogs, plus one strategic deliverable." },
-        { "@type": "Offer", name: "Growth Retainer", price: "1997", priceCurrency: "USD", description: "Monthly retainer covering LinkedIn, blogs, short + long-form video, ad creatives, website optimization, monthly strategy." },
-        { "@type": "Offer", name: "Full System", price: "4997", priceCurrency: "USD", description: "All-in monthly plan covering 30 LinkedIn posts, 8 long-form blogs, full ad engine, podcast editing, course modules, automations, quarterly custom website build." },
+        { "@type": "Offer", name: "Pilot", price: "299", priceCurrency: "USD", description: "14-day paid trial: onboarding interview, 12 social posts, 3 short-form video edits, 5 long-form blogs, plus one strategic deliverable." },
+        { "@type": "Offer", name: "Growth Retainer", price: "1997", priceCurrency: "USD", description: "Monthly retainer covering social, blogs, short + long-form video, ad creatives, website optimization, and monthly strategy." },
+        { "@type": "Offer", name: "Full System", price: "4997", priceCurrency: "USD", description: "All-in monthly plan covering 30 social posts, 8 long-form blogs, full ad engine, podcast editing, course modules, automations, and quarterly custom website build." },
       ],
     },
     {
@@ -132,15 +139,16 @@ const structuredData = {
       name: "Lakshya Soni",
       jobTitle: "Founder",
       description:
-        "Multi-discipline content creative. Years editing video across formats at a Canadian production studio, scriptwriter for founders and creators on camera, creative director on brand films and campaigns, four years of freelance motion design on Upwork, currently runs marketing for a SaaS company. Started EchoPulse to do the opposite of agencies charging serious money for deliverables-for-the-sake-of-deliverables.",
+        "Multi-discipline operator running EchoPulse. Years editing video across formats at a Canadian production studio, freelance motion design, marketing lead at a Canadian SaaS, and frontend engineer shipping production code. Built EchoPulse to be the one team founders, coaches, business owners, and real estate agents can hire instead of managing five vendors.",
       knowsAbout: [
         "Video editing",
-        "Scriptwriting",
+        "Content production",
         "Creative direction",
         "Motion design",
-        "LinkedIn ghostwriting",
-        "B2B SaaS marketing",
+        "Content marketing",
+        "SaaS marketing",
         "Ad creative",
+        "Real estate marketing",
         "Content strategy",
       ],
       worksFor: { "@id": "https://echopulse.media/#organization" },
@@ -154,21 +162,32 @@ const structuredData = {
       url: "https://echopulse.media",
       name: "EchoPulse",
       description:
-        "Content studio that clones your voice and writes at scale. 20–30 hours a week back, in your voice.",
+        "Done-for-you marketing for serious businesses. Video, content, ads, websites, and custom software for founders, coaches, business owners, and real estate agents. 20 to 30 hours a week back.",
       publisher: { "@id": "https://echopulse.media/#organization" },
       inLanguage: "en",
     },
   ],
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  // Server-side geo read from middleware-set headers. In production this is
+  // free (Vercel/Cloudflare inject them); in local dev these come back as
+  // null and the client-side fallback in useGeoPrice takes over.
+  const { country, city } = await getServerGeo();
+
   return (
     <html lang="en" className={inter.variable}>
       <head>
         {/* Preconnect to font/script CDNs for faster handshake */}
         <link rel="preconnect" href="https://unpkg.com" crossOrigin="" />
+        {/* Cal.com preconnect — DNS + TLS handshake done BEFORE the user clicks
+            "Book a call", so when the modal opens the iframe starts at full speed. */}
+        <link rel="preconnect" href="https://cal.com" />
+        <link rel="dns-prefetch" href="https://cal.com" />
+        <link rel="preconnect" href="https://app.cal.com" />
+        <link rel="dns-prefetch" href="https://app.cal.com" />
         {/* Shery.js stylesheet — only loaded on devices that can hover (skipped via media on mobile) */}
         <link
           rel="stylesheet"
@@ -177,23 +196,36 @@ export default function RootLayout({
         />
       </head>
       <body className="pb-20 md:pb-0">
+        {/* Skip-to-content — first focusable element. Invisible until the
+            user Tabs to it. Lets keyboard users bypass the nav. */}
+        <a href="#main" className="skip-to-content">Skip to content</a>
         {/* Structured data for search engines + AI agents (Organization + Person + WebSite). */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
         />
-        <SmoothScroll>
-          <Cursor />
-          {children}
-        </SmoothScroll>
-        {/* Mobile-only sticky CTA bar — visible after scrolling past the hero */}
-        <MobileStickyCTA />
-        {/* Desktop-leaning $299 Pilot popup — auto-shows after a delay or scroll past hero */}
-        <PilotPopup />
-        {/* Normalizes every emoji in the DOM to Twemoji SVGs — Apple-emoji-style consistency across every OS */}
-        <EmojiNormalizer />
-        {/* Analytics — scroll milestones, Calendly book listener, Clarity loader */}
-        <AnalyticsProvider />
+        {/* GeoProvider wraps the whole tree so every component that calls
+            useGeoPrice gets the server-detected region on the FIRST render
+            — no client fetch, no flash, no flicker. */}
+        <GeoProvider initialCountry={country} initialCity={city}>
+          <SmoothScroll>
+            <Cursor />
+            {children}
+          </SmoothScroll>
+          {/* Desktop-leaning Pilot popup — auto-shows after a delay or scroll past hero */}
+          <PilotPopup />
+          {/* Normalizes every emoji in the DOM to Twemoji SVGs for consistent rendering. */}
+          <EmojiNormalizer />
+          {/* Analytics — scroll milestones, Calendly book listener, Clarity loader */}
+          <AnalyticsProvider />
+          {/* Global "Book a call" modal — open from anywhere via window.openBookCallModal() */}
+          <BookCallModal />
+          {/* Pune-only on-site shoot inquiry modal — open via
+              window.openPuneInquiryModal(packageName). Required phone field,
+              no Razorpay path; submissions land in #pune-onsite Slack +
+              Sales Pipeline → Discovery Call Booked in Asana. */}
+          <PuneInquiryModal />
+        </GeoProvider>
         {/* GA4 — only loaded when NEXT_PUBLIC_GA_ID is set */}
         {GA_ID && <GoogleAnalytics gaId={GA_ID} />}
         {/* Shery loads after hydration AND only on desktop pointer devices */}

@@ -1,12 +1,67 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { useGeoPrice } from '@/lib/useGeoPrice';
+import { useGeoPrice, localizeOrderPrice } from '@/lib/useGeoPrice';
+import { getCheapestStartingPrice } from '@/lib/orderData';
 import { BOOK_CALL_URL } from '@/lib/links';
 import { trackPilotClick, trackCallClick } from '@/lib/analytics';
 
+/**
+ * Drive the mobile swipe-carousel dots indicator. When the user swipes the
+ * .pms-rail, whichever .pms-card is most visible inside the rail gets the
+ * active state, and the matching .pms-dot flips on. IntersectionObserver
+ * scoped to the rail so we don't fire on unrelated scrolling elsewhere.
+ *
+ * Runs once on mount, cleans up on unmount. Safe to no-op when the swipe
+ * carousel isn't in the DOM (desktop viewport).
+ */
+function useMobilePricingDots() {
+  useEffect(() => {
+    const rail = document.querySelector<HTMLElement>('.pricing-mobile-swipe .pms-rail');
+    if (!rail) return;
+    const cards = Array.from(rail.querySelectorAll<HTMLElement>('.pms-card'));
+    const dots = Array.from(document.querySelectorAll<HTMLElement>('.pricing-mobile-swipe .pms-dot'));
+    if (!cards.length || !dots.length) return;
+    const obs = new IntersectionObserver(
+      (entries) => {
+        // Pick the entry with the largest intersection ratio.
+        let bestIdx = -1;
+        let bestRatio = 0;
+        entries.forEach(e => {
+          const idx = Number((e.target as HTMLElement).dataset.index ?? -1);
+          if (e.intersectionRatio > bestRatio) {
+            bestRatio = e.intersectionRatio;
+            bestIdx = idx;
+          }
+        });
+        if (bestIdx >= 0) {
+          dots.forEach((d, i) => { d.dataset.active = i === bestIdx ? 'true' : 'false'; });
+        }
+      },
+      { root: rail, threshold: [0.5, 0.7, 0.9] },
+    );
+    cards.forEach(c => obs.observe(c));
+    return () => obs.disconnect();
+  }, []);
+}
+
 export default function Pricing() {
-  const { currency, prices, countryLabel, ready } = useGeoPrice();
+  const { currency, prices, countryLabel, ready, region, country } = useGeoPrice();
+  // Localized "starting at" price for the à la carte order banner. Reads as
+  // ₹1,499 in India, $15 in US, £14 in UK, CHF 19 in Zurich, etc. — every
+  // region gets a sales-friendly round number, not raw FX.
+  const orderStartingPrice = localizeOrderPrice(getCheapestStartingPrice(), region, country).display;
+  // (Old `mobileSelectedTier` picker state was removed when the mobile UX
+  // changed from a tier-picker row to a horizontal swipe carousel. Cards
+  // are equal-weight peers in the carousel — none is "selected" globally.)
+
+  // Desktop-only: which plan card's expanded feature list is open. Cards
+  // start collapsed showing the headline benefits; tap the row to expand.
+  const [expandedPlan, setExpandedPlan] = useState<string | null>(null);
+
+  // Mobile swipe carousel — update dots indicator from scroll position.
+  useMobilePricingDots();
 
   const plans = [
     {
@@ -14,15 +69,15 @@ export default function Pricing() {
       price: `${currency}${prices.pilot}`,
       originalPrice: `${currency}${prices.pilotOriginal}`,
       per: 'one-off / 2 weeks',
-      badge: 'Try us out · $299',
+      badge: `Try us out · ${currency}${prices.pilot}`,
       tagline: 'See real work in 14 days before you sign anything.',
       features: [
-        '90-min recorded voice interview (your Voice DNA)',
-        '12 LinkedIn posts: 8 short-form + 2 long-form story posts + 2 carousels',
-        '3 short-form video edits (Reels / TikToks / Shorts)',
+        '90-min onboarding interview + brand brief',
+        '12 social posts: 8 short-form + 2 story posts + 2 carousels',
+        '3 short-form video edits (Reels / TikToks / Shorts / property cuts)',
         '5 long-form blog drafts (1,500 words each, fully researched)',
-        'One strategic deliverable: voice audit of your last 10 posts, or a 30-day content thesis',
-        'Curated to where your business actually needs content',
+        'One strategic deliverable: content audit, or a 30-day plan',
+        'Curated to the channels your business actually needs',
         '48-hour turnaround per deliverable',
         'Revisions until you are satisfied',
         'Live Loom walkthrough on delivery',
@@ -38,10 +93,10 @@ export default function Pricing() {
       badge: 'Monthly · Most Popular',
       tagline: 'The retainer most clients pick. One team, every channel, every month.',
       features: [
-        'Voice interview + quarterly Voice DNA refresh',
-        '20 LinkedIn posts per month (5/week)',
+        'Onboarding interview + quarterly brand-brief refresh',
+        '20 social posts per month (5/week — LinkedIn, Instagram, or wherever your buyers are)',
         '4 long-form blogs per month (1,500 to 2,500 words each)',
-        '12 short-form video edits + 2 long-form (YouTube, podcast highlights)',
+        '12 short-form video edits + 2 long-form (YouTube, podcast, listing tours)',
         '6 ad creatives per month (static + video)',
         'Full website revamp + ongoing optimization (rebuilt for conversions in month one, tuned monthly after)',
         'Funnel optimization with conversion tracking + A/B tests',
@@ -61,11 +116,11 @@ export default function Pricing() {
       tagline: 'For operators going all-in on content. Locked package, no upsells, no scaling tricks.',
       features: [
         'Everything in Growth, scaled',
-        'Long-form YouTube editing (vlogs, sponsored content, educational)',
+        'Long-form YouTube editing (vlogs, sponsored content, educational, listing tours)',
         'Podcast editing: full episodes + 8 to 12 highlight cuts each',
         'Course module editing (Kajabi, Teachable, Thinkific, Skool)',
         'Company process optimization (SOPs, workflows, internal automations)',
-        '30 LinkedIn posts + 8 long-form blogs per month',
+        '30 social posts + 8 long-form blogs per month',
         'Full ad creative engine across Meta, TikTok, YouTube, Google',
         'Custom website or funnel build each quarter (4 builds/year)',
         'One small custom app build per quarter included (up to $9,997 scope) + 30% off larger app builds',
@@ -96,6 +151,7 @@ export default function Pricing() {
       <div style={{ position: 'relative', zIndex: 1, maxWidth: '1180px', margin: '0 auto' }}>
         {/* Outer rounded panel — contains headline + cards as one unit */}
         <motion.div
+          className="pricing-panel"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -111,27 +167,32 @@ export default function Pricing() {
           }}
         >
           <motion.h2
+            className="pricing-h2"
             initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            style={{ fontFamily: 'Inter, sans-serif', fontSize: 'clamp(28px, 3.4vw, 48px)', fontWeight: 900, letterSpacing: '-1.8px', margin: '0 0 10px', lineHeight: 1, color: '#0C0C0B' }}
+            style={{ fontFamily: 'Inter, sans-serif', fontSize: 'clamp(28px, 3.4vw, 48px)', fontWeight: 900, letterSpacing: '-1.6px', margin: '0 0 14px', lineHeight: 1.05, color: '#0C0C0B' }}
           >
-            See real work in 14 days for <span style={{ color: '#E8541A' }}>$299.</span><br />
-            Decide retainer after.
+            Simple pricing. <span style={{ color: '#E8541A' }}>Real work upfront.</span>
           </motion.h2>
           <motion.p
+            className="pricing-sub"
             initial={{ opacity: 0, y: 12 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
-            style={{ color: '#6E6B63', fontSize: '13.5px', maxWidth: '620px', lineHeight: 1.6, margin: '0 0 16px' }}
+            style={{ color: '#6E6B63', fontSize: '14px', maxWidth: '620px', lineHeight: 1.6, margin: '0 0 16px' }}
           >
-            We&apos;re running the Pilot <strong style={{ color: '#0C0C0B', fontWeight: 700 }}>at cost</strong> while we build out our first 50 case studies. <span style={{ textDecoration: 'line-through', color: '#A8A49B' }}>{currency}{prices.pilotOriginal}</span> down to <strong style={{ color: '#0C0C0B', fontWeight: 700 }}>{currency}{prices.pilot}</strong> for two weeks of real work: 12 LinkedIn posts, 3 short-form video edits, 5 long-form blogs, the voice interview, and one strategic deliverable. You decide if it earns a retainer. Cancel anytime.
+            Owner-operated, with senior eyes on every deliverable.{' '}
+            <strong style={{ color: '#0C0C0B', fontWeight: 700 }}>3-hour replies, re-dos until it&apos;s right, and no surprise invoices</strong>
+            {' '}— which is why we ship sharper than agencies twice our size,
+            and at a fraction of the retainer.
           </motion.p>
 
           {/* Region indicator */}
           <motion.div
+            className="pricing-region"
             initial={{ opacity: 0 }}
             animate={{ opacity: ready ? 1 : 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
@@ -141,10 +202,109 @@ export default function Pricing() {
             Showing {countryLabel}. Same scope worldwide.
           </motion.div>
 
+          {/* ── Mobile-only swipeable pricing carousel ─────────────────
+             Reference: workout-analytics card with a BEST VALUE badge,
+             big price, green-check feature list, and a single CTA. On
+             phone we render full plan cards in a horizontal scroll-snap
+             strip with the FEATURED plan (Pilot) first, followed by
+             Growth and Full System. User swipes left/right; the next
+             card's edge peeks in so they know there's more to see.
+
+             Dots indicator at the bottom shows which card is centered,
+             driven by IntersectionObserver attached to each card.
+
+             The old `.pricing-mobile-app` tier-picker row was replaced
+             with this layout per user request — single-card focus, no
+             tap-to-swap, just swipe-through.
+          */}
+          <div
+            className="pricing-mobile-swipe"
+            style={{ display: 'none' /* shown only via @media (max-width: 640px) below */ }}
+          >
+            <div className="pms-rail" role="region" aria-label="Pricing plans">
+              {plans.map((plan, i) => (
+                <article
+                  key={plan.tier}
+                  className="pms-card"
+                  data-featured={plan.featured ? 'true' : 'false'}
+                  data-index={i}
+                  aria-roledescription="slide"
+                  aria-label={`${plan.tier} plan ${i + 1} of ${plans.length}`}
+                >
+                  {plan.featured && (
+                    <span className="pms-badge">Best Value</span>
+                  )}
+
+                  <h3 className="pms-name">{plan.tier}</h3>
+
+                  <div className="pms-price-row">
+                    <span className="pms-price">{plan.price}</span>
+                    <span className="pms-per">{plan.per}</span>
+                  </div>
+
+                  {plan.tagline && (
+                    <p className="pms-tagline">{plan.tagline}</p>
+                  )}
+
+                  <ul className="pms-feature-list">
+                    {plan.features.slice(0, 6).map((f, j) => (
+                      <li key={j} className="pms-feature-row">
+                        <span className="pms-check" aria-hidden="true">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M5 12l5 5L20 7" />
+                          </svg>
+                        </span>
+                        <span className="pms-feature-text">{f}</span>
+                      </li>
+                    ))}
+                    {plan.features.length > 6 && (
+                      <li className="pms-feature-more">
+                        +{plan.features.length - 6} more in this plan
+                      </li>
+                    )}
+                  </ul>
+
+                  <button
+                    type="button"
+                    className="pms-cta"
+                    data-cursor-hover
+                    onClick={() => {
+                      trackPilotClick(`pricing_mobile_swipe_${plan.tier.toLowerCase()}`);
+                      if (plan.featured) {
+                        // Pilot → /order self-serve checkout
+                        window.location.href = '/order';
+                      } else {
+                        trackCallClick(`pricing_mobile_swipe_${plan.tier.toLowerCase()}`);
+                        (window as unknown as { openBookCallModal?: () => void }).openBookCallModal?.();
+                      }
+                    }}
+                  >
+                    {plan.cta}
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" aria-hidden="true">
+                      <path d="M5 12h14M12 5l7 7-7 7" />
+                    </svg>
+                  </button>
+
+                  <p className="pms-cta-fine">No card. No contracts. Cancel anytime.</p>
+                </article>
+              ))}
+            </div>
+
+            {/* Dots indicator — visual cue that there are more cards to swipe to.
+                Updated by IntersectionObserver in the effect below. */}
+            <div className="pms-dots" aria-hidden="true">
+              {plans.map((p, i) => (
+                <span key={p.tier} className="pms-dot" data-active={i === 0 ? 'true' : 'false'} />
+              ))}
+            </div>
+          </div>
+
           <div className="pricing-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', alignItems: 'stretch' }}>
           {plans.map((plan, i) => (
             <motion.div
               key={plan.tier}
+              className="pricing-card"
+              data-featured={plan.featured ? 'true' : 'false'}
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -172,6 +332,7 @@ export default function Pricing() {
 
               {plan.badge && (
                 <div
+                  className="tier-badge"
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
@@ -220,12 +381,13 @@ export default function Pricing() {
                 </div>
               )}
 
-              <div style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '3px', textTransform: 'uppercase', marginBottom: '6px', color: plan.featured ? 'rgba(242,238,231,0.38)' : '#6E6B63' }}>
+              <div className="tier-name" style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '3px', textTransform: 'uppercase', marginBottom: '6px', color: plan.featured ? 'rgba(242,238,231,0.38)' : '#6E6B63' }}>
                 {plan.tier}
               </div>
 
               {'tagline' in plan && plan.tagline && (
                 <div
+                  className="plan-tagline"
                   style={{
                     fontSize: '12.5px',
                     lineHeight: 1.5,
@@ -247,8 +409,9 @@ export default function Pricing() {
               {'originalPrice' in plan && plan.originalPrice ? (
                 <>
                   {/* Reserved 18px slot — original price renders here, transforms to look big initially */}
-                  <div style={{ height: '18px', marginBottom: '2px', position: 'relative' }}>
+                  <div className="tier-original-slot" style={{ height: '18px', marginBottom: '2px', position: 'relative' }}>
                     <motion.div
+                      className="tier-original"
                       initial={{ scale: 2.55, y: 24 }}
                       whileInView={{ scale: 1, y: 0 }}
                       viewport={{ once: true, margin: '-80px' }}
@@ -293,6 +456,7 @@ export default function Pricing() {
                   {/* Big discounted price + Save pill — fade in as the shrink finishes */}
                   <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginBottom: '4px', minHeight: '36px' }}>
                     <motion.div
+                      className="tier-price"
                       initial={{ opacity: 0, y: 10 }}
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true, margin: '-80px' }}
@@ -332,6 +496,7 @@ export default function Pricing() {
                   </div>
 
                   <motion.div
+                    className="tier-per"
                     initial={{ opacity: 0 }}
                     whileInView={{ opacity: 1 }}
                     viewport={{ once: true, margin: '-80px' }}
@@ -343,6 +508,7 @@ export default function Pricing() {
 
                   {/* "For a limited time only" mark — fades in last */}
                   <motion.div
+                    className="tier-limited"
                     initial={{ opacity: 0, y: 4 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, margin: '-80px' }}
@@ -379,16 +545,31 @@ export default function Pricing() {
                 </>
               ) : (
                 <>
-                  <div style={{ fontFamily: 'Inter, sans-serif', fontSize: '36px', fontWeight: 900, letterSpacing: '-1.5px', lineHeight: 1, marginBottom: '4px', color: plan.featured ? '#F2EEE7' : '#0C0C0B' }}>
+                  <div className="tier-price" style={{ fontFamily: 'Inter, sans-serif', fontSize: '36px', fontWeight: 900, letterSpacing: '-1.5px', lineHeight: 1, marginBottom: '4px', color: plan.featured ? '#F2EEE7' : '#0C0C0B' }}>
                     {plan.price}
                   </div>
-                  <div style={{ fontSize: '12px', color: plan.featured ? 'rgba(242,238,231,0.38)' : '#6E6B63', marginBottom: '20px' }}>
+                  <div className="tier-per" style={{ fontSize: '12px', color: plan.featured ? 'rgba(242,238,231,0.38)' : '#6E6B63', marginBottom: '20px' }}>
                     {plan.per}
                   </div>
                 </>
               )}
 
-              <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 22px', display: 'flex', flexDirection: 'column', gap: '8px', flex: 1 }}>
+              {/* Mobile: compact feature count + tap-to-expand toggle */}
+              <button
+                className="tier-expand-btn"
+                type="button"
+                onClick={() => setExpandedPlan(expandedPlan === plan.tier ? null : plan.tier)}
+                style={{ display: 'none' /* shown via CSS on mobile */ }}
+              >
+                <span style={{ color: '#E8541A', fontWeight: 800 }}>✓</span>
+                {plan.features.length} included
+                <span className="tier-expand-chevron" style={{ marginLeft: 'auto', fontSize: '10px', transition: 'transform 0.2s', display: 'inline-block', transform: expandedPlan === plan.tier ? 'rotate(180deg)' : 'rotate(0deg)' }}>▾</span>
+              </button>
+
+              <ul
+                className={`tier-features${expandedPlan === plan.tier ? ' tier-features-open' : ''}`}
+                style={{ listStyle: 'none', padding: 0, margin: '0 0 22px', display: 'flex', flexDirection: 'column', gap: '8px', flex: 1 }}
+              >
                 {plan.features.map((feat) => (
                   <li key={feat} style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '12px', lineHeight: 1.45, color: plan.featured ? 'rgba(242,238,231,0.8)' : '#0C0C0B' }}>
                     <span style={{ color: '#E8541A', fontWeight: 900, flexShrink: 0, fontSize: '11px' }}>✓</span>
@@ -398,6 +579,7 @@ export default function Pricing() {
               </ul>
 
               <a
+                className="tier-cta"
                 href={BOOK_CALL_URL}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -441,10 +623,116 @@ export default function Pricing() {
           ))}
         </div>
 
+        {/* À la carte order banner — sits under the 3 retainer cards.
+           Routes to /order for clients who want a one-off edit without
+           committing to a retainer. The "from $15" floor pulls from
+           lib/orderData.ts so it can't drift. */}
+        <motion.a
+          href="/order"
+          className="pricing-order-banner"
+          initial={{ opacity: 0, y: 14 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.22 }}
+          whileHover={{ y: -2 }}
+          data-cursor-hover
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '24px',
+            marginTop: '20px',
+            padding: '22px 26px',
+            background: 'linear-gradient(135deg, #0C0C0B 0%, #1a1614 100%)',
+            border: '1px solid rgba(232,84,26,0.32)',
+            borderRadius: '18px',
+            textDecoration: 'none',
+            boxShadow: '0 10px 36px rgba(12,12,11,0.18), inset 0 1px 0 rgba(255,255,255,0.04)',
+            position: 'relative',
+            overflow: 'hidden',
+            cursor: 'none',
+            flexWrap: 'wrap',
+          }}
+        >
+          {/* Ambient highlight */}
+          <span
+            aria-hidden="true"
+            style={{
+              position: 'absolute',
+              top: '-50%',
+              right: '-10%',
+              width: '320px',
+              height: '320px',
+              background: 'radial-gradient(circle, rgba(232,84,26,0.22) 0%, transparent 60%)',
+              filter: 'blur(40px)',
+              pointerEvents: 'none',
+            }}
+          />
+          <div style={{ position: 'relative', zIndex: 1, flex: '1 1 380px', minWidth: 0 }}>
+            <div style={{
+              fontSize: '10px',
+              fontWeight: 800,
+              letterSpacing: '2.5px',
+              textTransform: 'uppercase',
+              color: '#E8541A',
+              marginBottom: '6px',
+            }}>
+              Or — pay per project
+            </div>
+            <div style={{
+              fontFamily: 'Inter, sans-serif',
+              fontSize: 'clamp(20px, 2.2vw, 26px)',
+              fontWeight: 800,
+              color: '#F2EEE7',
+              letterSpacing: '-0.5px',
+              lineHeight: 1.15,
+              marginBottom: '6px',
+            }}>
+              Order a custom edit. <span style={{ color: '#E8541A' }}>From {orderStartingPrice}.</span>
+            </div>
+            <div style={{
+              fontSize: '13px',
+              color: 'rgba(242,238,231,0.6)',
+              lineHeight: 1.55,
+              maxWidth: '520px',
+            }}>
+              No retainer, no contract. Pick a service, configure your tier, send a Drive link. Reels, long-form, podcast, repurpose.
+            </div>
+          </div>
+
+          <span
+            className="pricing-order-cta"
+            style={{
+              position: 'relative',
+              zIndex: 1,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '13px 24px',
+              background: '#E8541A',
+              color: '#fff',
+              borderRadius: '100px',
+              fontSize: '13px',
+              fontWeight: 700,
+              fontFamily: 'Inter, sans-serif',
+              whiteSpace: 'nowrap',
+              boxShadow: '0 6px 22px rgba(232,84,26,0.4)',
+              flexShrink: 0,
+              minHeight: '44px',
+            }}
+          >
+            Start ordering
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true">
+              <path d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
+          </span>
+        </motion.a>
+
         {/* Add-ons row — sits under the 3 cards, inside the same rounded panel.
            Spun out of Full System so the core tier stays focused on content
            production and ops; community work is its own thing. */}
         <motion.div
+          className="pricing-addons"
           initial={{ opacity: 0, y: 12 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -474,6 +762,7 @@ export default function Pricing() {
             Add-ons
           </span>
           <span
+            className="addons-copy"
             style={{
               flex: 1,
               minWidth: 0,
@@ -502,9 +791,591 @@ export default function Pricing() {
       </div>
 
       <style>{`
-        @media (max-width: 768px) {
-          .pricing-grid { grid-template-columns: 1fr !important; }
+        @media (max-width: 900px) {
+          .pricing-grid { grid-template-columns: 1fr !important; gap: 14px !important; }
           .pricing-grid > * { transform: scale(1) !important; }
+        }
+
+        /* ── Mobile pricing: SWIPE CAROUSEL ──────────────────────────
+           Reference: workout-analytics card with a BEST VALUE badge,
+           big price, green checks, and a single primary CTA. Featured
+           plan (Pilot) renders first; user swipes right to reveal
+           Growth and Full System. Scroll-snap so each card centres
+           cleanly. Dots indicator below shows position in the strip.
+        ────────────────────────────────────────────────────────── */
+        @media (max-width: 640px) {
+          section#pricing { padding: 24px 0 36px !important; }
+          section#pricing > div:not(.pricing-mobile-swipe) { padding-left: 12px; padding-right: 12px; }
+
+          /* Swap the layouts: hide the stacked cards + old picker, show the swipe rail. */
+          section#pricing .pricing-grid { display: none !important; }
+          section#pricing .pricing-mobile-app { display: none !important; }
+          section#pricing .pricing-mobile-swipe { display: block !important; padding: 4px 0 8px; }
+
+          /* ── Horizontal scroll rail ── */
+          .pms-rail {
+            display: flex;
+            gap: 14px;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            padding: 8px 16px 18px;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+          }
+          .pms-rail::-webkit-scrollbar { display: none; }
+
+          /* ── Plan card ── */
+          .pms-card {
+            flex: 0 0 86%;
+            max-width: 360px;
+            scroll-snap-align: center;
+            scroll-snap-stop: always;
+            background: #FFFFFF;
+            border: 1px solid rgba(12,12,11,0.08);
+            border-radius: 22px;
+            padding: 22px 20px 22px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 4px 18px rgba(12,12,11,0.06);
+            font-family: Inter, sans-serif;
+            color: #0C0C0B;
+          }
+          /* Featured card — warm amber gradient like the iOS reference card. */
+          .pms-card[data-featured="true"] {
+            background: linear-gradient(180deg, #FFEACC 0%, #FFCFA0 100%);
+            border-color: rgba(232,84,26,0.35);
+            box-shadow: 0 14px 36px rgba(232,84,26,0.22), inset 0 1px 0 rgba(255,255,255,0.7);
+          }
+
+          .pms-badge {
+            display: inline-block;
+            align-self: flex-start;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.4px;
+            color: #2A56FF;
+            background: rgba(42,86,255,0.10);
+            padding: 4px 10px;
+            border-radius: 100px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+          }
+
+          .pms-name {
+            font-size: 17px;
+            font-weight: 700;
+            margin: 0 0 8px;
+            color: rgba(12,12,11,0.78);
+            letter-spacing: -0.2px;
+          }
+
+          .pms-price-row {
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+            margin-bottom: 4px;
+          }
+          .pms-price {
+            font-size: 34px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            color: #0C0C0B;
+            line-height: 1;
+          }
+          .pms-per {
+            font-size: 12.5px;
+            color: rgba(12,12,11,0.55);
+            font-weight: 600;
+          }
+
+          .pms-tagline {
+            font-size: 12.5px;
+            color: rgba(12,12,11,0.55);
+            margin: 6px 0 16px;
+            line-height: 1.45;
+          }
+
+          .pms-feature-list {
+            list-style: none;
+            margin: 0 0 18px;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            flex: 1;
+          }
+          .pms-feature-row {
+            display: grid;
+            grid-template-columns: 20px 1fr;
+            gap: 10px;
+            align-items: start;
+            font-size: 13.5px;
+            line-height: 1.4;
+            color: rgba(12,12,11,0.84);
+          }
+          .pms-check {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #22C55E;
+            color: #FFFFFF;
+            flex-shrink: 0;
+            margin-top: 1px;
+          }
+          .pms-feature-more {
+            font-size: 12px;
+            color: rgba(12,12,11,0.5);
+            font-style: italic;
+            padding-left: 30px;
+          }
+
+          .pms-cta {
+            background: #2A56FF;
+            color: #FFFFFF;
+            border: none;
+            border-radius: 100px;
+            padding: 15px 22px;
+            font-size: 15px;
+            font-weight: 700;
+            font-family: Inter, sans-serif;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-height: 50px;
+            width: 100%;
+            box-shadow: 0 10px 24px rgba(42,86,255,0.32);
+          }
+          /* Featured card flips the CTA to brand orange so the recommended plan
+             reads as the visual primary on its own card. */
+          .pms-card[data-featured="true"] .pms-cta {
+            background: #E8541A;
+            box-shadow: 0 12px 28px rgba(232,84,26,0.42);
+          }
+
+          .pms-cta-fine {
+            font-size: 11.5px;
+            color: rgba(12,12,11,0.5);
+            text-align: center;
+            margin: 10px 0 0;
+          }
+
+          /* ── Dots indicator ── */
+          .pms-dots {
+            display: flex;
+            justify-content: center;
+            gap: 7px;
+            margin-top: 6px;
+          }
+          .pms-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: rgba(12,12,11,0.18);
+            transition: background 0.2s, width 0.2s;
+          }
+          .pms-dot[data-active="true"] {
+            background: #E8541A;
+            width: 22px;
+            border-radius: 4px;
+          }
+
+          /* ── Tier picker row (top of card) ── */
+          .pma-tier-row {
+            display: grid;
+            grid-template-columns: 1fr 1.12fr 1fr;
+            gap: 8px;
+            margin-bottom: 18px;
+            align-items: stretch;
+          }
+          .pma-tier-card {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 4px;
+            padding: 14px 8px 12px;
+            background: #FFFFFF;
+            border: 1px solid rgba(12,12,11,0.08);
+            border-radius: 16px;
+            cursor: pointer;
+            font-family: Inter, sans-serif;
+            text-align: center;
+            box-shadow: 0 2px 6px rgba(12,12,11,0.03);
+            transition: transform 0.18s, box-shadow 0.18s, background 0.18s, border-color 0.18s;
+            min-height: 96px;
+          }
+          .pma-tier-card[data-active="true"] {
+            background: linear-gradient(180deg, #FFF4E6 0%, #FFE5C7 100%);
+            border-color: rgba(232,84,26,0.55);
+            box-shadow: 0 8px 22px rgba(232,84,26,0.18), inset 0 1px 0 rgba(255,255,255,0.6);
+            transform: translateY(-2px);
+          }
+          .pma-tier-card[data-active="true"] .pma-tier-name { color: #0C0C0B; }
+          .pma-tier-card[data-active="true"] .pma-tier-price { color: #0C0C0B; }
+          .pma-popular-pill {
+            position: absolute;
+            top: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 2px 9px;
+            background: #E8541A;
+            color: #fff;
+            border-radius: 100px;
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            white-space: nowrap;
+            box-shadow: 0 4px 10px rgba(232,84,26,0.4);
+          }
+          .pma-tier-name {
+            font-size: 12px;
+            font-weight: 800;
+            color: #6E6B63;
+            letter-spacing: -0.2px;
+            margin-bottom: 1px;
+            line-height: 1;
+          }
+          .pma-tier-price {
+            font-size: 18px;
+            font-weight: 900;
+            color: #0C0C0B;
+            letter-spacing: -0.8px;
+            line-height: 1;
+          }
+          .pma-tier-per {
+            font-size: 9.5px;
+            color: rgba(110,107,99,0.85);
+            font-weight: 500;
+            letter-spacing: -0.05px;
+          }
+
+          /* ── Benefits panel (below picker) ── */
+          .pma-benefits {
+            background: #FFFFFF;
+            border: 1px solid rgba(12,12,11,0.06);
+            border-radius: 20px;
+            padding: 18px 16px 16px;
+            box-shadow: 0 4px 14px rgba(12,12,11,0.04);
+          }
+          .pma-benefits-head {
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+            margin-bottom: 14px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(12,12,11,0.06);
+          }
+          .pma-benefits-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #6E6B63;
+            letter-spacing: 0.2px;
+          }
+          .pma-benefits-tier {
+            font-size: 14px;
+            font-weight: 900;
+            color: #0C0C0B;
+            letter-spacing: -0.3px;
+          }
+          .pma-feature-list {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+          }
+          .pma-feature-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 12.5px;
+            color: #2A2924;
+            line-height: 1.45;
+          }
+          .pma-check {
+            flex-shrink: 0;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: rgba(16,185,129,0.12);
+            color: #10b981;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 1px;
+          }
+          .pma-feature-text { flex: 1; }
+
+          /* ── Sticky bottom CTA ── */
+          .pma-cta {
+            width: 100%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: linear-gradient(180deg, #F36835 0%, #E8541A 100%);
+            color: #fff;
+            border: none;
+            border-radius: 100px;
+            padding: 13px 22px;
+            font-size: 14px;
+            font-weight: 800;
+            letter-spacing: 0.1px;
+            cursor: pointer;
+            font-family: Inter, sans-serif;
+            min-height: 48px;
+            box-shadow: 0 8px 24px rgba(232,84,26,0.30), inset 0 1px 0 rgba(255,255,255,0.18);
+            transition: filter 0.15s, transform 0.15s;
+          }
+          .pma-cta:active { transform: scale(0.98); }
+          .pma-cta:hover { filter: brightness(1.06); }
+
+          .pma-cta-fine {
+            margin: 9px 0 0;
+            text-align: center;
+            font-size: 10.5px;
+            color: rgba(110,107,99,0.75);
+            font-weight: 500;
+          }
+        }
+        @media (max-width: 380px) {
+          .pma-tier-card { padding: 12px 6px 10px; min-height: 90px; }
+          .pma-tier-price { font-size: 16.5px; }
+          .pma-tier-per { font-size: 9px; }
+          .pma-feature-row { font-size: 12px; }
+          .pma-benefits { padding: 16px 14px 14px; }
+        }
+
+        /* ── Original mobile pricing header — still active to compress
+           the eyebrow/headline/region pill above the new app pattern ── */
+        @media (max-width: 640px) {
+
+          section#pricing .pricing-panel {
+            padding: 14px 14px 10px !important;
+            border-radius: 18px !important;
+          }
+          section#pricing .pricing-h2 {
+            font-size: 20px !important;
+            letter-spacing: -0.5px !important;
+            line-height: 1.1 !important;
+            margin-bottom: 6px !important;
+          }
+          section#pricing .pricing-sub {
+            font-size: 11.5px !important;
+            line-height: 1.45 !important;
+            margin-bottom: 8px !important;
+          }
+          section#pricing .pricing-region {
+            font-size: 9px !important;
+            padding: 3px 9px !important;
+            gap: 5px !important;
+            margin-bottom: 10px !important;
+          }
+
+          /* Clean stacked tier cards — visual style modeled on premium
+             subscription paywalls (Apple One, Spotify Family, etc.). Three
+             rows share rounded outer corners and a unified container. */
+          .pricing-grid {
+            grid-template-columns: 1fr !important;
+            display: grid !important;
+            gap: 6px !important;
+            overflow: visible !important;
+          }
+
+          .pricing-card {
+            padding: 20px 18px 18px !important;
+            border-radius: 18px !important;
+            flex: none !important;
+            max-width: none !important;
+            position: relative !important;
+            border: 1px solid rgba(12,12,11,0.07) !important;
+            background: #FAF7F1 !important;
+            box-shadow: 0 2px 8px rgba(12,12,11,0.03) !important;
+          }
+          /* Featured (Pilot) card — dark dominant tier, strong orange ring,
+             plays the role of the highlighted "Yearly" tier in the reference */
+          .pricing-card[data-featured="true"] {
+            background: #0C0C0B !important;
+            border: 1.5px solid rgba(232,84,26,0.55) !important;
+            box-shadow:
+              0 12px 28px rgba(232,84,26,0.18),
+              0 0 0 4px rgba(232,84,26,0.10) !important;
+          }
+          /* Title color on the featured dark card */
+          .pricing-card[data-featured="true"] .tier-name,
+          .pricing-card[data-featured="true"] .tier-price,
+          .pricing-card[data-featured="true"] .plan-tagline,
+          .pricing-card[data-featured="true"] .tier-features li {
+            color: #F2EEE7 !important;
+          }
+          .pricing-card[data-featured="true"] .tier-per { color: rgba(242,238,231,0.55) !important; }
+
+          /* Keep the tagline — it's helpful at full card width */
+          .pricing-card .plan-tagline {
+            display: block !important;
+            font-size: 12.5px !important;
+            line-height: 1.5 !important;
+            margin: 4px 0 12px !important;
+          }
+          /* Hide the "was X" original price on mobile to reduce noise */
+          .pricing-card .tier-original-slot { display: none !important; }
+          .pricing-card .tier-limited { display: none !important; }
+
+          /* Top badge — only on featured, cleaner pill */
+          .pricing-card .tier-badge {
+            display: inline-block !important;
+            font-size: 9.5px !important;
+            font-weight: 700 !important;
+            letter-spacing: 1.2px !important;
+            padding: 4px 10px !important;
+            margin-bottom: 10px !important;
+            white-space: nowrap !important;
+            line-height: 1.3 !important;
+            border-radius: 100px !important;
+            background: rgba(232,84,26,0.18) !important;
+            color: #E8541A !important;
+            border: 1px solid rgba(232,84,26,0.35) !important;
+          }
+          .pricing-card[data-featured="true"] .tier-badge {
+            background: rgba(232,84,26,0.20) !important;
+          }
+
+          /* Tier name — large like a section heading */
+          .pricing-card .tier-name {
+            font-size: 22px !important;
+            font-weight: 900 !important;
+            letter-spacing: -0.5px !important;
+            margin-bottom: 4px !important;
+            text-transform: none !important;
+          }
+          /* Tagline — single line, smaller */
+          .pricing-card .plan-tagline {
+            display: block !important;
+            font-size: 12px !important;
+            line-height: 1.5 !important;
+            margin: 0 0 12px !important;
+            color: #6E6B63 !important;
+          }
+          .pricing-card[data-featured="true"] .plan-tagline {
+            color: rgba(242,238,231,0.55) !important;
+          }
+
+          /* Price row — price + "Save X%" inline like the reference */
+          .pricing-card .tier-price {
+            font-size: 38px !important;
+            font-weight: 900 !important;
+            letter-spacing: -1.6px !important;
+            line-height: 1 !important;
+            margin-bottom: 4px !important;
+          }
+          .pricing-card .tier-per {
+            font-size: 12.5px !important;
+            margin-bottom: 16px !important;
+          }
+          /* Save 50% badge sits beside the price */
+          .pricing-card .tier-save {
+            display: inline-block !important;
+            margin-left: 10px !important;
+            padding: 4px 8px !important;
+            font-size: 10px !important;
+            font-weight: 800 !important;
+            letter-spacing: 0.5px !important;
+            background: rgba(232,84,26,0.20) !important;
+            color: #E8541A !important;
+            border-radius: 6px !important;
+            vertical-align: middle !important;
+          }
+
+          /* Full feature list on mobile — readers scrolling want to see what
+             they get before they commit. No collapse, no expand button. */
+          .pricing-card .tier-features {
+            display: flex !important;
+            flex-direction: column !important;
+            margin: 0 0 16px !important;
+            gap: 8px !important;
+          }
+          .pricing-card .tier-features li {
+            font-size: 13px !important;
+            line-height: 1.45 !important;
+            gap: 9px !important;
+            display: flex !important;
+            align-items: flex-start !important;
+          }
+          .pricing-card .tier-features li span { font-size: 11px !important; }
+
+          /* Hide the expand button — was rendering as an orphan ✓ between
+             the price and the feature list since features are now always shown. */
+          .pricing-card .tier-expand-btn { display: none !important; }
+
+          /* CTA — pill-shaped, full-width, prominent. Cream pill on dark
+             featured card (high contrast), orange pill on cream cards. */
+          .pricing-card .tier-cta {
+            padding: 14px 20px !important;
+            font-size: 14px !important;
+            font-weight: 800 !important;
+            min-height: 48px !important;
+            border-radius: 100px !important;
+            letter-spacing: 0.1px !important;
+            width: 100% !important;
+            justify-content: center !important;
+            background: #E8541A !important;
+            color: #F2EEE7 !important;
+            border: none !important;
+            transition: transform 0.2s, background 0.2s !important;
+          }
+          .pricing-card .tier-cta:active { transform: scale(0.97) !important; }
+          .pricing-card[data-featured="true"] .tier-cta {
+            background: #F2EEE7 !important;
+            color: #0C0C0B !important;
+          }
+
+          /* Order banner — stack vertically on mobile */
+          .pricing-order-banner {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 14px !important;
+            padding: 18px 18px !important;
+            margin-top: 14px !important;
+            border-radius: 14px !important;
+          }
+          .pricing-order-banner .pricing-order-cta {
+            width: 100% !important;
+            justify-content: center !important;
+            padding: 13px 18px !important;
+            font-size: 13px !important;
+          }
+
+          /* Add-ons strip — vertical on mobile */
+          .pricing-addons {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 8px !important;
+            padding: 12px 14px !important;
+            margin-top: 12px !important;
+          }
+          .pricing-addons .addons-copy {
+            font-size: 11.5px !important;
+            line-height: 1.5 !important;
+          }
+        }
+
+        @media (max-width: 380px) {
+          section#pricing { padding: 36px 10px 44px !important; }
+          section#pricing .pricing-panel { padding: 18px 10px 16px !important; }
+          section#pricing .pricing-h2 { font-size: 20px !important; }
+          .pricing-card { padding: 8px 6px 10px !important; }
+          .pricing-card .tier-price { font-size: 16px !important; }
+          .pricing-card .tier-cta { font-size: 9px !important; padding: 8px 3px !important; }
         }
       `}</style>
     </section>

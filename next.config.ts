@@ -20,11 +20,18 @@ const nextConfig: NextConfig = {
 
   // Image optimization formats (used by next/image when adopted).
   // Both Vercel and Netlify support next/image out of the box.
+  //
+  // Cloudinary hosts all the OurWork showcase videos and any future <Image>
+  // posters built from those clips. Adding both `res.cloudinary.com` (asset
+  // delivery) and `player.cloudinary.com` (embed player) up-front so a
+  // future next/image swap doesn't fail the Vercel build.
   images: {
     formats: ["image/avif", "image/webp"],
     remotePatterns: [
-      { protocol: "https", hostname: "cdn.jsdelivr.net" }, // Twemoji
-      { protocol: "https", hostname: "emojicdn.elk.sh" },  // Apple emoji proxy
+      { protocol: "https", hostname: "cdn.jsdelivr.net" },        // Twemoji
+      { protocol: "https", hostname: "emojicdn.elk.sh" },         // Apple emoji proxy
+      { protocol: "https", hostname: "res.cloudinary.com" },      // Cloudinary asset CDN (videos + future posters)
+      { protocol: "https", hostname: "player.cloudinary.com" },   // Cloudinary embed player (older video links)
     ],
   },
 

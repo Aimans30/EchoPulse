@@ -1,12 +1,25 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { BOOK_CALL_URL, BOOK_CALL_LABEL_LONG } from '@/lib/links';
+import { BOOK_CALL_LABEL_LONG } from '@/lib/links';
 import { trackCallClick } from '@/lib/analytics';
 
+/**
+ * CTABanner — clean dark card on its own.
+ *
+ * The painterly multi-color SVG background was removed (per user feedback —
+ * the gradient slice bleeding past the top corner looked off). Back to the
+ * original premium-agency pattern: solid dark surface, soft single-color
+ * orange radial highlight in the back-right corner for warmth, generous
+ * padding. No gradient strips, no painterly blobs, no glass card.
+ */
 export default function CTABanner() {
   return (
-    <div id="book-call" className="cta-banner-wrap" style={{ margin: '0 56px 128px', scrollMarginTop: '80px' }}>
+    <div
+      id="book-call"
+      className="cta-banner-wrap"
+      style={{ margin: '0 56px 128px', scrollMarginTop: '80px' }}
+    >
       <motion.div
         className="cta-banner-inner"
         data-dark-bg="true"
@@ -27,16 +40,29 @@ export default function CTABanner() {
           flexWrap: 'wrap',
         }}
       >
+        {/* Soft single-color radial glow back-right — the ONLY background
+            effect. No multi-color blobs, no gradient strips, no painterly. */}
         <div
+          aria-hidden="true"
           style={{
             position: 'absolute',
             inset: 0,
-            background: 'radial-gradient(ellipse at 70% 50%, rgba(232,84,26,0.12) 0%, transparent 65%)',
+            background:
+              'radial-gradient(ellipse at 70% 50%, rgba(232,84,26,0.12) 0%, transparent 65%)',
             pointerEvents: 'none',
           }}
         />
 
-        <div className="cta-banner-text" style={{ position: 'relative', zIndex: 1, flex: '1 1 520px', minWidth: 0, maxWidth: '880px' }}>
+        <div
+          className="cta-banner-text"
+          style={{
+            position: 'relative',
+            zIndex: 1,
+            flex: '1 1 520px',
+            minWidth: 0,
+            maxWidth: '880px',
+          }}
+        >
           <motion.div
             className="cta-banner-h"
             initial={{ opacity: 0, x: -20 }}
@@ -57,6 +83,7 @@ export default function CTABanner() {
             <span style={{ display: 'block' }}>You run your business.</span>
           </motion.div>
           <motion.p
+            className="cta-banner-p"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
@@ -69,11 +96,12 @@ export default function CTABanner() {
               lineHeight: 1.7,
             }}
           >
-            That&apos;s what most founders and coaches lose every week. Writing posts. Editing clips. Briefing freelancers. Rewriting drafts that still don&apos;t sound like them. We do all of it, in your voice. Book a free 45-minute call. We&apos;ll review what you&apos;re publishing, run a 10-minute Voice Foundation preview, and send you a plan in writing. Hire us after. Or don&apos;t.
+            That is what most founders, coaches, business owners, and real estate agents lose every week. Editing clips. Writing posts. Chasing freelancers. Reviewing drafts that still miss the mark. We handle all of it. Book a free 45-minute call. We will review what you are publishing today, map a 30-day plan, and put the numbers in writing.
           </motion.p>
         </div>
 
         <motion.div
+          className="cta-banner-action"
           initial={{ opacity: 0, scale: 0.9 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
@@ -88,13 +116,15 @@ export default function CTABanner() {
             zIndex: 1,
           }}
         >
-          <motion.a
-            href={BOOK_CALL_URL}
-            target="_blank"
-            rel="noopener noreferrer"
+          <motion.button
+            type="button"
+            className="cta-banner-btn"
             data-cursor-hover
             aria-label={BOOK_CALL_LABEL_LONG}
-            onClick={() => trackCallClick('cta_banner')}
+            onClick={() => {
+              trackCallClick('cta_banner');
+              (window as unknown as { openBookCallModal?: () => void }).openBookCallModal?.();
+            }}
             whileHover={{ scale: 1.04, boxShadow: '0 16px 60px rgba(232,84,26,0.5)' }}
             whileTap={{ scale: 0.98 }}
             style={{
@@ -108,18 +138,26 @@ export default function CTABanner() {
               cursor: 'none',
               transition: 'background 0.3s',
               fontFamily: 'Inter, sans-serif',
-              textDecoration: 'none',
-              display: 'inline-block',
               whiteSpace: 'nowrap',
               boxShadow: '0 8px 40px rgba(232,84,26,0.38)',
               minHeight: '48px',
             }}
-            onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = '#d94a14')}
-            onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = '#E8541A')}
+            onMouseEnter={(e) =>
+              ((e.currentTarget as HTMLElement).style.background = '#d94a14')
+            }
+            onMouseLeave={(e) =>
+              ((e.currentTarget as HTMLElement).style.background = '#E8541A')
+            }
           >
             {BOOK_CALL_LABEL_LONG}
-          </motion.a>
-          <span style={{ fontSize: '12px', color: 'rgba(242,238,231,0.28)', textAlign: 'center' }}>
+          </motion.button>
+          <span
+            style={{
+              fontSize: '12px',
+              color: 'rgba(242,238,231,0.28)',
+              textAlign: 'center',
+            }}
+          >
             No credit card. No contracts. Just a conversation.
           </span>
         </motion.div>
@@ -132,9 +170,12 @@ export default function CTABanner() {
         }
         @media (max-width: 640px) {
           .cta-banner-wrap { margin: 0 16px 80px !important; }
-          .cta-banner-inner { padding: 48px 28px !important; }
+          .cta-banner-inner { padding: 48px 28px !important; gap: 28px !important; }
           .cta-banner-h { font-size: 28px !important; letter-spacing: -0.8px !important; line-height: 1.1 !important; }
           .cta-banner-text { flex-basis: 100% !important; }
+          .cta-banner-p { font-size: 14px !important; margin-top: 16px !important; }
+          .cta-banner-action { width: 100% !important; align-items: stretch !important; }
+          .cta-banner-btn { width: 100% !important; padding: 16px 24px !important; }
         }
       `}</style>
     </div>

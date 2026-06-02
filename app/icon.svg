@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <!--
+    EchoPulse favicon (browser tab icon).
+    Next.js auto-detects app/icon.svg and serves it as the favicon for
+    every page on the site. No <link rel="icon"> tag needed in <head>.
+
+    Design language matches the in-page Nav logo:
+      • Dark rounded square = the "container" tone of the brand
+      • Orange "E" mark = the EchoPulse accent that punctuates every
+        headline, button, and CTA
+      • Three horizontal bars echo the brand's "pulse" idea
+        (signal/sound-wave) so the mark reads as both letterform AND
+        rhythm at thumbnail size
+  -->
+  <rect width="32" height="32" rx="8" fill="#0C0C0B"/>
+  <rect x="8"  y="9"  width="16" height="3" rx="1.5" fill="#E8541A"/>
+  <rect x="8"  y="14.5" width="11" height="3" rx="1.5" fill="#E8541A"/>
+  <rect x="8"  y="20" width="16" height="3" rx="1.5" fill="#E8541A"/>
+</svg>

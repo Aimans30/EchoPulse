@@ -1,9 +1,13 @@
 // Single source of truth for outbound conversion links.
-// Replace BOOK_CALL_URL with your real Calendly / Cal.com / Savvycal link
-// before going live. Every CTA across the site reads from here, so updating
-// one constant updates the whole site.
+// Every default CTA across the site reads from here.
+//
+// Service-specific override: components/ServicePageClient.tsx checks
+// service.bookCallUrl (set in lib/serviceData.ts) before falling back to
+// this URL. The Websites service currently uses a dedicated event:
+//   https://cal.com/lakshya-soni-jvwfee/echopulse-website-strategy-call (30m)
+// All other services use the default below.
 
-export const BOOK_CALL_URL = 'https://cal.com/lakshyasoni/intro';
+export const BOOK_CALL_URL = 'https://cal.com/lakshya-soni-jvwfee/echopulse-marketing-agency-call';
 export const BOOK_CALL_LABEL = 'Book a Free Call';
 export const BOOK_CALL_LABEL_LONG = 'Book a Free 45-min Call';
 

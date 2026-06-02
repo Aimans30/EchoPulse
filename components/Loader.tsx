@@ -3,55 +3,138 @@
 import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 
+/**
+ * Loader — branded intro splash with richer motion.
+ *
+ * Animation timeline:
+ *   1. Backdrop fades in (very fast, ~0.2s) — sets dark stage
+ *   2. Orbital ring + ambient glow pulse in behind the wordmark
+ *   3. Letters reveal one-by-one with blur + lift
+ *   4. Progress bar fills across the bottom edge
+ *   5. Wordmark exits up with blur, ring contracts, backdrop fades out
+ *
+ * Concurrency: the parent <Home> mounts the real page content BEHIND the
+ * loader at the same time (opacity 0). That means every dynamic-import
+ * chunk and image is downloading WHILE this animation plays — so by the
+ * time the loader exits, the page is already fully prepared. Zero wait
+ * after the splash.
+ *
+ * Safety:
+ *   - Failsafe timer force-completes after 4.5s if GSAP hangs
+ *   - Loader sets pointer-events:none during exit so it can't block scroll
+ *   - Forcibly clears any inherited body overflow:hidden on unmount
+ */
 export default function Loader({ onDone }: { onDone: () => void }) {
   const loaderRef = useRef<HTMLDivElement>(null);
   const barRef = useRef<HTMLDivElement>(null);
   const wordRef = useRef<HTMLDivElement>(null);
+  const ringRef = useRef<SVGSVGElement>(null);
+  const glowRef = useRef<HTMLDivElement>(null);
+
+  // Keep `onDone` fresh without retriggering the animation effect.
+  const onDoneRef = useRef(onDone);
+  useEffect(() => { onDoneRef.current = onDone; }, [onDone]);
+
+  // Failsafe: hide loader after 4.5s no matter what.
+  useEffect(() => {
+    const failsafe = window.setTimeout(() => { onDoneRef.current?.(); }, 3500);
+    return () => window.clearTimeout(failsafe);
+  }, []);
+
+  // Belt-and-suspenders: when this component unmounts, clear any
+  // overflow:hidden that may have been left on body. Prevents a stuck-scroll
+  // state if a modal/popup happened to set it during the loader window.
+  useEffect(() => () => {
+    if (typeof document !== 'undefined') {
+      if (document.body.style.overflow === 'hidden') document.body.style.overflow = '';
+      if (document.documentElement.style.overflow === 'hidden') document.documentElement.style.overflow = '';
+    }
+  }, []);
 
   useEffect(() => {
     const letters = wordRef.current?.querySelectorAll('.l');
-    if (!letters || !letters.length) return;
+    if (!letters || !letters.length) {
+      onDoneRef.current?.();
+      return;
+    }
 
     const tl = gsap.timeline({
       onComplete: () => {
+        // Exit sequence — block pointer events so the (about to fade) overlay
+        // can never trap a click during its 0.5s exit.
+        if (loaderRef.current) loaderRef.current.style.pointerEvents = 'none';
+
         const exit = gsap.timeline({
-          onComplete: onDone,
+          onComplete: () => onDoneRef.current?.(),
         });
-        exit.to(letters, {
-          y: -16,
-          opacity: 0,
-          filter: 'blur(8px)',
-          duration: 0.5,
-          stagger: 0.025,
-          ease: 'power3.in',
-        }, 0)
-        .to(loaderRef.current, {
-          opacity: 0,
-          duration: 0.5,
-          ease: 'power2.inOut',
-        }, 0.2);
+        exit
+          .to(letters, {
+            y: -20,
+            opacity: 0,
+            filter: 'blur(10px)',
+            duration: 0.55,
+            stagger: 0.022,
+            ease: 'power3.in',
+          }, 0)
+          .to(ringRef.current, {
+            scale: 0.6,
+            opacity: 0,
+            duration: 0.55,
+            ease: 'power2.in',
+          }, 0)
+          .to(glowRef.current, {
+            opacity: 0,
+            duration: 0.5,
+            ease: 'power2.out',
+          }, 0)
+          .to(loaderRef.current, {
+            opacity: 0,
+            duration: 0.55,
+            ease: 'power2.inOut',
+          }, 0.15);
       },
     });
 
-    // Letter blur reveal
-    tl.fromTo(letters,
-      { y: 28, opacity: 0, filter: 'blur(10px)' },
-      {
-        y: 0,
-        opacity: 1,
-        filter: 'blur(0px)',
-        duration: 0.85,
-        stagger: 0.045,
-        ease: 'power3.out',
-      }
-    )
-    // Progress bar fills while letters are settled
-    .to(barRef.current, { width: '100%', duration: 0.9, ease: 'power2.inOut' }, '-=0.4');
+    // ── Intro ──
+    tl
+      // Glow ambience first
+      .fromTo(glowRef.current,
+        { opacity: 0, scale: 0.8 },
+        { opacity: 1, scale: 1, duration: 0.45, ease: 'power2.out' },
+        0,
+      )
+      // Orbital ring scales + fades in
+      .fromTo(ringRef.current,
+        { opacity: 0, scale: 0.6, rotate: -40 },
+        { opacity: 1, scale: 1, rotate: 0, duration: 0.7, ease: 'power3.out' },
+        0.05,
+      )
+      // Letter blur reveal — staggered
+      .fromTo(letters,
+        { y: 24, opacity: 0, filter: 'blur(10px)' },
+        {
+          y: 0,
+          opacity: 1,
+          filter: 'blur(0px)',
+          duration: 0.7,
+          stagger: 0.035,
+          ease: 'power3.out',
+        },
+        0.05,
+      )
+      // Subtle settle bounce on the orange half ("Pulse") to land the brand
+      .to('.l-pulse', {
+        y: -3,
+        duration: 0.18,
+        ease: 'power1.out',
+        yoyo: true,
+        repeat: 1,
+      }, '-=0.15')
+      // Progress bar fills
+      .to(barRef.current, { width: '100%', duration: 0.8, ease: 'power2.inOut' }, '-=0.4');
 
-    return () => {
-      tl.kill();
-    };
-  }, [onDone]);
+    return () => { tl.kill(); };
+  }, []);
 
   const letters = 'EchoPulse'.split('');
 
@@ -62,22 +145,95 @@ export default function Loader({ onDone }: { onDone: () => void }) {
       style={{
         position: 'fixed',
         inset: 0,
-        background: '#0C0C0B',
+        background: 'radial-gradient(ellipse at 50% 50%, #14120F 0%, #0C0C0B 60%, #050505 100%)',
         zIndex: 8000,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
+        overflow: 'hidden',
       }}
     >
+      {/* Ambient glow behind the wordmark */}
+      <div
+        ref={glowRef}
+        aria-hidden="true"
+        style={{
+          position: 'absolute',
+          width: '520px',
+          height: '520px',
+          borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(232,84,26,0.18) 0%, rgba(232,84,26,0.05) 35%, transparent 70%)',
+          filter: 'blur(40px)',
+          opacity: 0,
+          willChange: 'transform, opacity',
+        }}
+      />
+
+      {/* Orbital ring — two dashed circles with a tiny rotating marker */}
+      <svg
+        ref={ringRef}
+        viewBox="0 0 400 400"
+        width="380"
+        height="380"
+        style={{
+          position: 'absolute',
+          opacity: 0,
+          pointerEvents: 'none',
+        }}
+        aria-hidden="true"
+      >
+        {/* Outer faint ring */}
+        <circle
+          cx="200"
+          cy="200"
+          r="180"
+          fill="none"
+          stroke="rgba(242,238,231,0.06)"
+          strokeWidth="1"
+        />
+        {/* Inner dashed orange ring with continuous rotation */}
+        <g style={{ transformOrigin: '200px 200px', animation: 'epRingSpin 9s linear infinite' }}>
+          <circle
+            cx="200"
+            cy="200"
+            r="150"
+            fill="none"
+            stroke="rgba(232,84,26,0.45)"
+            strokeWidth="1.5"
+            strokeDasharray="2 12"
+            strokeLinecap="round"
+          />
+          {/* Orbiting orange dot */}
+          <circle cx="350" cy="200" r="4" fill="#E8541A">
+            <animate attributeName="opacity" values="0.3;1;0.3" dur="1.6s" repeatCount="indefinite" />
+          </circle>
+        </g>
+        {/* Second counter-rotating dashed ring */}
+        <g style={{ transformOrigin: '200px 200px', animation: 'epRingSpinR 14s linear infinite' }}>
+          <circle
+            cx="200"
+            cy="200"
+            r="120"
+            fill="none"
+            stroke="rgba(242,238,231,0.08)"
+            strokeWidth="1"
+            strokeDasharray="1 6"
+          />
+        </g>
+      </svg>
+
+      {/* Wordmark */}
       <div
         ref={wordRef}
         style={{
           fontFamily: 'Inter, sans-serif',
-          fontSize: '36px',
+          fontSize: '44px',
           fontWeight: 800,
-          letterSpacing: '-1px',
+          letterSpacing: '-1.5px',
           color: '#F2EEE7',
           display: 'flex',
+          position: 'relative',
+          zIndex: 1,
           willChange: 'transform, opacity, filter',
         }}
       >
@@ -86,10 +242,11 @@ export default function Loader({ onDone }: { onDone: () => void }) {
           return (
             <span
               key={i}
-              className="l"
+              className={`l ${isOrange ? 'l-pulse' : ''}`}
               style={{
                 display: 'inline-block',
                 color: isOrange ? '#E8541A' : '#F2EEE7',
+                textShadow: isOrange ? '0 0 24px rgba(232,84,26,0.35)' : 'none',
                 willChange: 'transform, opacity, filter',
               }}
             >
@@ -98,17 +255,26 @@ export default function Loader({ onDone }: { onDone: () => void }) {
           );
         })}
       </div>
+
+      {/* Progress bar at bottom edge */}
       <div
         ref={barRef}
         style={{
           position: 'absolute',
           bottom: 0,
           left: 0,
-          height: '3px',
-          background: '#E8541A',
+          height: '2px',
+          background: 'linear-gradient(90deg, #E8541A, #ff7a3c)',
           width: 0,
+          boxShadow: '0 0 12px rgba(232,84,26,0.6)',
         }}
       />
+
+      {/* Animation keyframes for the SVG rings */}
+      <style>{`
+        @keyframes epRingSpin   { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes epRingSpinR  { from { transform: rotate(0deg); } to { transform: rotate(-360deg); } }
+      `}</style>
     </div>
   );
 }

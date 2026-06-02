@@ -1,11 +1,12 @@
 'use client';
 
-const serviceLinks = [
-  'Video Editing', 'LinkedIn Ghostwriting', 'Blog Production',
-  'Ad Creatives', 'Websites & Funnels', 'Automations',
-];
+import Link from 'next/link';
 
-const companyLinks = ['About', 'Our Work', 'Results', 'Pricing', 'Contact'];
+const serviceLinks = [
+  'Video Editing', 'LinkedIn & Social', 'Blog Production',
+  'Ad Creatives', 'Websites & Funnels', 'Automations',
+  'Apps & Software',
+];
 
 export default function Footer() {
   return (
@@ -20,7 +21,7 @@ export default function Footer() {
       className="site-footer"
     >
       <div>
-        <a
+        <Link
           href="/"
           style={{
             fontFamily: 'Inter, sans-serif',
@@ -34,23 +35,21 @@ export default function Footer() {
           }}
         >
           Echo<span style={{ color: '#E8541A' }}>Pulse</span>
-        </a>
+        </Link>
         <p style={{ fontSize: '14px', color: '#6E6B63', lineHeight: 1.7, marginBottom: '28px', margin: '0 0 28px' }}>
-          Full-stack content studio for premium founders and brands. Voice-driven video, LinkedIn ghostwriting, blogs, ad creatives, websites, and automations. Without the AI slop.
+          Done-for-you marketing for serious businesses. Video, content, ads, websites, automations, and custom software for founders, coaches, business owners, and real estate agents. One team, one bill.
         </p>
         <div style={{ display: 'flex', gap: '10px' }}>
           {[
-            { label: 'in', href: '#' },
-            { label: 'ig', href: '#' },
-            { label: 'yt', href: '#' },
+            { label: 'in', href: 'https://www.linkedin.com/in/lakshyasoni/' },
           ].map((s) => (
             <a
               key={s.label}
               href={s.href}
               style={{
-                width: '36px',
-                height: '36px',
-                borderRadius: '10px',
+                width: '44px',
+                height: '44px',
+                borderRadius: '12px',
                 background: 'rgba(255,255,255,0.55)',
                 backdropFilter: 'blur(10px)',
                 border: '1px solid rgba(255,255,255,0.8)',
@@ -124,18 +123,24 @@ export default function Footer() {
             marginBottom: '20px',
           }}
         >
-          Company
+          Quick Links
         </h4>
         <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          {companyLinks.map((c) => (
-            <li key={c}>
+          {[
+            { label: 'Order a service', href: '/order' },
+            { label: 'See pricing', href: '/#pricing' },
+            { label: 'FAQ', href: '/#faq' },
+            { label: 'Blog', href: '/blog' },
+            { label: 'Terms of Service', href: '/terms' },
+          ].map((c) => (
+            <li key={c.label}>
               <a
-                href={`#${c.toLowerCase()}`}
+                href={c.href}
                 style={{ color: '#6E6B63', textDecoration: 'none', fontSize: '14px', transition: 'color 0.2s' }}
                 onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.color = '#0C0C0B')}
                 onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.color = '#6E6B63')}
               >
-                {c}
+                {c.label}
               </a>
             </li>
           ))}
@@ -158,9 +163,7 @@ export default function Footer() {
         <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {[
             { label: 'echopulse.media', href: 'https://echopulse.media' },
-            { label: 'Instagram', href: '#' },
-            { label: 'LinkedIn', href: '#' },
-            { label: 'YouTube', href: '#' },
+            { label: 'LinkedIn', href: 'https://www.linkedin.com/in/lakshyasoni/' },
           ].map((c) => (
             <li key={c.label}>
               <a
@@ -193,13 +196,47 @@ export default function Footer() {
           © 2026 EchoPulse. All rights reserved.
         </p>
         <p style={{ fontSize: '13px', color: '#A8A49B', margin: 0 }}>
-          Voice-driven content. Engineered to convert.
+          Done-for-you marketing. For serious businesses.
         </p>
       </div>
 
       <style>{`
-        @media (max-width: 1200px) { .site-footer { grid-template-columns: 1fr 1fr !important; } }
-        @media (max-width: 768px) { .site-footer { grid-template-columns: 1fr !important; padding: 56px 28px 32px !important; } }
+        .site-footer a[href^="#"],
+        .site-footer a[href^="http"] {
+          display: inline-block;
+        }
+        @media (max-width: 1200px) { .site-footer { grid-template-columns: 1fr 1fr !important; gap: 40px !important; } }
+        @media (max-width: 768px) {
+          .site-footer {
+            grid-template-columns: 1fr !important;
+            padding: 56px 22px 32px !important;
+            gap: 36px !important;
+          }
+          /* Pad list-item links so the row meets a 44px tap target */
+          .site-footer ul { gap: 4px !important; }
+          .site-footer ul li a {
+            display: block !important;
+            padding: 12px 0 !important;
+            font-size: 15px !important;
+            min-height: 44px !important;
+            line-height: 1.3 !important;
+          }
+          /* Section heading spacing tightens */
+          .site-footer h4 { margin-bottom: 10px !important; }
+          /* Brand intro paragraph: snug font + spacing */
+          .site-footer p { font-size: 14px !important; }
+          /* Bottom bar — stack copyright + tagline so each reads cleanly */
+          .site-footer > div:last-of-type {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 10px !important;
+            padding-top: 24px !important;
+          }
+          .site-footer > div:last-of-type p { font-size: 12.5px !important; }
+        }
+        @media (max-width: 380px) {
+          .site-footer { padding: 48px 16px 28px !important; gap: 32px !important; }
+        }
       `}</style>
     </footer>
   );

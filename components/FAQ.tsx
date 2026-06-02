@@ -2,16 +2,22 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useGeoPrice } from '@/lib/useGeoPrice';
 
-const faqs = [
+/**
+ * Build the FAQ list. Takes the localized pilot price token (e.g. "$299"
+ * or "₹4,999") so India / EU / etc. visitors see the same answer copy
+ * with their currency rendered in place of the US default.
+ */
+const buildFaqs = (pilotPrice: string) => [
   // ── Top 3: objection-handlers, ordered the way buyers actually hesitate ──
   {
     q: "You're new. Why should I trust you with my brand?",
-    a: "Because we don't ask you to. Every engagement opens with a paid $299 Pilot — 14 days, real deliverables, no contract. You see the work, then decide. If it's not what you'd publish, you keep what we made and walk away. On top of that: I spent years editing professional video at a Canadian production studio, ran paid client work in motion and content, and lead marketing at a Canadian SaaS today. The shop is new. The hands aren't.",
+    a: `Because we do not ask you to. Every engagement opens with a paid ${pilotPrice} Pilot — 14 days, real deliverables, no contract. You see the work, then decide. If it is not what you would publish, you keep what we made and walk away. The studio is young, but the operators are not. The team has shipped paid work across video, content, ads, and code for years before this.`,
   },
   {
-    q: 'Will it actually sound like me, or like every other agency?',
-    a: "That's what the Voice Foundation exists to fix. We record a 90-minute interview, pull your phrasing, your beliefs, the stories you already tell, and turn it into a Voice DNA document. Every draft gets scored against it before it ships. Below an 8/10 match, it doesn't go out.",
+    q: 'How do you make work that actually fits my business?',
+    a: "We start with a 90-minute onboarding interview that covers your offer, your buyer, your competitors, and the way you already talk about what you do. That becomes a brand brief every writer, editor, and designer on the team references on every deliverable. Below an 8/10 fit against the brief, the work does not ship.",
   },
   {
     q: "What if I don't like the work?",
@@ -19,46 +25,44 @@ const faqs = [
   },
   // ── Existing FAQs continue below, original order preserved ──
   {
-    q: 'What is the Voice Foundation?',
-    a: "A 90-minute recorded interview every client does before we write a word. We transcribe it, extract your vocabulary, opinions, stories, and rhythm, and build a Voice DNA doc. Every writer and editor on the team references it on every deliverable. It's the single reason our work sounds like you instead of like a content mill.",
+    q: 'What is the onboarding interview?',
+    a: "A 90-minute recorded session every client does before we touch the work. We cover your business model, your offer, your audience, your competitors, and the way you already talk about what you do. That gets compiled into a brand brief the whole team works from. It is the single reason our work fits your business instead of feeling like generic agency output.",
   },
   {
     q: 'Why EchoPulse instead of three separate agencies?',
-    a: "Because three agencies means three different voices on your channels and you stuck in the middle managing the inconsistency. Our LinkedIn writer, blog writer, video editor, and ad creative all work off the same Voice Foundation. One brain, one voice, every channel.",
+    a: "Three agencies means three different reads of your brand on your channels, and you stuck in the middle managing the inconsistency. Our editors, writers, designers, and engineers all work off the same brief. One team, one direction, every channel. One invoice instead of five.",
   },
   {
     q: 'How fast do you ship?',
-    a: '48 hours on individual deliverables — a LinkedIn post, a short-form edit, an ad creative. Long-form blogs land in 5 to 7 days. Website builds run 3 to 4 weeks. Need a 24-hour rush? +30%.',
+    a: '48 hours on individual deliverables — a LinkedIn post, a short-form edit, an ad creative, a property reel. Long-form blogs land in 5 to 7 days. Website builds run 3 to 4 weeks. Need a 24-hour rush? +30%.',
   },
   {
     q: 'Do you use AI, or avoid it?',
-    a: 'We use AI as a research and outline tool, never as the writer. The final pass is always human, scored against your Voice Foundation. If a draft reads like ChatGPT, we cut it. Clients regularly tell us they cannot tell which posts they wrote and which we wrote.',
+    a: 'We use AI as a research and outline tool, never as the final writer or editor. The last pass is always human, scored against your brand brief. If a draft reads like ChatGPT, we cut it. The bar is work you would happily publish under your own name.',
   },
   {
     q: 'Where is your team based?',
-    a: "Remote and async, working across North American and European time zones. Most of our clients are in Canada, the US, the UK, and Western Europe. Communication runs through Slack, Notion, and Loom — you get same-day responses inside normal working hours, and weekly Loom walkthroughs on every batch we ship.",
+    a: "Remote and async, working across North American and European time zones. Most clients are in Canada, the US, the UK, India, and Western Europe. Communication runs through Slack, Notion, and Loom — you get same-day responses inside working hours, and weekly Loom walkthroughs on every batch we ship.",
   },
   {
     q: 'What do you need from me to start?',
-    a: "Three things: 90 minutes for the Voice Foundation interview, your existing brand assets (logo, colors, anything you've published you like), and a 30-minute kickoff to align on goals and audience. After onboarding, plan on 30 to 60 minutes a week reviewing drafts. We handle the rest.",
+    a: "Three things: 90 minutes for the onboarding interview, your existing brand assets (logo, colors, photos, anything you have published that you liked), and a 30-minute kickoff to align on goals and audience. After onboarding, plan on 30 to 60 minutes a week reviewing drafts. We handle the rest.",
+  },
+  {
+    q: 'Do you work with real estate agents and local businesses?',
+    a: "Yes. Real estate agents, brokerages, and short-term-rental operators are a core audience. Local businesses and service operators too. The deliverables shift — listing reels, agent-brand video, geo-targeted ads, local SEO content, booking funnels — but the model is the same. One team handles every channel.",
   },
   {
     q: 'Are there long-term contracts?',
-    a: "No. Every retainer is month-to-month with 14 days notice to cancel. We open with a $299 Pilot — 14 days, 12 LinkedIn posts, 3 short-form edits, 5 long-form blog drafts, the voice interview, and one strategic deliverable — so you see the work before you commit to anything monthly.",
+    a: `No. Every retainer is month-to-month with 14 days notice to cancel. We open with a ${pilotPrice} Pilot — 14 days, real deliverables across the channels that fit your business, the onboarding interview, and one strategic asset — so you see the work before you commit to anything monthly.`,
   },
   {
     q: 'Who owns what we produce?',
-    a: "You do, fully. On delivery, every file transfers to you — raw project files, design source, master video files, code. No licensing fees, no usage caps, no surprise invoice if you ever stop working with us.",
+    a: "You do, fully. On delivery, every file transfers to you — raw project files, design source, master video files, code, ad accounts. No licensing fees, no usage caps, no surprise invoice if you ever stop working with us.",
   },
 ];
 
-// Split into 2 columns: first half on the left, second half on the right.
-// Top 3 (objection-handlers) live at the top of the left column where the eye lands first.
-const HALF = Math.ceil(faqs.length / 2);
-const leftItems = faqs.slice(0, HALF);
-const rightItems = faqs.slice(HALF);
-
-type FaqItem = (typeof faqs)[number];
+type FaqItem = ReturnType<typeof buildFaqs>[number];
 
 function FaqCard({
   faq,
@@ -96,6 +100,7 @@ function FaqCard({
     >
       {/* Question row */}
       <div
+        className="faq-q-row"
         style={{
           display: 'flex',
           alignItems: 'center',
@@ -104,6 +109,7 @@ function FaqCard({
         }}
       >
         <span
+          className="faq-q"
           style={{
             fontFamily: 'Inter, sans-serif',
             fontSize: '16px',
@@ -118,6 +124,7 @@ function FaqCard({
 
         {/* Toggle — circle with + when closed, filled black circle with × when open */}
         <motion.span
+          className="faq-toggle"
           aria-hidden="true"
           animate={{
             background: isOpen ? '#0C0C0B' : 'rgba(255,255,255,0.85)',
@@ -173,6 +180,7 @@ function FaqCard({
             style={{ overflow: 'hidden' }}
           >
             <p
+              className="faq-a"
               style={{
                 margin: '16px 0 4px',
                 fontSize: '14.5px',
@@ -193,6 +201,14 @@ function FaqCard({
 
 export default function FAQ() {
   const [open, setOpen] = useState<number | null>(0);
+  const { currency, prices } = useGeoPrice();
+
+  // Compose the per-locale FAQ list. Memoization isn't worth it — the array
+  // is tiny and only rebuilds when geo flips (once per session).
+  const faqs = buildFaqs(`${currency}${prices.pilot}`);
+  const HALF = Math.ceil(faqs.length / 2);
+  const leftItems = faqs.slice(0, HALF);
+  const rightItems = faqs.slice(HALF);
 
   return (
     <section id="faq" style={{ padding: '128px 56px', background: '#F2EEE7' }}>
@@ -303,13 +319,28 @@ export default function FAQ() {
 
         @media (max-width: 900px) {
           .faq-grid { flex-direction: column !important; gap: 12px !important; }
-          .faq-header { flex-direction: column !important; align-items: flex-start !important; gap: 24px !important; }
+          .faq-header { flex-direction: column !important; align-items: flex-start !important; gap: 24px !important; margin-bottom: 40px !important; }
           .faq-sub { flex-basis: auto !important; max-width: 560px; }
         }
         @media (max-width: 640px) {
-          section#faq { padding: 80px 20px !important; }
-          .faq-h2 { font-size: 40px !important; letter-spacing: -1.5px !important; }
-          .faq-card { padding: 18px 20px !important; }
+          section#faq { padding: 72px 18px !important; }
+          .faq-h2 { font-size: 38px !important; letter-spacing: -1.4px !important; }
+          .faq-sub { font-size: 14px !important; line-height: 1.6 !important; }
+          .faq-card { padding: 18px 18px !important; border-radius: 16px !important; }
+          .faq-card .faq-q-row { gap: 14px !important; }
+          .faq-card .faq-q { font-size: 15px !important; line-height: 1.4 !important; }
+          .faq-card .faq-a { font-size: 14px !important; line-height: 1.65 !important; margin-top: 14px !important; }
+          /* Toggle — keep 32px visual but expand tap area via padding-around-padding using an outer wrap */
+          .faq-card .faq-toggle {
+            width: 36px !important;
+            height: 36px !important;
+          }
+        }
+        @media (max-width: 380px) {
+          section#faq { padding: 60px 14px !important; }
+          .faq-h2 { font-size: 34px !important; letter-spacing: -1.2px !important; }
+          .faq-card { padding: 16px 16px !important; }
+          .faq-card .faq-q { font-size: 14.5px !important; }
         }
       `}</style>
     </section>
