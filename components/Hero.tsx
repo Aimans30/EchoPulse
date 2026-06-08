@@ -623,23 +623,37 @@ export default function Hero() {
            and give CTAs full-width tap targets. */
         @media(max-width:640px){
           .hero-inner{
-            padding: 96px 20px 40px !important;
+            /* Center-aligned mobile hero, inspired by editorial portfolio
+               sites (illustrate.framer.website pattern). Generous vertical
+               padding lets the headline breathe, single-column stack reads
+               cleanly on portrait. */
+            padding: 84px 24px 48px !important;
             gap: 0 !important;
+            text-align: center !important;
+            align-items: center !important;
+          }
+          /* The text column inside .hero-inner — center its children too */
+          .hero-inner > div:first-child{
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            text-align: center !important;
+            width: 100% !important;
           }
           .hero-eyebrow-m{
             display:inline-flex !important;
             align-items:center;
             gap:8px;
-            padding:6px 12px 6px 8px;
-            background:rgba(232,84,26,0.08);
-            border:1px solid rgba(232,84,26,0.20);
+            padding:6px 14px 6px 10px;
+            background:rgba(12,12,11,0.05);
+            border:1px solid rgba(12,12,11,0.10);
             border-radius:100px;
             font-family:Inter,sans-serif;
-            font-size:10.5px;
-            font-weight:700;
-            letter-spacing:0.3px;
-            color:#E8541A;
-            margin-bottom:22px;
+            font-size:11px;
+            font-weight:600;
+            letter-spacing:0.2px;
+            color:rgba(12,12,11,0.65);
+            margin: 0 auto 24px !important;
           }
           .hero-eyebrow-m .ep-pulse{
             width:6px;height:6px;border-radius:50%;background:#10b981;
@@ -653,54 +667,72 @@ export default function Hero() {
           .hero-h1-mobile{
             display:block !important;
             font-family:Inter,sans-serif;
-            font-weight:900;
-            font-size: clamp(34px, 9.2vw, 44px) !important;
-            line-height: 1.06 !important;
-            letter-spacing: -1.4px !important;
+            font-weight:800;
+            font-size: clamp(28px, 8vw, 38px) !important;
+            line-height: 1.12 !important;
+            letter-spacing: -0.6px !important;
             color:#0C0C0B;
-            margin: 0 0 18px !important;
+            margin: 0 auto 20px !important;
+            max-width: 340px !important;
+            text-align: center !important;
           }
           .hero-h1-mobile .accent{
             color:#E8541A;
             font-style:italic;
           }
           .hero-sub{
-            font-size: 15.5px !important;
-            line-height: 1.6 !important;
-            color:#5A574F !important;
-            margin: 0 0 24px !important;
+            font-size: 14.5px !important;
+            line-height: 1.55 !important;
+            color:#6B675E !important;
+            margin: 0 auto 28px !important;
+            max-width: 300px !important;
+            text-align: center !important;
+            font-weight: 400 !important;
+          }
+          .hero-sub strong{
+            font-weight: 600 !important;
+            color: #0C0C0B !important;
           }
           .hero-sub .desktop-only{ display:none; }
-          /* Buttons share one row, centered. Both pill-shaped and compact —
-             no longer full-width "stadium" rectangles which felt heavy. */
+          /* CTA stack — centered as a row on phone, both buttons compact
+             pills. Primary stays solid black, secondary is a clean text
+             link with subtle underline-on-hover (less visual weight than
+             the old outlined pill — keeps the focus on the primary). */
           .hero-actions{
-            gap:10px !important;
-            margin-bottom:0 !important;
-            width:100% !important;
+            gap:14px !important;
+            margin: 0 auto !important;
+            width:auto !important;
             flex-direction:row !important;
             align-items:center !important;
-            justify-content:flex-start !important;
+            justify-content:center !important;
             flex-wrap:wrap !important;
           }
-          .hero-actions .btn-p,
-          .hero-actions .btn-o{
+          .hero-actions .btn-p{
             width:auto !important;
             flex:0 0 auto !important;
             justify-content:center !important;
-            padding:12px 22px !important;
-            font-size:13px !important;
-            min-height:44px !important;
+            padding:14px 26px !important;
+            font-size:13.5px !important;
+            min-height:46px !important;
             box-sizing:border-box !important;
             border-radius:100px !important;
             display:inline-flex !important;
             align-items:center !important;
             gap:8px !important;
+            font-weight:700 !important;
           }
           .hero-actions .btn-o{
             background: transparent !important;
-            border: 1px solid rgba(12,12,11,0.16) !important;
+            border: 1px solid rgba(12,12,11,0.14) !important;
             color: #0C0C0B !important;
-            padding:12px 20px !important;
+            padding:14px 22px !important;
+            font-size:13.5px !important;
+            font-weight:600 !important;
+            min-height:46px !important;
+            border-radius:100px !important;
+            display:inline-flex !important;
+            align-items:center !important;
+            gap:6px !important;
           }
           .scroll-hint{ display:none !important; }
           /* Hide the orbital entirely — replaced by mobile service grid below */
@@ -821,15 +853,22 @@ export default function Hero() {
           }
         }
         @media(max-width:380px){
-          .hero-inner{ padding:88px 16px 36px !important; }
+          .hero-inner{ padding:76px 20px 40px !important; }
           .hero-h1-mobile{
-            font-size: 30px !important;
-            letter-spacing: -1.1px !important;
+            font-size: 27px !important;
+            letter-spacing: -0.5px !important;
+            line-height: 1.14 !important;
+            max-width: 290px !important;
           }
           .hero-sub{
-            font-size: 14.5px !important;
-            margin: 0 0 22px !important;
+            font-size: 13.5px !important;
+            line-height: 1.55 !important;
+            margin: 0 auto 24px !important;
+            max-width: 280px !important;
           }
+          .hero-actions{ gap: 12px !important; }
+          .hero-actions .btn-p{ padding: 12px 22px !important; font-size: 13px !important; min-height: 44px !important; }
+          .hero-actions .btn-o{ padding: 12px 18px !important; font-size: 13px !important; min-height: 44px !important; }
           .hero-trust-item .v{ font-size:13.5px !important; }
           .hero-trust-item .k{ font-size:8.5px !important; letter-spacing:0.6px !important; }
           .hero-services-grid{ gap:8px !important; }
@@ -858,8 +897,8 @@ export default function Hero() {
               style={{ fontFamily: 'Inter, sans-serif', fontSize: 'clamp(36px, 4.4vw, 64px)', fontWeight: 900, lineHeight: 1.04, letterSpacing: 'clamp(-1px, -0.035em, -2.4px)', margin: '0 0 24px' }}
             >
               {[
-                <>Marketing without</>,
-                <>the <span style={{ color: '#E8541A', fontStyle: 'italic' }}>agency tax.</span></>,
+                <>You run the business.</>,
+                <>We run <span style={{ color: '#E8541A', fontStyle: 'italic' }}>the content.</span></>,
               ].map((line, i) => (
                 <span key={i} className="hl-wrap">
                   <span className="hl-inner">{line}</span>
@@ -868,15 +907,17 @@ export default function Hero() {
             </h1>
 
             {/* Mobile headline — clean 2-line structure that reads naturally at 375px.
-                Hidden on desktop via the CSS above. */}
+                Each line is its own block so the italic accent on line 2 doesn't
+                pull the baseline of line 1, which made the headline look slightly
+                misaligned at the 375px viewport. */}
             <h1 className="hero-h1-mobile hero-mobile-only" aria-hidden="true">
-              Marketing without<br />
-              the <span className="accent">agency tax.</span>
+              <span style={{ display: 'block' }}>You run the business.</span>
+              <span style={{ display: 'block' }}>We run <span className="accent">the content.</span></span>
             </h1>
 
             <p ref={subRef} className="hero-sub" style={{ fontSize: '16px', color: '#6E6B63', maxWidth: '540px', lineHeight: 1.7, fontWeight: 400, margin: '0 0 36px' }}>
-              <span>One owner-operated studio. Video, content, ads, sites, and code &mdash; replied to in 3 hours, re-done until you&rsquo;d ship it under your own name.</span>{' '}
-              <strong style={{ color: '#0C0C0B', fontWeight: 600 }}>Get 20 hours of your week back.</strong>
+              <span>Everything you publish, handled by one studio.</span>{' '}
+              <strong style={{ color: '#0C0C0B', fontWeight: 600 }}>You hit record, we do the rest.</strong>
             </p>
 
             <div ref={actionsRef} className="hero-actions" style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '0', alignItems: 'center' }}>
@@ -898,13 +939,13 @@ export default function Hero() {
               </button>
               {/* WARM — explore packages */}
               <a
-                href="#pricing"
+                href="#work"
                 className="btn-o"
-                aria-label="See packages"
+                aria-label="See work"
                 data-cursor-hover
-                onClick={() => trackPilotClick('hero_secondary_see_packages')}
+                onClick={() => trackPilotClick('hero_secondary_see_work')}
               >
-                See packages
+                See work
               </a>
             </div>
 

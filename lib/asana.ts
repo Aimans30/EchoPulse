@@ -271,7 +271,7 @@ export async function createOrder(args: {
 }
 
 /**
- * New retainer client from Stripe/Razorpay subscription webhook. Creates
+ * New retainer client from Razorpay/Dodo subscription webhook. Creates
  * BOTH the lifecycle card (Retainer Pipeline) AND the profile card
  * (Profile Cards). Returns both GIDs so the caller can ping Slack with
  * deep links.
@@ -287,7 +287,7 @@ export async function createRetainerClient(args: {
   tier: 'Pilot' | 'Growth' | 'Full Studio' | string;
   monthlyAmount: string;
   renewsOn: string;            // YYYY-MM-DD
-  paymentMethod?: 'Razorpay' | 'Stripe';
+  paymentMethod?: 'Razorpay' | 'Dodo';
 }): Promise<{ retainer: AsanaTask | null; profile: AsanaTask | null }> {
   const retainerName = `${args.fullName} · ${args.tier} · Renews ${args.renewsOn}`;
   const profileName = `${args.fullName} · ${args.tier}`;

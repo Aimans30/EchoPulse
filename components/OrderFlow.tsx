@@ -285,7 +285,50 @@ export default function OrderFlow() {
       const deliveryHours = getDeliveryHours(selection);
       const deliveryLabel = getDeliveryLabel(selection);
 
-      // ── 1. Create Razorpay order on the server ────────────────────
+      // ─────────────────────────────────────────────────────────────────
+      // PAYMENT GATEWAY ROUTER
+      //   • Region 'IN' → Razorpay (INR-only, what we already use)
+      //   • Everyone else → Dodo Payments (Merchant-of-Record, accepts
+      //                     USD/EUR/GBP/CAD/AUD; Dodo handles tax + payouts
+      //                     to our INR bank account)
+      // The currency code from localizedTotal drives Dodo. India keeps
+      // hitting Razorpay since INR isn't a Dodo-supported settlement currency.
+      // ─────────────────────────────────────────────────────────────────
+      if (region !== 'IN') {
+        // ── International flow: Dodo Payments hosted checkout ─────────
+        const dodoRes = await fetch('/api/dodo/checkout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            amountSmallest: Math.round(localizedTotal.raw * 100),
+            currency: localizedTotal.currencyCode,           // USD / EUR / GBP / CAD / AUD
+            service: serviceLabel,
+            tier,
+            client: {
+              fullName: client.fullName,
+              email: client.email,
+              country: country ?? undefined,
+            },
+            returnUrl: `${window.location.origin}/onboard?from=dodo&service=${encodeURIComponent(serviceLabel)}`,
+            cancelUrl: `${window.location.origin}/order?cancelled=1`,
+            metadata: {
+              deliveryHours: String(deliveryHours),
+              fileLink: client.fileLink ?? '',
+            },
+          }),
+        });
+        const dodoData = await dodoRes.json().catch(() => ({ ok: false }));
+        if (!dodoRes.ok || !dodoData.ok || !dodoData.paymentLink) {
+          throw new Error(dodoData.error ?? 'Could not start checkout. Please try again or email lakshya@echopulse.media.');
+        }
+        // Redirect to Dodo's hosted payment page. After success they bounce
+        // back to /onboard?from=dodo, and the Asana+Slack pipeline fires
+        // server-side from the Dodo webhook → /api/dodo/webhook.
+        window.location.href = dodoData.paymentLink;
+        return;
+      }
+
+      // ── 1. Create Razorpay order on the server (India flow) ───────
       const orderRes = await fetch('/api/razorpay/order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

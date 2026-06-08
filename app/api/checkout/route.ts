@@ -12,7 +12,7 @@ import { rateLimit } from '@/lib/rateLimit';
  *   2. Pings Slack → #orders so production sees it immediately
  *   3. Returns the Asana permalink so the UI can show success
  *
- * When Razorpay/Stripe lands, this same route handles the post-payment
+ * When Razorpay/Dodo webhooks land, this same route handles the post-payment
  * webhook — verify the signature, then call the same Asana+Slack pair.
  *
  * Required body fields:  fullName, email, service, total

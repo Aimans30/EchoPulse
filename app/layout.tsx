@@ -35,7 +35,7 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL("https://echopulse.media"),
   title: {
-    default: "EchoPulse — Marketing without the agency tax.",
+    default: "EchoPulse — You run the business. We run the content.",
     template: "%s | EchoPulse",
   },
   description:
@@ -67,7 +67,7 @@ export const metadata: Metadata = {
     canonical: "/",
   },
   openGraph: {
-    title: "EchoPulse — Marketing without the agency tax.",
+    title: "EchoPulse — You run the business. We run the content.",
     description:
       "Full-service content studio for founders, coaches, business owners, and real estate agents. Video, content, ads, websites, custom software. Done-for-you. One team, one bill. $299 14-day Pilot.",
     url: "https://echopulse.media",
@@ -77,7 +77,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "EchoPulse — Marketing without the agency tax.",
+    title: "EchoPulse — You run the business. We run the content.",
     description:
       "Full-service content studio for founders, coaches, business owners, and real estate agents. Video, content, ads, websites, custom software. Done-for-you. Get 20-30 hours a week back.",
     creator: "@lakshyasoni",
