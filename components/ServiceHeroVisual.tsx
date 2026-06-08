@@ -21,9 +21,110 @@ export default function ServiceHeroVisual({ slug, accent }: { slug: string; acce
       return <WebsiteVisual accent={accent} />;
     case 'automations':
       return <AutomationVisual accent={accent} />;
+    case 'apps-software':
+      return <GradientVisual accent={accent} />;
     default:
-      return <VideoEditingVisual accent={accent} />;
+      return <GradientVisual accent={accent} />;
   }
+}
+
+/**
+ * Minimal animated gradient panel. Used as the hero visual for Apps & Software
+ * (where any literal product mockup would be misleading — we build dozens of
+ * different things) and as a sane default for any service that doesn't have a
+ * bespoke visual yet. Pure CSS animation, no JS — looks expensive, runs cheap.
+ */
+function GradientVisual({ accent }: { accent: string }) {
+  return (
+    <div
+      aria-hidden="true"
+      style={{
+        position: 'relative',
+        width: '100%',
+        height: '100%',
+        minHeight: '420px',
+        borderRadius: '24px',
+        overflow: 'hidden',
+        background: '#0C0C0B',
+      }}
+    >
+      {/* Primary accent blob — drifts slowly */}
+      <div
+        style={{
+          position: 'absolute',
+          top: '-20%',
+          left: '-10%',
+          width: '70%',
+          height: '70%',
+          borderRadius: '50%',
+          background: `radial-gradient(circle, ${accent}aa 0%, ${accent}00 70%)`,
+          filter: 'blur(60px)',
+          animation: 'grad-drift-a 14s ease-in-out infinite alternate',
+        }}
+      />
+      {/* Secondary cool-tone blob — counter-orbits */}
+      <div
+        style={{
+          position: 'absolute',
+          bottom: '-15%',
+          right: '-10%',
+          width: '65%',
+          height: '65%',
+          borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(139,92,246,0.55) 0%, rgba(139,92,246,0) 70%)',
+          filter: 'blur(70px)',
+          animation: 'grad-drift-b 18s ease-in-out infinite alternate',
+        }}
+      />
+      {/* Subtle highlight blob, very low opacity, slow pulse */}
+      <div
+        style={{
+          position: 'absolute',
+          top: '40%',
+          left: '40%',
+          width: '40%',
+          height: '40%',
+          borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0) 70%)',
+          filter: 'blur(40px)',
+          animation: 'grad-pulse 9s ease-in-out infinite',
+        }}
+      />
+      {/* Fine grain noise overlay so the gradient doesn't look flat / banded */}
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          backgroundImage:
+            'radial-gradient(rgba(255,255,255,0.025) 1px, transparent 1px)',
+          backgroundSize: '3px 3px',
+          opacity: 0.6,
+          mixBlendMode: 'overlay',
+          pointerEvents: 'none',
+        }}
+      />
+      <style>{`
+        @keyframes grad-drift-a {
+          0%   { transform: translate(0, 0) scale(1); }
+          100% { transform: translate(8%, 6%) scale(1.08); }
+        }
+        @keyframes grad-drift-b {
+          0%   { transform: translate(0, 0) scale(1.05); }
+          100% { transform: translate(-6%, -8%) scale(1); }
+        }
+        @keyframes grad-pulse {
+          0%, 100% { opacity: 0.4; transform: scale(1); }
+          50%      { opacity: 0.7; transform: scale(1.15); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          [aria-hidden="true"] [style*="grad-drift"],
+          [aria-hidden="true"] [style*="grad-pulse"] {
+            animation: none !important;
+          }
+        }
+      `}</style>
+    </div>
+  );
 }
 
 const cardBase = {
@@ -1470,7 +1571,7 @@ function BlogRecognitionPipeline({ accent }: { accent: string }) {
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontSize: '11.5px', fontWeight: 800, color: '#F2EEE7', letterSpacing: '-0.1px', marginBottom: '2px' }}>
-                Your highest-leverage post
+                Your best blog post
               </div>
               <div style={{ fontSize: '9.5px', color: 'rgba(242,238,231,0.55)', display: 'flex', gap: '10px' }}>
                 <span>2,400 words</span>
@@ -2067,125 +2168,322 @@ function WebsiteVisual({ accent }: { accent: string }) {
 }
 
 /* ──────────────────────────────────────────────────────────
-   AUTOMATIONS — flow diagram with connected nodes
+   AUTOMATIONS — live activity feed showing AI agents working
    ────────────────────────────────────────────────────────── */
 function AutomationVisual({ accent }: { accent: string }) {
-  const nodes = [
-    { id: 1, label: 'New DM',    icon: '💬', x: 12, y: 22 },
-    { id: 2, label: 'Qualify',   icon: '🎯', x: 50, y: 12 },
-    { id: 3, label: 'Email',     icon: '📧', x: 88, y: 22 },
-    { id: 4, label: 'Calendar',  icon: '📅', x: 50, y: 60 },
-    { id: 5, label: 'Booked',    icon: '✓',  x: 50, y: 90, primary: true },
-  ];
+  return <AutomationActivityFeed accent={accent} />;
+}
+
+type AutomationEvent = {
+  time: string;
+  text: string;
+  agent: 'claude' | 'system' | 'human' | 'success';
+  icon: string;
+};
+
+const AUTOMATION_EVENTS: AutomationEvent[] = [
+  { time: '2:34', text: 'New DM from @maya · founder',         agent: 'system',  icon: '💬' },
+  { time: '2:34', text: 'Claude agent qualified · score 8/10', agent: 'claude',  icon: '🤖' },
+  { time: '2:35', text: 'Auto-reply sent with intake link',    agent: 'system',  icon: '⚡' },
+  { time: '2:38', text: 'Form submitted · added to CRM',       agent: 'system',  icon: '📋' },
+  { time: '2:40', text: 'Calendar booked · Thu 3pm',           agent: 'success', icon: '📅' },
+  { time: '2:41', text: 'Slack pinged · Lakshya notified',     agent: 'system',  icon: '🔔' },
+  { time: '2:45', text: 'New DM from @james · agency',         agent: 'system',  icon: '💬' },
+  { time: '2:45', text: 'Claude agent qualified · score 9/10', agent: 'claude',  icon: '🤖' },
+  { time: '2:47', text: 'Email sent · meeting prep brief',     agent: 'system',  icon: '📧' },
+  { time: '2:51', text: 'Calendar booked · Fri 10am',          agent: 'success', icon: '📅' },
+];
+
+function AutomationActivityFeed({ accent }: { accent: string }) {
+  const [visibleCount, setVisibleCount] = useState(3);
+  const [stats, setStats] = useState({ leads: 0, booked: 0, hours: 0 });
+
+  // Stream events in one at a time — when full, restart
+  useEffect(() => {
+    let cancelled = false;
+    const timers: ReturnType<typeof setTimeout>[] = [];
+
+    const cycle = () => {
+      if (cancelled) return;
+      setVisibleCount(0);
+      let i = 1;
+      const showNext = () => {
+        if (cancelled) return;
+        setVisibleCount(i);
+        if (i < AUTOMATION_EVENTS.length) {
+          i++;
+          timers.push(setTimeout(showNext, 700));
+        } else {
+          // pause then restart
+          timers.push(setTimeout(cycle, 3500));
+        }
+      };
+      showNext();
+    };
+    cycle();
+
+    return () => {
+      cancelled = true;
+      timers.forEach(clearTimeout);
+    };
+  }, []);
+
+  // Animate the stats counters up to their targets
+  useEffect(() => {
+    const targets = { leads: 247, booked: 18, hours: 14 };
+    const duration = 1800;
+    const start = performance.now();
+    let raf = 0;
+    const tick = (now: number) => {
+      const t = Math.min((now - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - t, 3);
+      setStats({
+        leads: Math.floor(targets.leads * eased),
+        booked: Math.floor(targets.booked * eased),
+        hours: Math.floor(targets.hours * eased),
+      });
+      if (t < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
+  const visibleEvents = AUTOMATION_EVENTS.slice(0, visibleCount);
+  const claude = '#8b5cf6';
+  const success = '#10b981';
+
+  const colorFor = (a: AutomationEvent['agent']) =>
+    a === 'claude' ? claude : a === 'success' ? success : accent;
 
   return (
-    <div style={{ position: 'relative', width: '100%', height: '460px' }}>
+    <div style={{ position: 'relative', width: '100%', height: '460px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      {/* Ambient glow */}
       <div
         style={{
           position: 'absolute',
           top: '50%',
           left: '50%',
           transform: 'translate(-50%,-50%)',
-          width: '340px',
+          width: '380px',
           height: '380px',
-          background: `radial-gradient(circle, ${accent}28 0%, transparent 70%)`,
-          filter: 'blur(40px)',
+          background: `radial-gradient(circle, ${accent}30 0%, transparent 70%)`,
+          filter: 'blur(60px)',
+          pointerEvents: 'none',
         }}
       />
 
-      <svg
-        width="100%"
-        height="100%"
-        viewBox="0 0 100 100"
-        preserveAspectRatio="none"
-        style={{ position: 'absolute', inset: 0 }}
-      >
-        {/* Connecting lines */}
-        {[
-          [1, 2], [2, 3], [1, 4], [3, 4], [4, 5],
-        ].map(([from, to], i) => {
-          const a = nodes.find(n => n.id === from)!;
-          const b = nodes.find(n => n.id === to)!;
-          return (
-            <motion.line
-              key={i}
-              x1={a.x}
-              y1={a.y}
-              x2={b.x}
-              y2={b.y}
-              stroke={accent}
-              strokeOpacity={0.4}
-              strokeWidth="0.3"
-              strokeDasharray="1 1.5"
-              initial={{ pathLength: 0, opacity: 0 }}
-              animate={{ pathLength: 1, opacity: 0.5 }}
-              transition={{ duration: 1, delay: 0.6 + i * 0.1 }}
-            />
-          );
-        })}
-      </svg>
-
-      {nodes.map((node, i) => (
-        <motion.div
-          key={node.id}
-          initial={{ opacity: 0, scale: 0.6 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5, delay: 0.4 + i * 0.1, ease: [0.16, 1, 0.3, 1] }}
-          whileHover={{ scale: 1.08 }}
-          style={{
-            position: 'absolute',
-            top: `${node.y}%`,
-            left: `${node.x}%`,
-            transform: 'translate(-50%, -50%)',
-            padding: '12px 16px',
-            borderRadius: '12px',
-            ...cardBase,
-            background: node.primary ? `${accent}` : 'rgba(255,255,255,0.06)',
-            border: node.primary ? `1px solid ${accent}` : '1px solid rgba(255,255,255,0.12)',
-            boxShadow: node.primary
-              ? `0 12px 32px ${accent}55, inset 0 1px 0 rgba(255,255,255,0.15)`
-              : '0 8px 24px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.06)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          <span style={{ fontSize: '14px', lineHeight: 1 }}>{node.icon}</span>
-          <span
-            style={{
-              fontSize: '11px',
-              fontWeight: 700,
-              letterSpacing: '0.2px',
-              color: node.primary ? '#fff' : '#F2EEE7',
-            }}
-          >
-            {node.label}
-          </span>
-        </motion.div>
-      ))}
-
-      {/* Stat badge */}
-      <motion.div
-        initial={{ opacity: 0, x: 20 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.7, delay: 1.0 }}
+      <div
         style={{
-          position: 'absolute',
-          right: '0',
-          top: '8%',
-          padding: '10px 14px',
-          borderRadius: '12px',
-          ...cardBase,
+          position: 'relative',
+          width: '100%',
+          maxWidth: '440px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '12px',
+          zIndex: 2,
         }}
       >
-        <div style={{ fontFamily: 'Inter,sans-serif', fontSize: '16px', fontWeight: 900, color: accent, lineHeight: 1 }}>
-          14d
+        {/* Stats row — three counters that animate up */}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(3, 1fr)',
+            gap: '8px',
+          }}
+        >
+          {[
+            { value: stats.leads, label: 'Leads caught', color: accent },
+            { value: stats.booked, label: 'Booked this week', color: success },
+            { value: `${stats.hours}h`, label: 'Time saved', color: claude },
+          ].map((s, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 + i * 0.08, ease: [0.16, 1, 0.3, 1] }}
+              style={{
+                padding: '12px 14px',
+                borderRadius: '12px',
+                background: 'rgba(255,255,255,0.04)',
+                border: '1px solid rgba(255,255,255,0.07)',
+                boxShadow: `inset 0 1px 0 rgba(255,255,255,0.04)`,
+              }}
+            >
+              <div
+                style={{
+                  fontFamily: 'Inter, sans-serif',
+                  fontSize: '20px',
+                  fontWeight: 900,
+                  letterSpacing: '-0.5px',
+                  color: s.color,
+                  lineHeight: 1,
+                  fontVariantNumeric: 'tabular-nums',
+                }}
+              >
+                {s.value}
+              </div>
+              <div
+                style={{
+                  fontSize: '8.5px',
+                  fontWeight: 700,
+                  letterSpacing: '1.5px',
+                  textTransform: 'uppercase',
+                  color: 'rgba(242,238,231,0.45)',
+                  marginTop: '4px',
+                }}
+              >
+                {s.label}
+              </div>
+            </motion.div>
+          ))}
         </div>
-        <div style={{ fontSize: '9px', fontWeight: 600, letterSpacing: '1.2px', textTransform: 'uppercase', color: 'rgba(242,238,231,0.55)', marginTop: '4px' }}>
-          Live in
+
+        {/* AI agent header */}
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+            padding: '10px 14px',
+            borderRadius: '12px',
+            background: `linear-gradient(135deg, ${claude}18 0%, rgba(255,255,255,0.04) 100%)`,
+            border: `1px solid ${claude}40`,
+          }}
+        >
+          <motion.div
+            animate={{
+              boxShadow: [
+                `0 0 0 0 ${claude}88`,
+                `0 0 0 6px ${claude}00`,
+              ],
+            }}
+            transition={{ duration: 1.6, repeat: Infinity, ease: 'easeOut' }}
+            style={{
+              width: '24px',
+              height: '24px',
+              borderRadius: '50%',
+              background: `linear-gradient(135deg, ${claude}, ${claude}cc)`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '10px',
+              flexShrink: 0,
+            }}
+          >
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z" />
+            </svg>
+          </motion.div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: '11px', fontWeight: 800, color: '#F2EEE7', letterSpacing: '-0.1px' }}>
+              Claude Code agent
+            </div>
+            <div style={{ fontSize: '9px', color: 'rgba(242,238,231,0.5)' }}>
+              Listening · qualifying · routing · 24/7
+            </div>
+          </div>
+          <span
+            style={{
+              fontSize: '8.5px',
+              fontWeight: 800,
+              letterSpacing: '1.2px',
+              textTransform: 'uppercase',
+              color: success,
+              background: `${success}1a`,
+              padding: '3px 8px',
+              borderRadius: '100px',
+              border: `1px solid ${success}40`,
+            }}
+          >
+            ● LIVE
+          </span>
+        </motion.div>
+
+        {/* Activity feed — events stream in */}
+        <div
+          style={{
+            position: 'relative',
+            padding: '10px',
+            borderRadius: '12px',
+            background: 'rgba(0,0,0,0.35)',
+            border: '1px solid rgba(255,255,255,0.05)',
+            minHeight: '200px',
+            maxHeight: '210px',
+            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '6px',
+          }}
+        >
+          {/* Top fade */}
+          <div
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              height: '20px',
+              background: 'linear-gradient(180deg, rgba(0,0,0,0.6) 0%, transparent 100%)',
+              pointerEvents: 'none',
+              zIndex: 2,
+            }}
+          />
+
+          <AnimatePresence initial={false}>
+            {visibleEvents.slice(-6).map((evt, i) => {
+              const realIdx = visibleEvents.length - (visibleEvents.slice(-6).length - i);
+              return (
+                <motion.div
+                  key={`${realIdx}-${evt.time}-${evt.text}`}
+                  initial={{ opacity: 0, x: -12, height: 0 }}
+                  animate={{ opacity: 1, x: 0, height: 'auto' }}
+                  exit={{ opacity: 0, x: 12 }}
+                  transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '9px',
+                    padding: '7px 10px',
+                    borderRadius: '8px',
+                    background: 'rgba(255,255,255,0.025)',
+                    border: `1px solid ${colorFor(evt.agent)}25`,
+                    overflow: 'hidden',
+                  }}
+                >
+                  <span style={{ fontSize: '11px', flexShrink: 0 }}>{evt.icon}</span>
+                  <span
+                    style={{
+                      fontSize: '8.5px',
+                      fontWeight: 700,
+                      color: 'rgba(242,238,231,0.4)',
+                      fontFamily: 'monospace',
+                      flexShrink: 0,
+                    }}
+                  >
+                    {evt.time}
+                  </span>
+                  <span style={{ fontSize: '10.5px', color: 'rgba(242,238,231,0.85)', flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {evt.text}
+                  </span>
+                  <span
+                    style={{
+                      width: '6px',
+                      height: '6px',
+                      borderRadius: '50%',
+                      background: colorFor(evt.agent),
+                      boxShadow: `0 0 6px ${colorFor(evt.agent)}`,
+                      flexShrink: 0,
+                    }}
+                  />
+                </motion.div>
+              );
+            })}
+          </AnimatePresence>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 }

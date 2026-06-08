@@ -1,20 +1,48 @@
 import { createClient } from 'next-sanity';
-import { createImageUrlBuilder } from '@sanity/image-url';
-import type { SanityImageSource } from '@sanity/image-url/lib/types/types';
+import imageUrlBuilder from '@sanity/image-url';
+import type { SanityImageSource } from '@sanity/image-url';
 
-export const client = createClient({
-  projectId: 'qkz53g2a',
-  dataset: 'production',
-  apiVersion: '2024-01-01',
-  useCdn: false, // Set to false to avoid CORS issues in development
+/**
+ * Sanity client for EchoPulse blog.
+ *
+ * Project + dataset are set in the Sanity Studio (blog-for-echopulse/sanity.config.ts).
+ * We mirror them here so the main Next.js app can query the same content.
+ *
+ * Env vars (set in .env.local for dev, in Vercel/Netlify dashboard for prod):
+ *   NEXT_PUBLIC_SANITY_PROJECT_ID=qkz53g2a
+ *   NEXT_PUBLIC_SANITY_DATASET=production
+ *
+ * Defaults are fine for now — the project is public-readable.
+ */
+export const SANITY_PROJECT_ID =
+  process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || 'qkz53g2a';
+export const SANITY_DATASET =
+  process.env.NEXT_PUBLIC_SANITY_DATASET || 'production';
+export const SANITY_API_VERSION = '2024-01-01';
+
+export const sanityClient = createClient({
+  projectId: SANITY_PROJECT_ID,
+  dataset: SANITY_DATASET,
+  apiVersion: SANITY_API_VERSION,
+  useCdn: true, // CDN reads are free + cached. Disable only if you need real-time previews.
   perspective: 'published',
 });
 
-const builder = createImageUrlBuilder(client);
+const builder = imageUrlBuilder(sanityClient);
 
+/**
+ * Use to build URLs for any Sanity image asset (the `mainImage` field, inline
+ * block images, etc.). Example:
+ *
+ *   <img src={urlFor(post.mainImage).width(1200).height(630).url()} />
+ */
 export function urlFor(source: SanityImageSource) {
   return builder.image(source);
 }
+
+// Alias for backward-compat with app/blogs/** which was written against the
+// old export name `client`.
+export const client = sanityClient;
 
 export interface BlogPost {
   _id: string;
@@ -24,7 +52,8 @@ export interface BlogPost {
   excerpt?: string;
   author?: string;
   readTime?: number;
-  mainImage?: any;
+  mainImage?: unknown;
   mainImageUrl?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   content?: any[];
 }

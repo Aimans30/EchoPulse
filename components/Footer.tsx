@@ -3,11 +3,10 @@
 import Link from 'next/link';
 
 const serviceLinks = [
-  'Video Editing', 'LinkedIn Ghostwriting', 'Blog Production',
+  'Video Editing', 'LinkedIn & Social', 'Blog Production',
   'Ad Creatives', 'Websites & Funnels', 'Automations',
+  'Apps & Software',
 ];
-
-const companyLinks = ['About', 'Our Work', 'Results', 'Pricing', 'Contact'];
 
 export default function Footer() {
   return (
@@ -22,7 +21,7 @@ export default function Footer() {
       className="site-footer"
     >
       <div>
-        <a
+        <Link
           href="/"
           style={{
             fontFamily: 'Inter, sans-serif',
@@ -36,43 +35,56 @@ export default function Footer() {
           }}
         >
           Echo<span style={{ color: '#E8541A' }}>Pulse</span>
-        </a>
+        </Link>
         <p style={{ fontSize: '14px', color: '#6E6B63', lineHeight: 1.7, marginBottom: '28px', margin: '0 0 28px' }}>
-          Full-stack content studio for premium founders and brands. Voice-driven video, LinkedIn ghostwriting, blogs, ad creatives, websites, and automations. Without the AI slop.
+          Done-for-you marketing for serious businesses. Video, content, ads, websites, automations, and custom software for founders, coaches, business owners, and real estate agents. One team, one bill.
         </p>
-        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-          <a
-            href="https://www.instagram.com/echopulse.media?igsh=bnY4Z2Zza2k4Njgw"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="EchoPulse on Instagram"
-            style={{ display: 'inline-flex', width: '36px', height: '36px', borderRadius: 10, alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.9)', border: '1px solid rgba(0,0,0,0.05)' }}
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
-              <rect x="2" y="2" width="20" height="20" rx="5" stroke="#0C0C0B" strokeWidth="1" fill="none" />
-              <path d="M12 7.25a4.75 4.75 0 1 0 0 9.5 4.75 4.75 0 0 0 0-9.5z" stroke="#0C0C0B" strokeWidth="1" fill="none" />
-              <circle cx="17" cy="7" r="0.8" fill="#0C0C0B" />
-            </svg>
-          </a>
-
-          <a
-            href="https://www.linkedin.com/company/echo-pulse-media/"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="EchoPulse on LinkedIn"
-            style={{ display: 'inline-flex', width: '36px', height: '36px', borderRadius: 10, alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.9)', border: '1px solid rgba(0,0,0,0.05)' }}
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
-              <path d="M4.98 3.5C4.98 4.88 3.86 6 2.48 6S0 4.88 0 3.5 1.12 1 2.5 1 4.98 2.12 4.98 3.5z" transform="translate(4 5)" stroke="#0C0C0B" strokeWidth="0.6" fill="none" />
-              <rect x="2" y="3" width="3" height="8" rx="0.5" transform="translate(9 5)" stroke="#0C0C0B" strokeWidth="0.6" fill="none" />
-              <path d="M2 3h3v8H2z" transform="translate(15 5)" stroke="#0C0C0B" strokeWidth="0.6" fill="none" />
-            </svg>
-          </a>
+        <div style={{ display: 'flex', gap: '10px' }}>
+          {[
+            { label: 'in', href: 'https://www.linkedin.com/in/lakshyasoni/' },
+          ].map((s) => (
+            <a
+              key={s.label}
+              href={s.href}
+              style={{
+                width: '44px',
+                height: '44px',
+                borderRadius: '12px',
+                background: 'rgba(255,255,255,0.55)',
+                backdropFilter: 'blur(10px)',
+                border: '1px solid rgba(255,255,255,0.8)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '12px',
+                fontWeight: 800,
+                cursor: 'none',
+                transition: 'all 0.25s',
+                textDecoration: 'none',
+                color: '#0C0C0B',
+                boxShadow: '0 2px 8px rgba(12,12,11,0.07)',
+              }}
+              onMouseEnter={(e) => {
+                const el = e.currentTarget as HTMLElement;
+                el.style.background = '#0C0C0B';
+                el.style.color = '#F2EEE7';
+                el.style.borderColor = '#0C0C0B';
+              }}
+              onMouseLeave={(e) => {
+                const el = e.currentTarget as HTMLElement;
+                el.style.background = 'rgba(255,255,255,0.55)';
+                el.style.color = '#0C0C0B';
+                el.style.borderColor = 'rgba(255,255,255,0.8)';
+              }}
+            >
+              {s.label}
+            </a>
+          ))}
         </div>
       </div>
 
       <div>
-        <h3
+        <h4
           style={{
             fontSize: '10px',
             fontWeight: 700,
@@ -83,7 +95,7 @@ export default function Footer() {
           }}
         >
           Services
-        </h3>
+        </h4>
         <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {serviceLinks.map((s) => (
             <li key={s}>
@@ -101,7 +113,7 @@ export default function Footer() {
       </div>
 
       <div>
-        <h3
+        <h4
           style={{
             fontSize: '10px',
             fontWeight: 700,
@@ -111,18 +123,24 @@ export default function Footer() {
             marginBottom: '20px',
           }}
         >
-          Company
-        </h3>
+          Quick Links
+        </h4>
         <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          {companyLinks.map((c) => (
-            <li key={c}>
+          {[
+            { label: 'Order a service', href: '/order' },
+            { label: 'See pricing', href: '/#pricing' },
+            { label: 'FAQ', href: '/#faq' },
+            { label: 'Blog', href: '/blog' },
+            { label: 'Terms of Service', href: '/terms' },
+          ].map((c) => (
+            <li key={c.label}>
               <a
-                href={`#${c.toLowerCase()}`}
+                href={c.href}
                 style={{ color: '#6E6B63', textDecoration: 'none', fontSize: '14px', transition: 'color 0.2s' }}
                 onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.color = '#0C0C0B')}
                 onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.color = '#6E6B63')}
               >
-                {c}
+                {c.label}
               </a>
             </li>
           ))}
@@ -130,7 +148,7 @@ export default function Footer() {
       </div>
 
       <div>
-        <h3
+        <h4
           style={{
             fontSize: '10px',
             fontWeight: 700,
@@ -141,13 +159,11 @@ export default function Footer() {
           }}
         >
           Contact
-        </h3>
+        </h4>
         <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {[
             { label: 'echopulse.media', href: 'https://echopulse.media' },
-            { label: 'Instagram', href: '#' },
-            { label: 'LinkedIn', href: '#' },
-            { label: 'YouTube', href: '#' },
+            { label: 'LinkedIn', href: 'https://www.linkedin.com/in/lakshyasoni/' },
           ].map((c) => (
             <li key={c.label}>
               <a
@@ -180,13 +196,47 @@ export default function Footer() {
           © 2026 EchoPulse. All rights reserved.
         </p>
         <p style={{ fontSize: '13px', color: '#A8A49B', margin: 0 }}>
-          Voice-driven content. Engineered to convert.
+          Done-for-you marketing. For serious businesses.
         </p>
       </div>
 
       <style>{`
-        @media (max-width: 1200px) { .site-footer { grid-template-columns: 1fr 1fr !important; } }
-        @media (max-width: 768px) { .site-footer { grid-template-columns: 1fr !important; padding: 56px 28px 32px !important; } }
+        .site-footer a[href^="#"],
+        .site-footer a[href^="http"] {
+          display: inline-block;
+        }
+        @media (max-width: 1200px) { .site-footer { grid-template-columns: 1fr 1fr !important; gap: 40px !important; } }
+        @media (max-width: 768px) {
+          .site-footer {
+            grid-template-columns: 1fr !important;
+            padding: 56px 22px 32px !important;
+            gap: 36px !important;
+          }
+          /* Pad list-item links so the row meets a 44px tap target */
+          .site-footer ul { gap: 4px !important; }
+          .site-footer ul li a {
+            display: block !important;
+            padding: 12px 0 !important;
+            font-size: 15px !important;
+            min-height: 44px !important;
+            line-height: 1.3 !important;
+          }
+          /* Section heading spacing tightens */
+          .site-footer h4 { margin-bottom: 10px !important; }
+          /* Brand intro paragraph: snug font + spacing */
+          .site-footer p { font-size: 14px !important; }
+          /* Bottom bar — stack copyright + tagline so each reads cleanly */
+          .site-footer > div:last-of-type {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 10px !important;
+            padding-top: 24px !important;
+          }
+          .site-footer > div:last-of-type p { font-size: 12.5px !important; }
+        }
+        @media (max-width: 380px) {
+          .site-footer { padding: 48px 16px 28px !important; gap: 32px !important; }
+        }
       `}</style>
     </footer>
   );

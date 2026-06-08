@@ -1,36 +1,52 @@
-import { MetadataRoute } from 'next';
-import { client } from '@/lib/sanity';
+import type { MetadataRoute } from 'next';
+import { services } from '@/lib/serviceData';
+import { getAllPosts } from '@/lib/blog';
+
+/**
+ * Sitemap — generated at build time. Lists the homepage + every service
+ * detail page + every published blog post so search engines and AI crawlers
+ * can discover the full site without crawling JS-rendered links.
+ */
+const SITE_URL = 'https://echopulse.media';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = 'https://echopulse.media';
+  const now = new Date();
 
-  const blogPosts = await client.fetch<Array<{ slug: { current: string }; publishedAt: string }>>(
-    `*[_type == "blog" && defined(slug.current)] {
-      slug,
-      publishedAt
-    }`
-  );
+  const home: MetadataRoute.Sitemap[number] = {
+    url: SITE_URL,
+    lastModified: now,
+    changeFrequency: 'weekly',
+    priority: 1.0,
+  };
 
-  const blogUrls = blogPosts.map((post) => ({
-    url: `${baseUrl}/blogs/${post.slug.current}`,
-    lastModified: new Date(post.publishedAt),
-    changeFrequency: 'weekly' as const,
-    priority: 0.7,
+  const blogIndex: MetadataRoute.Sitemap[number] = {
+    url: `${SITE_URL}/blog`,
+    lastModified: now,
+    changeFrequency: 'weekly',
+    priority: 0.85,
+  };
+
+  const serviceRoutes: MetadataRoute.Sitemap = services.map((service) => ({
+    url: `${SITE_URL}/services/${service.slug}`,
+    lastModified: now,
+    changeFrequency: 'monthly',
+    priority: 0.8,
   }));
 
-  return [
-    {
-      url: baseUrl,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 1,
-    },
-    {
-      url: `${baseUrl}/blogs`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.8,
-    },
-    ...blogUrls,
-  ];
+  // Blog posts from Sanity — wrapped in try so a Sanity outage never breaks
+  // the build. If Sanity is down, the sitemap drops the post URLs gracefully.
+  let blogPosts: MetadataRoute.Sitemap = [];
+  try {
+    const posts = await getAllPosts();
+    blogPosts = posts.map((post) => ({
+      url: `${SITE_URL}/blog/${post.slug}`,
+      lastModified: post.publishedAt ? new Date(post.publishedAt) : now,
+      changeFrequency: 'monthly' as const,
+      priority: 0.75,
+    }));
+  } catch {
+    // Sanity unreachable — sitemap continues without blog posts.
+  }
+
+  return [home, blogIndex, ...serviceRoutes, ...blogPosts];
 }

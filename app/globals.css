@@ -2,24 +2,19 @@
 
 :root {
   --cream: #F2EEE7;
-  --cream2: #EAE5DC;
   --black: #0C0C0B;
-  --grey: #6E6B63;
+  /* Bumped from #6E6B63 (~4.4:1 on cream — borderline AA fail) to #5A574F
+     which clears 5.5:1 — comfortably WCAG AA for body text. */
+  --grey: #5A574F;
   --grey2: #A8A49B;
   --orange: #E8541A;
   --border: rgba(12,12,11,0.09);
-  --glass-light: rgba(255,255,255,0.52);
-  --glass-dark: rgba(12,12,11,0.45);
-  --glass-border-light: rgba(255,255,255,0.70);
-  --glass-border-dark: rgba(255,255,255,0.09);
 }
 
 @theme inline {
   --color-cream: var(--cream);
-  --color-cream2: var(--cream2);
   --color-ep-black: var(--black);
   --color-ep-grey: var(--grey);
-  --color-ep-grey2: var(--grey2);
   --color-orange: var(--orange);
 }
 
@@ -32,52 +27,29 @@ body {
   background: var(--cream);
   color: var(--black);
   overflow-x: hidden;
+  overflow-y: auto;          /* explicit so nothing can implicitly hide it */
   cursor: none;
+}
+
+/* Text inputs get the native I-beam, NOT the custom dot+ring. Lets users
+   see exactly where they'll type. Custom cursor is hidden over inputs via
+   the JS hover handler in Cursor.tsx. */
+input,
+textarea,
+select,
+[contenteditable="true"] {
+  cursor: text !important;
+}
+
+/* Restore body scroll only when a modal explicitly requests the lock.
+   Anything else that tries to slip overflow:hidden onto body is overridden. */
+html:not(.modal-open),
+body:not(.modal-open) {
+  overflow-y: auto !important;
 }
 
 @media (max-width: 768px) {
   body { cursor: auto; }
-}
-
-/* Ticker animation */
-@keyframes ticker {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
-
-/* Marquee animation */
-@keyframes marquee {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
-
-/* Counter animation */
-@keyframes countUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.ticker-animate {
-  animation: ticker 32s linear infinite;
-}
-
-.marquee-animate {
-  animation: marquee 22s linear infinite;
-}
-
-/* Glass morphism utilities */
-.glass-light {
-  background: var(--glass-light);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid var(--glass-border-light);
-}
-
-.glass-dark {
-  background: var(--glass-dark);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid var(--glass-border-dark);
 }
 
 /* Custom scrollbar */
@@ -85,6 +57,68 @@ body {
 ::-webkit-scrollbar-track { background: var(--cream); }
 ::-webkit-scrollbar-thumb { background: var(--grey2); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--orange); }
+
+/* ─────────────────────────────────────────────────────────────────
+   ACCESSIBILITY — focus, reduced motion, skip-link
+   Applied site-wide; cannot be overridden by component styles.
+   ───────────────────────────────────────────────────────────────── */
+
+/* Visible focus rings on every interactive — keyboard users get a clear
+   "you are here" marker. Mouse users never see it (:focus-visible). */
+*:focus { outline: none; }
+*:focus-visible {
+  outline: 2px solid var(--orange);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+/* Buttons / links with their own rounded shape get a snug ring */
+a:focus-visible,
+button:focus-visible {
+  outline-offset: 2px;
+}
+
+/* Skip-to-content link — invisible until focused via Tab, then jumps to top
+   of content. Standard a11y pattern; first stop in keyboard tab order. */
+.skip-to-content {
+  position: fixed;
+  top: -100px;
+  left: 16px;
+  z-index: 99999;
+  padding: 12px 18px;
+  background: var(--black);
+  color: var(--cream);
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  border-radius: 8px;
+  transition: top 0.2s ease;
+}
+.skip-to-content:focus,
+.skip-to-content:focus-visible {
+  top: 16px;
+  outline: 2px solid var(--orange);
+  outline-offset: 3px;
+}
+
+/* Respect prefers-reduced-motion across the entire site. Anything that
+   uses transitions, animations, or transforms gets effectively neutralized.
+   Components still render — just without the movement. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    transition-delay: 0ms !important;
+    scroll-behavior: auto !important;
+  }
+  /* The custom cursor is more confusing than helpful when motion is off */
+  .cursor-dot, .cursor-ring { display: none !important; }
+  body, * { cursor: auto !important; }
+}
 
 /* ── RESPONSIVE OVERRIDES — tablets ── */
 @media (max-width: 1024px) {
@@ -142,25 +176,39 @@ body {
     gap: 16px !important;
   }
 
-  /* Ensure tap targets are at least 44px */
-  a, button, [role="button"] {
-    min-height: 40px;
+  /* Tap targets — Apple HIG + WCAG 2.5.5 recommendation is ≥ 44×44 */
+  a, button, [role="button"], input[type="submit"], input[type="button"] {
+    min-height: 44px;
+    /* Removes the 300ms tap delay AND prevents accidental double-tap zoom */
+    touch-action: manipulation;
   }
 
-  /* Disable horizontal page bleed */
+  /* iOS zooms on inputs with font-size < 16px when they get focus — set the
+     floor so the page doesn't jump on focus. */
+  input, textarea, select {
+    font-size: 16px !important;
+    min-height: 44px;
+  }
+  textarea { min-height: 96px; }
+
+  /* Disable horizontal page bleed at the document level */
   html, body {
     overflow-x: hidden;
     max-width: 100vw;
   }
 
-  /* Marquee/ticker — reduce CPU on phone */
-  .ticker-animate { animation-duration: 50s !important; }
-  .marquee-animate { animation-duration: 36s !important; }
-
-  /* Cap absurd box-shadows that murder mobile compositor perf */
-  *[style*="box-shadow"] {
-    /* tone down inline shadows on phones */
-    /* (this attribute selector is heavy but only applies once per element) */
+  /* Horizontal-scroll safety: only constrain direct content elements,
+     NOT absolute / fixed positioned decoratives (ambient orbs, the orbital
+     graphic, etc.) which intentionally extend beyond their parent. */
+  body main *,
+  body footer *,
+  body header * {
+    max-width: 100%;
+  }
+  /* Restore where explicit horizontal scroll is intended */
+  .hscroll, .stats-band-items, .services-grid[data-mobile-scroll="true"],
+  .work-track, .vid-card, .vid-card-h {
+    max-width: none;
   }
 }
 
@@ -173,29 +221,219 @@ body {
   h1 { font-size: clamp(28px, 9vw, 40px) !important; }
 }
 
-/* ── REDUCE EXPENSIVE EFFECTS ON MOBILE ──
-   backdrop-filter is the single biggest perf killer on mobile GPUs.
-   Cut blur radius dramatically; keep visual hierarchy via opacity. */
-@media (max-width: 1024px) {
-  .glass-light,
-  .glass-dark,
-  *[style*="backdrop-filter"] {
-    backdrop-filter: blur(8px) !important;
-    -webkit-backdrop-filter: blur(8px) !important;
+/* ──────────────────────────────────────────────────────────
+   MOBILE HARDENING — systemic fixes for narrow viewports.
+   These run on top of any component-level media queries.
+   ────────────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  /* Force every element to use border-box sizing on tablets.
+     NOTE: max-width:100vw is intentionally NOT set on * here —
+     doing so breaks flex/grid children whose width can legitimately
+     exceed 100vw (e.g. scroll-snap carousels). Instead we guard
+     only the root elements below. */
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  /* The Apps & Software featured card spans full grid width on every
+     breakpoint, but its internal aspect-ratio visual can push out — let
+     the inner mini visual shrink with the viewport. */
+  .service-card-wide {
+    width: 100% !important;
+  }
+
+  /* The two-column founder card needs to stack with the photo above the
+     letter on tablets, not beside it. */
+  .founder-card-grid {
+    flex-direction: column !important;
+    gap: 28px !important;
+  }
+  .founder-portrait-col {
+    width: 100% !important;
+    max-width: 360px !important;
+    align-self: center !important;
+  }
+
+  /* FAQ uses flex, not grid — collapse explicitly. */
+  .faq-grid {
+    flex-direction: column !important;
   }
 }
 
-@media (max-width: 768px) {
-  /* On phones, kill backdrop-filter entirely — substitute solid bg */
-  .glass-light {
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    background: rgba(255,255,255,0.85) !important;
+@media (max-width: 640px) {
+  /* Headlines that use clamp() can still render too large on phones because
+     the clamp lower-bound is high. Cap them harder on small phones. */
+  h1 { font-size: clamp(28px, 8vw, 38px) !important; line-height: 1.08 !important; }
+  h2 { font-size: clamp(24px, 7vw, 32px) !important; line-height: 1.1 !important; }
+  h3 { font-size: clamp(18px, 5vw, 24px) !important; line-height: 1.18 !important; }
+
+  /* Generic readable paragraph size on phones */
+  p { font-size: 15px; line-height: 1.65; }
+
+  /* Pricing tiers: stack to single column with generous gap */
+  .pricing-grid,
+  [class*="pricing-grid"] {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
   }
-  .glass-dark {
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    background: rgba(12,12,11,0.92) !important;
+
+  /* CTA banners + dark hero cards: tighten interior padding */
+  .cta-banner-inner {
+    padding: 36px 22px !important;
+  }
+  .cta-banner-h {
+    font-size: clamp(24px, 7.5vw, 32px) !important;
+    letter-spacing: -0.6px !important;
+    line-height: 1.12 !important;
+  }
+
+  /* The BookCallModal iframe shows a Calendly UI — 16:9 is too short on
+     phone where Calendly's UI is vertical. Switch to a portrait ratio. */
+  div[role="dialog"] iframe[title="Book a call"] {
+    /* Parent has aspect-ratio: 16/9 — override its container instead */
+  }
+  /* Target the modal card via its inline styles via attribute match */
+  div[role="dialog"][aria-modal="true"] {
+    aspect-ratio: 9 / 14 !important;
+    width: min(95vw, 420px) !important;
+  }
+
+  /* Service cards: ensure visuals don't overflow */
+  .service-card-visual {
+    max-width: 100% !important;
+    overflow: hidden;
+  }
+
+  /* Blog post body: smaller content padding so the prose breathes */
+  main article {
+    padding-left: 18px !important;
+    padding-right: 18px !important;
+  }
+
+  /* Nav pill on phone: ensure the logo + hamburger + CTA fit on one line */
+  .nav-pill {
+    padding: 9px 12px 9px 18px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Below 480px (small Android, iPhone SE), things get tight. */
+  section {
+    padding-left: 14px !important;
+    padding-right: 14px !important;
+  }
+  h1 { font-size: clamp(26px, 8.5vw, 34px) !important; }
+
+  /* Pricing card padding */
+  [class*="service-card"], [class*="pricing-card"], .faq-card {
+    padding: 18px 18px !important;
+  }
+}
+
+/* Hard guarantee: no horizontal scroll, ever, on any viewport */
+html, body {
+  overflow-x: hidden !important;
+  max-width: 100vw;
+  width: 100%;
+}
+
+/* ──────────────────────────────────────────────────────────
+   MOBILE UX POLISH PASS  —  the "act as a pro mobile UI
+   designer" sweep. Hand-tuned overrides for the components
+   that read worst on phone before this pass:
+   Manifesto headline · Pricing cards · Hero · founder card.
+   ────────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  /* MANIFESTO — the original headline used display:flex + 18px gap +
+     flex-wrap which produces ugly word-by-word breaks on narrow screens
+     (each word becomes a flex item that wraps independently).
+     Switch to inline + tighter gap so words flow as a natural sentence. */
+  .manifesto-line {
+    display: block !important;
+    gap: 0 !important;
+    font-size: clamp(28px, 8vw, 38px) !important;
+    letter-spacing: -1px !important;
+    line-height: 1.1 !important;
+    padding: 18px 0 !important;
+  }
+  .manifesto-line > span {
+    display: inline !important;
+    margin-right: 6px;
+  }
+  .manifesto-line > svg {
+    display: inline-block !important;
+    width: 22px !important;
+    height: 22px !important;
+    margin-left: 6px !important;
+    vertical-align: middle;
+  }
+
+  /* PRICING — tighten card padding, reduce big number sizes, shrink the
+     feature list so the whole card fits without endless scroll-thrash. */
+  [class*="pricing-grid"],
+  .pricing-grid {
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+  }
+  /* Pricing tier cards */
+  .pricing-grid > div,
+  [data-pricing-card="true"] {
+    padding: 24px 22px !important;
+    border-radius: 16px !important;
+  }
+  /* Big price number — was 36px, scale to fit phone width with the per/cycle */
+  .pricing-grid h3,
+  .pricing-grid [style*="fontWeight: 900"][style*="36px"] {
+    font-size: 32px !important;
+  }
+
+  /* HERO — primary CTA stack on phone (button on top of button, full width) */
+  .hero-actions .btn-p,
+  .hero-actions .btn-o {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+  }
+  .hero-actions {
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+
+  /* The phone sticky CTA adds ~88px of fixed bottom chrome. Give every
+     section that ends near the bottom a little breathing room above it
+     so the sticky bar doesn't visually clip the last paragraph. */
+  body {
+    padding-bottom: 0 !important;
+  }
+  section:last-of-type,
+  footer {
+    padding-bottom: 96px !important;
+  }
+}
+
+@media (max-width: 380px) {
+  /* Sub-380px phones (small Android, iPhone SE): one more squeeze */
+  .manifesto-line {
+    font-size: 26px !important;
+    letter-spacing: -0.8px !important;
+    padding: 14px 0 !important;
+  }
+  .manifesto-line > svg {
+    width: 18px !important;
+    height: 18px !important;
+  }
+}
+
+/* ── REDUCE EXPENSIVE EFFECTS ON MOBILE ──
+   backdrop-filter is the single biggest perf killer on mobile GPUs.
+   We target named classes instead of the heavy *[style*="..."] attribute
+   selector (which runs on every element with an inline style). */
+@media (max-width: 768px) {
+  .tab-bar,
+  .vid-brand,
+  .vid-play {
+    backdrop-filter: blur(6px) !important;
+    -webkit-backdrop-filter: blur(6px) !important;
   }
 }
 
@@ -286,22 +524,6 @@ section + section {
   box-shadow: 0 0 0 4px rgba(232, 84, 26, 0.18);
 }
 
-/* Skip-to-content link — keyboard accessibility */
-.skip-link {
-  position: absolute;
-  top: -40px;
-  left: 8px;
-  background: var(--black);
-  color: var(--cream);
-  padding: 8px 16px;
-  border-radius: 8px;
-  z-index: 10000;
-  text-decoration: none;
-  font-weight: 600;
-  transition: top 0.2s;
-}
-.skip-link:focus { top: 8px; }
-
 /* Print styles — kill the dark backgrounds + cursor */
 @media print {
   body { background: white; color: black; cursor: auto; }
@@ -309,10 +531,22 @@ section + section {
   *[data-dark-bg="true"] { background: white !important; color: black !important; }
 }
 
-/* Image rendering quality */
+/* Image rendering quality — `auto` lets the browser choose the best algorithm
+   (crisp-edges was causing blurry photos on retina displays). */
 img {
-  image-rendering: -webkit-optimize-contrast;
-  image-rendering: crisp-edges;
+  image-rendering: auto;
+}
+
+/* content-visibility: auto tells the browser to skip rendering below-fold
+   sections entirely until they scroll into view. This is one of the biggest
+   first-paint / scroll-jank wins available in modern CSS. */
+#manifesto, #testimonials, #who-we-work-with, #work,
+#services, #process, #pricing, #faq {
+  content-visibility: auto;
+  /* contain-intrinsic-size gives the browser a size hint so layout doesn't
+     jump when the section is un-skipped during scroll. 1px width + estimate
+     of section height (1000px is a safe overestimate). */
+  contain-intrinsic-size: 0 1000px;
 }
 
 /* ── Apple emoji normalization ──
@@ -372,14 +606,10 @@ h1, h2, h3 {
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* Container-query-style max-width helpers — keep content from getting too wide */
-.content-container {
-  width: 100%;
-  max-width: 1180px;
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: clamp(20px, 4vw, 56px);
-  padding-right: clamp(20px, 4vw, 56px);
+/* Skeleton shimmer used by lazy-loaded sections (ServiceHeroVisual placeholder, etc.) */
+@keyframes svc-shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
 }
 
 /* Lenis smooth scroll */
@@ -401,14 +631,6 @@ html.lenis, html.lenis body {
 
 .lenis.lenis-smooth iframe {
   pointer-events: none;
-}
-
-/* ── Apple-style refinements ── */
-
-:root {
-  --ease-apple: cubic-bezier(0.4, 0, 0.2, 1);
-  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
-  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* ── KILL THE BLINKING CARET EVERYWHERE ──

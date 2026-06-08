@@ -3,23 +3,41 @@
 import { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BOOK_CALL_URL, BOOK_CALL_LABEL_LONG } from '@/lib/links';
+import {
+  Clapperboard,
+  PenLine,
+  FileText,
+  Target,
+  Globe,
+  Settings,
+  Mic,
+  ClipboardList,
+  Wrench,
+  Eye,
+  Rocket,
+  type LucideIcon,
+} from 'lucide-react';
+import { BOOK_CALL_LABEL_LONG } from '@/lib/links';
+import { trackPilotClick, trackCallClick } from '@/lib/analytics';
 
-const services = [
-  { icon: '🎬', name: 'Video Editing',         tag: 'Cinematic + Short-form', color: '#E8541A' },
-  { icon: '✍️', name: 'LinkedIn Ghostwriting', tag: 'Voice-driven posts',     color: '#8b5cf6' },
-  { icon: '📝', name: 'Blog Production',       tag: 'Long-form, SEO-built',   color: '#f59e0b' },
-  { icon: '🎯', name: 'Ad Creatives',          tag: 'Meta · TikTok · Google', color: '#3b82f6' },
-  { icon: '🌐', name: 'Websites & Funnels',    tag: 'Conversion-engineered',  color: '#10b981' },
-  { icon: '⚙️', name: 'Automations',           tag: 'Make · ManyChat · CRM',  color: '#E8541A' },
+type Service = { Icon: LucideIcon; name: string; tag: string; color: string };
+type FlowStep = { n: string; Icon: LucideIcon; label: string; sub: string; color: string };
+
+const services: Service[] = [
+  { Icon: Clapperboard, name: 'Video Editing',         tag: 'Cinematic + Short-form', color: '#E8541A' },
+  { Icon: PenLine,      name: 'LinkedIn & Social',     tag: 'Posts, carousels, copy', color: '#8b5cf6' },
+  { Icon: FileText,     name: 'Blog Production',       tag: 'Long-form, SEO-built',   color: '#f59e0b' },
+  { Icon: Target,       name: 'Ad Creatives',          tag: 'Meta · TikTok · Google', color: '#3b82f6' },
+  { Icon: Globe,        name: 'Websites & Funnels',    tag: 'Conversion-engineered',  color: '#10b981' },
+  { Icon: Settings,     name: 'Automations',           tag: 'Make · ManyChat · CRM',  color: '#E8541A' },
 ];
 
-const flow = [
-  { n: '01', icon: '🎙️', label: 'Founder Interview', sub: '90-min recorded session captures your voice', color: '#E8541A' },
-  { n: '02', icon: '📋', label: 'Strategy & Brief', sub: 'Topics, calendar, success metrics',     color: '#f59e0b' },
-  { n: '03', icon: '🛠️', label: 'We Produce',       sub: 'Video, LinkedIn, blogs, ad creative',   color: '#8b5cf6' },
-  { n: '04', icon: '👁️', label: 'You Review',       sub: 'Revisions until you are satisfied',     color: '#3b82f6' },
-  { n: '05', icon: '🚀', label: 'Ship & Refine',    sub: 'Performance review, iterate monthly',   color: '#10b981' },
+const flow: FlowStep[] = [
+  { n: '01', Icon: Mic,           label: 'Discovery Call',    sub: 'We learn your business, audience, and offer', color: '#E8541A' },
+  { n: '02', Icon: ClipboardList, label: 'Strategy & Brief',  sub: 'Topics, calendar, success metrics',           color: '#f59e0b' },
+  { n: '03', Icon: Wrench,        label: 'We Produce',        sub: 'Video, content, ads, sites, software',        color: '#8b5cf6' },
+  { n: '04', Icon: Eye,           label: 'You Review',        sub: 'Revisions until you are satisfied',           color: '#3b82f6' },
+  { n: '05', Icon: Rocket,        label: 'Ship & Refine',     sub: 'Performance review, iterate monthly',         color: '#10b981' },
 ];
 
 /* ──────────────────────────────────────────────────────────
@@ -72,9 +90,11 @@ function InteractiveGraphic() {
   const [wavePhase, setWavePhase] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Continuous orbit rotation — pauses when user hovers a node
+  // Continuous orbit rotation — pauses when user hovers a node OR when the
+  // user prefers reduced motion (a11y + battery saver on mobile).
   useEffect(() => {
     if (hovered !== null) return;
+    if (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     let raf = 0;
     let last = performance.now();
     const tick = (now: number) => {
@@ -88,9 +108,11 @@ function InteractiveGraphic() {
   }, [hovered]);
 
   // Wave-phase animation — only ticks while a service node is hovered.
-  // Drives the sine wave that travels along the connection line.
+  // Drives the sine wave that travels along the connection line. Also
+  // skipped under prefers-reduced-motion.
   useEffect(() => {
     if (hovered === null) return;
+    if (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     let raf = 0;
     let last = performance.now();
     const tick = (now: number) => {
@@ -123,19 +145,13 @@ function InteractiveGraphic() {
 
   const servicePositions = services.map((_, i) => {
     const a = ((i / services.length) * 360 + angle) * (Math.PI / 180);
-    return { 
-      x: Math.round((center + Math.cos(a) * innerR) * 1e10) / 1e10, 
-      y: Math.round((center + Math.sin(a) * innerR) * 1e10) / 1e10 
-    };
+    return { x: center + Math.cos(a) * innerR, y: center + Math.sin(a) * innerR };
   });
 
   const flowPositions = flow.map((_, i) => {
     // Counter-rotate slower + offset so workflow waypoints don't sit on top of services
     const a = ((i / flow.length) * 360 - angle * 0.4 + 36) * (Math.PI / 180);
-    return { 
-      x: Math.round((center + Math.cos(a) * outerR) * 1e10) / 1e10, 
-      y: Math.round((center + Math.sin(a) * outerR) * 1e10) / 1e10 
-    };
+    return { x: center + Math.cos(a) * outerR, y: center + Math.sin(a) * outerR };
   });
 
   return (
@@ -186,7 +202,7 @@ function InteractiveGraphic() {
 
           {/* Pulse rings — emanating from core every couple seconds */}
           {[0, 1, 2].map((i) => (
-            <circle
+            <motion.circle
               key={`pulse-${i}`}
               cx={center}
               cy={center}
@@ -194,8 +210,8 @@ function InteractiveGraphic() {
               fill="none"
               stroke="#E8541A"
               strokeWidth={1.2}
-              className="ep-pulse-ring"
-              style={{ animationDelay: `${i * 1}s` }}
+              animate={{ r: [70, 200], opacity: [0.45, 0] }}
+              transition={{ duration: 3, delay: i * 1, repeat: Infinity, ease: 'easeOut' }}
             />
           ))}
 
@@ -237,27 +253,34 @@ function InteractiveGraphic() {
 
           {/* Data-flow particles — visualize work flowing into the core */}
           {servicePositions.map((p, i) => (
-            <circle
+            <motion.circle
               key={`pt-${i}`}
-              cx={p.x}
-              cy={p.y}
               r={2.5}
               fill={services[i].color}
-              className="ep-flow-dot"
-              style={{ animationDelay: `${i * 0.4}s` }}
+              animate={{
+                cx: [p.x, center],
+                cy: [p.y, center],
+                opacity: [0, 1, 0],
+              }}
+              transition={{
+                duration: 2.4,
+                delay: i * 0.4,
+                repeat: Infinity,
+                ease: 'easeIn',
+              }}
             />
           ))}
 
           {/* Workflow waypoints (outer ring) — subtle pulse in sequence */}
           {flowPositions.map((p, i) => (
             <g key={`wf-${i}`}>
-              <circle
+              <motion.circle
                 cx={p.x}
                 cy={p.y}
                 r={4}
                 fill={flow[i].color}
-                className="ep-waypoint"
-                style={{ animationDelay: `${i * 0.5}s` }}
+                animate={{ opacity: [0.25, 1, 0.25], r: [4, 6, 4] }}
+                transition={{ duration: 2.5, delay: i * 0.5, repeat: Infinity, ease: 'easeInOut' }}
               />
               <text
                 x={p.x}
@@ -275,51 +298,52 @@ function InteractiveGraphic() {
           ))}
 
           {/* Service nodes — interactive */}
-          {servicePositions.map((p, i) => (
-            <g
-              key={`svc-${i}`}
-              transform={`translate(${p.x},${p.y})`}
-              onMouseEnter={() => setHovered(i)}
-              onMouseLeave={() => setHovered(null)}
-              style={{ cursor: 'none' }}
-            >
-              {hovered === i && (
-                <circle r={34} fill={services[i].color} fillOpacity={0.18} filter="url(#ep-soft-glow)" />
-              )}
-              <circle
-                r={hovered === i ? 26 : 22}
-                fill={services[i].color}
-                style={{
-                  transition: 'r 0.3s cubic-bezier(0.16,1,0.3,1), filter 0.3s',
-                  filter:
-                    hovered === i
-                      ? `drop-shadow(0 8px 22px ${services[i].color}aa)`
-                      : `drop-shadow(0 2px 8px ${services[i].color}55)`,
-                }}
-              />
-              {/* invisible larger hit target */}
-              <circle r={32} fill="transparent" />
-              <text
-                textAnchor="middle"
-                dy="6"
-                fontSize="18"
-                style={{ pointerEvents: 'none', userSelect: 'none' }}
+          {servicePositions.map((p, i) => {
+            const ServiceIcon = services[i].Icon;
+            return (
+              <g
+                key={`svc-${i}`}
+                transform={`translate(${p.x},${p.y})`}
+                onMouseEnter={() => setHovered(i)}
+                onMouseLeave={() => setHovered(null)}
+                style={{ cursor: 'none' }}
               >
-                {services[i].icon}
-              </text>
-            </g>
-          ))}
+                {hovered === i && (
+                  <circle r={34} fill={services[i].color} fillOpacity={0.18} filter="url(#ep-soft-glow)" />
+                )}
+                <circle
+                  r={hovered === i ? 26 : 22}
+                  fill={services[i].color}
+                  style={{
+                    transition: 'r 0.3s cubic-bezier(0.16,1,0.3,1), filter 0.3s',
+                    filter:
+                      hovered === i
+                        ? `drop-shadow(0 8px 22px ${services[i].color}aa)`
+                        : `drop-shadow(0 2px 8px ${services[i].color}55)`,
+                  }}
+                />
+                {/* invisible larger hit target */}
+                <circle r={32} fill="transparent" />
+                {/* Lucide icon — nested SVG positioned via outer <g> translate.
+                   Using nested SVG (not foreignObject) for consistent rendering across browsers. */}
+                <g style={{ pointerEvents: 'none' }} transform="translate(-10,-10)">
+                  <ServiceIcon size={20} color="#fff" strokeWidth={2.2} aria-hidden="true" />
+                </g>
+              </g>
+            );
+          })}
 
           {/* Central core */}
           <circle cx={center} cy={center} r={56} fill="url(#ep-core-fill)" stroke="rgba(232,84,26,0.4)" strokeWidth={1} />
-          <circle
+          <motion.circle
             cx={center}
             cy={center}
             r={56}
             fill="none"
             stroke="#E8541A"
             strokeOpacity={0.6}
-            className="ep-core-ring"
+            animate={{ r: [56, 66], opacity: [0.6, 0] }}
+            transition={{ duration: 2.4, repeat: Infinity, ease: 'easeOut' }}
           />
 
           <text
@@ -356,6 +380,7 @@ function InteractiveGraphic() {
             const p = servicePositions[hovered];
             const vx = p.x - center;
             const gap = 38; // node radius + breathing room
+            const HoveredIcon = services[hovered].Icon;
 
             // Horizontal-only placement — left for left-half nodes, right for right-half.
             // Avoids any case where vertical placement would push the chip across
@@ -400,8 +425,8 @@ function InteractiveGraphic() {
                   whiteSpace: 'nowrap',
                 }}
               >
-                <span className="emoji" style={{ fontSize: 13, lineHeight: 1, display: 'inline-flex' }}>
-                  {services[hovered].icon}
+                <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 16, height: 16, flexShrink: 0 }}>
+                  <HoveredIcon size={14} color={services[hovered].color} strokeWidth={2.2} aria-hidden="true" />
                 </span>
                 <span
                   style={{
@@ -430,11 +455,10 @@ function InteractiveGraphic() {
    with a subtle "active" highlight that cycles through them.
    ────────────────────────────────────────────────────────── */
 const BAND_STATS = [
-  { value: '48h',      label: 'turnaround per deliverable' },
-  { value: '6',        label: 'services under one roof' },
-  { value: '∞',        label: 'revisions until satisfied' },
-  { value: '2 weeks',  label: 'Pilot to first work shipped' },
-  { value: '0',        label: 'templates · 100% custom' },
+  { value: '48h',     label: 'turnaround per deliverable' },
+  { value: '7',       label: 'services under one roof' },
+  { value: '∞',       label: 'revisions until satisfied' },
+  { value: '20-30h',  label: 'back to you every week' },
 ];
 
 function StatsBand() {
@@ -474,36 +498,12 @@ function StatsBand() {
           borderRadius: '100px',
           boxShadow: '0 8px 32px rgba(12,12,11,0.06), inset 0 1px 0 rgba(255,255,255,0.95)',
           flexWrap: 'wrap',
-          justifyContent: 'space-between',
+          // Centered: the "By the numbers" eyebrow + green dot were removed,
+          // so the four remaining stats are the only thing in this pill.
+          justifyContent: 'center',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
-          <motion.span
-            animate={{ scale: [1, 1.4, 1], opacity: [0.5, 1, 0.5] }}
-            transition={{ duration: 2, repeat: Infinity }}
-            style={{
-              width: '7px',
-              height: '7px',
-              borderRadius: '50%',
-              background: '#10b981',
-              boxShadow: '0 0 10px #10b981',
-            }}
-          />
-          <span
-            style={{
-              fontSize: '10px',
-              fontWeight: 800,
-              letterSpacing: '2.5px',
-              color: '#6E6B63',
-              textTransform: 'uppercase',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            By the numbers
-          </span>
-        </div>
-
-        <div className="stats-band-items" style={{ display: 'flex', alignItems: 'center', gap: '32px', flexWrap: 'wrap', justifyContent: 'center' }}>
+        <div className="stats-band-items" style={{ display: 'flex', alignItems: 'center', gap: '36px', flexWrap: 'wrap', justifyContent: 'center', width: '100%' }}>
           {BAND_STATS.map((s, i) => {
             const isActive = i === activeIdx;
             return (
@@ -546,8 +546,13 @@ function StatsBand() {
       <style>{`
         @media (max-width: 900px) {
           .stats-band { padding: 0 24px 48px !important; }
-          .stats-band > div { flex-direction: column; gap: 14px; padding: 18px 22px !important; border-radius: 24px !important; }
-          .stats-band-items { gap: 16px 22px !important; justify-content: flex-start !important; }
+          .stats-band > div { flex-direction: column; gap: 14px; padding: 18px 22px !important; border-radius: 24px !important; align-items: flex-start !important; }
+          .stats-band-items { gap: 14px 22px !important; justify-content: flex-start !important; width: 100%; }
+        }
+        /* Hidden on phone — the hero stays clean. The stats reappear inside
+           dedicated sections lower on the page anyway. */
+        @media (max-width: 640px) {
+          .stats-band { display: none !important; }
         }
       `}</style>
     </motion.div>
@@ -564,12 +569,16 @@ export default function Hero() {
 
   useEffect(() => {
     const lines = headlineRef.current?.querySelectorAll('.hl-inner');
-    const tl = gsap.timeline({ delay: 1.2 });
-    tl.fromTo('#grid-bg',      { opacity: 0 }, { opacity: 1, duration: 1.5 })
-      .fromTo(eyebrowRef.current,  { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7, ease: 'power3.out' }, '-=0.9')
-      .fromTo(lines ?? [],         { y: '110%' },          { y: '0%', duration: 0.95, ease: 'power3.out', stagger: 0.1 }, '-=0.4')
-      .fromTo([subRef.current, actionsRef.current], { y: 16, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7, ease: 'power3.out', stagger: 0.12 }, '-=0.4')
-      .fromTo(rightRef.current,    { x: 24, opacity: 0 }, { x: 0, opacity: 1, duration: 0.9, ease: 'power3.out' }, '-=0.9');
+    // SHORT timeline — total play time ~0.85s. Starts immediately on mount
+    // so by the time the loader (1.4s) is done, the Hero animation has
+    // finished. The page is in its final settled state when revealed.
+    const tl = gsap.timeline();
+    tl.fromTo('#grid-bg',      { opacity: 0 }, { opacity: 1, duration: 0.6 })
+      .fromTo(eyebrowRef.current,  { y: 12, opacity: 0 }, { y: 0, opacity: 1, duration: 0.35, ease: 'power2.out' }, '-=0.5')
+      .fromTo(lines ?? [],         { y: '105%' },          { y: '0%', duration: 0.5, ease: 'power3.out', stagger: 0.05 }, '-=0.25')
+      .fromTo([subRef.current, actionsRef.current], { y: 10, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4, ease: 'power2.out', stagger: 0.06 }, '-=0.25')
+      .fromTo(rightRef.current,    { x: 16, opacity: 0 }, { x: 0, opacity: 1, duration: 0.5, ease: 'power2.out' }, '-=0.55');
+    return () => { tl.kill(); };
   }, []);
 
   return (
@@ -600,26 +609,273 @@ export default function Hero() {
         .scroll-hint{position:absolute;bottom:24px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:6px;color:#A8A49B;font-size:9px;letter-spacing:3px;text-transform:uppercase;font-weight:600;}
         .scroll-line{width:1px;height:28px;background:linear-gradient(to bottom,#E8541A,transparent);animation:sline 1.8s ease-in-out infinite;}
         @keyframes sline{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
-        .ep-pulse-ring,.ep-core-ring,.ep-waypoint,.ep-flow-dot{transform-box: fill-box; transform-origin: center;}
-        .ep-pulse-ring{animation: ep-pulse 3s ease-out infinite;}
-        .ep-core-ring{animation: ep-core 2.4s ease-out infinite;}
-        .ep-waypoint{animation: ep-waypoint 2.5s ease-in-out infinite;}
-        .ep-flow-dot{animation: ep-flow 2.4s ease-in infinite;}
-        @keyframes ep-pulse{0%{transform:scale(1);opacity:.45}100%{transform:scale(2.85);opacity:0}}
-        @keyframes ep-core{0%{transform:scale(1);opacity:.6}100%{transform:scale(1.18);opacity:0}}
-        @keyframes ep-waypoint{0%,100%{transform:scale(1);opacity:.25}50%{transform:scale(1.5);opacity:1}}
-        @keyframes ep-flow{0%{opacity:0;transform:scale(1)}50%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1)}}
-        @media(max-width:860px){.hero-right{display:none!important;}.hero-inner{gap:0!important;}}
+        /* Mobile-only elements are hidden on desktop by default */
+        .hero-mobile-only { display: none; }
+        /* Tablet: stack vertically — text on top, orbital graphic below, both centered */
+        @media(max-width:860px){
+          .hero-inner{flex-direction:column!important;gap:36px!important;align-items:stretch!important;}
+          .hero-right{width:100%!important;display:flex!important;justify-content:center!important;}
+        }
+        /* ── Phone redesign ──
+           Below 640px the hero is rebuilt for portrait-touch context. We tighten
+           the type stack, restructure the headline into clean 2-line form, swap
+           the orbital graphic for a native mobile service grid + trust strip,
+           and give CTAs full-width tap targets. */
         @media(max-width:640px){
-          .hero-inner{padding:88px 20px 40px!important;}
-          .hero-actions{gap:10px!important;margin-bottom:24px!important;width:100%;justify-content:center!important;}
-          .hero-actions .btn-p,.hero-actions .btn-o{flex:1;min-width:140px;justify-content:center;padding:16px 24px!important;font-size:14px!important;}
-          .hero-actions .hero-trust{order:-1;width:100%;justify-content:flex-start;margin-bottom:4px;}
-          .scroll-hint{display:none!important;}
+          .hero-inner{
+            /* Center-aligned mobile hero, inspired by editorial portfolio
+               sites (illustrate.framer.website pattern). Generous vertical
+               padding lets the headline breathe, single-column stack reads
+               cleanly on portrait. */
+            padding: 84px 24px 48px !important;
+            gap: 0 !important;
+            text-align: center !important;
+            align-items: center !important;
+          }
+          /* The text column inside .hero-inner — center its children too */
+          .hero-inner > div:first-child{
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            text-align: center !important;
+            width: 100% !important;
+          }
+          .hero-eyebrow-m{
+            display:inline-flex !important;
+            align-items:center;
+            gap:8px;
+            padding:6px 14px 6px 10px;
+            background:rgba(12,12,11,0.05);
+            border:1px solid rgba(12,12,11,0.10);
+            border-radius:100px;
+            font-family:Inter,sans-serif;
+            font-size:11px;
+            font-weight:600;
+            letter-spacing:0.2px;
+            color:rgba(12,12,11,0.65);
+            margin: 0 auto 24px !important;
+          }
+          .hero-eyebrow-m .ep-pulse{
+            width:6px;height:6px;border-radius:50%;background:#10b981;
+            box-shadow:0 0 8px rgba(16,185,129,0.6);
+            animation:bdot 2s ease-in-out infinite;
+          }
+          /* Restructure h1 into a clean 2-line stack: we hide the original
+             3-span layout and render a mobile-native 2-line version inside
+             .hero-h1-mobile (just below). */
+          .hero-h1-desktop{ display:none !important; }
+          .hero-h1-mobile{
+            display:block !important;
+            font-family:Inter,sans-serif;
+            font-weight:800;
+            font-size: clamp(28px, 8vw, 38px) !important;
+            line-height: 1.12 !important;
+            letter-spacing: -0.6px !important;
+            color:#0C0C0B;
+            margin: 0 auto 20px !important;
+            max-width: 340px !important;
+            text-align: center !important;
+          }
+          .hero-h1-mobile .accent{
+            color:#E8541A;
+            font-style:italic;
+          }
+          .hero-sub{
+            font-size: 14.5px !important;
+            line-height: 1.55 !important;
+            color:#6B675E !important;
+            margin: 0 auto 28px !important;
+            max-width: 300px !important;
+            text-align: center !important;
+            font-weight: 400 !important;
+          }
+          .hero-sub strong{
+            font-weight: 600 !important;
+            color: #0C0C0B !important;
+          }
+          .hero-sub .desktop-only{ display:none; }
+          /* CTA stack — centered as a row on phone, both buttons compact
+             pills. Primary stays solid black, secondary is a clean text
+             link with subtle underline-on-hover (less visual weight than
+             the old outlined pill — keeps the focus on the primary). */
+          .hero-actions{
+            gap:14px !important;
+            margin: 0 auto !important;
+            width:auto !important;
+            flex-direction:row !important;
+            align-items:center !important;
+            justify-content:center !important;
+            flex-wrap:wrap !important;
+          }
+          .hero-actions .btn-p{
+            width:auto !important;
+            flex:0 0 auto !important;
+            justify-content:center !important;
+            padding:14px 26px !important;
+            font-size:13.5px !important;
+            min-height:46px !important;
+            box-sizing:border-box !important;
+            border-radius:100px !important;
+            display:inline-flex !important;
+            align-items:center !important;
+            gap:8px !important;
+            font-weight:700 !important;
+          }
+          .hero-actions .btn-o{
+            background: transparent !important;
+            border: 1px solid rgba(12,12,11,0.14) !important;
+            color: #0C0C0B !important;
+            padding:14px 22px !important;
+            font-size:13.5px !important;
+            font-weight:600 !important;
+            min-height:46px !important;
+            border-radius:100px !important;
+            display:inline-flex !important;
+            align-items:center !important;
+            gap:6px !important;
+          }
+          .scroll-hint{ display:none !important; }
+          /* Hide the orbital entirely — replaced by mobile service grid below */
+          .hero-right{ display:none !important; }
+
+          /* Mobile-only blocks: service chips + trust strip */
+          .hero-mobile-only{ display:block; }
+
+          .hero-trust-strip{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:8px;
+            margin-top:24px;
+            padding:14px 14px;
+            background:rgba(255,255,255,0.55);
+            backdrop-filter: blur(14px) saturate(180%);
+            -webkit-backdrop-filter: blur(14px) saturate(180%);
+            border:1px solid rgba(12,12,11,0.08);
+            border-radius:14px;
+            box-shadow:0 4px 18px rgba(12,12,11,0.04), inset 0 1px 0 rgba(255,255,255,0.9);
+          }
+          .hero-trust-item{
+            display:flex; flex-direction:column; align-items:center; gap:2px;
+            flex:1 1 0;
+            min-width:0;
+            text-align:center;
+          }
+          .hero-trust-item .v{
+            font-family:Inter,sans-serif;
+            font-size:15px;
+            font-weight:900;
+            letter-spacing:-0.4px;
+            color:#0C0C0B;
+          }
+          .hero-trust-item .v.accent{ color:#E8541A; }
+          .hero-trust-item .k{
+            font-size:9.5px;
+            font-weight:700;
+            letter-spacing:0.8px;
+            text-transform:uppercase;
+            color:#8A857B;
+            white-space:nowrap;
+          }
+          .hero-trust-sep{
+            width:1px;
+            height:28px;
+            background:rgba(12,12,11,0.08);
+            flex-shrink:0;
+          }
+
+          /* Service grid — 2 columns × 3 rows of premium-feeling chips */
+          .hero-services-label{
+            display:flex;
+            align-items:center;
+            gap:10px;
+            margin: 28px 0 12px;
+            font-family:Inter,sans-serif;
+            font-size:10px;
+            font-weight:800;
+            letter-spacing:2.5px;
+            text-transform:uppercase;
+            color:#8A857B;
+          }
+          .hero-services-label::before{
+            content:'';
+            width:18px; height:1px; background:#E8541A;
+            display:block;
+          }
+          .hero-services-grid{
+            display:grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap:10px;
+          }
+          .hero-svc-chip{
+            display:flex;
+            align-items:center;
+            gap:10px;
+            padding:13px 12px;
+            background:rgba(255,255,255,0.5);
+            border:1px solid rgba(12,12,11,0.08);
+            border-radius:14px;
+            transition: transform 0.2s, border-color 0.2s, background 0.2s;
+          }
+          .hero-svc-chip:active{
+            transform: scale(0.98);
+            background:rgba(255,255,255,0.75);
+            border-color: rgba(232,84,26,0.30);
+          }
+          .hero-svc-chip .svc-ico{
+            width:34px; height:34px; border-radius:10px;
+            display:flex; align-items:center; justify-content:center;
+            flex-shrink:0;
+          }
+          .hero-svc-chip .svc-text{
+            display:flex; flex-direction:column; gap:1px;
+            min-width:0; flex:1;
+          }
+          .hero-svc-chip .svc-name{
+            font-family:Inter,sans-serif;
+            font-size:12.5px;
+            font-weight:800;
+            color:#0C0C0B;
+            letter-spacing:-0.2px;
+            line-height:1.1;
+            white-space:nowrap;
+            overflow:hidden;
+            text-overflow:ellipsis;
+          }
+          .hero-svc-chip .svc-tag{
+            font-size:10px;
+            color:#8A857B;
+            font-weight:500;
+            line-height:1.2;
+            white-space:nowrap;
+            overflow:hidden;
+            text-overflow:ellipsis;
+          }
         }
         @media(max-width:380px){
-          .hero-inner{padding:80px 16px 48px!important;}
-          h1{letter-spacing:-1.5px!important;}
+          .hero-inner{ padding:76px 20px 40px !important; }
+          .hero-h1-mobile{
+            font-size: 27px !important;
+            letter-spacing: -0.5px !important;
+            line-height: 1.14 !important;
+            max-width: 290px !important;
+          }
+          .hero-sub{
+            font-size: 13.5px !important;
+            line-height: 1.55 !important;
+            margin: 0 auto 24px !important;
+            max-width: 280px !important;
+          }
+          .hero-actions{ gap: 12px !important; }
+          .hero-actions .btn-p{ padding: 12px 22px !important; font-size: 13px !important; min-height: 44px !important; }
+          .hero-actions .btn-o{ padding: 12px 18px !important; font-size: 13px !important; min-height: 44px !important; }
+          .hero-trust-item .v{ font-size:13.5px !important; }
+          .hero-trust-item .k{ font-size:8.5px !important; letter-spacing:0.6px !important; }
+          .hero-services-grid{ gap:8px !important; }
+          .hero-svc-chip{ padding:11px 10px !important; }
+          .hero-svc-chip .svc-ico{ width:30px; height:30px; }
+          .hero-svc-chip .svc-name{ font-size:11.5px !important; }
+          .hero-svc-chip .svc-tag{ font-size:9.5px !important; }
         }
       `}</style>
 
@@ -634,15 +890,15 @@ export default function Hero() {
           <div style={{ flex: '1 1 0', minWidth: 0 }}>
             <div ref={eyebrowRef} />
 
+            {/* Desktop headline — original 3-line stacked structure. Hidden on phone. */}
             <h1
               ref={headlineRef}
-              className="hero-h1"
-              style={{ fontFamily: 'Inter, sans-serif', fontSize: 'clamp(40px, 5.4vw, 80px)', fontWeight: 900, lineHeight: 1, letterSpacing: 'clamp(-1.5px, -0.04em, -3px)', margin: '0 0 28px' }}
+              className="hero-h1 hero-h1-desktop"
+              style={{ fontFamily: 'Inter, sans-serif', fontSize: 'clamp(36px, 4.4vw, 64px)', fontWeight: 900, lineHeight: 1.04, letterSpacing: 'clamp(-1px, -0.035em, -2.4px)', margin: '0 0 24px' }}
             >
               {[
-                <>Content that</>,
-                <><span style={{ color: '#E8541A', fontStyle: 'italic' }}>converts.</span></>,
-                <>No AI slop.</>,
+                <>You run the business.</>,
+                <>We run <span style={{ color: '#E8541A', fontStyle: 'italic' }}>the content.</span></>,
               ].map((line, i) => (
                 <span key={i} className="hl-wrap">
                   <span className="hl-inner">{line}</span>
@@ -650,30 +906,60 @@ export default function Hero() {
               ))}
             </h1>
 
-            <p ref={subRef} style={{ fontSize: '16px', color: '#6E6B63', maxWidth: '460px', lineHeight: 1.75, fontWeight: 400, margin: '0 0 36px', opacity: 0 }}>
-              Cinematic video, LinkedIn ghostwriting, blogs, ad creatives, and conversion sites.{' '}
-              <strong style={{ color: '#0C0C0B', fontWeight: 600 }}>Built for founders who want their voice in every word.</strong>{' '}
-              Six services. One team. No templates.
+            {/* Mobile headline — clean 2-line structure that reads naturally at 375px.
+                Each line is its own block so the italic accent on line 2 doesn't
+                pull the baseline of line 1, which made the headline look slightly
+                misaligned at the 375px viewport. */}
+            <h1 className="hero-h1-mobile hero-mobile-only" aria-hidden="true">
+              <span style={{ display: 'block' }}>You run the business.</span>
+              <span style={{ display: 'block' }}>We run <span className="accent">the content.</span></span>
+            </h1>
+
+            <p ref={subRef} className="hero-sub" style={{ fontSize: '16px', color: '#6E6B63', maxWidth: '540px', lineHeight: 1.7, fontWeight: 400, margin: '0 0 36px' }}>
+              <span>Everything you publish, handled by one studio.</span>{' '}
+              <strong style={{ color: '#0C0C0B', fontWeight: 600 }}>You hit record, we do the rest.</strong>
             </p>
 
-            <div ref={actionsRef} className="hero-actions" style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '0', opacity: 0, alignItems: 'center' }}>
-              <button onClick={() => (window as any).openBookCallModal && (window as any).openBookCallModal()} className="btn-p" aria-label={BOOK_CALL_LABEL_LONG} data-cursor-hover>
-                <span>{BOOK_CALL_LABEL_LONG}</span>
+            <div ref={actionsRef} className="hero-actions" style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '0', alignItems: 'center' }}>
+              {/* PRIMARY — opens the BookCallModal (Calendly iframe) so visitors
+                 stay on the page instead of getting yanked to a new tab. */}
+              <button
+                type="button"
+                className="btn-p"
+                aria-label={BOOK_CALL_LABEL_LONG}
+                data-cursor-hover
+                onClick={() => {
+                  trackCallClick('hero_primary');
+                  (window as unknown as { openBookCallModal?: () => void }).openBookCallModal?.();
+                }}
+                style={{ border: 'none', cursor: 'none' }}
+              >
+                <span>Book a strategy call</span>
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
               </button>
-              <a href="#services" className="btn-o" data-cursor-hover>See Our Work</a>
+              {/* WARM — explore packages */}
+              <a
+                href="#work"
+                className="btn-o"
+                aria-label="See work"
+                data-cursor-hover
+                onClick={() => trackPilotClick('hero_secondary_see_work')}
+              >
+                See work
+              </a>
             </div>
+
           </div>
 
-          <div ref={rightRef} className="hero-right" style={{ flexShrink: 0, width: '420px', opacity: 0 }}>
+          <div ref={rightRef} className="hero-right" style={{ flexShrink: 0, width: '420px' }}>
             <InteractiveGraphic />
           </div>
         </div>
 
-        {/* Full-width stats band — lives on the main page now, no longer
-            tucked under the orbital panel */}
+        {/* Full-width stats band */}
         <StatsBand />
       </section>
+
     </>
   );
 }

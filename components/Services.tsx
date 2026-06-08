@@ -3,14 +3,42 @@
 import { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import {
+  MessageCircle,
+  Target,
+  Check,
+  Clapperboard,
+  PenLine,
+  FileText,
+  Globe,
+  Settings,
+  Code,
+  ArrowUpRight,
+  type LucideIcon,
+} from 'lucide-react';
+
+/**
+ * Per-service Lucide icon for the compact mobile tile list. Keyed by slug
+ * so the rendering is data-driven and adding a new service is one line.
+ */
+const SERVICE_ICONS: Record<string, LucideIcon> = {
+  'video-editing':         Clapperboard,
+  'linkedin-ghostwriting': PenLine,
+  'blog-production':       FileText,
+  'ad-creatives':          Target,
+  'websites-funnels':      Globe,
+  'automations':           Settings,
+  'apps-software':         Code,
+};
 
 const services = [
-  { num: '01', name: 'Video Editing',         slug: 'video-editing',         color: '#E8541A', desc: 'Retention-engineered short-form, long-form, and cinematic property reels.', pills: ['Cinematic', 'Short Form', 'Real Estate'] },
-  { num: '02', name: 'LinkedIn Ghostwriting', slug: 'linkedin-ghostwriting', color: '#8b5cf6', desc: 'Voice-driven posts your audience replies to. Captured in a 90-min interview.', pills: ['Voice DNA', 'Posts', 'Carousels'] },
-  { num: '03', name: 'Blog Production',       slug: 'blog-production',       color: '#f59e0b', desc: 'Long-form content with real research, real sources, and zero AI tells.', pills: ['Long-Form', 'SEO', 'Voice-Matched'] },
-  { num: '04', name: 'Ad Creatives',          slug: 'ad-creatives',          color: '#3b82f6', desc: 'Static and video ads on a subscription. Fresh hooks before fatigue hits.', pills: ['Meta', 'TikTok', 'Static + Video'] },
-  { num: '05', name: 'Websites & Funnels',    slug: 'websites-funnels',      color: '#10b981', desc: 'Conversion-engineered sites that earn their pixels. Sub-2-second mobile.', pills: ['Websites', 'Funnels', 'Lead Pages'] },
-  { num: '06', name: 'Automations',           slug: 'automations',           color: '#E8541A', desc: 'DM flows, email sequences, and CRM glue that catches every lead.', pills: ['Make.com', 'ManyChat', 'CRM'] },
+  { num: '01', name: 'Video Editing',         slug: 'video-editing',         color: '#E8541A', desc: 'Retention-engineered short-form, long-form, brand films, and cinematic property reels.', pills: ['Cinematic', 'Short Form', 'Real Estate'] },
+  { num: '02', name: 'LinkedIn & Social',     slug: 'linkedin-ghostwriting', color: '#8b5cf6', desc: 'Posts, carousels, and captions your buyers actually stop scrolling for. Written, scheduled, shipped.', pills: ['Posts', 'Carousels', 'Captions'] },
+  { num: '03', name: 'Blog Production',       slug: 'blog-production',       color: '#f59e0b', desc: 'Long-form content with real research, real sources, ranks on Google, zero AI tells.', pills: ['Long-Form', 'SEO', 'Researched'] },
+  { num: '04', name: 'Ad Creatives',          slug: 'ad-creatives',          color: '#3b82f6', desc: 'Static and video ads on a subscription. Fresh hooks before fatigue kills your CPA.', pills: ['Meta', 'TikTok', 'Static + Video'] },
+  { num: '05', name: 'Websites & Funnels',    slug: 'websites-funnels',      color: '#10b981', desc: 'Conversion-engineered sites that earn their pixels. Sub-2-second mobile load.', pills: ['Websites', 'Funnels', 'Lead Pages'] },
+  { num: '06', name: 'Automations',           slug: 'automations',           color: '#E8541A', desc: 'DM flows, email sequences, and CRM glue that catches every lead while you sleep.', pills: ['Make.com', 'ManyChat', 'CRM'] },
+  { num: '07', name: 'Apps & Software',       slug: 'apps-software',         color: '#06b6d4', desc: 'Custom MVPs, immersive 3D Three.js websites, AI tools, client portals. Fixed price, code you own.', pills: ['MVPs', 'Three.js 3D', 'AI Tools'] },
 ];
 
 /* ──────────────────────────────────────────────────────────
@@ -24,62 +52,110 @@ function ServiceMiniVisual({ slug, accent }: { slug: string; accent: string }) {
     case 'ad-creatives':        return <AdsMini accent={accent} />;
     case 'websites-funnels':    return <WebsiteMini accent={accent} />;
     case 'automations':         return <AutomationMini accent={accent} />;
+    case 'apps-software':       return <AppsMini accent={accent} />;
     default:                    return null;
   }
 }
 
 function VideoMini({ accent }: { accent: string }) {
+  // A single clean video preview with a timeline scrub bar below.
+  // The scrub bar has edit-cut markers and a playhead that animates across.
+  // That whole composition reads as "video editing" the moment you see it.
   return (
-    <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-end', height: '100%', padding: '0 4px' }}>
-      {[
-        { h: 70, gradient: '#1c0e00,#3d2005' },
-        { h: 100, gradient: '#0a0f1a,#1a2238' },
-        { h: 80, gradient: '#001408,#063520' },
-      ].map((tile, i) => (
-        <div
-          key={i}
-          className="vid-mini-tile"
-          style={{
-            flex: 1,
-            height: `${tile.h}%`,
-            background: `linear-gradient(155deg, ${tile.gradient.split(',').join(',')})`,
-            borderRadius: '10px',
-            position: 'relative',
-            overflow: 'hidden',
-            border: '1px solid rgba(255,255,255,0.08)',
-            transition: 'transform 0.4s cubic-bezier(0.16,1,0.3,1)',
-          }}
-        >
-          {/* Top accent bar */}
-          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '2px', background: `linear-gradient(90deg, transparent, ${accent}, transparent)` }} />
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', height: '100%', padding: '0 4px' }}>
+      {/* Video preview frame */}
+      <div
+        style={{
+          flex: 1,
+          background: 'linear-gradient(155deg, #1c0e00 0%, #2a1a08 50%, #3d2005 100%)',
+          borderRadius: '8px',
+          position: 'relative',
+          overflow: 'hidden',
+          border: '1px solid rgba(255,255,255,0.08)',
+          minHeight: '40px',
+        }}
+      >
+        {/* Top accent bar */}
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '1.5px', background: `linear-gradient(90deg, transparent, ${accent}, transparent)` }} />
 
-          {/* Center play button */}
-          <div
-            style={{
-              position: 'absolute',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              width: '24px',
-              height: '24px',
-              borderRadius: '50%',
-              background: 'rgba(255,255,255,0.95)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 2px 12px rgba(0,0,0,0.3)',
-            }}
-          >
-            <svg width="9" height="9" viewBox="0 0 24 24" fill="#0C0C0B" style={{ marginLeft: '1.5px' }}>
-              <path d="M8 5v14l11-7z" />
-            </svg>
-          </div>
+        {/* Play button center */}
+        <div style={{
+          position: 'absolute', top: '50%', left: '50%',
+          transform: 'translate(-50%,-50%)',
+          width: '22px', height: '22px',
+          borderRadius: '50%',
+          background: 'rgba(255,255,255,0.95)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          boxShadow: '0 2px 10px rgba(0,0,0,0.4)',
+        }}>
+          <svg width="8" height="8" viewBox="0 0 24 24" fill="#0C0C0B" style={{ marginLeft: '1.5px' }}>
+            <path d="M8 5v14l11-7z" />
+          </svg>
         </div>
-      ))}
+
+        {/* Timecode top-right corner */}
+        <div style={{
+          position: 'absolute', top: '5px', right: '6px',
+          fontSize: '6.5px', fontWeight: 700,
+          color: 'rgba(255,255,255,0.55)',
+          fontFamily: 'ui-monospace, Menlo, monospace',
+          letterSpacing: '0.5px',
+        }}>
+          00:42
+        </div>
+      </div>
+
+      {/* Timeline scrubber with edit-cut markers */}
+      <div style={{
+        position: 'relative',
+        height: '12px',
+        background: 'rgba(255,255,255,0.05)',
+        borderRadius: '4px',
+        overflow: 'hidden',
+        border: '1px solid rgba(255,255,255,0.06)',
+      }}>
+        {/* Edit cut markers — vertical lines at 4 spots */}
+        {[18, 38, 58, 78].map((pos) => (
+          <div key={pos} style={{
+            position: 'absolute',
+            top: 0, bottom: 0,
+            left: `${pos}%`,
+            width: '1px',
+            background: 'rgba(255,255,255,0.18)',
+          }} />
+        ))}
+        {/* Played progress fill */}
+        <div style={{
+          position: 'absolute',
+          top: 0, bottom: 0, left: 0,
+          background: `linear-gradient(90deg, ${accent}88, ${accent})`,
+          borderRadius: '4px 0 0 4px',
+          animation: 'vid-mini-scrub 4.5s ease-in-out infinite',
+        }} />
+        {/* Playhead dot */}
+        <div style={{
+          position: 'absolute',
+          top: '50%',
+          width: '8px', height: '8px',
+          borderRadius: '50%',
+          background: '#fff',
+          boxShadow: `0 0 0 2px ${accent}, 0 0 8px ${accent}`,
+          transform: 'translate(-50%,-50%)',
+          animation: 'vid-mini-playhead 4.5s ease-in-out infinite',
+        }} />
+      </div>
 
       <style>{`
-        .service-card:hover .vid-mini-tile { transform: translateY(-4px); }
-        .service-card:hover .vid-mini-tile:nth-child(2) { transform: translateY(-8px); }
+        @keyframes vid-mini-scrub {
+          0% { width: 8%; }
+          50% { width: 72%; }
+          100% { width: 8%; }
+        }
+        @keyframes vid-mini-playhead {
+          0% { left: 8%; }
+          50% { left: 72%; }
+          100% { left: 8%; }
+        }
       `}</style>
     </div>
   );
@@ -156,7 +232,7 @@ function BlogMini({ accent }: { accent: string }) {
           marginBottom: '10px',
         }}
       >
-        VOICE FOUNDATION
+        ON-BRAND
       </div>
 
       {/* Title */}
@@ -303,57 +379,195 @@ function WebsiteMini({ accent }: { accent: string }) {
 }
 
 function AutomationMini({ accent }: { accent: string }) {
+  // Clean 3-row stack: lead arrives → AI qualifies → call booked.
+  // Reads top-to-bottom like a real automation log. A check icon fills in
+  // on each row in sequence, like watching the system tick through.
   return (
-    <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-      <svg
-        width="100%"
-        height="100%"
-        viewBox="0 0 100 100"
-        preserveAspectRatio="none"
-        style={{ position: 'absolute', inset: 0 }}
-      >
-        {/* Connecting lines */}
-        <line x1="20" y1="30" x2="50" y2="20" stroke={accent} strokeOpacity="0.4" strokeWidth="0.5" strokeDasharray="2 2" />
-        <line x1="50" y1="20" x2="80" y2="30" stroke={accent} strokeOpacity="0.4" strokeWidth="0.5" strokeDasharray="2 2" />
-        <line x1="20" y1="30" x2="50" y2="65" stroke={accent} strokeOpacity="0.4" strokeWidth="0.5" strokeDasharray="2 2" />
-        <line x1="80" y1="30" x2="50" y2="65" stroke={accent} strokeOpacity="0.4" strokeWidth="0.5" strokeDasharray="2 2" />
-        <line x1="50" y1="65" x2="50" y2="92" stroke={accent} strokeOpacity="0.6" strokeWidth="0.6" />
-      </svg>
-
+    <div
+      style={{
+        position: 'relative',
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        gap: '5px',
+        padding: '4px 6px',
+        overflow: 'hidden',
+      }}
+    >
       {[
-        { x: 20, y: 30, icon: '💬', label: 'DM' },
-        { x: 50, y: 20, icon: '🎯', label: 'Qualify' },
-        { x: 80, y: 30, icon: '📧', label: 'Email' },
-        { x: 50, y: 65, icon: '📅', label: 'Cal' },
-        { x: 50, y: 92, icon: '✓',  label: 'Done', primary: true },
-      ].map((node, i) => (
+        { label: 'New lead in', Icon: MessageCircle as LucideIcon, delay: '0s' },
+        { label: 'Qualified',   Icon: Target         as LucideIcon, delay: '1.2s' },
+        { label: 'Call booked', Icon: Check          as LucideIcon, delay: '2.4s' },
+      ].map((row, i) => (
         <div
           key={i}
-          className="auto-mini-node"
           style={{
-            position: 'absolute',
-            top: `${node.y}%`,
-            left: `${node.x}%`,
-            transform: 'translate(-50%, -50%)',
-            padding: '5px 9px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '6px 10px',
+            background: 'rgba(255,255,255,0.045)',
+            border: '1px solid rgba(255,255,255,0.08)',
             borderRadius: '8px',
-            background: node.primary ? accent : 'rgba(255,255,255,0.06)',
-            border: node.primary ? `1px solid ${accent}` : '1px solid rgba(255,255,255,0.12)',
+            position: 'relative',
+            overflow: 'hidden',
+          }}
+        >
+          {/* Status dot — fades to brand color in sequence */}
+          <div style={{
+            width: '8px',
+            height: '8px',
+            borderRadius: '50%',
+            background: accent,
+            opacity: 0,
+            animation: `auto-row-tick-${i} 3.6s ease-in-out ${row.delay} infinite`,
+            flexShrink: 0,
+          }} />
+          {/* Icon */}
+          <row.Icon size={11} color="rgba(242,238,231,0.7)" strokeWidth={2} aria-hidden="true" />
+          {/* Label */}
+          <span style={{
+            fontSize: '9px',
+            fontWeight: 600,
+            color: 'rgba(242,238,231,0.78)',
+            letterSpacing: '-0.1px',
+          }}>
+            {row.label}
+          </span>
+        </div>
+      ))}
+
+      {/* Single set of keyframes used by all rows with staggered delay */}
+      <style>{`
+        @keyframes auto-row-tick-0 { 0%,8% { opacity: 0 } 12%,80% { opacity: 1 } 92%,100% { opacity: 0 } }
+        @keyframes auto-row-tick-1 { 0%,8% { opacity: 0 } 12%,80% { opacity: 1 } 92%,100% { opacity: 0 } }
+        @keyframes auto-row-tick-2 { 0%,8% { opacity: 0 } 12%,80% { opacity: 1 } 92%,100% { opacity: 0 } }
+      `}</style>
+    </div>
+  );
+}
+
+function AppsMini({ accent }: { accent: string }) {
+  // Stylized browser window — code lines on top, working app dashboard
+  // beneath, with a soft pulse on the primary "deploy" pill. Signals
+  // "we ship code that becomes a working product."
+  return (
+    <div
+      style={{
+        position: 'relative',
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '4px',
+      }}
+    >
+      <div
+        style={{
+          width: '100%',
+          height: '92%',
+          borderRadius: '8px',
+          background: 'rgba(255,255,255,0.04)',
+          border: '1px solid rgba(255,255,255,0.10)',
+          overflow: 'hidden',
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
+        {/* Window chrome */}
+        <div
+          style={{
             display: 'flex',
             alignItems: 'center',
             gap: '4px',
-            fontSize: '8px',
-            fontWeight: 700,
-            color: node.primary ? '#fff' : 'rgba(242,238,231,0.85)',
-            whiteSpace: 'nowrap',
-            transition: 'all 0.3s cubic-bezier(0.16,1,0.3,1)',
-            animationDelay: `${i * 0.1}s`,
+            padding: '6px 8px',
+            borderBottom: '1px solid rgba(255,255,255,0.06)',
+            background: 'rgba(255,255,255,0.03)',
           }}
         >
-          <span style={{ fontSize: '9px', lineHeight: 1 }}>{node.icon}</span>
-          <span>{node.label}</span>
+          <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'rgba(255,255,255,0.25)' }} />
+          <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'rgba(255,255,255,0.25)' }} />
+          <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'rgba(255,255,255,0.25)' }} />
+          <span
+            style={{
+              marginLeft: '8px',
+              fontSize: '7px',
+              fontFamily: 'ui-monospace, Menlo, monospace',
+              color: 'rgba(255,255,255,0.45)',
+              letterSpacing: '0.4px',
+            }}
+          >
+            app.yourbrand.com
+          </span>
         </div>
-      ))}
+
+        {/* App body — sidebar + main */}
+        <div style={{ display: 'flex', flex: 1, gap: '6px', padding: '8px' }}>
+          {/* Sidebar */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', width: '24%' }}>
+            {[1, 0.55, 0.55, 0.55].map((opacity, i) => (
+              <div
+                key={i}
+                style={{
+                  height: '6px',
+                  borderRadius: '2px',
+                  background: i === 0 ? accent : 'rgba(255,255,255,0.12)',
+                  opacity,
+                }}
+              />
+            ))}
+          </div>
+
+          {/* Main panel */}
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '5px' }}>
+            <div
+              style={{
+                height: '7px',
+                width: '60%',
+                borderRadius: '2px',
+                background: 'rgba(255,255,255,0.22)',
+              }}
+            />
+            <div style={{ display: 'flex', gap: '5px' }}>
+              <div style={{ flex: 1, height: '20px', borderRadius: '4px', background: `linear-gradient(135deg, ${accent}30, ${accent}10)`, border: `1px solid ${accent}40` }} />
+              <div style={{ flex: 1, height: '20px', borderRadius: '4px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.10)' }} />
+            </div>
+            <div style={{ height: '4px', width: '85%', borderRadius: '2px', background: 'rgba(255,255,255,0.10)' }} />
+            <div style={{ height: '4px', width: '70%', borderRadius: '2px', background: 'rgba(255,255,255,0.08)' }} />
+
+            {/* Pulsing deploy pill */}
+            <div style={{ marginTop: 'auto', display: 'flex', justifyContent: 'flex-end' }}>
+              <div
+                className="apps-mini-pill"
+                style={{
+                  fontSize: '7px',
+                  fontWeight: 800,
+                  padding: '3px 7px',
+                  borderRadius: '100px',
+                  background: accent,
+                  color: '#fff',
+                  letterSpacing: '0.6px',
+                  textTransform: 'uppercase',
+                  boxShadow: `0 0 0 0 ${accent}80`,
+                  animation: 'apps-mini-pulse 1.8s ease-in-out infinite',
+                }}
+              >
+                Deployed
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <style>{`
+          @keyframes apps-mini-pulse {
+            0%, 100% { box-shadow: 0 0 0 0 ${accent}80; }
+            50%      { box-shadow: 0 0 0 8px ${accent}00; }
+          }
+        `}</style>
+      </div>
     </div>
   );
 }
@@ -396,7 +610,17 @@ export default function Services() {
           gap: 12px;
         }
         @media (max-width: 1100px) { .services-grid { grid-template-columns: repeat(2, 1fr) !important; } }
-        @media (max-width: 700px)  { .services-grid { grid-template-columns: 1fr !important; } }
+        @media (max-width: 700px)  { .services-grid { grid-template-columns: repeat(2, 1fr) !important; } }
+
+        /* The 7th service (Apps & Software) is the newest offering — promote
+           it to a full-width "featured" card so the last row of the grid
+           reads as intentional instead of an orphan. */
+        .service-card-wide { grid-column: 1 / -1; }
+        .service-card-wide .service-card-visual {
+          /* On the wide card the visual sits beside the copy, not above. */
+          aspect-ratio: 16 / 7;
+          max-height: 220px;
+        }
 
         .service-card {
           position: relative;
@@ -498,9 +722,188 @@ export default function Services() {
           transition: transform 0.5s cubic-bezier(0.16,1,0.3,1);
         }
         .service-card:hover .service-card-bottom-rule { transform: scaleX(1); }
+
+        /* ── Mobile responsiveness ─────────────────────────────────── */
+        @media (max-width: 900px) {
+          #services { padding: 56px 24px 64px !important; }
+          .services-shell { padding: 28px 20px 24px !important; border-radius: 22px !important; }
+          .services-head { gap: 20px !important; margin-bottom: 24px !important; }
+          .services-head h2 { font-size: 34px !important; letter-spacing: -1.2px !important; max-width: none !important; }
+          .services-head p { max-width: none !important; font-size: 12.5px !important; }
+        }
+        @media (max-width: 640px) {
+          #services { padding: 40px 0 48px !important; }
+          .services-shell { padding: 16px 14px 16px !important; border-radius: 18px !important; margin: 0 12px !important; }
+          .services-head { margin-bottom: 16px !important; gap: 8px !important; padding: 0 4px !important; }
+          .services-head h2 { font-size: 22px !important; letter-spacing: -0.8px !important; line-height: 1.08 !important; }
+          .services-head p { font-size: 11.5px !important; line-height: 1.5 !important; display: none !important; }
+
+          /* MOBILE: compact glass-tile list — all 7 services visible in one
+             screen, no scrolling needed. Each tile is a small rounded
+             rectangle with glass treatment + arrow → service page. */
+          .services-grid {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 6px !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            overflow: visible !important;
+          }
+          /* Apps & Software was a "wide" featured slot on desktop. Kill
+             ALL of its mobile size + position overrides so it's identical
+             to the other 6 tiles. */
+          .service-card-wide { grid-column: auto !important; }
+          .service-card-wide,
+          .service-card-wide > a,
+          .service-card-wide .service-card {
+            grid-column: auto !important;
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+          }
+          .service-card-wide .service-card {
+            padding: 8px 12px !important;
+            height: 52px !important;
+            max-height: 52px !important;
+          }
+          .service-card-wide .service-card-visual { display: none !important; }
+
+          /* Hide desktop arrow svg, show mobile chevron */
+          .svc-arrow-up { display: none !important; }
+          .svc-arrow-mobile { display: block !important; }
+
+          /* Mobile icon — small square tile, accent-tinted, sits on the left */
+          .service-card-mobile-icon {
+            width: 34px !important;
+            height: 34px !important;
+            flex-shrink: 0 !important;
+            border-radius: 9px !important;
+            background: rgba(255,255,255,0.05) !important;
+            border: 1px solid rgba(255,255,255,0.10) !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+          }
+          /* Just ensure visibility — color/stroke is set inline on the SVG */
+          .service-card-mobile-icon svg {
+            display: block !important;
+          }
+
+          .service-card {
+            display: flex !important;
+            flex-direction: row !important;
+            align-items: center !important;
+            gap: 12px !important;
+            padding: 8px 12px !important;
+            min-height: 0 !important;
+            height: 52px !important;
+            max-height: 52px !important;
+            border-radius: 12px !important;
+            /* Glassmorphism: subtle white tint + heavy backdrop blur over the
+               dark section background. Reads as premium frosted glass. */
+            background: rgba(255,255,255,0.04) !important;
+            backdrop-filter: blur(18px) saturate(160%) !important;
+            -webkit-backdrop-filter: blur(18px) saturate(160%) !important;
+            border: 1px solid rgba(255,255,255,0.07) !important;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.04) !important;
+          }
+          .service-card:hover { transform: none !important; background: rgba(255,255,255,0.06) !important; }
+          .service-card:active { background: rgba(255,255,255,0.08) !important; }
+          /* Content wrapper collapses to inline — just the title sits between
+             the icon (left) and the chevron (right). */
+          .service-card-content {
+            gap: 0 !important;
+            flex-direction: row !important;
+            align-items: center !important;
+            justify-content: flex-start !important;
+          }
+
+          /* Hide the heavy animated visual + the number eyebrow + body desc
+             + pills — the tile is just icon + name + arrow. */
+          .service-card-visual { display: none !important; }
+          .service-card-num { display: none !important; }
+          .service-card-desc { display: none !important; }
+          .service-card-pills { display: none !important; }
+          .service-card-bottom-rule { display: none !important; }
+
+          /* Tile body: name in the middle, arrow on the far right. */
+          .service-card-title {
+            font-size: 14px !important;
+            font-weight: 800 !important;
+            letter-spacing: -0.2px !important;
+            margin: 0 !important;
+            flex: 1 1 auto !important;
+            color: #F2EEE7 !important;
+          }
+
+          /* Show the arrow as a small chevron on the right of each tile.
+             Absolute positioning + corner-stuck on desktop; reposition to
+             inline-right for mobile flex layout. */
+          .service-card-arrow {
+            position: static !important;
+            margin-left: auto !important;
+            width: 24px !important;
+            height: 24px !important;
+            background: rgba(232,84,26,0.18) !important;
+            border: 1px solid rgba(232,84,26,0.30) !important;
+            border-radius: 100px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            flex-shrink: 0 !important;
+            top: auto !important;
+            right: auto !important;
+          }
+          /* Arrow visibility — color/stroke is set inline on the SVG */
+          .service-card-arrow .svc-arrow-mobile { display: block !important; }
+
+          /* Apps & Software — same tile size as the others */
+          .service-card-wide .service-card-visual { display: none !important; }
+
+          /* No swipe cue — there's no carousel anymore */
+          .services-swipe-cue { display: none !important; }
+          .services-old-swipe {
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            margin-top: 10px;
+            font-size: 10px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: rgba(242,238,231,0.35);
+            font-weight: 700;
+          }
+          .services-swipe-cue .dot {
+            width: 5px; height: 5px; border-radius: 50%;
+            background: rgba(232,84,26,0.5);
+            animation: scue 1.6s ease-in-out infinite;
+          }
+          .services-swipe-cue .dot:nth-child(2) { animation-delay: 0.2s; }
+          .services-swipe-cue .dot:nth-child(3) { animation-delay: 0.4s; }
+          @keyframes scue { 0%,100% { opacity: 0.3 } 50% { opacity: 1 } }
+        }
+        @media (max-width: 380px) {
+          .services-head h2 { font-size: 20px !important; }
+          .service-card-title { font-size: 13px !important; }
+          .services-grid { gap: 5px !important; }
+          /* Lock the compact tile height on very small phones too —
+             the old 178px rule was making cards huge. */
+          .service-card {
+            padding: 8px 10px !important;
+            height: 48px !important;
+            max-height: 48px !important;
+            min-height: 0 !important;
+            gap: 10px !important;
+          }
+          .service-card-mobile-icon { width: 28px !important; height: 28px !important; }
+        }
+        /* Hide swipe cue on desktop — only visible on mobile */
+        .services-swipe-cue { display: none; }
       `}</style>
 
       <motion.div
+        className="services-shell"
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
@@ -519,6 +922,7 @@ export default function Services() {
         }}
       >
         <div
+          className="services-head"
           style={{
             display: 'flex',
             alignItems: 'flex-end',
@@ -535,7 +939,7 @@ export default function Services() {
             transition={{ duration: 0.7, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
             style={{ fontFamily: 'Inter, sans-serif', fontSize: 'clamp(28px, 3.4vw, 48px)', fontWeight: 900, letterSpacing: '-1.8px', lineHeight: 1, color: '#F2EEE7', maxWidth: '520px', margin: 0 }}
           >
-            Six services. One team.<br />
+            Seven services. One team.<br />
             <span style={{ color: '#E8541A' }}>Zero</span> AI slop.
           </motion.h2>
           <motion.p
@@ -558,20 +962,52 @@ export default function Services() {
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: i * 0.08, ease: [0.16, 1, 0.3, 1] }}
             data-dark-bg="true"
+            // The 7th card (Apps & Software) spans full row — featured slot.
+            className={service.slug === 'apps-software' ? 'service-card-wide' : undefined}
           >
-            <Link href={`/services/${service.slug}`} style={{ display: 'block', textDecoration: 'none' }} data-dark-bg="true">
+            <Link
+              href={`/services/${service.slug}`}
+              style={{ display: 'block', textDecoration: 'none' }}
+              data-dark-bg="true"
+            >
               <div
                 className="service-card service-magnet"
                 data-dark-bg="true"
                 style={{ ['--card-accent' as string]: service.color } as React.CSSProperties}
               >
-                {/* Mini visual */}
+                {/* Mobile-only icon — RAW inline SVG (no Lucide React).
+                   Bypasses every cascade / Lucide-wrapping issue. The
+                   service-card-mobile-icon container is shown only at
+                   ≤640px via CSS, so this is mobile-only. */}
+                <div className="service-card-mobile-icon" aria-hidden="true">
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke={service.color}
+                    strokeWidth="2.4"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    style={{ display: 'block' }}
+                  >
+                    {service.slug === 'video-editing'         && <><rect x="2" y="2" width="20" height="20" rx="2.5" ry="2.5" /><line x1="7" y1="2" x2="7" y2="22" /><line x1="17" y1="2" x2="17" y2="22" /><line x1="2" y1="12" x2="22" y2="12" /></>}
+                    {service.slug === 'linkedin-ghostwriting' && <><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" /></>}
+                    {service.slug === 'blog-production'       && <><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><path d="M14 2v6h6" /><line x1="8" y1="13" x2="16" y2="13" /><line x1="8" y1="17" x2="16" y2="17" /></>}
+                    {service.slug === 'ad-creatives'          && <><circle cx="12" cy="12" r="10" /><circle cx="12" cy="12" r="6" /><circle cx="12" cy="12" r="2" /></>}
+                    {service.slug === 'websites-funnels'      && <><circle cx="12" cy="12" r="10" /><line x1="2" y1="12" x2="22" y2="12" /><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" /></>}
+                    {service.slug === 'automations'           && <><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" /></>}
+                    {service.slug === 'apps-software'         && <><polyline points="16 18 22 12 16 6" /><polyline points="8 6 2 12 8 18" /></>}
+                  </svg>
+                </div>
+
+                {/* Mini visual — hidden on mobile */}
                 <div className="service-card-visual" data-dark-bg="true">
                   <ServiceMiniVisual slug={service.slug} accent={service.color} />
                 </div>
 
                 {/* Content */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', flex: 1 }}>
+                <div className="service-card-content" style={{ display: 'flex', flexDirection: 'column', gap: '10px', flex: 1 }}>
                   <div className="service-card-num">{service.num}</div>
                   <h3 className="service-card-title">{service.name}</h3>
                   <p className="service-card-desc">{service.desc}</p>
@@ -584,10 +1020,30 @@ export default function Services() {
                   ))}
                 </div>
 
-                {/* Arrow */}
+                {/* Arrow — desktop uses the up-right arrow as before;
+                    mobile CSS swaps it for a chevron pill. */}
                 <div className="service-card-arrow">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(242,238,231,0.6)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <svg className="svc-arrow-up" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(242,238,231,0.6)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M7 17L17 7M7 7h10v10" />
+                  </svg>
+                  {/* Mobile arrow — raw SVG so nothing in Lucide React's
+                     internals can hide it. The wrapper class flips visibility
+                     between desktop and mobile via CSS. */}
+                  <svg
+                    className="svc-arrow-mobile"
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#E8541A"
+                    strokeWidth="2.6"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    style={{ display: 'block' }}
+                    aria-hidden="true"
+                  >
+                    <line x1="7" y1="17" x2="17" y2="7" />
+                    <polyline points="7 7 17 7 17 17" />
                   </svg>
                 </div>
 
@@ -597,6 +1053,12 @@ export default function Services() {
             </Link>
           </motion.div>
         ))}
+        </div>
+
+        {/* Swipe hint — appears only on mobile via CSS, signals horizontal carousel */}
+        <div className="services-swipe-cue" aria-hidden="true">
+          <span className="dot" /><span className="dot" /><span className="dot" />
+          <span style={{ marginLeft: 6 }}>Swipe</span>
         </div>
       </motion.div>
     </section>
