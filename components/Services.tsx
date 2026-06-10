@@ -731,174 +731,23 @@ export default function Services() {
           .services-head h2 { font-size: 34px !important; letter-spacing: -1.2px !important; max-width: none !important; }
           .services-head p { max-width: none !important; font-size: 12.5px !important; }
         }
-        @media (max-width: 640px) {
+        @media (max-width: 700px) {
           #services { padding: 40px 0 48px !important; }
           .services-shell { padding: 16px 14px 16px !important; border-radius: 18px !important; margin: 0 12px !important; }
           .services-head { margin-bottom: 16px !important; gap: 8px !important; padding: 0 4px !important; }
           .services-head h2 { font-size: 22px !important; letter-spacing: -0.8px !important; line-height: 1.08 !important; }
-          .services-head p { font-size: 11.5px !important; line-height: 1.5 !important; display: none !important; }
-
-          /* MOBILE: compact glass-tile list — all 7 services visible in one
-             screen, no scrolling needed. Each tile is a small rounded
-             rectangle with glass treatment + arrow → service page. */
-          .services-grid {
-            display: flex !important;
-            flex-direction: column !important;
-            gap: 6px !important;
-            padding: 0 !important;
-            margin: 0 !important;
-            overflow: visible !important;
-          }
-          /* Apps & Software was a "wide" featured slot on desktop. Kill
-             ALL of its mobile size + position overrides so it's identical
-             to the other 6 tiles. */
-          .service-card-wide { grid-column: auto !important; }
-          .service-card-wide,
-          .service-card-wide > a,
-          .service-card-wide .service-card {
-            grid-column: auto !important;
-            width: 100% !important;
-            margin: 0 !important;
-            padding: 0 !important;
-          }
-          .service-card-wide .service-card {
-            padding: 8px 12px !important;
-            height: 52px !important;
-            max-height: 52px !important;
-          }
-          .service-card-wide .service-card-visual { display: none !important; }
-
-          /* Hide desktop arrow svg, show mobile chevron */
-          .svc-arrow-up { display: none !important; }
-          .svc-arrow-mobile { display: block !important; }
-
-          /* Mobile icon — small square tile, accent-tinted, sits on the left */
-          .service-card-mobile-icon {
-            width: 34px !important;
-            height: 34px !important;
-            flex-shrink: 0 !important;
-            border-radius: 9px !important;
-            background: rgba(255,255,255,0.05) !important;
-            border: 1px solid rgba(255,255,255,0.10) !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-          }
-          /* Just ensure visibility — color/stroke is set inline on the SVG */
-          .service-card-mobile-icon svg {
-            display: block !important;
-          }
-
-          .service-card {
-            display: flex !important;
-            flex-direction: row !important;
-            align-items: center !important;
-            gap: 12px !important;
-            padding: 8px 12px !important;
-            min-height: 0 !important;
-            height: 52px !important;
-            max-height: 52px !important;
-            border-radius: 12px !important;
-            /* Glassmorphism: subtle white tint + heavy backdrop blur over the
-               dark section background. Reads as premium frosted glass. */
-            background: rgba(255,255,255,0.04) !important;
-            backdrop-filter: blur(18px) saturate(160%) !important;
-            -webkit-backdrop-filter: blur(18px) saturate(160%) !important;
-            border: 1px solid rgba(255,255,255,0.07) !important;
-            box-shadow: inset 0 1px 0 rgba(255,255,255,0.04) !important;
-          }
-          .service-card:hover { transform: none !important; background: rgba(255,255,255,0.06) !important; }
-          .service-card:active { background: rgba(255,255,255,0.08) !important; }
-          /* Content wrapper collapses to inline — just the title sits between
-             the icon (left) and the chevron (right). */
-          .service-card-content {
-            gap: 0 !important;
-            flex-direction: row !important;
-            align-items: center !important;
-            justify-content: flex-start !important;
-          }
-
-          /* Hide the heavy animated visual + the number eyebrow + body desc
-             + pills — the tile is just icon + name + arrow. */
-          .service-card-visual { display: none !important; }
-          .service-card-num { display: none !important; }
-          .service-card-desc { display: none !important; }
-          .service-card-pills { display: none !important; }
-          .service-card-bottom-rule { display: none !important; }
-
-          /* Tile body: name in the middle, arrow on the far right. */
-          .service-card-title {
-            font-size: 14px !important;
-            font-weight: 800 !important;
-            letter-spacing: -0.2px !important;
-            margin: 0 !important;
-            flex: 1 1 auto !important;
-            color: #F2EEE7 !important;
-          }
-
-          /* Show the arrow as a small chevron on the right of each tile.
-             Absolute positioning + corner-stuck on desktop; reposition to
-             inline-right for mobile flex layout. */
-          .service-card-arrow {
-            position: static !important;
-            margin-left: auto !important;
-            width: 24px !important;
-            height: 24px !important;
-            background: rgba(232,84,26,0.18) !important;
-            border: 1px solid rgba(232,84,26,0.30) !important;
-            border-radius: 100px !important;
-            display: inline-flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            flex-shrink: 0 !important;
-            top: auto !important;
-            right: auto !important;
-          }
-          /* Arrow visibility — color/stroke is set inline on the SVG */
-          .service-card-arrow .svc-arrow-mobile { display: block !important; }
-
-          /* Apps & Software — same tile size as the others */
-          .service-card-wide .service-card-visual { display: none !important; }
-
-          /* No swipe cue — there's no carousel anymore */
-          .services-swipe-cue { display: none !important; }
-          .services-old-swipe {
-            display: flex !important;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            margin-top: 10px;
-            font-size: 10px;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            color: rgba(242,238,231,0.35);
-            font-weight: 700;
-          }
-          .services-swipe-cue .dot {
-            width: 5px; height: 5px; border-radius: 50%;
-            background: rgba(232,84,26,0.5);
-            animation: scue 1.6s ease-in-out infinite;
-          }
-          .services-swipe-cue .dot:nth-child(2) { animation-delay: 0.2s; }
-          .services-swipe-cue .dot:nth-child(3) { animation-delay: 0.4s; }
-          @keyframes scue { 0%,100% { opacity: 0.3 } 50% { opacity: 1 } }
+          .services-head p { display: none !important; }
+          /* Hide desktop grid, show mobile list */
+          .services-grid { display: none !important; }
+          .svc-mobile-list { display: flex !important; }
         }
         @media (max-width: 380px) {
           .services-head h2 { font-size: 20px !important; }
-          .service-card-title { font-size: 13px !important; }
-          .services-grid { gap: 5px !important; }
-          /* Lock the compact tile height on very small phones too —
-             the old 178px rule was making cards huge. */
-          .service-card {
-            padding: 8px 10px !important;
-            height: 48px !important;
-            max-height: 48px !important;
-            min-height: 0 !important;
-            gap: 10px !important;
-          }
-          .service-card-mobile-icon { width: 28px !important; height: 28px !important; }
+          .svc-mobile-tile { height: 50px !important; }
+          .svc-mobile-tile-name { font-size: 13px !important; }
         }
-        /* Hide swipe cue on desktop — only visible on mobile */
+        /* Desktop: hide mobile list */
+        .svc-mobile-list { display: none; }
         .services-swipe-cue { display: none; }
       `}</style>
 
@@ -979,14 +828,18 @@ export default function Services() {
                    Bypasses every cascade / Lucide-wrapping issue. The
                    service-card-mobile-icon container is shown only at
                    ≤640px via CSS, so this is mobile-only. */}
-                <div className="service-card-mobile-icon" aria-hidden="true">
+                <div
+                  className="service-card-mobile-icon"
+                  aria-hidden="true"
+                  style={{ background: `${service.color}22`, border: `1px solid ${service.color}44` }}
+                >
                   <svg
-                    width="18"
-                    height="18"
+                    width="16"
+                    height="16"
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke={service.color}
-                    strokeWidth="2.4"
+                    strokeWidth="2.2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     style={{ display: 'block' }}
@@ -1031,11 +884,11 @@ export default function Services() {
                      between desktop and mobile via CSS. */}
                   <svg
                     className="svc-arrow-mobile"
-                    width="14"
-                    height="14"
+                    width="13"
+                    height="13"
                     viewBox="0 0 24 24"
                     fill="none"
-                    stroke="#E8541A"
+                    stroke="rgba(242,238,231,0.7)"
                     strokeWidth="2.6"
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -1055,10 +908,94 @@ export default function Services() {
         ))}
         </div>
 
-        {/* Swipe hint — appears only on mobile via CSS, signals horizontal carousel */}
-        <div className="services-swipe-cue" aria-hidden="true">
-          <span className="dot" /><span className="dot" /><span className="dot" />
-          <span style={{ marginLeft: 6 }}>Swipe</span>
+        {/* Mobile-only list — completely separate from desktop grid, zero CSS conflict */}
+        <div
+          className="svc-mobile-list"
+          style={{
+            flexDirection: 'column',
+            gap: '6px',
+          }}
+        >
+          {services.map((service) => {
+            const Icon = SERVICE_ICONS[service.slug];
+            return (
+              <Link
+                key={service.slug}
+                href={`/services/${service.slug}`}
+                style={{ textDecoration: 'none', display: 'block' }}
+              >
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    gap: '12px',
+                    padding: '10px 14px',
+                    height: '56px',
+                    borderRadius: '12px',
+                    background: 'rgba(255,255,255,0.04)',
+                    border: '1px solid rgba(255,255,255,0.08)',
+                    backdropFilter: 'blur(12px)',
+                    WebkitBackdropFilter: 'blur(12px)',
+                    boxSizing: 'border-box',
+                  }}
+                  className="svc-mobile-tile"
+                >
+                  {/* Icon box */}
+                  <div
+                    style={{
+                      width: '34px',
+                      height: '34px',
+                      borderRadius: '9px',
+                      background: `${service.color}22`,
+                      border: `1px solid ${service.color}55`,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                    }}
+                  >
+                    {Icon && <Icon size={16} color={service.color} strokeWidth={2} aria-hidden="true" />}
+                  </div>
+
+                  {/* Name */}
+                  <span
+                    className="svc-mobile-tile-name"
+                    style={{
+                      flex: 1,
+                      fontFamily: 'Inter, sans-serif',
+                      fontSize: '14px',
+                      fontWeight: 800,
+                      color: '#F2EEE7',
+                      letterSpacing: '-0.2px',
+                    }}
+                  >
+                    {service.name}
+                  </span>
+
+                  {/* Arrow */}
+                  <div
+                    style={{
+                      width: '28px',
+                      height: '28px',
+                      borderRadius: '100px',
+                      background: 'rgba(255,255,255,0.07)',
+                      border: '1px solid rgba(255,255,255,0.14)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                    }}
+                  >
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(242,238,231,0.7)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <line x1="7" y1="17" x2="17" y2="7" />
+                      <polyline points="7 7 17 7 17 17" />
+                    </svg>
+                  </div>
+                </div>
+              </Link>
+            );
+          })}
         </div>
       </motion.div>
     </section>

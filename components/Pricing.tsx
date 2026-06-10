@@ -1343,16 +1343,21 @@ export default function Pricing() {
           .pricing-order-banner {
             flex-direction: column !important;
             align-items: flex-start !important;
+            justify-content: flex-start !important;
             gap: 14px !important;
             padding: 18px 18px !important;
             margin-top: 14px !important;
             border-radius: 14px !important;
+          }
+          .pricing-order-banner > div {
+            flex: none !important;
           }
           .pricing-order-banner .pricing-order-cta {
             width: 100% !important;
             justify-content: center !important;
             padding: 13px 18px !important;
             font-size: 13px !important;
+            flex-shrink: 0 !important;
           }
 
           /* Add-ons strip — vertical on mobile */

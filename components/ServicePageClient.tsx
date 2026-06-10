@@ -961,103 +961,24 @@ export default function ServicePageClient({ service }: { service: ServiceData })
             .svc-comparison-section { padding: 56px 16px !important; }
             .svc-comparison-section h2 { font-size: clamp(28px, 7vw, 42px) !important; letter-spacing: -1.2px !important; margin-bottom: 24px !important; }
 
-            /* Flatten the outer wrapper — each row card has its own border/bg */
+            /* Wrap the table in a scrollable container */
             .cmp-container {
-              background: transparent !important;
-              border: none !important;
-              backdrop-filter: none !important;
-              -webkit-backdrop-filter: none !important;
-              border-radius: 0 !important;
-              overflow: visible !important;
+              overflow-x: auto !important;
+              -webkit-overflow-scrolling: touch !important;
+              border-radius: 16px !important;
             }
 
-            /* Desktop 3-column header row — hidden on mobile, each card has
-               its own EchoPulse/Generic Agency labels via ::before */
-            .cmp-header-row { display: none !important; }
-
-            /* Each data row becomes a self-contained card:
-               row 1: Feature label (full width, orange strip)
-               row 2: Us cell | Them cell (side by side) */
+            /* Fix column widths so they don't collapse — table scrolls horizontally */
+            .cmp-header-row,
             .cmp-grid {
-              grid-template-columns: 1fr 1fr !important;
-              grid-template-areas: 'feature feature' 'us them' !important;
-              background: rgba(255,255,255,0.04) !important;
-              border: 1px solid rgba(255,255,255,0.08) !important;
-              border-radius: 14px !important;
-              overflow: hidden !important;
-              margin-bottom: 10px !important;
-              border-bottom: 1px solid rgba(255,255,255,0.08) !important;
-            }
-            .cmp-grid:last-child { margin-bottom: 0 !important; }
-
-            /* Feature label = card header strip with brand-orange tint */
-            .cmp-feature-cell {
-              grid-area: feature !important;
-              padding: 11px 14px !important;
-              font-size: 11px !important;
-              font-weight: 800 !important;
-              letter-spacing: 1.6px !important;
-              text-transform: uppercase !important;
-              color: #F2EEE7 !important;
-              background: rgba(232,84,26,0.10) !important;
-              border-bottom: 1px solid rgba(232,84,26,0.18) !important;
-              border-left: none !important;
+              grid-template-columns: 120px 160px 160px !important;
+              min-width: 440px !important;
             }
 
-            /* Us column — left side, brand-tinted background */
-            .cmp-us-cell {
-              grid-area: us !important;
-              padding: 12px 12px !important;
-              font-size: 12px !important;
-              line-height: 1.45 !important;
-              color: #F2EEE7 !important;
-              background: rgba(232,84,26,0.05) !important;
-              border-left: none !important;
-              display: flex !important;
-              flex-direction: column !important;
-              align-items: flex-start !important;
-              gap: 6px !important;
-            }
-            .cmp-us-cell::before {
-              content: '\\2713  ECHOPULSE' !important;
-              font-size: 9.5px !important;
-              font-weight: 800 !important;
-              letter-spacing: 1.2px !important;
-              color: #E8541A !important;
-              line-height: 1 !important;
-            }
-            /* Hide the inline ✓ span — the ::before label includes the check */
-            .cmp-us-cell > span:first-child { display: none !important; }
-
-            /* Them column — right side, dimmer to imply "the alternative" */
-            .cmp-them-cell {
-              grid-area: them !important;
-              padding: 12px 12px !important;
-              font-size: 12px !important;
-              line-height: 1.45 !important;
-              color: rgba(242,238,231,0.58) !important;
-              border-left: 1px solid rgba(255,255,255,0.06) !important;
-              display: flex !important;
-              flex-direction: column !important;
-              align-items: flex-start !important;
-              gap: 6px !important;
-            }
-            .cmp-them-cell::before {
-              content: '\\2717  GENERIC AGENCY' !important;
-              font-size: 9.5px !important;
-              font-weight: 800 !important;
-              letter-spacing: 1.2px !important;
-              color: rgba(239,68,68,0.7) !important;
-              line-height: 1 !important;
-            }
-            .cmp-them-cell > span:first-child { display: none !important; }
-          }
-
-          /* Tiny phones — tighten one notch */
-          @media (max-width: 380px) {
-            .cmp-feature-cell { font-size: 10.5px !important; letter-spacing: 1.3px !important; padding: 10px 12px !important; }
-            .cmp-us-cell, .cmp-them-cell { font-size: 11.5px !important; padding: 10px 10px !important; gap: 5px !important; }
-            .cmp-us-cell::before, .cmp-them-cell::before { font-size: 8.8px !important; letter-spacing: 1px !important; }
+            .cmp-header-cell { padding: 12px 14px !important; font-size: 10px !important; }
+            .cmp-feature-cell { padding: 14px 14px !important; font-size: 12px !important; }
+            .cmp-us-cell { padding: 14px 14px !important; font-size: 12px !important; line-height: 1.45 !important; }
+            .cmp-them-cell { padding: 14px 14px !important; font-size: 12px !important; line-height: 1.45 !important; }
           }
         `}</style>
       </section>
@@ -1630,6 +1551,22 @@ export default function ServicePageClient({ service }: { service: ServiceData })
             width: 100% !important;
           }
         }
+
+        /* FINAL CTA ACTIONS ─── */
+        @media (max-width: 768px) {
+          .svc-final-actions {
+            flex-direction: row !important;
+            flex-wrap: wrap !important;
+            gap: 10px !important;
+            align-items: center !important;
+          }
+          .svc-final-actions > * {
+            padding: 12px 20px !important;
+            font-size: 13px !important;
+            flex: 0 0 auto !important;
+            width: auto !important;
+          }
+        }
       `}</style>
       </motion.div>
     </>
@@ -1673,7 +1610,7 @@ function FAQItem({ item, i, color }: { item: { q: string; a: string }; i: number
           {item.q}
         </span>
         <motion.div
-          animate={{ rotate: open ? 45 : 0, background: open ? color : 'transparent' }}
+          animate={{ rotate: open ? 45 : 0, background: open ? color : 'rgba(0,0,0,0)' }}
           transition={{ duration: 0.3 }}
           style={{
             width: '32px',

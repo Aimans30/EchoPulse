@@ -319,11 +319,13 @@ export default function FAQ() {
 
         @media (max-width: 900px) {
           .faq-grid { flex-direction: column !important; gap: 12px !important; }
-          .faq-header { flex-direction: column !important; align-items: flex-start !important; gap: 24px !important; margin-bottom: 40px !important; }
-          .faq-sub { flex-basis: auto !important; max-width: 560px; }
+          .faq-header { flex-direction: column !important; align-items: flex-start !important; gap: 16px !important; margin-bottom: 28px !important; }
+          .faq-header > div { flex: none !important; min-width: 0 !important; width: 100% !important; }
+          .faq-sub { flex: none !important; flex-basis: auto !important; max-width: 560px; }
         }
         @media (max-width: 640px) {
           section#faq { padding: 72px 18px !important; }
+          .faq-header { gap: 12px !important; margin-bottom: 24px !important; }
           .faq-h2 { font-size: 38px !important; letter-spacing: -1.4px !important; }
           .faq-sub { font-size: 14px !important; line-height: 1.6 !important; }
           .faq-card { padding: 18px 18px !important; border-radius: 16px !important; }

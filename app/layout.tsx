@@ -13,7 +13,7 @@ import PuneInquiryModal from "@/components/PuneInquiryModal";
 import { GeoProvider } from "@/components/GeoProvider";
 import { getServerGeo } from "@/lib/geoServer";
 
-const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
+const GA_ID = 'G-3PPKSJLR7F';
 
 // Slim font weights — only what we actually use, with display:swap for fast first paint
 const inter = Inter({
@@ -99,6 +99,10 @@ export const metadata: Metadata = {
     email: false,
     address: false,
   },
+  icons: {
+    icon: '/favicon.ico',
+    shortcut: '/favicon.ico',
+  },
 };
 
 // JSON-LD structured data — describes EchoPulse + the founder for AI agents,
@@ -180,6 +184,14 @@ export default async function RootLayout({
   return (
     <html lang="en" className={inter.variable}>
       <head>
+        {/* Microsoft Clarity */}
+        <Script id="clarity-init" strategy="afterInteractive">{`
+          (function(c,l,a,r,i,t,y){
+            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+          })(window, document, "clarity", "script", "ukzjzunyk5");
+        `}</Script>
         {/* Preconnect to font/script CDNs for faster handshake */}
         <link rel="preconnect" href="https://unpkg.com" crossOrigin="" />
         {/* Cal.com preconnect — DNS + TLS handshake done BEFORE the user clicks
@@ -226,8 +238,7 @@ export default async function RootLayout({
               Sales Pipeline → Discovery Call Booked in Asana. */}
           <PuneInquiryModal />
         </GeoProvider>
-        {/* GA4 — only loaded when NEXT_PUBLIC_GA_ID is set */}
-        {GA_ID && <GoogleAnalytics gaId={GA_ID} />}
+        <GoogleAnalytics gaId={GA_ID} />
         {/* Shery loads after hydration AND only on desktop pointer devices */}
         <Script
           src="https://unpkg.com/sheryjs/dist/Shery.js"

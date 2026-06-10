@@ -59,7 +59,7 @@ function buildLinePath(
   phase: number,
   amplitude: number,
 ) {
-  if (amplitude <= 0.05) return `M ${x1} ${y1} L ${x2} ${y2}`;
+  if (amplitude <= 0.05) return `M ${x1.toFixed(4)} ${y1.toFixed(4)} L ${x2.toFixed(4)} ${y2.toFixed(4)}`;
   const dx = x2 - x1;
   const dy = y2 - y1;
   const len = Math.sqrt(dx * dx + dy * dy);
@@ -143,15 +143,17 @@ function InteractiveGraphic() {
   const innerR = 132;  // service orbit radius
   const outerR = 188;  // workflow ring radius
 
+  const r4 = (n: number) => Math.round(n * 1e4) / 1e4;
+
   const servicePositions = services.map((_, i) => {
     const a = ((i / services.length) * 360 + angle) * (Math.PI / 180);
-    return { x: center + Math.cos(a) * innerR, y: center + Math.sin(a) * innerR };
+    return { x: r4(center + Math.cos(a) * innerR), y: r4(center + Math.sin(a) * innerR) };
   });
 
   const flowPositions = flow.map((_, i) => {
     // Counter-rotate slower + offset so workflow waypoints don't sit on top of services
     const a = ((i / flow.length) * 360 - angle * 0.4 + 36) * (Math.PI / 180);
-    return { x: center + Math.cos(a) * outerR, y: center + Math.sin(a) * outerR };
+    return { x: r4(center + Math.cos(a) * outerR), y: r4(center + Math.sin(a) * outerR) };
   });
 
   return (

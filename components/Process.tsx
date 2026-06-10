@@ -90,7 +90,7 @@ export default function Process() {
           display: grid;
           grid-template-columns: repeat(5, 1fr);
           gap: 12px;
-          align-items: start;
+          align-items: stretch;
         }
         @media(max-width:1100px){ .process-grid { grid-template-columns: repeat(3,1fr) !important; } }
         @media(max-width:700px) { .process-grid { grid-template-columns: 1fr 1fr !important; } }
@@ -118,7 +118,8 @@ export default function Process() {
             grid-auto-flow: column !important;
             grid-template-columns: none !important;
             grid-auto-columns: 64% !important;
-            grid-template-rows: 1fr !important;
+            grid-template-rows: auto !important;
+            align-items: stretch !important;
             gap: 10px !important;
             overflow-x: auto !important;
             scroll-snap-type: x mandatory !important;
@@ -128,7 +129,7 @@ export default function Process() {
             margin: 0 -18px !important;
           }
           .process-grid::-webkit-scrollbar { display: none !important; }
-          .process-grid > * { scroll-snap-align: start !important; min-width: 0 !important; height: auto !important; }
+          .process-grid > * { scroll-snap-align: start !important; min-width: 0 !important; }
 
           .process-card {
             padding: 16px 14px 16px !important;
