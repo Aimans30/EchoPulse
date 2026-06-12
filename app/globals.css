@@ -28,8 +28,21 @@ body {
   color: var(--black);
   overflow-x: hidden;
   overflow-y: auto;          /* explicit so nothing can implicitly hide it */
-  cursor: none;
 }
+
+/* Only hide the native cursor once the custom JS cursor has confirmed it's
+   running (it adds .ep-cursor-ready to <html>). If the cursor script never
+   initializes, throws, or is on a touch device, the native cursor stays —
+   so the page is never left with NO cursor at all. This is the safety net
+   for "cursor disappeared, had to reload". */
+html.ep-cursor-ready body { cursor: none; }
+
+/* Fallback when the custom cursor is NOT ready: force a usable native cursor
+   on everything, overriding the inline `cursor:none` that components set on
+   buttons/links/cards. The :where() wrapper keeps specificity at 0 so any
+   genuinely-needed cursor (text inputs' I-beam) still wins. */
+html:not(.ep-cursor-ready) :where(a, button, [data-cursor-hover]) { cursor: pointer !important; }
+html:not(.ep-cursor-ready) body { cursor: auto; }
 
 /* Text inputs get the native I-beam, NOT the custom dot+ring. Lets users
    see exactly where they'll type. Custom cursor is hidden over inputs via

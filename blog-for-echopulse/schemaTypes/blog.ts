@@ -27,6 +27,13 @@ export const blog = defineType({
     }),
 
     defineField({
+      name: 'category',
+      title: 'Category',
+      type: 'string',
+      description: 'Short topic label shown as a pill (e.g. Finance, Marketing, Strategy).',
+    }),
+
+    defineField({
       name: 'excerpt',
       title: 'Excerpt',
       type: 'text',

@@ -1,6 +1,7 @@
 import { PortableText, type PortableTextComponents } from '@portabletext/react';
 import type { PortableTextBlock } from '@portabletext/types';
 import { urlFor } from '@/lib/sanity';
+import { slugifyHeading, blockToPlainText } from '@/lib/toc';
 
 /**
  * Renderer for the rich-text `content` field on a Sanity blog post.
@@ -112,7 +113,23 @@ function VideoEmbed({ url, caption }: { url: string; caption?: string }) {
   );
 }
 
-const components: PortableTextComponents = {
+/**
+ * Build the Portable Text renderer config. Created per-render so the heading
+ * de-dupe counter (`headingSeen`) starts fresh each time and stays in lockstep
+ * with lib/toc.ts extractHeadings — both walk the same blocks in order and
+ * apply the same slug + numeric-suffix rule, so sidebar links resolve.
+ */
+function buildComponents(): PortableTextComponents {
+  const headingSeen = new Map<string, number>();
+  const headingId = (text: string): string => {
+    let id = slugifyHeading(text);
+    const count = headingSeen.get(id) ?? 0;
+    headingSeen.set(id, count + 1);
+    if (count > 0) id = `${id}-${count + 1}`;
+    return id;
+  };
+
+  const components: PortableTextComponents = {
   types: {
     image: ({ value }) => {
       if (!value?.asset) return null;
@@ -190,12 +207,24 @@ const components: PortableTextComponents = {
     h1: ({ children }) => (
       <h1 style={blogH1Style}>{children}</h1>
     ),
-    h2: ({ children }) => (
-      <h2 style={blogH2Style}>{children}</h2>
-    ),
-    h3: ({ children }) => (
-      <h3 style={blogH3Style}>{children}</h3>
-    ),
+    h2: ({ children, value }) => {
+      const id = headingId(blockToPlainText(value as PortableTextBlock));
+      // scroll-margin-top keeps the heading clear of the fixed nav when an
+      // anchor link jumps to it.
+      return (
+        <h2 id={id} style={{ ...blogH2Style, scrollMarginTop: '120px' }}>
+          {children}
+        </h2>
+      );
+    },
+    h3: ({ children, value }) => {
+      const id = headingId(blockToPlainText(value as PortableTextBlock));
+      return (
+        <h3 id={id} style={{ ...blogH3Style, scrollMarginTop: '120px' }}>
+          {children}
+        </h3>
+      );
+    },
     h4: ({ children }) => (
       <h4 style={blogH4Style}>{children}</h4>
     ),
@@ -248,10 +277,13 @@ const components: PortableTextComponents = {
       </code>
     ),
   },
-};
+  };
+
+  return components;
+}
 
 export default function BlogContent({ value }: { value: PortableTextBlock[] }) {
-  return <PortableText value={value} components={components} />;
+  return <PortableText value={value} components={buildComponents()} />;
 }
 
 // ── inline style objects ──────────────────────────────────────────────

@@ -9,6 +9,15 @@ import { getAllPosts } from '@/lib/blog';
  */
 const SITE_URL = 'https://echopulse.media';
 
+/**
+ * Revalidate the sitemap every 10 minutes. Without this, Next.js renders
+ * sitemap.xml once at build time and caches it forever — new blog posts
+ * published in Sanity would never appear until the next deploy. With ISR,
+ * the first request after the 10-minute window triggers a fresh Sanity
+ * fetch and the new post's URL shows up automatically. No redeploy needed.
+ */
+export const revalidate = 600;
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
 

@@ -35,7 +35,7 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL("https://echopulse.media"),
   title: {
-    default: "EchoPulse — You run the business. We run the content.",
+    default: "EchoPulse — You hit record. We do the rest.",
     template: "%s | EchoPulse",
   },
   description:
@@ -67,20 +67,29 @@ export const metadata: Metadata = {
     canonical: "/",
   },
   openGraph: {
-    title: "EchoPulse — You run the business. We run the content.",
+    title: "EchoPulse — You hit record. We do the rest.",
     description:
-      "Full-service content studio for founders, coaches, business owners, and real estate agents. Video, content, ads, websites, custom software. Done-for-you. One team, one bill. $299 14-day Pilot.",
+      "Full-service content studio for founders, coaches, business owners, and real estate agents. Video, social, ads, websites, custom software — handled end to end by one team. One bill. $299 14-day Pilot.",
     url: "https://echopulse.media",
     siteName: "EchoPulse",
     type: "website",
     locale: "en_US",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1902,
+        height: 653,
+        alt: "EchoPulse — You hit record. We do the rest.",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "EchoPulse — You run the business. We run the content.",
+    title: "EchoPulse — You hit record. We do the rest.",
     description:
-      "Full-service content studio for founders, coaches, business owners, and real estate agents. Video, content, ads, websites, custom software. Done-for-you. Get 20-30 hours a week back.",
+      "Full-service content studio for founders, coaches, business owners, and real estate agents. Video, social, ads, websites, custom software — handled end to end. Get 20-30 hours a week back.",
     creator: "@lakshyasoni",
+    images: ["/og-image.png"],
   },
   robots: {
     index: true,

@@ -13,6 +13,12 @@ export default function Cursor() {
     if (window.matchMedia('(pointer:coarse)').matches) return;
     if (window.matchMedia('(prefers-reduced-motion:reduce)').matches) return;
 
+    // Signal CSS that the custom cursor is live, so `cursor: none` activates.
+    // Removed in cleanup — if this component ever unmounts or the effect bails,
+    // the native cursor comes back instead of leaving the user with nothing.
+    const html = document.documentElement;
+    html.classList.add('ep-cursor-ready');
+
     let mx = innerWidth / 2, my = innerHeight / 2;
     let dx = mx, dy = my, rx = mx, ry = my;
     let dark = false, hover = false, fc = 0, lx = -9, ly = -9, moved = false, snap = false;
@@ -49,22 +55,55 @@ export default function Cursor() {
     };
 
     const tick = () => {
-      dx += (mx - dx) * 0.20; dy += (my - dy) * 0.20;
-      rx += (mx - rx) * 0.10; ry += (my - ry) * 0.10;
-      dot.style.transform = `translate3d(${dx - 4}px,${dy - 4}px,0)`;
-      const rs = hover ? 44 : 28;
-      ring.style.transform = `translate3d(${rx - rs / 2}px,${ry - rs / 2}px,0)`;
-      if (++fc % 6 === 0) probe();
+      // Re-schedule FIRST so a throw inside probe()/style writes can never kill
+      // the loop. A dead loop = frozen cursor that only a reload would fix.
       raf = requestAnimationFrame(tick);
+      try {
+        dx += (mx - dx) * 0.20; dy += (my - dy) * 0.20;
+        rx += (mx - rx) * 0.10; ry += (my - ry) * 0.10;
+        dot.style.transform = `translate3d(${dx - 4}px,${dy - 4}px,0)`;
+        const rs = hover ? 44 : 28;
+        ring.style.transform = `translate3d(${rx - rs / 2}px,${ry - rs / 2}px,0)`;
+        if (++fc % 6 === 0) probe();
+      } catch {
+        /* one bad frame shouldn't stop the cursor — keep ticking */
+      }
     };
     let raf = requestAnimationFrame(tick);
 
-    const move = (e: MouseEvent) => {
-      mx = e.clientX; my = e.clientY; moved = true;
-      if (snap) { snap = false; dx = mx; dy = my; rx = mx; ry = my; dot.style.opacity = ''; ring.style.opacity = ''; }
-    };
     const INTERACTIVE = 'a,button,[data-cursor-hover]';
     const TEXT_INPUT  = 'input,textarea,select,[contenteditable="true"]';
+
+    // Restore visibility unless the pointer is genuinely over a text input.
+    // Centralized so every "I'm back" path (mousemove, mouseenter, focus,
+    // pageshow) reuses the same correct logic and the cursor can't get
+    // permanently stuck invisible.
+    const reveal = (clientX?: number, clientY?: number) => {
+      const x = clientX ?? mx, y = clientY ?? my;
+      const el = (x >= 0 && y >= 0) ? document.elementFromPoint(x, y) : null;
+      const overText = !!(el && (el as Element).closest?.(TEXT_INPUT));
+      if (!overText) {
+        dot.style.opacity = '';
+        ring.style.opacity = '';
+      }
+    };
+
+    const move = (e: MouseEvent) => {
+      mx = e.clientX; my = e.clientY; moved = true;
+      if (snap) { snap = false; dx = mx; dy = my; rx = mx; ry = my; }
+      // Defensive: any real movement that isn't over a text input restores
+      // the cursor. Cheap (string compares only when opacity is actually 0).
+      if (dot.style.opacity === '0') reveal(mx, my);
+    };
+
+    // Pointer re-enters the window → make sure the cursor is shown again. This
+    // is the key fix for "cursor gone after alt-tabbing back": visibilitychange
+    // hides it, but only a mousemove used to bring it back.
+    const enter = (e: MouseEvent) => {
+      mx = e.clientX; my = e.clientY;
+      snap = true;
+      reveal(mx, my);
+    };
 
     const over = (e: MouseEvent) => {
       const target = e.target as Element;
@@ -99,21 +138,48 @@ export default function Cursor() {
       }
     };
     const hide = () => { dot.style.opacity = '0'; ring.style.opacity = '0'; snap = true; };
-    const vis = () => { if (document.hidden) hide(); };
+    // On tab re-focus / becoming visible, proactively restore — don't wait for
+    // a mousemove that may never come if the pointer is already stationary.
+    const vis = () => { if (document.hidden) hide(); else reveal(); };
+    const wake = () => { snap = true; reveal(); };
+
+    // RAF watchdog: if the loop ever dies (throw, throttle, bfcache restore),
+    // this restarts it so the cursor never freezes permanently. Cheap — one
+    // check per second.
+    let lastFc = -1;
+    const watchdog = setInterval(() => {
+      if (fc === lastFc) {
+        // tick() hasn't advanced since last check → loop is dead, revive it.
+        cancelAnimationFrame(raf);
+        raf = requestAnimationFrame(tick);
+      }
+      lastFc = fc;
+    }, 1000);
 
     addEventListener('mousemove', move, { passive: true });
     addEventListener('mouseover', over, { passive: true });
     addEventListener('mouseout', out, { passive: true });
+    addEventListener('mouseenter', enter, { passive: true });
     addEventListener('blur', hide);
+    addEventListener('focus', wake);
+    addEventListener('pageshow', wake);
     document.addEventListener('visibilitychange', vis);
+    document.documentElement.addEventListener('mouseenter', enter, { passive: true });
 
     return () => {
       removeEventListener('mousemove', move);
       removeEventListener('mouseover', over);
       removeEventListener('mouseout', out);
+      removeEventListener('mouseenter', enter);
       removeEventListener('blur', hide);
+      removeEventListener('focus', wake);
+      removeEventListener('pageshow', wake);
       document.removeEventListener('visibilitychange', vis);
+      document.documentElement.removeEventListener('mouseenter', enter);
+      clearInterval(watchdog);
       cancelAnimationFrame(raf);
+      // Restore the native cursor — the custom one is no longer running.
+      html.classList.remove('ep-cursor-ready');
     };
   }, []);
 

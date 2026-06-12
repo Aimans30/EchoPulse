@@ -348,30 +348,22 @@ function InteractiveGraphic() {
             transition={{ duration: 2.4, repeat: Infinity, ease: 'easeOut' }}
           />
 
-          <text
-            x={center}
-            y={center - 4}
-            textAnchor="middle"
-            fontSize="13"
-            fontWeight="900"
-            fill="#F2EEE7"
-            letterSpacing="2.5px"
+          {/* Clip the logo to a circle so it sits flush inside the core */}
+          <defs>
+            <clipPath id="ep-core-clip">
+              <circle cx={center} cy={center} r={54} />
+            </clipPath>
+          </defs>
+          <image
+            href="/logo.png"
+            x={center - 54}
+            y={center - 54}
+            width={108}
+            height={108}
+            clipPath="url(#ep-core-clip)"
+            preserveAspectRatio="xMidYMid slice"
             style={{ pointerEvents: 'none', userSelect: 'none' }}
-          >
-            ECHO
-          </text>
-          <text
-            x={center}
-            y={center + 12}
-            textAnchor="middle"
-            fontSize="13"
-            fontWeight="900"
-            fill="#E8541A"
-            letterSpacing="2.5px"
-            style={{ pointerEvents: 'none', userSelect: 'none' }}
-          >
-            PULSE
-          </text>
+          />
         </svg>
 
         {/* Hover tooltip — small glass chip that docks against the node's outer edge.
@@ -624,15 +616,22 @@ export default function Hero() {
            the orbital graphic for a native mobile service grid + trust strip,
            and give CTAs full-width tap targets. */
         @media(max-width:640px){
+          /* Kill the 100vh stretch on phone — with the orbital hidden there was
+             nothing to fill it, leaving a big dead gap above the stats band.
+             Let the hero size to its content + comfortable breathing room. */
+          .hero-section{
+            min-height: auto !important;
+            justify-content: center !important;
+          }
           .hero-inner{
-            /* Center-aligned mobile hero, inspired by editorial portfolio
-               sites (illustrate.framer.website pattern). Generous vertical
-               padding lets the headline breathe, single-column stack reads
-               cleanly on portrait. */
-            padding: 84px 24px 48px !important;
+            /* Center-aligned mobile hero. Tighter vertical rhythm now that the
+               section no longer forces full-viewport height. */
+            padding: 100px 24px 40px !important;
             gap: 0 !important;
             text-align: center !important;
             align-items: center !important;
+            justify-content: center !important;
+            min-height: auto !important;
           }
           /* The text column inside .hero-inner — center its children too */
           .hero-inner > div:first-child{
@@ -700,22 +699,26 @@ export default function Hero() {
              pills. Primary stays solid black, secondary is a clean text
              link with subtle underline-on-hover (less visual weight than
              the old outlined pill — keeps the focus on the primary). */
+          /* CTA stack — both buttons full-width and identical size, stacked
+             vertically. Equal width = clean, intentional look (no more one
+             pill wider than the other). */
           .hero-actions{
-            gap:14px !important;
+            gap:12px !important;
             margin: 0 auto !important;
-            width:auto !important;
-            flex-direction:row !important;
-            align-items:center !important;
+            width:100% !important;
+            max-width:340px !important;
+            flex-direction:column !important;
+            align-items:stretch !important;
             justify-content:center !important;
-            flex-wrap:wrap !important;
+            flex-wrap:nowrap !important;
           }
           .hero-actions .btn-p{
-            width:auto !important;
+            width:100% !important;
             flex:0 0 auto !important;
             justify-content:center !important;
-            padding:14px 26px !important;
-            font-size:13.5px !important;
-            min-height:46px !important;
+            padding:15px 26px !important;
+            font-size:14px !important;
+            min-height:50px !important;
             box-sizing:border-box !important;
             border-radius:100px !important;
             display:inline-flex !important;
@@ -724,16 +727,19 @@ export default function Hero() {
             font-weight:700 !important;
           }
           .hero-actions .btn-o{
+            width:100% !important;
+            box-sizing:border-box !important;
             background: transparent !important;
-            border: 1px solid rgba(12,12,11,0.14) !important;
+            border: 1px solid rgba(12,12,11,0.16) !important;
             color: #0C0C0B !important;
-            padding:14px 22px !important;
-            font-size:13.5px !important;
+            padding:15px 26px !important;
+            font-size:14px !important;
             font-weight:600 !important;
-            min-height:46px !important;
+            min-height:50px !important;
             border-radius:100px !important;
             display:inline-flex !important;
             align-items:center !important;
+            justify-content:center !important;
             gap:6px !important;
           }
           .scroll-hint{ display:none !important; }
@@ -881,7 +887,7 @@ export default function Hero() {
         }
       `}</style>
 
-      <section style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', position: 'relative', overflowX: 'clip' }}>
+      <section className="hero-section" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', position: 'relative', overflowX: 'clip' }}>
         <div id="grid-bg" />
 
         <div

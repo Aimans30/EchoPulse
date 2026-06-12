@@ -15,6 +15,7 @@ export type BlogPost = {
   title: string;
   slug: string;
   publishedAt?: string;
+  category?: string;
   excerpt?: string;
   author?: string;
   readTime?: number;
@@ -25,8 +26,42 @@ export type BlogPost = {
 
 export type BlogPostSummary = Pick<
   BlogPost,
-  '_id' | 'title' | 'slug' | 'publishedAt' | 'excerpt' | 'author' | 'readTime' | 'mainImage' | 'mainImageUrl'
+  '_id' | 'title' | 'slug' | 'publishedAt' | 'category' | 'excerpt' | 'author' | 'readTime' | 'mainImage' | 'mainImageUrl'
 >;
+
+/**
+ * Keyword → category rules, checked in order. First match wins, so put more
+ * specific topics before broad ones. Each entry: [category label, keywords].
+ * Keywords are matched case-insensitively against the post title.
+ */
+const CATEGORY_RULES: Array<[string, string[]]> = [
+  ['Real Estate', ['airbnb', 'real estate', 'realtor', 'agent', 'property', 'host', 'str ', 'short-term rental']],
+  ['AI Marketing', ['ai marketing', 'ai content', 'ai stack', 'ai agent', 'agentic', 'world model', 'chatgpt', 'gemini', 'llm', 'ai search', 'ai overview']],
+  ['Funnels', ['funnel', 'cac', 'roas', 'paid media', 'conversion', 'lead gen', 'lead generation']],
+  ['Video', ['video', 'short-form', 'youtube', 'reels', 'editing', 'retention', '4k', '1080p', 'vertical video', 'podcast']],
+  ['Authority', ['authority', 'founder brand', 'personal brand', 'positioning', 'thought leadership', 'premium', 'high-ticket', 'high ticket']],
+  ['Content Ops', ['batch production', 'content pipeline', 'repurpos', 'content engine', 'production system', 'workflow', 'content assets']],
+  ['SEO', ['seo', 'entity-based', 'google search', 'rank']],
+  ['Social', ['social media', 'linkedin', 'instagram', 'algorithm', 'b2b marketing']],
+  ['Automation', ['automation', 'manychat', 'crm', 'pipeline']],
+  ['Strategy', ['business', 'scale', 'scaling', 'systems', 'operational', 'growth', 'roi', 'framework']],
+  ['Company', ['echopulse', 'partner', 'certified']],
+];
+
+/**
+ * Resolve the category to display for a post. A real `category` set in Sanity
+ * always wins; otherwise we derive one from the title via CATEGORY_RULES so
+ * every post gets a sensible pill without manual data entry. Falls back to
+ * "Insights" if nothing matches.
+ */
+export function resolveCategory(post: Pick<BlogPostSummary, 'category' | 'title'>): string {
+  if (post.category && post.category.trim()) return post.category.trim();
+  const title = post.title.toLowerCase();
+  for (const [label, keywords] of CATEGORY_RULES) {
+    if (keywords.some((kw) => title.includes(kw))) return label;
+  }
+  return 'Insights';
+}
 
 /**
  * Fetch every published blog post, newest first.
@@ -38,6 +73,7 @@ export async function getAllPosts(): Promise<BlogPostSummary[]> {
     title,
     "slug": slug.current,
     publishedAt,
+    category,
     excerpt,
     author,
     readTime,
@@ -45,6 +81,42 @@ export async function getAllPosts(): Promise<BlogPostSummary[]> {
     mainImageUrl
   }`;
   return sanityClient.fetch(query, {}, { next: { revalidate: 60 } });
+}
+
+/**
+ * Fetch up to `limit` other posts to show as "Related Articles" at the bottom
+ * of a post. Prefers same-category posts, then fills with the most recent
+ * others. Excludes the post being viewed.
+ */
+export async function getRelatedPosts(
+  currentSlug: string,
+  category: string | undefined,
+  limit = 3,
+): Promise<BlogPostSummary[]> {
+  const query = `*[
+    _type == "blog" &&
+    defined(slug.current) &&
+    slug.current != $currentSlug
+  ] | order(
+    select(category == $category => 0, 1),
+    coalesce(publishedAt, _createdAt) desc
+  )[0...$limit]{
+    _id,
+    title,
+    "slug": slug.current,
+    publishedAt,
+    category,
+    excerpt,
+    author,
+    readTime,
+    mainImage,
+    mainImageUrl
+  }`;
+  return sanityClient.fetch(
+    query,
+    { currentSlug, category: category ?? null, limit },
+    { next: { revalidate: 60 } },
+  );
 }
 
 /**
@@ -57,6 +129,7 @@ export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
     title,
     "slug": slug.current,
     publishedAt,
+    category,
     excerpt,
     author,
     readTime,

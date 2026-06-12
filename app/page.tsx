@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import Loader from '@/components/Loader';
 import Nav from '@/components/Nav';
 import Hero from '@/components/Hero';
+import BottomBlur from '@/components/BottomBlur';
 
 // Code-split below-the-fold sections — they don't ship in the initial bundle.
 //
@@ -170,6 +171,9 @@ export default function Home() {
           <CTABanner />
         </main>
         <Footer />
+        {/* Permanent frosted-glass blur pinned to the viewport bottom.
+            Hides itself when the footer scrolls into view. */}
+        <BottomBlur />
       </div>
     </>
   );

@@ -11,6 +11,7 @@ const serviceLinks = [
 export default function Footer() {
   return (
     <footer
+      id="site-footer"
       style={{
         borderTop: '1px solid rgba(12,12,11,0.09)',
         padding: '72px 56px 48px',
