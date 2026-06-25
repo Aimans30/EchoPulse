@@ -18,7 +18,7 @@ export default function CTABanner() {
     <div
       id="book-call"
       className="cta-banner-wrap"
-      style={{ margin: '0 56px 128px', scrollMarginTop: '80px' }}
+      style={{ margin: '64px 56px 128px', scrollMarginTop: '80px' }}
     >
       <motion.div
         className="cta-banner-inner"
@@ -169,7 +169,7 @@ export default function CTABanner() {
           .cta-banner-h { font-size: clamp(28px, 6vw, 44px) !important; letter-spacing: -1px !important; }
         }
         @media (max-width: 640px) {
-          .cta-banner-wrap { margin: 0 16px 80px !important; }
+          .cta-banner-wrap { margin: 36px 16px 80px !important; }
           .cta-banner-inner { padding: 48px 28px !important; gap: 28px !important; }
           .cta-banner-h { font-size: 28px !important; letter-spacing: -0.8px !important; line-height: 1.1 !important; }
           .cta-banner-text { flex-basis: 100% !important; }

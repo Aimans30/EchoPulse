@@ -9,6 +9,7 @@ const tabs = [
   { label: 'Talking Head', key: 'talking'  },
   { label: 'Podcast Clips',key: 'podcast'  },
   { label: 'Long Form',    key: 'longform' },
+  { label: 'Real Estate',  key: 'realestate' },
 ];
 
 type Orientation = 'vertical' | 'horizontal';
@@ -36,6 +37,17 @@ const videos: VideoEntry[] = [
   { url: 'https://player.cloudinary.com/embed/?cloud_name=du6yx2h01&public_id=patern_intrupt_sdrd8w',                                                             type: 'talking',  brand: 'Founder Reel',   label: 'Pattern Interrupt' },
   { url: 'https://res.cloudinary.com/dqqd9rq8s/video/upload/f_mp4,q_auto/sample_1_j1b05r.mp4',                                                                    type: 'talking',  brand: 'B2B Brand',      label: 'Talking Head' },
   { url: 'https://res.cloudinary.com/dqqd9rq8s/video/upload/f_mp4,q_auto/c5_p3qm4j.mp4',                                                                         type: 'talking',  brand: 'Founder Reel',   label: 'Story'        },
+  { url: 'https://res.cloudinary.com/dqqd9rq8s/video/upload/v1782370864/c4_auow1y.mp4',                                                                           type: 'talking',  brand: 'Founder Reel',   label: 'Talking Head' },
+  { url: 'https://res.cloudinary.com/dqqd9rq8s/video/upload/v1782370930/c3_d6b0yo.mp4',                                                                           type: 'talking',  brand: 'Founder Reel',   label: 'Talking Head' },
+  { url: 'https://res.cloudinary.com/dqqd9rq8s/video/upload/v1782370996/c2_xxusow.mp4',                                                                           type: 'talking',  brand: 'Founder Reel',   label: 'Talking Head' },
+  { url: 'https://res.cloudinary.com/dqqd9rq8s/video/upload/v1782371012/milo_6_jycqyj.mp4',                                                                       type: 'talking',  brand: 'Founder Reel',   label: 'Talking Head' },
+  // Long form
+  { url: 'https://res.cloudinary.com/dqqd9rq8s/video/upload/v1761292978/_mediamen-26-11-2023-0001_sycb1h.mp4',                                                    type: 'longform', brand: 'Brand Film',     label: 'Cinematic',  orientation: 'horizontal' },
+  { url: 'https://res.cloudinary.com/dqqd9rq8s/video/upload/v1761292973/_mediamen-26-11-2023-0002_hmkbwn.mp4',                                                    type: 'longform', brand: 'Brand Film',     label: 'Cinematic',  orientation: 'horizontal' },
+  // Real estate
+  { url: 'https://res.cloudinary.com/dqqd9rq8s/video/upload/v1782371049/2426_fn_e4yyrc.mp4',                                                                      type: 'realestate', brand: 'Listing Reel', label: 'Property' },
+  { url: 'https://res.cloudinary.com/dqqd9rq8s/video/upload/v1782371126/2458_fn_uphhrb.mp4',                                                                      type: 'realestate', brand: 'Listing Reel', label: 'Property' },
+  { url: 'https://res.cloudinary.com/dqqd9rq8s/video/upload/v1782372139/2438_fn_z6wry7.mp4',                                                                      type: 'realestate', brand: 'Listing Reel', label: 'Property' },
 ];
 
 // ─── Layout constants ────────────────────────────────────────────────────────

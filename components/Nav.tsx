@@ -189,7 +189,7 @@ export default function Nav() {
           background: #0C0C0B;
           color: #F2EEE7;
           border: none;
-          padding: 10px 22px;
+          padding: 8px 20px;
           border-radius: 100px;
           font-size: 13px;
           font-weight: 600;
@@ -401,17 +401,17 @@ export default function Nav() {
           alignItems: 'center',
           justifyContent: 'space-between',
           gap: '32px',
-          padding: '14px 24px',
+          padding: '9px 22px',
           background: 'rgba(255,255,255,0.60)',
           backdropFilter: 'blur(24px)',
           WebkitBackdropFilter: 'blur(24px)',
           border: '1px solid rgba(255,255,255,0.75)',
-          borderRadius: '100px',
+          borderRadius: '16px',
           boxShadow: scrolled
             ? '0 12px 60px rgba(12,12,11,0.14), inset 0 1px 0 rgba(255,255,255,0.9)'
             : '0 8px 40px rgba(12,12,11,0.09), inset 0 1px 0 rgba(255,255,255,0.9)',
-          width: 'calc(100% - 80px)',
-          maxWidth: '1160px',
+          width: 'calc(100% - 200px)',
+          maxWidth: '1100px',
           transition: 'all 0.4s cubic-bezier(0.16,1,0.3,1)',
           opacity: 0,
         }}

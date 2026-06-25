@@ -2,8 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { useGeoPrice, localizeOrderPrice } from '@/lib/useGeoPrice';
-import { getCheapestStartingPrice } from '@/lib/orderData';
+import { useGeoPrice } from '@/lib/useGeoPrice';
 import { BOOK_CALL_URL } from '@/lib/links';
 import { trackPilotClick, trackCallClick } from '@/lib/analytics';
 
@@ -47,11 +46,7 @@ function useMobilePricingDots() {
 }
 
 export default function Pricing() {
-  const { currency, prices, countryLabel, ready, region, country } = useGeoPrice();
-  // Localized "starting at" price for the à la carte order banner. Reads as
-  // ₹1,499 in India, $15 in US, £14 in UK, CHF 19 in Zurich, etc. — every
-  // region gets a sales-friendly round number, not raw FX.
-  const orderStartingPrice = localizeOrderPrice(getCheapestStartingPrice(), region, country).display;
+  const { currency, prices, countryLabel, ready } = useGeoPrice();
   // (Old `mobileSelectedTier` picker state was removed when the mobile UX
   // changed from a tier-picker row to a horizontal swipe carousel. Cards
   // are equal-weight peers in the carousel — none is "selected" globally.)
@@ -623,170 +618,6 @@ export default function Pricing() {
           ))}
         </div>
 
-        {/* À la carte order banner — sits under the 3 retainer cards.
-           Routes to /order for clients who want a one-off edit without
-           committing to a retainer. The "from $15" floor pulls from
-           lib/orderData.ts so it can't drift. */}
-        <motion.a
-          href="/order"
-          className="pricing-order-banner"
-          initial={{ opacity: 0, y: 14 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.22 }}
-          whileHover={{ y: -2 }}
-          data-cursor-hover
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: '24px',
-            marginTop: '20px',
-            padding: '22px 26px',
-            background: 'linear-gradient(135deg, #0C0C0B 0%, #1a1614 100%)',
-            border: '1px solid rgba(232,84,26,0.32)',
-            borderRadius: '18px',
-            textDecoration: 'none',
-            boxShadow: '0 10px 36px rgba(12,12,11,0.18), inset 0 1px 0 rgba(255,255,255,0.04)',
-            position: 'relative',
-            overflow: 'hidden',
-            cursor: 'none',
-            flexWrap: 'wrap',
-          }}
-        >
-          {/* Ambient highlight */}
-          <span
-            aria-hidden="true"
-            style={{
-              position: 'absolute',
-              top: '-50%',
-              right: '-10%',
-              width: '320px',
-              height: '320px',
-              background: 'radial-gradient(circle, rgba(232,84,26,0.22) 0%, transparent 60%)',
-              filter: 'blur(40px)',
-              pointerEvents: 'none',
-            }}
-          />
-          <div style={{ position: 'relative', zIndex: 1, flex: '1 1 380px', minWidth: 0 }}>
-            <div style={{
-              fontSize: '10px',
-              fontWeight: 800,
-              letterSpacing: '2.5px',
-              textTransform: 'uppercase',
-              color: '#E8541A',
-              marginBottom: '6px',
-            }}>
-              Or — pay per project
-            </div>
-            <div style={{
-              fontFamily: 'Inter, sans-serif',
-              fontSize: 'clamp(20px, 2.2vw, 26px)',
-              fontWeight: 800,
-              color: '#F2EEE7',
-              letterSpacing: '-0.5px',
-              lineHeight: 1.15,
-              marginBottom: '6px',
-            }}>
-              Order a custom edit. <span style={{ color: '#E8541A' }}>From {orderStartingPrice}.</span>
-            </div>
-            <div style={{
-              fontSize: '13px',
-              color: 'rgba(242,238,231,0.6)',
-              lineHeight: 1.55,
-              maxWidth: '520px',
-            }}>
-              No retainer, no contract. Pick a service, configure your tier, send a Drive link. Reels, long-form, podcast, repurpose.
-            </div>
-          </div>
-
-          <span
-            className="pricing-order-cta"
-            style={{
-              position: 'relative',
-              zIndex: 1,
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '8px',
-              padding: '13px 24px',
-              background: '#E8541A',
-              color: '#fff',
-              borderRadius: '100px',
-              fontSize: '13px',
-              fontWeight: 700,
-              fontFamily: 'Inter, sans-serif',
-              whiteSpace: 'nowrap',
-              boxShadow: '0 6px 22px rgba(232,84,26,0.4)',
-              flexShrink: 0,
-              minHeight: '44px',
-            }}
-          >
-            Start ordering
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true">
-              <path d="M5 12h14M12 5l7 7-7 7" />
-            </svg>
-          </span>
-        </motion.a>
-
-        {/* Add-ons row — sits under the 3 cards, inside the same rounded panel.
-           Spun out of Full System so the core tier stays focused on content
-           production and ops; community work is its own thing. */}
-        <motion.div
-          className="pricing-addons"
-          initial={{ opacity: 0, y: 12 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.25 }}
-          style={{
-            marginTop: '20px',
-            padding: '16px 22px',
-            background: 'rgba(12,12,11,0.04)',
-            border: '1px solid rgba(12,12,11,0.06)',
-            borderRadius: '14px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '20px',
-            flexWrap: 'wrap',
-          }}
-        >
-          <span
-            style={{
-              fontSize: '9px',
-              fontWeight: 800,
-              letterSpacing: '2.5px',
-              textTransform: 'uppercase',
-              color: '#6E6B63',
-              flexShrink: 0,
-            }}
-          >
-            Add-ons
-          </span>
-          <span
-            className="addons-copy"
-            style={{
-              flex: 1,
-              minWidth: 0,
-              fontSize: '12.5px',
-              color: '#0C0C0B',
-              lineHeight: 1.55,
-            }}
-          >
-            <strong style={{ fontWeight: 700 }}>Community moderation</strong>
-            <span style={{ color: '#6E6B63' }}> · Skool, Discord, or your existing forum · daytime member responses, weekly programming, sentiment reports</span>
-          </span>
-          <span
-            style={{
-              fontSize: '13px',
-              fontWeight: 900,
-              color: '#E8541A',
-              letterSpacing: '-0.3px',
-              flexShrink: 0,
-              whiteSpace: 'nowrap',
-            }}
-          >
-            +{currency}799/mo
-          </span>
-        </motion.div>
         </motion.div>
       </div>
 
@@ -1339,39 +1170,6 @@ export default function Pricing() {
             color: #0C0C0B !important;
           }
 
-          /* Order banner — stack vertically on mobile */
-          .pricing-order-banner {
-            flex-direction: column !important;
-            align-items: flex-start !important;
-            justify-content: flex-start !important;
-            gap: 14px !important;
-            padding: 18px 18px !important;
-            margin-top: 14px !important;
-            border-radius: 14px !important;
-          }
-          .pricing-order-banner > div {
-            flex: none !important;
-          }
-          .pricing-order-banner .pricing-order-cta {
-            width: 100% !important;
-            justify-content: center !important;
-            padding: 13px 18px !important;
-            font-size: 13px !important;
-            flex-shrink: 0 !important;
-          }
-
-          /* Add-ons strip — vertical on mobile */
-          .pricing-addons {
-            flex-direction: column !important;
-            align-items: flex-start !important;
-            gap: 8px !important;
-            padding: 12px 14px !important;
-            margin-top: 12px !important;
-          }
-          .pricing-addons .addons-copy {
-            font-size: 11.5px !important;
-            line-height: 1.5 !important;
-          }
         }
 
         @media (max-width: 380px) {

@@ -105,8 +105,8 @@ export default function Testimonials() {
               zIndex: 1,
             }}
           >
-            Taste isn&apos;t an add-on.{' '}
-            <span style={{ color: '#E8541A' }}>It&apos;s the entire job.</span>
+            I edit it like I&apos;d{' '}
+            <span style={{ color: '#E8541A' }}>post it myself.</span>
           </motion.h2>
         </div>
 
