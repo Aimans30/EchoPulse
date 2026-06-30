@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     template: "%s | EchoPulse Media",
   },
   description:
-    "EchoPulse Media is a content and AI studio for founders, coaches, business owners, and real estate agents. Video edits, LinkedIn posts, blogs, ad creative, websites, and custom software — handled by one team. 20 to 30 hours back a week. One bill instead of five. No contracts. Starts with a $299 14-day Pilot.",
+    "Done-for-you content studio for founder-led content. Video editing for founders, LinkedIn content, and short-form video, handled by one team.",
   applicationName: "EchoPulse Media",
   authors: [{ name: "Lakshya Soni", url: "https://www.linkedin.com/in/lakshyasoni/" }],
   creator: "Lakshya Soni",

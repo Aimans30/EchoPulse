@@ -498,8 +498,8 @@ export default function Testimonials() {
           .founder-section { padding: 72px 0 !important; }
           .founder-container { padding: 0 20px !important; }
           .founder-quote-mark {
-            font-size: 140px !important;
-            top: -22px !important;
+            font-size: 110px !important;
+            top: -12px !important;
             left: -8px !important;
           }
           .founder-h2 {
