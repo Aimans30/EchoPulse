@@ -35,15 +35,15 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL("https://echopulse.media"),
   title: {
-    default: "EchoPulse — You hit record. We do the rest.",
-    template: "%s | EchoPulse",
+    default: "EchoPulse Media — You hit record. We do the rest.",
+    template: "%s | EchoPulse Media",
   },
   description:
-    "Full-service content studio for founders, coaches, business owners, and real estate agents. Video edits, LinkedIn posts, blogs, ad creative, websites, and custom software — handled by one team. 20 to 30 hours back a week. One bill instead of five. No contracts. Starts with a $299 14-day Pilot.",
-  applicationName: "EchoPulse",
+    "EchoPulse Media is a content and AI studio for founders, coaches, business owners, and real estate agents. Video edits, LinkedIn posts, blogs, ad creative, websites, and custom software — handled by one team. 20 to 30 hours back a week. One bill instead of five. No contracts. Starts with a $299 14-day Pilot.",
+  applicationName: "EchoPulse Media",
   authors: [{ name: "Lakshya Soni", url: "https://www.linkedin.com/in/lakshyasoni/" }],
   creator: "Lakshya Soni",
-  publisher: "EchoPulse",
+  publisher: "EchoPulse Media",
   keywords: [
     "content studio",
     "content agency",
@@ -60,6 +60,7 @@ export const metadata: Metadata = {
     "agency for coaches",
     "agency for real estate agents",
     "custom app development agency",
+    "EchoPulse Media",
     "EchoPulse",
     "Lakshya Soni",
   ],
@@ -67,11 +68,11 @@ export const metadata: Metadata = {
     canonical: "/",
   },
   openGraph: {
-    title: "EchoPulse — You hit record. We do the rest.",
+    title: "EchoPulse Media — You hit record. We do the rest.",
     description:
-      "Full-service content studio for founders, coaches, business owners, and real estate agents. Video, social, ads, websites, custom software — handled end to end by one team. One bill. $299 14-day Pilot.",
+      "EchoPulse Media — a content and AI studio for founders, coaches, business owners, and real estate agents. Video, social, ads, websites, custom software — handled end to end by one team. One bill. $299 14-day Pilot.",
     url: "https://echopulse.media",
-    siteName: "EchoPulse",
+    siteName: "EchoPulse Media",
     type: "website",
     locale: "en_US",
     images: [
@@ -79,16 +80,17 @@ export const metadata: Metadata = {
         url: "/og-image.png",
         width: 1902,
         height: 653,
-        alt: "EchoPulse — You hit record. We do the rest.",
+        alt: "EchoPulse Media — You hit record. We do the rest.",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "EchoPulse — You hit record. We do the rest.",
+    title: "EchoPulse Media — You hit record. We do the rest.",
     description:
-      "Full-service content studio for founders, coaches, business owners, and real estate agents. Video, social, ads, websites, custom software — handled end to end. Get 20-30 hours a week back.",
-    creator: "@lakshyasoni",
+      "EchoPulse Media — a content and AI studio for founders, coaches, business owners, and real estate agents. Video, social, ads, websites, custom software — handled end to end. Get 20-30 hours a week back.",
+    creator: "@Lakshya_Creates",
+    site: "@Lakshya_Creates",
     images: ["/og-image.png"],
   },
   robots: {
@@ -124,11 +126,12 @@ const structuredData = {
     {
       "@type": "Organization",
       "@id": "https://echopulse.media/#organization",
-      name: "EchoPulse",
-      alternateName: "EchoPulse Studio",
+      name: "EchoPulse Media",
+      alternateName: ["EchoPulse", "EchoPulse Studio"],
       url: "https://echopulse.media",
+      logo: "https://echopulse.media/logo.png",
       description:
-        "Full-service content studio for founders, coaches, business owners, and real estate agents. Video edits, social posts, blogs, ad creative, websites, automations, and custom software — one team, one bill, every channel. Built to give clients 20 to 30 hours back every week.",
+        "EchoPulse Media is a content and AI studio for founders, coaches, business owners, and real estate agents. Video edits, social posts, blogs, ad creative, websites, automations, and custom software — one team, one bill, every channel. Built to give clients 20 to 30 hours back every week.",
       foundingDate: "2025",
       founder: { "@id": "https://echopulse.media/#founder" },
       areaServed: [
@@ -139,7 +142,10 @@ const structuredData = {
         { "@type": "Country", name: "India" },
         { "@type": "Place", name: "Western Europe" },
       ],
-      sameAs: ["https://www.linkedin.com/in/lakshyasoni/"],
+      sameAs: [
+        "https://www.linkedin.com/in/lakshyasoni/",
+        "https://x.com/Lakshya_Creates",
+      ],
       makesOffer: [
         { "@type": "Offer", name: "Pilot", price: "299", priceCurrency: "USD", description: "14-day paid trial: onboarding interview, 12 social posts, 3 short-form video edits, 5 long-form blogs, plus one strategic deliverable." },
         { "@type": "Offer", name: "Growth Retainer", price: "1997", priceCurrency: "USD", description: "Monthly retainer covering social, blogs, short + long-form video, ad creatives, website optimization, and monthly strategy." },
@@ -152,7 +158,7 @@ const structuredData = {
       name: "Lakshya Soni",
       jobTitle: "Founder",
       description:
-        "Multi-discipline operator running EchoPulse. Years editing video across formats at a Canadian production studio, freelance motion design, marketing lead at a Canadian SaaS, and frontend engineer shipping production code. Built EchoPulse to be the one team founders, coaches, business owners, and real estate agents can hire instead of managing five vendors.",
+        "Multi-discipline operator running EchoPulse Media. Years editing video across formats at a Canadian production studio, freelance motion design, marketing lead at a Canadian SaaS, and frontend engineer shipping production code. Built EchoPulse Media to be the one team founders, coaches, business owners, and real estate agents can hire instead of managing five vendors.",
       knowsAbout: [
         "Video editing",
         "Content production",
@@ -166,14 +172,18 @@ const structuredData = {
       ],
       worksFor: { "@id": "https://echopulse.media/#organization" },
       url: "https://echopulse.media",
-      sameAs: ["https://www.linkedin.com/in/lakshyasoni/"],
+      sameAs: [
+        "https://www.linkedin.com/in/lakshyasoni/",
+        "https://x.com/Lakshya_Creates",
+      ],
       image: "https://echopulse.media/founder.jpg",
     },
     {
       "@type": "WebSite",
       "@id": "https://echopulse.media/#website",
       url: "https://echopulse.media",
-      name: "EchoPulse",
+      name: "EchoPulse Media",
+      alternateName: "EchoPulse",
       description:
         "Done-for-you marketing for serious businesses. Video, content, ads, websites, and custom software for founders, coaches, business owners, and real estate agents. 20 to 30 hours a week back.",
       publisher: { "@id": "https://echopulse.media/#organization" },

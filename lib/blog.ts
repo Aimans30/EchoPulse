@@ -15,6 +15,7 @@ export type BlogPost = {
   title: string;
   slug: string;
   publishedAt?: string;
+  _updatedAt?: string;
   category?: string;
   excerpt?: string;
   author?: string;
@@ -23,6 +24,27 @@ export type BlogPost = {
   mainImageUrl?: string;
   content?: PortableTextBlock[];
 };
+
+/**
+ * The site runs as an owner-operated studio, so every post is authored by the
+ * founder unless Sanity explicitly names someone else. Named, human authorship
+ * is a strong E-E-A-T / AI-citation signal — far stronger than a faceless
+ * "EchoPulse Team" byline, which we treat as "no real author set".
+ */
+export const DEFAULT_AUTHOR = 'Lakshya Soni';
+
+/**
+ * Resolve the human author to display + put in structured data. A real,
+ * specific author set in Sanity wins; the generic "EchoPulse Team" placeholder
+ * (or an empty field) resolves to the founder so no post is left faceless.
+ */
+export function resolveAuthor(author?: string): string {
+  const a = author?.trim();
+  if (!a || /^echopulse(\s+team)?$/i.test(a) || /^team$/i.test(a)) {
+    return DEFAULT_AUTHOR;
+  }
+  return a;
+}
 
 export type BlogPostSummary = Pick<
   BlogPost,
@@ -129,6 +151,7 @@ export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
     title,
     "slug": slug.current,
     publishedAt,
+    _updatedAt,
     category,
     excerpt,
     author,

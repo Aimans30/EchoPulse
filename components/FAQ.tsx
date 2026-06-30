@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -22,12 +22,12 @@ const buildFaqSections = (pilotPrice: string) => [
         a: "We work across four main verticals: founders/startups, coaches, business owners, and real estate agents. We've written listing tour scripts, coach authority content, B2B LinkedIn posts, and founder newsletters. That said, you know your niche better than we do, and we'll always say so. The onboarding interview exists so you can transfer that knowledge in one structured session rather than correcting us for six months. We come in knowing the vocabulary. You fill in the nuance.",
       },
       {
-        q: 'Can I see work you’ve done for someone in my situation before committing?',
+        q: "Can I see work you've done for someone in my situation before committing?",
         a: `Yes — book a free call and we'll pull samples closest to your use case. We can show edited Reels, LinkedIn post series, blog drafts, and ad creative. If we don't have a close match in our portfolio, we'll say so honestly. The ${pilotPrice} Pilot exists precisely for that situation: instead of asking you to trust samples from someone else's brand, we show you what we'd produce for yours. Real work on your content in 14 days. Then you decide.`,
       },
       {
         q: "I've been burned by agencies before. What's different here?",
-        a: 'The most common agency complaints we hear: work gets handed to junior staff after the sales call, you’re locked into 6-month contracts before you see anything, communication disappears after onboarding. We address all three. Senior eyes on every deliverable — this is owner-operated, not account-managed. No contracts — month-to-month after the Pilot, cancel with 30 days’ notice. 3-hour reply window during business hours, every time. The Pilot exists specifically because we’d rather prove it than ask you to believe it.',
+        a: "The most common agency complaints we hear: work gets handed to junior staff after the sales call, you're locked into 6-month contracts before you see anything, communication disappears after onboarding. We address all three. Senior eyes on every deliverable — this is owner-operated, not account-managed. No contracts — month-to-month after the Pilot, cancel with 30 days' notice. 3-hour reply window during business hours, every time. The Pilot exists specifically because we'd rather prove it than ask you to believe it.",
       },
     ],
   },
@@ -53,31 +53,6 @@ const buildFaqSections = (pilotPrice: string) => [
     ],
   },
   {
-    section: 'How it actually works',
-    items: [
-      {
-        q: 'How much time does this actually take from me each month?',
-        a: "After onboarding, the ongoing requirement from you is light: one monthly strategy call (30–45 minutes), approvals on content before it goes live (we batch these so it's one sitting, not a daily drip), and — for video — sending us raw footage. Most clients are spending 2–3 hours a month with us after the first 30 days. The heavy lift is the onboarding interview at the start. After that, you approve, we produce.",
-      },
-      {
-        q: 'Who actually does the work — do you outsource to freelancers?',
-        a: "We work with a trusted team of editors, writers, and designers — not random freelance marketplaces. Every deliverable is reviewed by a senior lead before it reaches you. This is owner-operated: the person you talk to on the strategy call is connected to the work being done, not handing it to someone offshore and forwarding the output. We're transparent about being a studio rather than a solo, and that's the advantage — you get team capacity without the coordination overhead of managing multiple vendors.",
-      },
-      {
-        q: 'What does the revision process look like — how many rounds do I get?',
-        a: 'Revisions until you’re satisfied — that’s not a tagline, it’s the actual policy. We don’t count rounds. What we do ask is that feedback is specific: "the tone feels too formal" beats "can you make it better." We deliver with a Loom walkthrough explaining every choice so your feedback is faster and more targeted. In practice, most clients land on a final version in 1–2 rounds once the brand brief is dialled in.',
-      },
-      {
-        q: 'How do you handle content across multiple platforms — do I need separate strategies?',
-        a: "One advantage of everything being under one roof is that we repurpose intelligently. A long-form YouTube video becomes short clips, a LinkedIn post series, a blog post, and potentially ad creative — all adapted for each platform's native format, not just reposted. You don't need separate strategies because it's one system. We'll tell you in the strategy call which channels are worth your investment and which to skip given your audience and goals.",
-      },
-      {
-        q: 'Do I have to send you raw footage every week?',
-        a: "For video editing, yes — we need your raw recordings to edit. But we help you batch this efficiently: one 60–90 minute recording session per month can produce 12+ pieces of short-form content when scripted and cut correctly. We'll guide you on what to record, how to structure it for editing efficiency, and what setup you need. You don't need a studio — a phone with decent lighting is enough for most platforms. The goal is to make recording feel like a single monthly task, not a weekly grind.",
-      },
-    ],
-  },
-  {
     section: 'Pricing & commitment',
     items: [
       {
@@ -91,27 +66,6 @@ const buildFaqSections = (pilotPrice: string) => [
       {
         q: "What happens if I want to pause for a month — do I lose my spot?",
         a: "We don't do lock-in and we don't penalise pauses. If you need to step back, give us 30 days' notice and we'll pause your retainer. When you're ready to restart, we pick up from the brand brief and strategy already in place — no repeat onboarding. We'd rather have clients who return because the work was good than clients who stay because they're contractually obligated.",
-      },
-    ],
-  },
-  {
-    section: 'Is this the right fit?',
-    items: [
-      {
-        q: "I'm not posting consistently right now. Is that a problem to start?",
-        a: "Not at all — inconsistency is usually why people come to us. You don't need a system in place before we can help; building the system is the first thing we do. The Pilot includes a content audit or 30-day plan precisely for this situation. We'll assess where you are, decide which channels deserve your attention, build a calendar you can sustain — then execute it for you.",
-      },
-      {
-        q: 'What types of businesses are a bad fit for EchoPulse?',
-        a: "We're the wrong fit for: large enterprises needing compliance review on every post, brands that want to be fully hands-off with zero input or approvals, or businesses with no video content planned — our model is built around you recording your own footage. We're the right fit for: founders building personal brands, coaches who want authority content, real estate agents running their own marketing, and business owners tired of managing multiple vendors. If you're on the fence, the strategy call will tell you within 20 minutes.",
-      },
-      {
-        q: "We're based outside the US — does that change anything?",
-        a: 'No. We work with clients globally and price the same scope worldwide (the website shows USD by default). Strategy calls are scheduled across time zones, deliverables are asynchronous, and communication runs via Slack and Loom so timezone gaps don’t slow things down. The only thing that changes is currency on the invoice, which we can accommodate.',
-      },
-      {
-        q: "Do you work with businesses that sell services, not products?",
-        a: "Almost exclusively. Founders, coaches, real estate agents, and consultants are our core audience — businesses where the person is the brand and trust drives the sale. Content for service businesses isn't about product features; it's about authority, consistency, and social proof. That's exactly what we build. If you're selling a physical product or running e-commerce, we're probably not the right fit and we'll say so on the call.",
       },
     ],
   },

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import Link from 'next/link';
 import { motion } from 'framer-motion';
 import {
   Rocket,
@@ -9,6 +10,7 @@ import {
   ShoppingBag,
   Briefcase,
   MessageCircle,
+  ArrowRight,
   type LucideIcon,
 } from 'lucide-react';
 import { BOOK_CALL_LABEL } from '@/lib/links';
@@ -22,41 +24,43 @@ type Card = {
   tagColor: string;
   gradient: string | null;
   accentLine: string;
+  /** Standalone ICP landing page this card links to. Omitted for the CTA card. */
+  href?: string;
   dark?: boolean;
   cta?: boolean;
 };
 
 const cards: Card[] = [
   {
-    num: '01', Icon: Rocket, title: 'Founders & Operators',
+    num: '01', Icon: Rocket, title: 'Founders & Operators', href: '/founders',
     desc: 'SaaS, agency, and consulting founders who want LinkedIn, blogs, video, and ads handled by one team. So you can stop reviewing five freelancers and run the business.',
     tag: 'Our Core', tagColor: '#E8541A',
     gradient: 'radial-gradient(circle at 80% 20%, rgba(232,84,26,0.12) 0%, transparent 60%)',
     accentLine: '#E8541A',
   },
   {
-    num: '02', Icon: Home, title: 'Real Estate Agents',
+    num: '02', Icon: Home, title: 'Real Estate Agents', href: '/real-estate',
     desc: 'Solo agents, brokerages, and short-term-rental operators who need cinematic property reels, personal-brand video, listing content, and ads that actually book viewings.',
     tag: 'Big Lift', tagColor: '#f59e0b',
     gradient: 'radial-gradient(circle at 80% 20%, rgba(245,158,11,0.10) 0%, transparent 60%)',
     accentLine: '#f59e0b',
   },
   {
-    num: '03', Icon: GraduationCap, title: 'Coaches & Course Creators',
+    num: '03', Icon: GraduationCap, title: 'Coaches & Course Creators', href: '/coaches',
     desc: 'Educators and coaches who need pre-launch content, evergreen short-form, ad creative, and funnels that fill cohorts and coaching slots without manual selling.',
     tag: 'High ROI', tagColor: '#8b5cf6',
     gradient: 'radial-gradient(circle at 80% 20%, rgba(139,92,246,0.10) 0%, transparent 60%)',
     accentLine: '#8b5cf6',
   },
   {
-    num: '04', Icon: ShoppingBag, title: 'DTC & E-Commerce',
+    num: '04', Icon: ShoppingBag, title: 'DTC & E-Commerce', href: '/dtc',
     desc: 'Brands burning through ad creative every two weeks. Fresh static + video ads on a subscription so fatigue stops killing your CPA. Plus the store, the funnels, the email.',
     tag: 'Subscription', tagColor: '#10b981',
     gradient: 'radial-gradient(circle at 80% 20%, rgba(16,185,129,0.10) 0%, transparent 60%)',
     accentLine: '#10b981',
   },
   {
-    num: '05', Icon: Briefcase, title: 'Business Owners',
+    num: '05', Icon: Briefcase, title: 'Business Owners', href: '/business-owners',
     desc: 'Local businesses, service operators, agencies, and consultancies who need inbound leads from content instead of cold outreach. Plus a site that converts the traffic.',
     tag: 'Scaling', tagColor: '#3b82f6',
     gradient: 'radial-gradient(circle at 80% 20%, rgba(59,130,246,0.10) 0%, transparent 60%)',
@@ -81,6 +85,11 @@ const cardVariants = {
   hidden: { opacity: 0, y: 40, scale: 0.97 },
   visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] as [number,number,number,number] } },
 };
+
+// Stable component refs (created once at module scope — never recreate inside
+// render/map or React remounts the subtree every frame).
+const MotionLink = motion(Link);
+const MotionDiv = motion.div;
 
 export default function WhoWeWorkWith() {
   const gridRef = useRef<HTMLDivElement>(null);
@@ -153,6 +162,9 @@ export default function WhoWeWorkWith() {
           cursor: none;
           transition: box-shadow 0.4s cubic-bezier(0.16,1,0.3,1);
         }
+        .wwww-card-link { text-decoration: none; color: inherit; display: block; }
+        .wwww-card-link .wwww-view { opacity: 0.85; transition: gap 0.25s ease, opacity 0.25s ease; }
+        .wwww-card-link:hover .wwww-view { opacity: 1; gap: 8px; }
         .wwww-card-light {
           background: rgba(255,255,255,0.58);
           backdrop-filter: blur(28px);
@@ -354,11 +366,17 @@ export default function WhoWeWorkWith() {
         whileInView="visible"
         viewport={{ once: true, margin: '-60px' }}
       >
-        {cards.map((card, i) => (
-          <motion.div
+        {cards.map((card, i) => {
+          // Linked ICP cards render their whole surface as a Link to the
+          // standalone landing page; the CTA card keeps its book-call button.
+          const CardTag = card.href ? MotionLink : MotionDiv;
+          const linkProps = card.href ? { href: card.href } : {};
+          return (
+          <CardTag
             key={card.num}
+            {...linkProps}
             variants={cardVariants}
-            className={`wwww-card ${card.dark ? 'wwww-card-dark float-b' : 'wwww-card-light float-a'}`}
+            className={`wwww-card ${card.dark ? 'wwww-card-dark float-b' : 'wwww-card-light float-a'}${card.href ? ' wwww-card-link' : ''}`}
             style={{ animationDelay: `${i * 0.3}s` }}
             whileHover={{ y: -8 }}
             transition={{ type: 'spring', stiffness: 300, damping: 20 }}
@@ -405,9 +423,17 @@ export default function WhoWeWorkWith() {
               </div>
 
               {card.tag && (
-                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', marginTop: '24px', padding: '5px 14px', background: `${card.tagColor}15`, border: `1px solid ${card.tagColor}30`, borderRadius: '100px', fontSize: '10px', fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase', color: card.tagColor }}>
-                  <div style={{ width: '5px', height: '5px', borderRadius: '50%', background: card.tagColor }} />
-                  {card.tag}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', marginTop: '24px', flexWrap: 'wrap' }}>
+                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '5px 14px', background: `${card.tagColor}15`, border: `1px solid ${card.tagColor}30`, borderRadius: '100px', fontSize: '10px', fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase', color: card.tagColor }}>
+                    <div style={{ width: '5px', height: '5px', borderRadius: '50%', background: card.tagColor }} />
+                    {card.tag}
+                  </div>
+                  {card.href && (
+                    <span className="wwww-view" style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', fontSize: '12px', fontWeight: 700, color: card.accentLine }}>
+                      View page
+                      <ArrowRight size={13} strokeWidth={2.4} aria-hidden="true" />
+                    </span>
+                  )}
                 </div>
               )}
 
@@ -427,8 +453,9 @@ export default function WhoWeWorkWith() {
                 </button>
               )}
             </div>
-          </motion.div>
-        ))}
+          </CardTag>
+          );
+        })}
       </motion.div>
 
       {/* Swipe hint — mobile only via CSS */}

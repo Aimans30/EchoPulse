@@ -194,7 +194,7 @@ export default function Footer() {
         }}
       >
         <p style={{ fontSize: '13px', color: '#A8A49B', margin: 0 }}>
-          © 2026 EchoPulse. All rights reserved.
+          © 2026 EchoPulse Media. All rights reserved.
         </p>
         <p style={{ fontSize: '13px', color: '#A8A49B', margin: 0 }}>
           Done-for-you marketing. For serious businesses.

@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback, useMemo, useTransition } from 'react';
 import { motion } from 'framer-motion';
+import { videos, previewMp4Src, type Orientation, type VideoEntry } from '@/lib/videos';
 
 // ─── Tab definitions ────────────────────────────────────────────────────────
 const tabs = [
@@ -12,44 +13,6 @@ const tabs = [
   { label: 'Real Estate',  key: 'realestate' },
 ];
 
-type Orientation = 'vertical' | 'horizontal';
-type VideoEntry = {
-  url:          string;
-  type:         string;
-  brand:        string;
-  label:        string;
-  orientation?: Orientation;
-};
-
-// ─── Single source-of-truth video list ──────────────────────────────────────
-const videos: VideoEntry[] = [
-  // Longform
-  { url: 'https://player.cloudinary.com/embed/?cloud_name=du6yx2h01&public_id=vsl1_1_aagaus',                                                                     type: 'longform', brand: 'Sales Video',    label: 'VSL',        orientation: 'horizontal' },
-  { url: 'https://player.cloudinary.com/embed/?cloud_name=du6yx2h01&public_id=Untitled_video_-_Made_with_Clipchamp_1_1_spvlnf',                                   type: 'longform', brand: 'Brand Film',     label: 'Cinematic',  orientation: 'horizontal' },
-  { url: 'https://res.cloudinary.com/dqqd9rq8s/video/upload/f_mp4,q_auto/fn_1_xy7wfm.mp4',                                                                        type: 'longform', brand: 'Founder Film',   label: 'Story',      orientation: 'horizontal' },
-  // Podcast
-  { url: 'https://player.cloudinary.com/embed/?cloud_name=du6yx2h01&public_id=17_feb_xngenr',                                                                     type: 'podcast',  brand: 'Podcast',        label: 'Episode'     },
-  { url: 'https://res.cloudinary.com/du6yx2h01/video/upload/v1765363520/Ep1_Clip18_corrected_xn2szx.mp4',                                                         type: 'podcast',  brand: 'Podcast Clip',   label: 'Hook'        },
-  { url: 'https://res.cloudinary.com/dqqd9rq8s/video/upload/f_mp4,q_auto/EP4_trailer_l6atpc.mp4',                                                                 type: 'podcast',  brand: 'Podcast',        label: 'Trailer',    orientation: 'horizontal' },
-  { url: 'https://res.cloudinary.com/dqqd9rq8s/video/upload/f_mp4,q_auto/mian_hlymvc.mp4',                                                                        type: 'podcast',  brand: 'Podcast Clip',   label: 'Highlight',  orientation: 'horizontal' },
-  { url: 'https://res.cloudinary.com/du6yx2h01/video/upload/v1779111471/Clip_2_sy4gp8.mp4',                                                                       type: 'podcast',  brand: 'Podcast Clip',   label: 'Highlight'   },
-  // Talking head
-  { url: 'https://player.cloudinary.com/embed/?cloud_name=du6yx2h01&public_id=patern_intrupt_sdrd8w',                                                             type: 'talking',  brand: 'Founder Reel',   label: 'Pattern Interrupt' },
-  { url: 'https://res.cloudinary.com/dqqd9rq8s/video/upload/f_mp4,q_auto/sample_1_j1b05r.mp4',                                                                    type: 'talking',  brand: 'B2B Brand',      label: 'Talking Head' },
-  { url: 'https://res.cloudinary.com/dqqd9rq8s/video/upload/f_mp4,q_auto/c5_p3qm4j.mp4',                                                                         type: 'talking',  brand: 'Founder Reel',   label: 'Story'        },
-  { url: 'https://res.cloudinary.com/dqqd9rq8s/video/upload/v1782370864/c4_auow1y.mp4',                                                                           type: 'talking',  brand: 'Founder Reel',   label: 'Talking Head' },
-  { url: 'https://res.cloudinary.com/dqqd9rq8s/video/upload/v1782370930/c3_d6b0yo.mp4',                                                                           type: 'talking',  brand: 'Founder Reel',   label: 'Talking Head' },
-  { url: 'https://res.cloudinary.com/dqqd9rq8s/video/upload/v1782370996/c2_xxusow.mp4',                                                                           type: 'talking',  brand: 'Founder Reel',   label: 'Talking Head' },
-  { url: 'https://res.cloudinary.com/dqqd9rq8s/video/upload/v1782371012/milo_6_jycqyj.mp4',                                                                       type: 'talking',  brand: 'Founder Reel',   label: 'Talking Head' },
-  // Long form
-  { url: 'https://res.cloudinary.com/dqqd9rq8s/video/upload/v1761292978/_mediamen-26-11-2023-0001_sycb1h.mp4',                                                    type: 'longform', brand: 'Brand Film',     label: 'Cinematic',  orientation: 'horizontal' },
-  { url: 'https://res.cloudinary.com/dqqd9rq8s/video/upload/v1761292973/_mediamen-26-11-2023-0002_hmkbwn.mp4',                                                    type: 'longform', brand: 'Brand Film',     label: 'Cinematic',  orientation: 'horizontal' },
-  // Real estate
-  { url: 'https://res.cloudinary.com/dqqd9rq8s/video/upload/v1782371049/2426_fn_e4yyrc.mp4',                                                                      type: 'realestate', brand: 'Listing Reel', label: 'Property' },
-  { url: 'https://res.cloudinary.com/dqqd9rq8s/video/upload/v1782371126/2458_fn_uphhrb.mp4',                                                                      type: 'realestate', brand: 'Listing Reel', label: 'Property' },
-  { url: 'https://res.cloudinary.com/dqqd9rq8s/video/upload/v1782372139/2438_fn_z6wry7.mp4',                                                                      type: 'realestate', brand: 'Listing Reel', label: 'Property' },
-];
-
 // ─── Layout constants ────────────────────────────────────────────────────────
 const CARD_H          = 408;
 const CARD_W_VERTICAL = 230;
@@ -58,28 +21,6 @@ const GAP             = 12;
 const SPEED           = 0.55; // px / frame
 
 const cardWidth = (o?: Orientation) => o === 'horizontal' ? CARD_W_HORIZ : CARD_W_VERTICAL;
-
-// ─── Cloudinary preview URL helper ──────────────────────────────────────────
-// Converts embed-player links to direct .mp4 URLs sized for the card's display
-// width (×2 for retina). Skips non-Cloudinary sources.
-function previewMp4Src(src: string, orientation?: Orientation): string | null {
-  const w = orientation === 'horizontal' ? 1500 : 700;
-
-  if (src.includes('player.cloudinary.com/embed')) {
-    try {
-      const url      = new URL(src);
-      const publicId = url.searchParams.get('public_id');
-      const cloud    = url.searchParams.get('cloud_name') || 'du6yx2h01';
-      if (publicId) return `https://res.cloudinary.com/${cloud}/video/upload/c_scale,w_${w},q_auto:good,f_auto/${publicId}.mp4`;
-    } catch { return null; }
-  }
-  if (src.includes('res.cloudinary.com') && src.includes('/video/upload/')) {
-    if (/[,/]w_\d+/.test(src)) return src;
-    return src.replace('/video/upload/', `/video/upload/c_scale,w_${w},q_auto:good/`);
-  }
-  if (src.includes('.mp4')) return src;
-  return null;
-}
 
 // ─── VideoModal — isolated so opening it doesn't re-render the carousel ─────
 function VideoModal({ src, onClose }: { src: string; onClose: () => void }) {
@@ -172,11 +113,51 @@ export default function OurWork() {
   // `pendingTab` lags behind `activeTab` by one transition — it's what the
   // heavy carousel uses for filtering. The pill animation, label color,
   // etc. are driven by `activeTab` and stay snappy.
-  const filtered = useMemo(
-    () => pendingTab === 'all' ? videos : videos.filter(v => v.type === pendingTab),
-    [pendingTab],
-  );
+  const filtered = useMemo(() => {
+    if (pendingTab !== 'all') return videos.filter(v => v.type === pendingTab);
+    // For "All": interleave verticals and horizontals so mixed sizes appear
+    // throughout rather than all horizontals bunched together.
+    const verticals = videos.filter(v => !v.orientation || v.orientation === 'vertical');
+    const horizontals = videos.filter(v => v.orientation === 'horizontal');
+    const mixed: VideoEntry[] = [];
+    const maxLen = Math.max(verticals.length, horizontals.length);
+    for (let i = 0; i < maxLen; i++) {
+      if (i < verticals.length) mixed.push(verticals[i]);
+      if (i < horizontals.length) mixed.push(horizontals[i]);
+    }
+    return mixed;
+  }, [pendingTab]);
+
   const doubled = useMemo(() => [...filtered, ...filtered], [filtered]);
+
+  // Measure whether the (single, un-doubled) card set is wide enough to fill
+  // the track. If not, we center the row and freeze the auto-scroll so a small
+  // set (e.g. 3 real-estate clips) sits centered instead of left-aligned with
+  // dead space on the right or visibly tiling the same clips on loop.
+  const [fitsTrack, setFitsTrack] = useState(true);
+  // Ref mirror so the RAF loop (a stable closure) reads the live value without
+  // having to be torn down and recreated whenever fitsTrack flips.
+  const fitsTrackRef = useRef(true);
+  useEffect(() => { fitsTrackRef.current = fitsTrack; }, [fitsTrack]);
+  useEffect(() => {
+    const measure = () => {
+      const outer = trackRef.current;
+      if (!outer) return;
+      // Sum the natural width of ONE pass of the filtered set + gaps + padding.
+      const oneSetWidth = filtered.reduce(
+        (sum, v) => sum + cardWidth(orientationOf(v)) + GAP,
+        0,
+      ) + 112; // 56px padding each side
+      const fits = oneSetWidth >= outer.clientWidth;
+      setFitsTrack(fits);
+      // Reset scroll offset when we switch into a centered (non-scrolling)
+      // set so the next scrollable tab starts from a clean position.
+      if (!fits) xOffsetRef.current = 0;
+    };
+    measure();
+    window.addEventListener('resize', measure);
+    return () => window.removeEventListener('resize', measure);
+  }, [filtered, orientationOf]);
 
   // ── IntersectionObserver: play only cards visible inside the track ─────────
   // We use root=trackRef so the carrier div (overflow:hidden) acts as the
@@ -258,7 +239,7 @@ export default function OurWork() {
     if (!inner) return;
 
     const tick = () => {
-      if (!pauseRef.current) {
+      if (!pauseRef.current && fitsTrackRef.current) {
         xOffsetRef.current += SPEED;
         const loopAt = inner.scrollWidth / 2;
         if (loopAt > 0 && xOffsetRef.current >= loopAt) {
@@ -300,8 +281,17 @@ export default function OurWork() {
 
   const scrollBy = (dir: number) => {
     pauseRef.current = true;
-    xOffsetRef.current = Math.max(0, xOffsetRef.current + dir * (CARD_W_VERTICAL + GAP));
-    setTimeout(() => { pauseRef.current = false; }, 1400);
+    xOffsetRef.current = Math.max(0, xOffsetRef.current + dir * (CARD_W_VERTICAL + GAP) * 3);
+    // Clamp so we don't overshoot the loop boundary
+    const inner = innerRef.current;
+    if (inner) {
+      const loopAt = inner.scrollWidth / 2;
+      if (loopAt > 0 && xOffsetRef.current >= loopAt) {
+        xOffsetRef.current = xOffsetRef.current % loopAt;
+      }
+      inner.style.transform = `translateX(-${xOffsetRef.current}px)`;
+    }
+    setTimeout(() => { pauseRef.current = false; }, 600);
   };
 
   const openModal = useCallback((src: string) => {
@@ -324,6 +314,9 @@ export default function OurWork() {
           padding: 0 56px;
           will-change: transform;
         }
+        /* When the set is too small to scroll, it's centered — give the cards
+           a more generous gap so 3 reels feel deliberate, not cramped. */
+        .work-track-centered { gap: 28px; }
         .vid-card {
           position: relative; border-radius: 16px; overflow: hidden;
           flex-shrink: 0; height: ${CARD_H}px;
@@ -536,9 +529,15 @@ export default function OurWork() {
           onTouchStart={() => { pauseRef.current = true; }}
           onTouchEnd={() => { pauseRef.current = false; }}
         >
-          {/* Inner flex row — translated by RAF, never scrolled */}
-          <div ref={innerRef} className="work-track">
-            {doubled.map((video, i) => {
+          {/* Inner flex row — translated by RAF, never scrolled. When the set
+              is too small to fill the track we render a single pass and center
+              it (no doubling, no auto-scroll) so it doesn't visibly loop. */}
+          <div
+            ref={innerRef}
+            className={`work-track${!fitsTrack ? ' work-track-centered' : ''}`}
+            style={!fitsTrack ? { justifyContent: 'center', transform: 'none' } : undefined}
+          >
+            {(fitsTrack ? doubled : filtered).map((video, i) => {
               // Resolve orientation through manual override → runtime-detected
               // → vertical-fallback so newly-added videos auto-fit their cards.
               const orient = orientationOf(video);

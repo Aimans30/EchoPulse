@@ -5,7 +5,7 @@ import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
 import BlogContent from '@/components/BlogContent';
 import TableOfContents from '@/components/TableOfContents';
-import { getPostBySlug, getAllPostSlugs, getRelatedPosts, resolveCategory, type BlogPostSummary } from '@/lib/blog';
+import { getPostBySlug, getAllPostSlugs, getRelatedPosts, resolveCategory, resolveAuthor, type BlogPostSummary } from '@/lib/blog';
 import { urlFor } from '@/lib/sanity';
 import { extractHeadings } from '@/lib/toc';
 
@@ -35,7 +35,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       url: `${SITE_URL}/blog/${slug}`,
       type: 'article',
       publishedTime: post.publishedAt,
-      authors: post.author ? [post.author] : undefined,
+      modifiedTime: post._updatedAt,
+      authors: [resolveAuthor(post.author)],
       images: ogImage ? [{ url: ogImage, width: 1200, height: 630 }] : undefined,
     },
     twitter: {
@@ -67,24 +68,43 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     ? urlFor(post.mainImage).width(1600).height(900).fit('crop').auto('format').url()
     : post.mainImageUrl || null;
 
-  const dateLabel = post.publishedAt
-    ? new Date(post.publishedAt).toLocaleDateString('en-US', {
-        month: 'long',
-        day: 'numeric',
-        year: 'numeric',
-      })
-    : null;
+  const fmtDate = (iso?: string) =>
+    iso
+      ? new Date(iso).toLocaleDateString('en-US', {
+          month: 'long',
+          day: 'numeric',
+          year: 'numeric',
+        })
+      : null;
 
-  // Article schema for AI agents + search engines
+  const dateLabel = fmtDate(post.publishedAt);
+  // Show an "Updated" date only when the post was meaningfully revised after
+  // publishing (more than a day later), so recency is visible to readers and
+  // answer engines without showing a redundant "updated = published" line.
+  const showUpdated =
+    post._updatedAt &&
+    post.publishedAt &&
+    new Date(post._updatedAt).getTime() - new Date(post.publishedAt).getTime() >
+      24 * 60 * 60 * 1000;
+  const updatedLabel = showUpdated ? fmtDate(post._updatedAt) : null;
+
+  // Named, human author — strongest E-E-A-T / AI-citation signal we have.
+  const authorName = resolveAuthor(post.author);
+
+  // Article schema for AI agents + search engines. datePublished +
+  // dateModified + a named Person author are the recency/authorship signals
+  // answer engines weight most heavily.
   const articleLd = {
     '@context': 'https://schema.org',
     '@type': 'Article',
     headline: post.title,
     description: post.excerpt || undefined,
     datePublished: post.publishedAt || undefined,
-    author: post.author
-      ? { '@type': 'Person', name: post.author }
-      : { '@id': `${SITE_URL}/#founder` },
+    dateModified: post._updatedAt || post.publishedAt || undefined,
+    author:
+      authorName === 'Lakshya Soni'
+        ? { '@id': `${SITE_URL}/#founder` }
+        : { '@type': 'Person', name: authorName },
     publisher: { '@id': `${SITE_URL}/#organization` },
     mainEntityOfPage: { '@type': 'WebPage', '@id': `${SITE_URL}/blog/${slug}` },
     image: headerImageSrc ? [headerImageSrc] : undefined,
@@ -138,11 +158,15 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           </aside>
 
           <article className="blog-post-article">
-            {/* Meta row — category pill + date + read time */}
+            {/* Meta row — category pill + published date + updated date + read time */}
             <div className="blog-post-meta">
               <span className="blog-post-category">{resolveCategory(post)}</span>
               {dateLabel && <span className="blog-post-meta-text">{dateLabel}</span>}
-              {dateLabel && post.readTime && <span className="blog-post-meta-dot" aria-hidden="true">·</span>}
+              {updatedLabel && <span className="blog-post-meta-dot" aria-hidden="true">·</span>}
+              {updatedLabel && (
+                <span className="blog-post-meta-text">Updated {updatedLabel}</span>
+              )}
+              {(dateLabel || updatedLabel) && post.readTime && <span className="blog-post-meta-dot" aria-hidden="true">·</span>}
               {post.readTime && <span className="blog-post-meta-text">{post.readTime} min read</span>}
             </div>
 
@@ -175,44 +199,70 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               </p>
             )}
 
-            {/* Author */}
-            {post.author && (
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  marginBottom: '40px',
-                  paddingBottom: '24px',
-                  borderBottom: '1px solid rgba(12,12,11,0.08)',
-                }}
-              >
+            {/* Author byline — always shown with a named human author. Falls
+                back to the founder (Lakshya) when Sanity has no real author, so
+                no post is left faceless. Named authorship + a real headshot is
+                one of the strongest E-E-A-T / AI-citation trust signals. */}
+            {(() => {
+              const isFounder = authorName === 'Lakshya Soni';
+              const avatarSrc = isFounder ? '/founder.jpg' : '/logo.png';
+              return (
                 <div
                   style={{
-                    width: '40px',
-                    height: '40px',
-                    borderRadius: '50%',
-                    overflow: 'hidden',
-                    flexShrink: 0,
-                    background: '#0C0C0B',
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center',
+                    gap: '12px',
+                    marginBottom: '40px',
+                    paddingBottom: '24px',
+                    borderBottom: '1px solid rgba(12,12,11,0.08)',
                   }}
                 >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src="/logo.png"
-                    alt=""
-                    aria-hidden="true"
-                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-                  />
+                  <div
+                    style={{
+                      width: '44px',
+                      height: '44px',
+                      borderRadius: '50%',
+                      overflow: 'hidden',
+                      flexShrink: 0,
+                      background: '#0C0C0B',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={avatarSrc}
+                      alt={isFounder ? authorName : ''}
+                      aria-hidden={isFounder ? undefined : true}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                    />
+                  </div>
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ fontSize: '14px', fontWeight: 700, color: '#0C0C0B' }}>
+                      {isFounder ? (
+                        <a
+                          href="https://www.linkedin.com/in/lakshyasoni/"
+                          target="_blank"
+                          rel="author noopener noreferrer"
+                          style={{ color: '#0C0C0B', textDecoration: 'none' }}
+                          data-cursor-hover
+                        >
+                          {authorName}
+                        </a>
+                      ) : (
+                        authorName
+                      )}
+                    </div>
+                    {isFounder && (
+                      <div style={{ fontSize: '12.5px', color: '#6E6B63', marginTop: '2px', lineHeight: 1.4 }}>
+                        Founder, EchoPulse Media · writes about content, video & AEO
+                      </div>
+                    )}
+                  </div>
                 </div>
-                <div style={{ fontSize: '14px', fontWeight: 600, color: '#0C0C0B' }}>
-                  {post.author}
-                </div>
-              </div>
-            )}
+              );
+            })()}
 
             {/* Hero image */}
             {headerImageSrc && (

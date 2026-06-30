@@ -1,5 +1,6 @@
 import type { MetadataRoute } from 'next';
 import { services } from '@/lib/serviceData';
+import { icps } from '@/lib/icpData';
 import { getAllPosts } from '@/lib/blog';
 
 /**
@@ -42,6 +43,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
+  // ICP / audience landing pages (/real-estate, /founders, etc.) — high
+  // priority since they're the primary outbound conversion destinations.
+  const icpRoutes: MetadataRoute.Sitemap = icps.map((icp) => ({
+    url: `${SITE_URL}/${icp.key}`,
+    lastModified: now,
+    changeFrequency: 'monthly',
+    priority: 0.9,
+  }));
+
   // Blog posts from Sanity — wrapped in try so a Sanity outage never breaks
   // the build. If Sanity is down, the sitemap drops the post URLs gracefully.
   let blogPosts: MetadataRoute.Sitemap = [];
@@ -57,5 +67,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // Sanity unreachable — sitemap continues without blog posts.
   }
 
-  return [home, blogIndex, ...serviceRoutes, ...blogPosts];
+  return [home, blogIndex, ...icpRoutes, ...serviceRoutes, ...blogPosts];
 }

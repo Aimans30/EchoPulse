@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
 import { BOOK_CALL_URL } from '@/lib/links';
+import { trackCallClick } from '@/lib/analytics';
 
 /**
  * Founder section ("Testimonials" by name — actually the founder POV).
@@ -42,7 +43,9 @@ export default function Testimonials() {
         <div style={{ position: 'absolute', bottom: '-10%', right: '5%', width: '420px', height: '420px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(139,92,246,0.08) 0%, transparent 70%)', filter: 'blur(70px)' }} />
       </div>
 
-      <div className="founder-container" style={{ maxWidth: '780px', margin: '0 auto', padding: '0 28px', position: 'relative', zIndex: 1 }}>
+      <div className="founder-container" style={{ maxWidth: '1140px', margin: '0 auto', padding: '0 28px', position: 'relative', zIndex: 1 }}>
+       <div className="founder-grid" style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '56px', alignItems: 'center' }}>
+        <div className="founder-col-text" style={{ maxWidth: '720px', minWidth: 0 }}>
 
         {/* ── Editorial eyebrow ─────────────────────────────────────── */}
         <motion.div
@@ -73,10 +76,10 @@ export default function Testimonials() {
             className="founder-quote-mark"
             style={{
               position: 'absolute',
-              top: '-44px',
-              left: '-18px',
+              top: '-22px',
+              left: '-14px',
               fontFamily: 'Georgia, "Times New Roman", serif',
-              fontSize: '220px',
+              fontSize: '150px',
               fontWeight: 900,
               lineHeight: 1,
               color: 'rgba(232,84,26,0.16)',
@@ -251,6 +254,19 @@ export default function Testimonials() {
           ))}
         </motion.div>
 
+        {/* Supporting line — natural context for readers + crawlers. Works the
+            primary keywords in without stuffing. */}
+        <motion.p
+          className="founder-support"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.16 }}
+          style={{ fontSize: '13.5px', lineHeight: 1.7, color: 'rgba(242,238,231,0.6)', margin: '0 0 28px', maxWidth: '560px' }}
+        >
+          EchoPulse Media is a done-for-you content studio built around founder-led content. We handle video editing for founders, short-form video, and LinkedIn content, plus the full content production pipeline, so SaaS founders, coaches, and business owners ship consistently without managing five freelancers.
+        </motion.p>
+
         {/* ── Read-the-full-letter expand ─────────────────────────── */}
         <motion.div
           initial={{ opacity: 0 }}
@@ -267,31 +283,28 @@ export default function Testimonials() {
             style={{
               display: 'inline-flex',
               alignItems: 'center',
-              gap: '8px',
-              padding: '11px 18px',
+              gap: '7px',
+              padding: '4px 0',
               background: 'transparent',
-              border: '1px solid rgba(255,255,255,0.12)',
-              color: 'rgba(242,238,231,0.78)',
-              borderRadius: '100px',
+              border: 'none',
+              color: 'rgba(242,238,231,0.72)',
+              borderRadius: 0,
               fontFamily: 'Inter, sans-serif',
-              fontSize: '12.5px',
+              fontSize: '12px',
               fontWeight: 700,
               cursor: 'pointer',
-              transition: 'all 0.2s',
-              letterSpacing: '0.1px',
+              transition: 'color 0.2s',
+              letterSpacing: '1px',
+              textTransform: 'uppercase',
               minHeight: '44px',
             }}
             onMouseEnter={(e) => {
               const el = e.currentTarget as HTMLElement;
-              el.style.background = 'rgba(255,255,255,0.06)';
-              el.style.borderColor = 'rgba(255,255,255,0.22)';
               el.style.color = '#F2EEE7';
             }}
             onMouseLeave={(e) => {
               const el = e.currentTarget as HTMLElement;
-              el.style.background = 'transparent';
-              el.style.borderColor = 'rgba(255,255,255,0.12)';
-              el.style.color = 'rgba(242,238,231,0.78)';
+              el.style.color = 'rgba(242,238,231,0.72)';
             }}
           >
             {expanded ? 'Hide the full letter' : 'Read the full letter'}
@@ -348,7 +361,10 @@ export default function Testimonials() {
           }}
         >
           <button
-            onClick={() => (window as any).openBookCallModal && (window as any).openBookCallModal()}
+            onClick={() => {
+              trackCallClick('founder_letter');
+              (window as unknown as { openBookCallModal?: () => void }).openBookCallModal?.();
+            }}
             data-cursor-hover
             className="founder-cta founder-cta-primary"
             style={{
@@ -410,15 +426,69 @@ export default function Testimonials() {
             LinkedIn
           </a>
         </motion.div>
+        </div>{/* /founder-col-text */}
+
+        {/* ── Right-side media slot — founder portrait. Fills desktop dead
+            space and reinforces the personal "letter" tone. Hidden on mobile
+            (the signature row already carries the avatar). ── */}
+        <motion.div
+          className="founder-col-media"
+          aria-hidden="true"
+          initial={{ opacity: 0, scale: 0.96 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          style={{ position: 'relative' }}
+        >
+          <div
+            className="founder-portrait"
+            style={{
+              position: 'relative',
+              borderRadius: '24px',
+              overflow: 'hidden',
+              aspectRatio: '4 / 5',
+              border: '1px solid rgba(232,84,26,0.22)',
+              boxShadow: '0 24px 70px rgba(0,0,0,0.45)',
+            }}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/founder.jpg"
+              alt="Lakshya Soni, founder of EchoPulse Media, a done-for-you content studio for founder-led video and LinkedIn content"
+              loading="lazy"
+              decoding="async"
+              style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+            />
+            <div
+              aria-hidden="true"
+              style={{
+                position: 'absolute',
+                inset: 0,
+                background: 'linear-gradient(180deg, transparent 55%, rgba(13,12,10,0.55) 100%)',
+                pointerEvents: 'none',
+              }}
+            />
+          </div>
+        </motion.div>
+       </div>{/* /founder-grid */}
       </div>
 
       <style>{`
+        /* Desktop: 2-column letter + portrait. Portrait hidden below lg so
+           mobile stays single-column (the signature row carries the avatar). */
+        .founder-col-media { display: none; }
+        @media (min-width: 1024px) {
+          .founder-grid { grid-template-columns: 1.15fr 0.85fr !important; }
+          .founder-col-media { display: block !important; }
+        }
+
         /* ── Tablet ─────────────────────────────────────────────── */
         @media (max-width: 860px) {
           .founder-section { padding: 88px 0 !important; }
+          .founder-grid { gap: 40px !important; }
           .founder-quote-mark {
-            font-size: 170px !important;
-            top: -32px !important;
+            font-size: 130px !important;
+            top: -16px !important;
             left: -12px !important;
           }
         }

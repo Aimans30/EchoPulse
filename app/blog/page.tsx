@@ -8,12 +8,12 @@ import { urlFor } from '@/lib/sanity';
 export const metadata: Metadata = {
   title: 'Blog',
   description:
-    "EchoPulse's blog — long-form notes on content strategy, voice work, video editing, and the AI-as-infrastructure approach behind everything we ship.",
+    "EchoPulse Media's blog — long-form notes on content strategy, voice work, video editing, and the AI-as-infrastructure approach behind everything we ship.",
   alternates: { canonical: '/blog' },
   openGraph: {
-    title: 'Blog | EchoPulse',
+    title: 'Blog | EchoPulse Media',
     description:
-      'Long-form notes on content strategy, voice work, and the AI-as-infrastructure approach behind everything EchoPulse ships.',
+      'Long-form notes on content strategy, voice work, and the AI-as-infrastructure approach behind everything EchoPulse Media ships.',
     url: 'https://echopulse.media/blog',
     type: 'website',
   },
