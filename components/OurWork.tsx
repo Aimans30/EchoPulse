@@ -115,10 +115,14 @@ export default function OurWork() {
   // etc. are driven by `activeTab` and stay snappy.
   const filtered = useMemo(() => {
     if (pendingTab !== 'all') return videos.filter(v => v.type === pendingTab);
-    // For "All": interleave verticals and horizontals so mixed sizes appear
-    // throughout rather than all horizontals bunched together.
-    const verticals = videos.filter(v => !v.orientation || v.orientation === 'vertical');
-    const horizontals = videos.filter(v => v.orientation === 'horizontal');
+    // For "All": de-dupe by URL first (a clip can be listed under more than one
+    // tab/ICP — e.g. a talking-head reel that also fits real estate — but it
+    // should appear only once in the combined "All" view), then interleave
+    // verticals and horizontals so mixed sizes are spread throughout.
+    const seen = new Set<string>();
+    const unique = videos.filter(v => (seen.has(v.url) ? false : (seen.add(v.url), true)));
+    const verticals = unique.filter(v => !v.orientation || v.orientation === 'vertical');
+    const horizontals = unique.filter(v => v.orientation === 'horizontal');
     const mixed: VideoEntry[] = [];
     const maxLen = Math.max(verticals.length, horizontals.length);
     for (let i = 0; i < maxLen; i++) {

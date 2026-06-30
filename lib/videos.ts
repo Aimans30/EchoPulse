@@ -49,6 +49,17 @@ export const videos: VideoEntry[] = [
   { url: 'https://res.cloudinary.com/dqqd9rq8s/video/upload/v1782371049/2426_fn_e4yyrc.mp4',                                    type: 'realestate', brand: 'Listing Reel', label: 'Property',                            icp: ['real-estate'] },
   { url: 'https://res.cloudinary.com/dqqd9rq8s/video/upload/v1782371126/2458_fn_uphhrb.mp4',                                    type: 'realestate', brand: 'Listing Reel', label: 'Property',                            icp: ['real-estate'] },
   { url: 'https://res.cloudinary.com/dqqd9rq8s/video/upload/v1782372139/2438_fn_z6wry7.mp4',                                    type: 'realestate', brand: 'Listing Reel', label: 'Property',                            icp: ['real-estate'] },
+
+  // ─── New clips ───────────────────────────────────────────────────────────
+  // General vertical reel — shows across the home carousel ("All" + Talking).
+  { url: 'https://res.cloudinary.com/du6yx2h01/video/upload/v1782821858/c20_xv9ahv.mp4',                                        type: 'talking',  brand: 'Founder Reel',   label: 'Talking Head', orientation: 'vertical', icp: ['founders', 'coaches', 'business-owners', 'dtc'] },
+  // Talking-head reel that also fits real estate agents → tagged on both tabs
+  // (one entry per tab so each portfolio tab + ICP page picks it up).
+  { url: 'https://player.cloudinary.com/embed/?cloud_name=du6yx2h01&public_id=vx_lpxdya',                                       type: 'talking',  brand: 'Founder Reel',   label: 'Talking Head', orientation: 'vertical', icp: ['founders', 'coaches'] },
+  { url: 'https://player.cloudinary.com/embed/?cloud_name=du6yx2h01&public_id=vx_lpxdya',                                       type: 'realestate', brand: 'Agent Reel',   label: 'Talking Head', orientation: 'vertical', icp: ['real-estate'] },
+  // Additional real-estate listing reels
+  { url: 'https://player.cloudinary.com/embed/?cloud_name=du6yx2h01&public_id=sample6_xv4so8',                                  type: 'realestate', brand: 'Listing Reel', label: 'Property',     orientation: 'vertical', icp: ['real-estate'] },
+  { url: 'https://res.cloudinary.com/du6yx2h01/video/upload/v1782822621/reel_1_lyznya.mp4',                                     type: 'realestate', brand: 'Listing Reel', label: 'Property',     orientation: 'vertical', icp: ['real-estate'] },
 ];
 
 /** All clips tagged for a given ICP landing page. */

@@ -97,20 +97,63 @@ export default function ICPPageClient({ data, videos }: { data: IcpData; videos:
     [detected],
   );
 
-  // Center small sets instead of looping/tiling (matches the homepage fix).
-  const railRef = useRef<HTMLDivElement>(null);
-  const [centered, setCentered] = useState(true);
+  // ── Auto-scrolling rail (mirrors OurWork's RAF marquee) ───────────────────
+  // outerRef = overflow-hidden clip box (IntersectionObserver root + measure).
+  // innerRef = the flex row we translateX every frame.
+  const outerRef = useRef<HTMLDivElement>(null);
+  const innerRef = useRef<HTMLDivElement>(null);
+  const SPEED = 0.5; // px / frame
+
+  const pauseRef = useRef(false);
+  const rafRef = useRef<number | undefined>(undefined);
+  const xOffsetRef = useRef(0);
+
+  // When the single set is too narrow to fill the rail, center it and freeze
+  // the marquee (otherwise 1-2 clips would tile/loop awkwardly). When it
+  // overflows, we double the set and auto-scroll.
+  const [scrolls, setScrolls] = useState(false);
+  const scrollsRef = useRef(false);
+  useEffect(() => { scrollsRef.current = scrolls; }, [scrolls]);
+
   useEffect(() => {
     const measure = () => {
-      const rail = railRef.current;
-      if (!rail) return;
-      const total = videos.reduce((sum, v) => sum + cardWidth(orientationOf(v)) + GAP, 0);
-      setCentered(total < rail.clientWidth);
+      const outer = outerRef.current;
+      if (!outer) return;
+      const oneSet = videos.reduce((sum, v) => sum + cardWidth(orientationOf(v)) + GAP, 0) + 112;
+      const willScroll = oneSet >= outer.clientWidth;
+      setScrolls(willScroll);
+      if (!willScroll) xOffsetRef.current = 0;
     };
     measure();
     window.addEventListener('resize', measure);
     return () => window.removeEventListener('resize', measure);
   }, [videos, orientationOf]);
+
+  // The RAF marquee loop. Doubling the rendered set (below) means the offset
+  // math self-corrects: once we pass half the scrollWidth we subtract it, so
+  // it loops seamlessly.
+  useEffect(() => {
+    const inner = innerRef.current;
+    if (!inner) return;
+    const tick = () => {
+      if (!pauseRef.current && scrollsRef.current) {
+        xOffsetRef.current += SPEED;
+        const loopAt = inner.scrollWidth / 2;
+        if (loopAt > 0 && xOffsetRef.current >= loopAt) xOffsetRef.current -= loopAt;
+        inner.style.transform = `translateX(-${xOffsetRef.current}px)`;
+      }
+      rafRef.current = requestAnimationFrame(tick);
+    };
+    rafRef.current = requestAnimationFrame(tick);
+    return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      rafRef.current = undefined;
+    };
+  }, [scrolls]);
+
+  // Render a doubled set only when scrolling so the loop has a seamless second
+  // pass; otherwise a single centered set.
+  const railVideos = scrolls ? [...videos, ...videos] : videos;
 
   const openModal = useCallback((src: string) => setModalSrc(src), []);
   const closeModal = useCallback(() => setModalSrc(null), []);
@@ -242,9 +285,20 @@ export default function ICPPageClient({ data, videos }: { data: IcpData; videos:
                 Edits we cut for <span style={{ color: accent }}>{data.name.toLowerCase()}</span>.
               </motion.h2>
             </div>
-            <div className="icp-rail-outer">
-              <div ref={railRef} className={`icp-rail${centered ? ' icp-rail-centered' : ''}`}>
-                {videos.map((video, i) => {
+            <div
+              ref={outerRef}
+              className="icp-rail-outer"
+              onMouseEnter={() => { pauseRef.current = true; }}
+              onMouseLeave={() => { pauseRef.current = false; }}
+              onTouchStart={() => { pauseRef.current = true; }}
+              onTouchEnd={() => { pauseRef.current = false; }}
+            >
+              <div
+                ref={innerRef}
+                className={`icp-rail${scrolls ? '' : ' icp-rail-centered'}`}
+                style={scrolls ? undefined : { transform: 'none' }}
+              >
+                {railVideos.map((video, i) => {
                   const orient = orientationOf(video);
                   const previewSrc = previewMp4Src(video.url, orient);
                   return (
@@ -455,11 +509,12 @@ export default function ICPPageClient({ data, videos }: { data: IcpData; videos:
         /* Work / carousel */
         .icp-work { padding: 64px 0 8px; }
         .icp-work .icp-h2 { margin-bottom: 36px; }
-        .icp-rail-outer { overflow: hidden; }
-        .icp-rail { display: flex; gap: ${GAP}px; padding: 0 56px 8px; overflow-x: auto; scrollbar-width: none; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; }
-        .icp-rail::-webkit-scrollbar { display: none; }
+        .icp-rail-outer { overflow: hidden; position: relative; }
+        /* Auto-scrolling marquee: the row is translated via RAF (transform),
+           NOT native scroll — so no scroll-snap / overflow-x here. */
+        .icp-rail { display: flex; gap: ${GAP}px; padding: 0 56px 8px; will-change: transform; }
         .icp-rail-centered { justify-content: center; }
-        .icp-vid-card { position: relative; flex-shrink: 0; border-radius: 16px; overflow: hidden; cursor: none; scroll-snap-align: start; box-shadow: 0 8px 30px rgba(12,12,11,0.10); }
+        .icp-vid-card { position: relative; flex-shrink: 0; border-radius: 16px; overflow: hidden; cursor: none; box-shadow: 0 8px 30px rgba(12,12,11,0.10); will-change: transform; transform: translateZ(0); }
         .icp-vid-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 45%); opacity: 0.7; transition: opacity 0.3s; pointer-events: none; }
         .icp-vid-card:hover .icp-vid-overlay { opacity: 1; }
         .icp-vid-brand { position: absolute; top: 10px; left: 10px; background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 700; color: #0C0C0B; z-index: 2; pointer-events: none; }

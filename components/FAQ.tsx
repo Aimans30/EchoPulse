@@ -5,11 +5,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useGeoPrice } from '@/lib/useGeoPrice';
 
 /**
- * Build the grouped FAQ sections. Takes the localized pilot price token
- * (e.g. "$299" or "₹4,999") so India / EU / etc. visitors see the same
- * answer copy with their currency rendered in place of the US default.
+ * Build the grouped FAQ sections. Takes the localized price tokens
+ * (e.g. "$299" / "$1,997" or "₹9,999" / "₹34,999") so India / EU / etc.
+ * visitors see answer copy whose prices match their own tier cards instead
+ * of hardcoded US dollars.
  */
-const buildFaqSections = (pilotPrice: string) => [
+const buildFaqSections = (pilotPrice: string, growthPrice: string) => [
   {
     section: 'Before you sign anything',
     items: [
@@ -56,12 +57,8 @@ const buildFaqSections = (pilotPrice: string) => [
     section: 'Pricing & commitment',
     items: [
       {
-        q: 'Why is the Pilot $299 and not free?',
-        a: `Free trials attract tire-kickers and produce low-quality work because neither side is invested. At ${pilotPrice}, you get a team that's committed to delivering real work, and you signal that you're a serious buyer. The ${pilotPrice} covers a portion of actual production cost — 10 deliverables in 14 days at this level requires real time from senior people. And unlike a free sample, you keep everything we produce whether you continue or not. If you don't see value in the work, you've spent ${pilotPrice} to find that out instead of $1,997+. That's a cheap discovery cost.`,
-      },
-      {
-        q: "What's the difference between $1,997/month and $4,997/month — is the cheaper plan actually enough?",
-        a: "The Growth plan ($1,997) covers the channels most clients need: LinkedIn and social posts, blogs, short-form video, ad creative, and website. It's enough for founders, coaches, and agents who want consistent content across their main channels without adding headcount. The Full System ($4,997+) is for operators also running a podcast, YouTube channel, courses, and paid ads at scale — and want all of it handled. If you're unsure, start with Growth. You can add channels as you scale. We'll tell you honestly on the call if Growth is overkill for where you are right now.",
+        q: `Why is the Pilot ${pilotPrice} and not free?`,
+        a: `Free trials attract tire-kickers and produce low-quality work because neither side is invested. At ${pilotPrice}, you get a team that's committed to delivering real work, and you signal that you're a serious buyer. The ${pilotPrice} covers a portion of actual production cost — 10 deliverables in 14 days at this level requires real time from senior people. And unlike a free sample, you keep everything we produce whether you continue or not. If you don't see value in the work, you've spent ${pilotPrice} to find that out instead of ${growthPrice}+. That's a cheap discovery cost.`,
       },
       {
         q: "What happens if I want to pause for a month — do I lose my spot?",
@@ -215,7 +212,7 @@ export default function FAQ() {
 
   // Compose the per-locale, grouped FAQ sections. Memoization isn't worth it —
   // the array is tiny and only rebuilds when geo flips (once per session).
-  const faqSections = buildFaqSections(`${currency}${prices.pilot}`);
+  const faqSections = buildFaqSections(`${currency}${prices.pilot}`, `${currency}${prices.growth}`);
 
   // Flatten for the structured-data block and to assign each card a stable,
   // unique index across all sections (drives the single shared `open` state).
