@@ -6,7 +6,11 @@ import { gsap } from 'gsap';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BOOK_CALL_URL, BOOK_CALL_LABEL, BOOK_CALL_LABEL_LONG } from '@/lib/links';
 
-const links = [
+export type NavLink = { label: string; href: string };
+
+// Default (homepage) links. ICP landing pages pass their own on-page anchor
+// set via the `links` prop so the nav stays DRY instead of a forked component.
+const HOMEPAGE_LINKS: NavLink[] = [
   { label: 'Services', href: '/#services' },
   { label: 'Work', href: '/#work' },
   { label: 'Pricing', href: '/#pricing' },
@@ -14,7 +18,23 @@ const links = [
   { label: 'FAQ', href: '/#faq' },
 ];
 
-export default function Nav() {
+// The homepage sections the active-highlight observer watches by default.
+const HOMEPAGE_SECTION_IDS = ['services', 'work', 'pricing', 'faq'];
+
+export default function Nav({
+  links = HOMEPAGE_LINKS,
+  sectionIds = HOMEPAGE_SECTION_IDS,
+  /**
+   * When true, the active-section observer runs on the CURRENT page regardless
+   * of route (used by standalone ICP pages whose anchors live on the same
+   * page). Default false = original homepage-only behavior.
+   */
+  observeCurrentPage = false,
+}: {
+  links?: NavLink[];
+  sectionIds?: string[];
+  observeCurrentPage?: boolean;
+} = {}) {
   const [scrolled, setScrolled] = useState(false);
   const [onDark, setOnDark] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -34,10 +54,11 @@ export default function Nav() {
   // routes since there are no section anchors to watch there.
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    // Only run on the homepage (single trailing slash or root).
-    if (window.location.pathname !== '/') return;
+    // Homepage-only by default; ICP pages opt in via observeCurrentPage so the
+    // highlight tracks their same-page anchor sections on any route.
+    if (!observeCurrentPage && window.location.pathname !== '/') return;
 
-    const targets = ['services', 'work', 'pricing', 'faq']
+    const targets = sectionIds
       .map((id) => document.getElementById(id))
       .filter((el): el is HTMLElement => el !== null);
     if (!targets.length) return;
@@ -54,7 +75,7 @@ export default function Nav() {
     );
     targets.forEach((t) => obs.observe(t));
     return () => obs.disconnect();
-  }, []);
+  }, [sectionIds, observeCurrentPage]);
 
   // Adaptive theming: when the nav is overlapping a section marked
   // `data-dark-bg="true"`, switch to the dark-glass variant. We sample the
@@ -354,7 +375,11 @@ export default function Nav() {
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
           >
-            {links.map((link, i) => (
+            {links.map((link, i) => {
+              const isActive =
+                !!activeSection &&
+                (link.href === `/#${activeSection}` || link.href === `#${activeSection}`);
+              return (
               <motion.div
                 key={link.label}
                 initial={{ opacity: 0, x: -16 }}
@@ -364,6 +389,7 @@ export default function Nav() {
                 <Link
                   href={link.href}
                   className="mobile-nav-link"
+                  aria-current={isActive ? 'page' : undefined}
                   onClick={closeMobile}
                   scroll={true}
                 >
@@ -371,7 +397,8 @@ export default function Nav() {
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#A8A49B" strokeWidth="2" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                 </Link>
               </motion.div>
-            ))}
+              );
+            })}
             <button
               type="button"
               className="mobile-nav-cta"
@@ -462,18 +489,25 @@ export default function Nav() {
         {/* Desktop links — Link gives soft client-side nav back to / + hash scroll,
            so jumping back from /services/* doesn't trigger a full reload. */}
         <ul className="nav-links-list" style={{ display: 'flex', gap: '28px', listStyle: 'none', margin: 0, padding: 0 }}>
-          {links.map((link) => (
-            <li key={link.label}>
-              <Link
-                href={link.href}
-                className={`nav-link ${activeSection && link.href === `/#${activeSection}` ? 'is-active' : ''}`}
-                aria-current={activeSection && link.href === `/#${activeSection}` ? 'page' : undefined}
-                scroll={true}
-              >
-                {link.label}
-              </Link>
-            </li>
-          ))}
+          {links.map((link) => {
+            // Match both homepage (/#id) and same-page (#id) anchor forms so
+            // the highlight works whether Nav is on / or an ICP page.
+            const isActive =
+              !!activeSection &&
+              (link.href === `/#${activeSection}` || link.href === `#${activeSection}`);
+            return (
+              <li key={link.label}>
+                <Link
+                  href={link.href}
+                  className={`nav-link ${isActive ? 'is-active' : ''}`}
+                  aria-current={isActive ? 'page' : undefined}
+                  scroll={true}
+                >
+                  {link.label}
+                </Link>
+              </li>
+            );
+          })}
         </ul>
 
         {/* Desktop CTA — opens the in-page BookCallModal (iframe Calendly) so

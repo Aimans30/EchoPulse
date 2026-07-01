@@ -1,6 +1,6 @@
 // ─── Shared portfolio video source-of-truth ─────────────────────────────────
 // Used by both the homepage portfolio carousel (components/OurWork.tsx) and the
-// per-ICP landing pages (app/[icp]/page.tsx → components/ICPPageClient.tsx).
+// per-ICP landing pages (app/[icp]/page.tsx → components/icp/ICPWork.tsx).
 //
 // Each clip carries an `icp` array tagging which audience landing page(s) it
 // belongs on. A clip can serve more than one ICP (a brand film fits both

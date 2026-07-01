@@ -166,7 +166,7 @@ const promisesDefault: Promise[] = [
     stat: '__PILOT_PRICE__',
     statLabel: 'Pilot to start',
     headline: 'Try first. Commit when convinced.',
-    body: 'Every relationship starts with a paid two-week Pilot at our intro price of __PILOT_PRICE__. 12 social posts, 3 short-form video edits, 5 long-form blogs, the onboarding interview, and one strategic deliverable. See the quality before any monthly engagement.',
+    body: 'Every relationship starts with a paid two-week Pilot at our intro price of __PILOT_PRICE__. 8 short-form and 5 clipped content pieces, 5 long-form blogs, the onboarding strategy session, and a content audit plus 30-day plan. See the quality before any monthly engagement.',
   },
 ];
 
@@ -535,7 +535,7 @@ export default function ServicePageClient({ service }: { service: ServiceData })
       window.open(service.bookCallUrl, '_blank', 'noopener,noreferrer');
       return;
     }
-    bookCall();
+    (window as unknown as { openBookCallModal?: () => void }).openBookCallModal?.();
   };
 
   return (

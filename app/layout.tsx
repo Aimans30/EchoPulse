@@ -147,7 +147,7 @@ const structuredData = {
         "https://x.com/Lakshya_Creates",
       ],
       makesOffer: [
-        { "@type": "Offer", name: "Pilot", price: "299", priceCurrency: "USD", description: "14-day paid trial: onboarding interview, 12 social posts, 3 short-form video edits, 5 long-form blogs, plus one strategic deliverable." },
+        { "@type": "Offer", name: "Pilot", price: "299", priceCurrency: "USD", description: "14-day paid trial: onboarding strategy session, 8 short-form and 5 clipped content pieces, 5 long-form blogs, plus a content audit and 30-day plan." },
         { "@type": "Offer", name: "Growth Retainer", price: "1997", priceCurrency: "USD", description: "Monthly retainer covering social, blogs, short + long-form video, ad creatives, website optimization, and monthly strategy." },
         { "@type": "Offer", name: "Full System", price: "4997", priceCurrency: "USD", description: "All-in monthly plan covering 30 social posts, 8 long-form blogs, full ad engine, podcast editing, course modules, automations, and quarterly custom website build." },
       ],

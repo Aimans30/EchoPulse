@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { getIcp, icps } from '@/lib/icpData';
 import { videosForIcp } from '@/lib/videos';
-import ICPPageClient from '@/components/ICPPageClient';
+import ICPPage from '@/components/icp/ICPPage';
 
 const SITE_URL = 'https://echopulse.media';
 
@@ -20,12 +20,17 @@ export async function generateMetadata({ params }: { params: Promise<{ icp: stri
   const data = getIcp(icp);
   if (!data) return {};
   const canonical = `${SITE_URL}/${data.key}`;
+  // data.metaTitle is the short descriptive part only (no brand suffix). The
+  // root layout template appends " | EchoPulse Media" for the document <title>,
+  // so we keep the tag under ~60 chars and avoid the brand doubling up. OG /
+  // Twitter titles carry the full brand form explicitly.
+  const fullTitle = `${data.metaTitle} | EchoPulse Media`;
   return {
     title: data.metaTitle,
     description: data.metaDescription,
     alternates: { canonical },
     openGraph: {
-      title: data.metaTitle,
+      title: fullTitle,
       description: data.metaDescription,
       url: canonical,
       siteName: 'EchoPulse Media',
@@ -34,7 +39,7 @@ export async function generateMetadata({ params }: { params: Promise<{ icp: stri
     },
     twitter: {
       card: 'summary_large_image',
-      title: data.metaTitle,
+      title: fullTitle,
       description: data.metaDescription,
       images: ['/og-image.png'],
     },
@@ -95,7 +100,7 @@ export default async function IcpLandingPage({ params }: { params: Promise<{ icp
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
-      <ICPPageClient data={data} videos={pageVideos} />
+      <ICPPage data={data} videos={pageVideos} />
     </>
   );
 }

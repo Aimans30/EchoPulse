@@ -45,7 +45,60 @@ function useMobilePricingDots() {
   }, []);
 }
 
-export default function Pricing() {
+// ── Per-tier feature copy ────────────────────────────────────────────────────
+// These are the DEFAULT (homepage) feature lines. ICP landing pages can pass a
+// `pricingCopy` override so each tier's feature list reads native to that
+// audience. Prices, counts, badges, taglines, and CTAs never change — only
+// these feature strings swap. A segment that supplies no override falls back to
+// these defaults (see `plans` below).
+export type PricingCopy = {
+  pilot: string[];
+  growth: string[];
+  full: string[];
+};
+
+const DEFAULT_PILOT_FEATURES: string[] = [
+  '90-min onboarding strategy session + brand brief',
+  '8 short-form + 2 static + 1 carousel + 5 clipped content pieces',
+  '5 long-form SEO blog drafts (1,500 words each, optimized for search and AI answer engines)',
+  'Content audit + 30-day plan',
+  'Curated to the channels your business actually needs',
+  '48-hour turnaround per deliverable',
+  'Revisions until you are satisfied',
+  'Live Loom walkthrough on delivery',
+  'No retainer commitment. See the work first.',
+];
+
+const DEFAULT_GROWTH_FEATURES: string[] = [
+  'Onboarding strategy session + quarterly brand-brief refresh',
+  '20 social posts per month across all platforms (LinkedIn, Instagram, wherever your buyers are)',
+  '4 long-form SEO blogs per month (1,500 to 2,500 words, optimized for search and AI answer engines)',
+  '12 short-form video edits + 12 clipped content pieces + 2 long-form (YouTube, podcast, listing tours)',
+  '6 ad creatives per month (4 static + 2 video)',
+  'Conversion-built website, rebuilt in month one and tuned every month after',
+  'Funnel optimization with conversion tracking and A/B testing built in',
+  'Monthly strategy call with a 30-day content calendar mapped ahead',
+  '48-hour turnaround on every deliverable, as standard',
+  'Monthly performance review so you see what is working',
+  '20% off any custom app or software build (MVPs, dashboards, course platforms, client portals)',
+];
+
+const DEFAULT_FULL_FEATURES: string[] = [
+  'Everything in Growth, scaled',
+  'Long-form YouTube editing (vlogs, sponsored content, educational, listing tours)',
+  'Podcast editing: full episodes + 8 to 12 highlight cuts each',
+  'Course module editing (Kajabi, Teachable, Thinkific, Skool)',
+  'Company process optimization (SOPs, workflows, internal automations)',
+  '30 social posts + 8 long-form blogs per month',
+  'Full ad creative engine across Meta, TikTok, YouTube, Google',
+  'Custom website or funnel build each quarter (4 builds/year)',
+  'One small custom app build per quarter included (up to $9,997 scope) + 30% off larger app builds',
+  'Automation stack setup (Make.com, ManyChat, CRM)',
+  'Dedicated account lead + bi-weekly strategy session',
+  'Live performance dashboard + monthly reporting',
+];
+
+export default function Pricing({ pricingCopy }: { pricingCopy?: PricingCopy } = {}) {
   const { currency, prices, countryLabel, ready } = useGeoPrice();
   // (Old `mobileSelectedTier` picker state was removed when the mobile UX
   // changed from a tier-picker row to a horizontal swipe carousel. Cards
@@ -66,18 +119,8 @@ export default function Pricing() {
       per: 'one-off / 2 weeks',
       badge: `Try us out · ${currency}${prices.pilot}`,
       tagline: 'See real work in 14 days before you sign anything.',
-      features: [
-        '90-min onboarding interview + brand brief',
-        '12 social posts: 8 short-form + 2 story posts + 2 carousels',
-        '3 short-form video edits (Reels / TikToks / Shorts / property cuts)',
-        '5 long-form blog drafts (1,500 words each, fully researched)',
-        'One strategic deliverable: content audit, or a 30-day plan',
-        'Curated to the channels your business actually needs',
-        '48-hour turnaround per deliverable',
-        'Revisions until you are satisfied',
-        'Live Loom walkthrough on delivery',
-        'No retainer commitment. See the work first.',
-      ],
+      // Per-segment override wins; otherwise the default homepage copy.
+      features: pricingCopy?.pilot ?? DEFAULT_PILOT_FEATURES,
       cta: 'Claim the Pilot',
       featured: true,
     },
@@ -87,19 +130,7 @@ export default function Pricing() {
       per: '/month',
       badge: 'Monthly · Most Popular',
       tagline: 'The retainer most clients pick. One team, every channel, every month.',
-      features: [
-        'Onboarding interview + quarterly brand-brief refresh',
-        '20 social posts per month (5/week — LinkedIn, Instagram, or wherever your buyers are)',
-        '4 long-form blogs per month (1,500 to 2,500 words each)',
-        '12 short-form video edits + 2 long-form (YouTube, podcast, listing tours)',
-        '6 ad creatives per month (static + video)',
-        'Full website revamp + ongoing optimization (rebuilt for conversions in month one, tuned monthly after)',
-        'Funnel optimization with conversion tracking + A/B tests',
-        'Monthly strategy call + 30-day content calendar',
-        '48-hour standard turnaround on every deliverable',
-        'Performance review with monthly reporting',
-        '20% off any custom app or software build (MVPs, dashboards, course platforms, client portals)',
-      ],
+      features: pricingCopy?.growth ?? DEFAULT_GROWTH_FEATURES,
       cta: 'Book a Call',
       featured: false,
     },
@@ -109,24 +140,11 @@ export default function Pricing() {
       per: '/month',
       badge: 'All-in. Fixed scope.',
       tagline: 'For operators going all-in on content. Locked package, no upsells, no scaling tricks.',
-      features: [
-        'Everything in Growth, scaled',
-        'Long-form YouTube editing (vlogs, sponsored content, educational, listing tours)',
-        'Podcast editing: full episodes + 8 to 12 highlight cuts each',
-        'Course module editing (Kajabi, Teachable, Thinkific, Skool)',
-        'Company process optimization (SOPs, workflows, internal automations)',
-        '30 social posts + 8 long-form blogs per month',
-        'Full ad creative engine across Meta, TikTok, YouTube, Google',
-        'Custom website or funnel build each quarter (4 builds/year)',
-        'One small custom app build per quarter included (up to $9,997 scope) + 30% off larger app builds',
-        'Automation stack setup (Make.com, ManyChat, CRM)',
-        'Dedicated account lead + bi-weekly strategy session',
-        'Live performance dashboard + monthly reporting',
-      ],
+      features: pricingCopy?.full ?? DEFAULT_FULL_FEATURES,
       cta: 'Talk to Us',
       featured: false,
     },
-  ] as const;
+  ];
 
   return (
     <section
