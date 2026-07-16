@@ -16,13 +16,22 @@ import { useInitialGeo } from '@/components/GeoProvider';
  *      production case), it's done. When absent (local dev), it falls back
  *      to a quick client-side detection: cookie -> sessionStorage -> ipapi.co.
  *
- * Pricing model: hand-tuned per market, not raw FX. India pricing in
- * particular is set against local agency rate cards rather than $1 = ₹83
- * conversion, which would price every package out of reach.
+ * Pricing model: hand-tuned per market, not raw FX.
+ *
+ * INDIA PRICING WAS REMOVED (2026-07). Previously visitors from IN saw a
+ * separate INR rate card (₹9,999 / ₹34,999 / ₹99,999+) priced against local
+ * agency rates — roughly 40% of the US price for the same scope. Since the
+ * business is now positioned at US/UK/global founders, there is one price
+ * everywhere: India resolves to 'OTHER', which is USD.
+ *
+ * Knock-on effects, so nobody is surprised later:
+ *   • Checkout for Indian buyers now routes to Dodo (USD) instead of Razorpay.
+ *     The Razorpay API routes still exist but nothing calls them.
+ *   • The Pune-gated on-site section and inquiry modal were removed with it.
  */
 
-export type Region = 'US' | 'CA' | 'EU' | 'UK' | 'IN' | 'OTHER';
-export type CurrencyCode = 'USD' | 'CAD' | 'EUR' | 'GBP' | 'INR';
+export type Region = 'US' | 'CA' | 'EU' | 'UK' | 'OTHER';
+export type CurrencyCode = 'USD' | 'CAD' | 'EUR' | 'GBP';
 
 export interface GeoPricing {
   region: Region;
@@ -31,7 +40,6 @@ export interface GeoPricing {
   countryLabel: string;
   country: string | null;
   city: string | null;
-  isPune: boolean;
   prices: {
     pilot: string;
     pilotOriginal: string;
@@ -57,21 +65,16 @@ interface RegionPricing {
 //
 // Policy notes:
 // • "Pilot" is the 1-month intro. Original is the strike-through anchor.
-// • India numbers reset upward 2026-05-30 — ₹4,999 → ₹9,999. The earlier
-//   number didn't survive the time-vs-revenue math after WhatsApp support,
-//   3 revisions, and 5 deliverables. Floor is now ₹9K so a 4-short bundle
-//   still delivers margin after editor pay.
-// • OTHER (the catch-all for non-listed countries) defaults to USD pricing
-//   — we don't discount unknown markets just because we don't recognize
-//   their currency. If a real ask comes through that needs PPP, we add the
-//   country here explicitly instead of auto-discounting.
+// • OTHER (the catch-all for non-listed countries, now including India)
+//   defaults to USD pricing — we don't discount unknown markets just because
+//   we don't recognize their currency. If a real ask comes through that needs
+//   PPP, add the country here explicitly instead of auto-discounting.
 const PRICING_BY_REGION: Record<Region, RegionPricing> = {
-  US:    { currency: '$',   currencyCode: 'USD', countryLabel: 'US pricing',     pilot: '299',    pilotOriginal: '599',    growth: '1,997',  full: '4,997+'   },
-  CA:    { currency: 'CA$', currencyCode: 'CAD', countryLabel: 'Canada pricing', pilot: '419',    pilotOriginal: '839',    growth: '2,747',  full: '6,997+'   },
-  EU:    { currency: '€',   currencyCode: 'EUR', countryLabel: 'EU pricing',     pilot: '279',    pilotOriginal: '559',    growth: '1,847',  full: '4,597+'   },
-  UK:    { currency: '£',   currencyCode: 'GBP', countryLabel: 'UK pricing',     pilot: '239',    pilotOriginal: '479',    growth: '1,597',  full: '3,997+'   },
-  IN:    { currency: '₹',   currencyCode: 'INR', countryLabel: 'India pricing',  pilot: '9,999',  pilotOriginal: '19,999', growth: '34,999', full: '99,999+'  },
-  OTHER: { currency: '$',   currencyCode: 'USD', countryLabel: 'USD pricing',    pilot: '299',    pilotOriginal: '599',    growth: '1,997',  full: '4,997+'   },
+  US:    { currency: '$',   currencyCode: 'USD', countryLabel: 'US pricing',     pilot: '299', pilotOriginal: '599', growth: '1,997', full: '4,997+' },
+  CA:    { currency: 'CA$', currencyCode: 'CAD', countryLabel: 'Canada pricing', pilot: '419', pilotOriginal: '839', growth: '2,747', full: '6,997+' },
+  EU:    { currency: '€',   currencyCode: 'EUR', countryLabel: 'EU pricing',     pilot: '279', pilotOriginal: '559', growth: '1,847', full: '4,597+' },
+  UK:    { currency: '£',   currencyCode: 'GBP', countryLabel: 'UK pricing',     pilot: '239', pilotOriginal: '479', growth: '1,597', full: '3,997+' },
+  OTHER: { currency: '$',   currencyCode: 'USD', countryLabel: 'USD pricing',    pilot: '299', pilotOriginal: '599', growth: '1,997', full: '4,997+' },
 };
 
 // Export for the /pricing-matrix admin page — single source of truth.
@@ -88,11 +91,14 @@ export const ALL_REGION_PRICING = PRICING_BY_REGION;
  * comparison tables, ad-hoc promo prices).
  *
  * Region multipliers + rounding:
- *   IN  → ×80, round to 99-ending in INR     ($15 → ₹1,499, $80 → ₹6,499)
  *   UK  → ×0.78, round to 9-ending in GBP    ($15 → £14, $80 → £69)
  *   EU  → ×0.92, round to 9-ending in EUR    ($15 → €14, $80 → €74)
  *   CA  → ×1.30, round to 9-ending in CAD    ($15 → CA$19, $80 → CA$99)
  *   US  → as-is                              ($15 → $15)
+ *
+ * India used to have its own piecewise INR curve here (a PPP ramp, not a flat
+ * ×80). Removed 2026-07 along with the INR rate card — IN now falls through to
+ * the USD default like any other unlisted market.
  *
  * High-PPP markets get a +15% premium on top of the regional multiplier:
  *   CH (Switzerland) → ×0.92 ×1.15 = ×1.06, displayed as CHF (not €)
@@ -101,7 +107,7 @@ export const ALL_REGION_PRICING = PRICING_BY_REGION;
  *   LU (Luxembourg)  → ×0.92 ×1.15
  *
  * The "no-brainer deal" math: every number reads as a sales-friendly round.
- * Never a raw FX figure like ₹1,247 — always ₹1,499 or ₹1,299.
+ * Never a raw FX figure like €13.80 — always €14 or €74.
  */
 export function localizeOrderPrice(
   usd: number,
@@ -120,40 +126,7 @@ export function localizeOrderPrice(
     if (n < 500) return Math.max(49, Math.round(n / 10) * 10 - 1);
     return Math.max(499, Math.round(n / 100) * 100 - 1);
   };
-  const inrRound = (n: number): number => {
-    // INR rounds to nearest hundred minus one (₹X99), with a minimum of ₹99
-    if (n < 200) return Math.max(99, Math.round(n / 100) * 100 - 1);
-    if (n < 5000) return Math.max(499, Math.round(n / 100) * 100 - 1);
-    return Math.max(4999, Math.round(n / 500) * 500 - 1);
-  };
-
-  /**
-   * India PPP curve — NOT a flat USD×80.
-   *
-   * The Indian market accepts low-anchor entry points happily but resists
-   * mid/high USD tiers when translated linearly. This piecewise mapping
-   * keeps small one-off services aspirational while compressing the
-   * mid-tier ladder so a Signature Reel ≈ ₹2,500 and Elite ≈ ₹5,000.
-   *
-   *   USD ≤ 15     → ×80          ($15  → ₹1,199 — entry tier feels native)
-   *   USD ≤ 80     → linear ramp  ($49  → ~₹1,899, $80 → ₹2,499)
-   *   USD ≤ 100    → linear ramp  ($90  → ~₹3,799, $100 → ₹4,999)
-   *   USD ≤ 350    → ×50          ($349 → ~₹17,499 — podcast premium)
-   *   USD  > 350   → ×45          (gentler at the very top end)
-   */
-  const inrFromUsd = (usd: number): number => {
-    if (usd <= 15) return usd * 80;
-    if (usd <= 80) return 1199 + (usd - 15) * 20;          // 1199 → 2499
-    if (usd <= 100) return 2499 + (usd - 80) * 125;        // 2499 → 4999
-    if (usd <= 350) return 4999 + (usd - 100) * 50;        // 4999 → 17499
-    return usd * 45;
-  };
-
   switch (region) {
-    case 'IN': {
-      const rounded = inrRound(inrFromUsd(usd));
-      return { display: `₹${rounded.toLocaleString('en-IN')}`, raw: rounded, currency: '₹', currencyCode: 'INR' };
-    }
     case 'UK': {
       const rounded = salesRound(usd * 0.78);
       return { display: `£${rounded}`, raw: rounded, currency: '£', currencyCode: 'GBP' };
@@ -192,7 +165,6 @@ const CA_TZ = new Set([
   'America/Montreal','America/St_Johns','America/Regina',
 ]);
 const UK_TZ = new Set(['Europe/London','Europe/Belfast','Europe/Edinburgh']);
-const IN_TZ = new Set(['Asia/Kolkata','Asia/Calcutta']);
 
 const EU_COUNTRIES = new Set([
   'AT','BE','BG','HR','CY','CZ','DK','EE','FI','FR','DE','GR','HU','IE','IT','LV','LT','LU',
@@ -205,7 +177,7 @@ function countryToRegion(c: string | null | undefined): Region {
   if (u === 'US') return 'US';
   if (u === 'CA') return 'CA';
   if (u === 'GB' || u === 'UK') return 'UK';
-  if (u === 'IN') return 'IN';
+  // 'IN' deliberately falls through to OTHER (USD) — see the header note.
   if (EU_COUNTRIES.has(u)) return 'EU';
   return 'OTHER';
 }
@@ -217,18 +189,11 @@ function regionFromTimezone(): Region {
     if (UK_TZ.has(tz)) return 'UK';
     if (CA_TZ.has(tz)) return 'CA';
     if (EU_TZ.has(tz)) return 'EU';
-    if (IN_TZ.has(tz)) return 'IN';
     if (tz.startsWith('America/')) return 'US';
     if (tz.startsWith('Europe/')) return 'EU';
     if (tz.startsWith('Asia/')) return 'OTHER';
     return 'OTHER';
   } catch { return 'OTHER'; }
-}
-
-function isPuneCity(city: string | null): boolean {
-  if (!city) return false;
-  const c = city.trim().toLowerCase();
-  return c === 'pune' || c === 'poona' || c.includes('pimpri') || c.includes('chinchwad');
 }
 
 const COOKIE_NAME = 'ep_geo';
@@ -304,7 +269,6 @@ export function useGeoPrice(): GeoPricing {
     countryLabel: data.countryLabel,
     country,
     city,
-    isPune: isPuneCity(city),
     prices: {
       pilot: data.pilot,
       pilotOriginal: data.pilotOriginal,

@@ -2,11 +2,24 @@
 
 import Link from 'next/link';
 
-const serviceLinks = [
-  'Video Editing', 'LinkedIn & Social', 'Blog Production',
-  'Ad Creatives', 'Websites & Funnels', 'Automations',
-  'Apps & Software',
-];
+import { services } from '@/lib/serviceData';
+
+/**
+ * Footer service links.
+ *
+ * These used to be a hardcoded string array where every single item linked to
+ * `#services` — an anchor on the homepage. That meant our seven money pages
+ * (/services/video-editing, /services/linkedin-ghostwriting, ...) had almost no
+ * internal links pointing at them, so they inherited no authority from the
+ * site's most-linked element. Google also can't rank an anchor as a page.
+ *
+ * Now derived from serviceData, so the footer always links to the real URLs and
+ * stays in sync automatically when a service is added or renamed.
+ */
+const serviceLinks = services.map((s) => ({
+  label: s.name,
+  href: `/services/${s.slug}`,
+}));
 
 export default function Footer() {
   return (
@@ -99,14 +112,14 @@ export default function Footer() {
         </h4>
         <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {serviceLinks.map((s) => (
-            <li key={s}>
+            <li key={s.href}>
               <a
-                href="#services"
+                href={s.href}
                 style={{ color: '#6E6B63', textDecoration: 'none', fontSize: '14px', transition: 'color 0.2s' }}
                 onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.color = '#0C0C0B')}
                 onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.color = '#6E6B63')}
               >
-                {s}
+                {s.label}
               </a>
             </li>
           ))}

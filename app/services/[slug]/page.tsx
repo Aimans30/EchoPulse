@@ -13,19 +13,27 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const service = getService(slug);
   if (!service) return {};
   const canonical = `${SITE_URL}/services/${slug}`;
+
+  // `title` used to be a plain string, which the root layout's
+  // `template: "%s | EchoPulse Media"` then wrapped — producing
+  // "Video Editing | EchoPulse | EchoPulse Media". `absolute` opts out of the
+  // template so the brand appears exactly once. The "for Founders" qualifier
+  // is what makes this rank for a query someone actually types.
+  const pageTitle = `${service.name} Services for Founders | EchoPulse`;
+
   return {
-    title: `${service.name} | EchoPulse`,
+    title: { absolute: pageTitle },
     description: service.heroSub,
     alternates: { canonical },
     openGraph: {
-      title: `${service.name} | EchoPulse`,
+      title: pageTitle,
       description: service.heroSub,
       url: canonical,
       type: 'article',
     },
     twitter: {
       card: 'summary_large_image',
-      title: `${service.name} | EchoPulse`,
+      title: pageTitle,
       description: service.heroSub,
     },
   };

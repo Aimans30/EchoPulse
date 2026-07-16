@@ -25,10 +25,8 @@ const OurWork = dynamic(() => import('@/components/OurWork'), { ssr: false });
 const Services = dynamic(() => import('@/components/Services'), { ssr: false });
 const Process = dynamic(() => import('@/components/Process'), { ssr: false });
 const Pricing = dynamic(() => import('@/components/Pricing')); // SSR: tier prices + schema in pre-rendered HTML
-// PuneOffering is a self-gating section: it returns null for non-Pune visitors,
-// so it's safe to always mount. Code-split so non-Pune folks don't even
-// download the chunk after the gate determines they don't need it.
-const PuneOffering = dynamic(() => import('@/components/PuneOffering'), { ssr: false });
+// NOTE: the Pune-gated on-site offering section was removed in July 2026 along
+// with the India rate card. components/PuneOffering.tsx is now unused.
 const FAQ = dynamic(() => import('@/components/FAQ'));           // SSR: FAQ schema for rich-result eligibility
 const CTABanner = dynamic(() => import('@/components/CTABanner')); // SSR: book-a-call CTA copy crawlable
 const Footer = dynamic(() => import('@/components/Footer'));      // SSR: contact info + sitemap-style links crawlable
@@ -161,11 +159,6 @@ export default function Home() {
           <OurWork />
           <Services />
           <Process />
-          {/* Pune-only section renders BEFORE Pricing so local visitors see
-              their in-person packages first (no scroll past international
-              monthly retainers they don't need). Returns null for everyone
-              else — order doesn't matter for non-Pune visitors. */}
-          <PuneOffering />
           <Pricing />
           <FAQ />
           <CTABanner />

@@ -36,6 +36,32 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.85,
   };
 
+  // /about — the founder entity page. High priority: it's the #2 page on the
+  // domain by impressions and it anchors the Person/Organization schema chain
+  // that both Google's raters and AI assistants use to decide we're a real firm.
+  const about: MetadataRoute.Sitemap[number] = {
+    url: `${SITE_URL}/about`,
+    lastModified: now,
+    changeFrequency: 'monthly',
+    priority: 0.9,
+  };
+
+  // /order was indexable but missing from the sitemap, so Google had no path to
+  // it except the nav. It's a conversion page; it belongs here.
+  const order: MetadataRoute.Sitemap[number] = {
+    url: `${SITE_URL}/order`,
+    lastModified: now,
+    changeFrequency: 'monthly',
+    priority: 0.7,
+  };
+
+  const terms: MetadataRoute.Sitemap[number] = {
+    url: `${SITE_URL}/terms`,
+    lastModified: now,
+    changeFrequency: 'yearly',
+    priority: 0.2,
+  };
+
   const serviceRoutes: MetadataRoute.Sitemap = services.map((service) => ({
     url: `${SITE_URL}/services/${service.slug}`,
     lastModified: now,
@@ -67,5 +93,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // Sanity unreachable — sitemap continues without blog posts.
   }
 
-  return [home, blogIndex, ...icpRoutes, ...serviceRoutes, ...blogPosts];
+  return [home, about, blogIndex, ...icpRoutes, ...serviceRoutes, ...blogPosts, order, terms];
 }

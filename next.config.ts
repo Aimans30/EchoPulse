@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { BLOG_REDIRECTS } from "./lib/redirects";
 
 /**
  * Next.js config — tuned for production deploys on **Vercel** and
@@ -33,6 +34,46 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "res.cloudinary.com" },      // Cloudinary asset CDN (videos + future posters)
       { protocol: "https", hostname: "player.cloudinary.com" },   // Cloudinary embed player (older video links)
     ],
+  },
+
+  /**
+   * Redirects — three jobs, and order matters (Next applies the first match).
+   *
+   *   1. Canonical host. GSC was counting https://, https://www. and http://
+   *      as three separate sites, splitting what little equity exists. Force
+   *      everything to the apex https://echopulse.media.
+   *   2. Blog consolidation. ~65 near-duplicate posts are unpublished in Sanity;
+   *      each 301s to the surviving post for its topic cluster so the equity
+   *      consolidates instead of 404ing. Emitted for BOTH /blog/* and /blogs/*
+   *      so a dead /blogs/ URL resolves in one hop, not two.
+   *   3. Section consolidation. /blogs/* -> /blog/*. Two live blog paths means
+   *      duplicate section signals; /blog is the canonical one.
+   */
+  async redirects() {
+    const deadSlugRedirects = Object.entries(BLOG_REDIRECTS).flatMap(
+      ([slug, destination]) => [
+        { source: `/blog/${slug}`, destination, permanent: true },
+        // Same target, so a dead /blogs/ URL never chains through /blog/.
+        { source: `/blogs/${slug}`, destination, permanent: true },
+      ],
+    );
+
+    return [
+      // 1. www -> apex. `has` matches the incoming Host header.
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "www.echopulse.media" }],
+        destination: "https://echopulse.media/:path*",
+        permanent: true,
+      },
+
+      // 2. Retired duplicate posts -> their cluster survivor.
+      ...deadSlugRedirects,
+
+      // 3. Everything still living under /blogs -> /blog.
+      { source: "/blogs", destination: "/blog", permanent: true },
+      { source: "/blogs/:slug", destination: "/blog/:slug", permanent: true },
+    ];
   },
 
   // Set correct Content-Type + cache headers for the AI-readable files.

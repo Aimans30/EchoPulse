@@ -557,7 +557,9 @@ export default function Hero() {
   const wrapRef      = useRef<HTMLDivElement>(null);
   const eyebrowRef   = useRef<HTMLDivElement>(null);
   const headlineRef  = useRef<HTMLHeadingElement>(null);
-  const subRef       = useRef<HTMLParagraphElement>(null);
+  // Was HTMLParagraphElement. The hero subline is now an <h2> (it carries the
+  // homepage's only keyword-bearing heading), so the ref type follows the tag.
+  const subRef       = useRef<HTMLHeadingElement>(null);
   const actionsRef   = useRef<HTMLDivElement>(null);
   const rightRef     = useRef<HTMLDivElement>(null);
 
@@ -917,16 +919,28 @@ export default function Hero() {
             {/* Mobile headline — clean 2-line structure that reads naturally at 375px.
                 Each line is its own block so the italic accent on line 2 doesn't
                 pull the baseline of line 1, which made the headline look slightly
-                misaligned at the 375px viewport. */}
-            <h1 className="hero-h1-mobile hero-mobile-only" aria-hidden="true">
+                misaligned at the 375px viewport.
+
+                NOTE: this is a <div>, not an <h1>. It used to be a second <h1>,
+                which meant every crawler saw TWO H1s on the homepage (CSS hides
+                one visually, but the DOM still carries both). One H1 per page. */}
+            <div className="hero-h1-mobile hero-mobile-only" role="presentation" aria-hidden="true">
               <span style={{ display: 'block' }}>You run the business.</span>
               <span style={{ display: 'block' }}>We run <span className="accent">the content.</span></span>
-            </h1>
+            </div>
 
-            <p ref={subRef} className="hero-sub" style={{ fontSize: '16px', color: '#6E6B63', maxWidth: '540px', lineHeight: 1.7, fontWeight: 400, margin: '0 0 36px' }}>
-              <span>Everything you publish, handled by one studio.</span>{' '}
+            {/* Keyword-bearing H2. The H1 above is pure brand copy — great for
+                humans, but it gives Google nothing to rank the homepage for.
+                This line states plainly what we sell and who we sell it to, in
+                the words buyers actually search. Doubles as the sentence AI
+                assistants extract when asked "what is EchoPulse Media". */}
+            <h2 ref={subRef} className="hero-sub" style={{ fontSize: '16px', color: '#6E6B63', maxWidth: '540px', lineHeight: 1.7, fontWeight: 400, margin: '0 0 36px' }}>
+              <span>
+                A done-for-you content agency for founders, coaches, and business owners:
+                video editing, LinkedIn ghostwriting, blogs, and ads under one roof.
+              </span>{' '}
               <strong style={{ color: '#0C0C0B', fontWeight: 600 }}>You hit record, we do the rest.</strong>
-            </p>
+            </h2>
 
             <div ref={actionsRef} className="hero-actions" style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '0', alignItems: 'center' }}>
               {/* PRIMARY — opens the BookCallModal (Calendly iframe) so visitors

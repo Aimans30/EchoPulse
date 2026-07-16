@@ -204,11 +204,9 @@ export default function OrderFlow() {
       }
     }
 
-    // Re-format the summed raw in the local currency style
-    const display =
-      currencyCode === 'INR'
-        ? `${currencyPrefix}${rawSum.toLocaleString('en-IN')}`
-        : `${currencyPrefix}${rawSum}`;
+    // Re-format the summed raw in the local currency style. The INR branch
+    // (lakh-grouped en-IN formatting) was removed with the India rate card.
+    const display = `${currencyPrefix}${rawSum}`;
 
     return { display, raw: rawSum, currencyCode };
   }, [selection, service, region, country, fmt]);
@@ -230,36 +228,20 @@ export default function OrderFlow() {
   const onNext = () => setStep(s => (Math.min(4, s + 1) as Step));
   const onBack = () => setStep(s => (Math.max(1, s - 1) as Step));
 
-  // Real submit — Razorpay checkout for INR (with test keys until live).
+  // Real submit — Dodo Payments hosted checkout.
   //
-  //   1. POST /api/razorpay/order  → server creates a Razorpay order, returns orderId
-  //   2. Load checkout.razorpay.com/v1/checkout.js (idempotent)
-  //   3. window.Razorpay({...}).open()  → user sees the secure dialog
-  //   4. On success handler fires       → POST /api/razorpay/verify with signature
-  //   5. Server HMAC-verifies + creates Asana order card + pings Slack #orders
-  //   6. Redirect to /onboard?asana={url} where the kickoff brief lives
+  //   1. POST /api/dodo/checkout → server creates the session, returns paymentLink
+  //   2. Redirect to Dodo's hosted page
+  //   3. On success Dodo bounces back to /onboard?from=dodo
+  //   4. /api/dodo/webhook fires server-side → Asana order card + Slack #orders
   //
-  // Test card: 4111 1111 1111 1111 · CVV 123 · Expiry 12/26
-  // Test UPI:  test@razorpay
+  // The Razorpay flow that used to live here (India / INR only) was removed
+  // with the India rate card in July 2026, along with its checkout.js loader.
   //
   // Clicking "Proceed" is the recorded act of agreement to /terms (the same
   // implicit-acceptance pattern Stripe/Amazon/Shopify use everywhere).
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
-
-  // Razorpay script — load once, idempotent
-  const ensureRazorpayLoaded = async (): Promise<void> => {
-    if (typeof window === 'undefined') throw new Error('SSR');
-    if ((window as unknown as { Razorpay?: unknown }).Razorpay) return;
-    await new Promise<void>((resolve, reject) => {
-      const s = document.createElement('script');
-      s.src = 'https://checkout.razorpay.com/v1/checkout.js';
-      s.async = true;
-      s.onload = () => resolve();
-      s.onerror = () => reject(new Error('Razorpay script failed to load'));
-      document.head.appendChild(s);
-    });
-  };
 
   const onCheckout = async () => {
     if (!service || !selection) return;
@@ -286,50 +268,17 @@ export default function OrderFlow() {
       const deliveryLabel = getDeliveryLabel(selection);
 
       // ─────────────────────────────────────────────────────────────────
-      // PAYMENT GATEWAY ROUTER
-      //   • Region 'IN' → Razorpay (INR-only, what we already use)
-      //   • Everyone else → Dodo Payments (Merchant-of-Record, accepts
-      //                     USD/EUR/GBP/CAD/AUD; Dodo handles tax + payouts
-      //                     to our INR bank account)
-      // The currency code from localizedTotal drives Dodo. India keeps
-      // hitting Razorpay since INR isn't a Dodo-supported settlement currency.
+      // PAYMENT — Dodo Payments hosted checkout, for everyone.
+      //
+      // There used to be a gateway router here: region 'IN' went to Razorpay
+      // (INR-only), everyone else to Dodo. The India rate card was removed in
+      // July 2026, so there is no INR flow left to route to and every buyer is
+      // charged in a Dodo-supported currency (USD/EUR/GBP/CAD/AUD).
+      //
+      // The Razorpay API routes (/api/razorpay/*) still exist but nothing calls
+      // them. Delete them once you're sure the INR rail isn't coming back.
       // ─────────────────────────────────────────────────────────────────
-      if (region !== 'IN') {
-        // ── International flow: Dodo Payments hosted checkout ─────────
-        const dodoRes = await fetch('/api/dodo/checkout', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            amountSmallest: Math.round(localizedTotal.raw * 100),
-            currency: localizedTotal.currencyCode,           // USD / EUR / GBP / CAD / AUD
-            service: serviceLabel,
-            tier,
-            client: {
-              fullName: client.fullName,
-              email: client.email,
-              country: country ?? undefined,
-            },
-            returnUrl: `${window.location.origin}/onboard?from=dodo&service=${encodeURIComponent(serviceLabel)}`,
-            cancelUrl: `${window.location.origin}/order?cancelled=1`,
-            metadata: {
-              deliveryHours: String(deliveryHours),
-              fileLink: client.fileLink ?? '',
-            },
-          }),
-        });
-        const dodoData = await dodoRes.json().catch(() => ({ ok: false }));
-        if (!dodoRes.ok || !dodoData.ok || !dodoData.paymentLink) {
-          throw new Error(dodoData.error ?? 'Could not start checkout. Please try again or email lakshya@echopulse.media.');
-        }
-        // Redirect to Dodo's hosted payment page. After success they bounce
-        // back to /onboard?from=dodo, and the Asana+Slack pipeline fires
-        // server-side from the Dodo webhook → /api/dodo/webhook.
-        window.location.href = dodoData.paymentLink;
-        return;
-      }
-
-      // ── 1. Create Razorpay order on the server (India flow) ───────
-      const orderRes = await fetch('/api/razorpay/order', {
+      const dodoRes = await fetch('/api/dodo/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -337,83 +286,32 @@ export default function OrderFlow() {
           // shows. Built by summing line-item-localized values so per-unit ×
           // quantity always equals the running total in the local currency.
           amountSmallest: Math.round(localizedTotal.raw * 100),
-          currency: 'INR',
-          receipt: `ep_${Date.now()}`,
-          notes: { service: serviceLabel, email: client.email, deliveryHours: String(deliveryHours) },
+          currency: localizedTotal.currencyCode,           // USD / EUR / GBP / CAD / AUD
+          service: serviceLabel,
+          tier,
+          client: {
+            fullName: client.fullName,
+            email: client.email,
+            country: country ?? undefined,
+          },
+          returnUrl: `${window.location.origin}/onboard?from=dodo&service=${encodeURIComponent(serviceLabel)}`,
+          cancelUrl: `${window.location.origin}/order?cancelled=1`,
+          metadata: {
+            deliveryHours: String(deliveryHours),
+            deliveryLabel,
+            fileLink: client.fileLink ?? '',
+          },
         }),
       });
-      const orderData = await orderRes.json().catch(() => ({ ok: false }));
-      if (!orderRes.ok || !orderData.ok) {
-        throw new Error(orderData.error ?? 'Could not create order. Please try again or email lakshya@echopulse.media.');
+      const dodoData = await dodoRes.json().catch(() => ({ ok: false }));
+      if (!dodoRes.ok || !dodoData.ok || !dodoData.paymentLink) {
+        throw new Error(dodoData.error ?? 'Could not start checkout. Please try again or email lakshya@echopulse.media.');
       }
-
-      // ── 2. Load Razorpay SDK ──────────────────────────────────────
-      await ensureRazorpayLoaded();
-
-      // ── 3. Open Razorpay checkout ─────────────────────────────────
-      const rzpOptions = {
-        key: orderData.keyId,
-        amount: orderData.amount,
-        currency: orderData.currency,
-        order_id: orderData.orderId,
-        name: 'EchoPulse Media',
-        description: serviceLabel,
-        prefill: {
-          name: client.fullName,
-          email: client.email,
-          contact: client.phone || '',
-        },
-        theme: { color: '#E8541A' },
-        // ── 4. Payment success handler — verify + fire pipeline
-        handler: async (resp: { razorpay_payment_id: string; razorpay_order_id: string; razorpay_signature: string }) => {
-          try {
-            const verifyRes = await fetch('/api/razorpay/verify', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                ...resp,
-                client: {
-                  fullName: client.fullName,
-                  email: client.email,
-                  phone: client.phone,
-                  service: serviceLabel,
-                  tier,
-                  total: localizedTotal.display,
-                  fileLink: client.fileLink,
-                  // Drives the Asana due_at clock + Slack copy server-side.
-                  deliveryHours,
-                  deliveryLabel,
-                },
-              }),
-            });
-            const verifyData = await verifyRes.json().catch(() => ({ ok: false }));
-            if (!verifyRes.ok || !verifyData.ok) {
-              throw new Error(verifyData.error ?? 'Payment verification failed. Save your payment ID and email lakshya@echopulse.media.');
-            }
-            const asanaParam = verifyData.asanaUrl ? `?asana=${encodeURIComponent(verifyData.asanaUrl)}` : '';
-            window.location.href = `/onboard${asanaParam}`;
-          } catch (err) {
-            setSubmitError(err instanceof Error ? err.message : 'Verification failed.');
-            setSubmitting(false);
-          }
-        },
-        modal: {
-          ondismiss: () => {
-            // User closed without paying — let them retry
-            setSubmitting(false);
-          },
-        },
-      };
-
-      type RazorpayInstance = { open: () => void; on: (evt: string, cb: (resp: { error: { description: string } }) => void) => void };
-      type RazorpayCtor = new (opts: typeof rzpOptions) => RazorpayInstance;
-      const RazorpayWindow = (window as unknown as { Razorpay: RazorpayCtor }).Razorpay;
-      const razorpay = new RazorpayWindow(rzpOptions);
-      razorpay.on('payment.failed', (resp) => {
-        setSubmitError(`Payment failed: ${resp.error.description}`);
-        setSubmitting(false);
-      });
-      razorpay.open();
+      // Redirect to Dodo's hosted payment page. After success they bounce
+      // back to /onboard?from=dodo, and the Asana+Slack pipeline fires
+      // server-side from the Dodo webhook → /api/dodo/webhook.
+      window.location.href = dodoData.paymentLink;
+      return;
     } catch (err) {
       setSubmitError(err instanceof Error ? err.message : 'Something went wrong.');
       setSubmitting(false);
@@ -924,9 +822,10 @@ function StepConfigure({
                             // up with the running total in the sidebar.
                             const unit = localizeOrderPrice(reelsUnitPrice, region, country);
                             const totalRaw = unit.raw * reelsQuantity;
-                            const totalDisplay = unit.currencyCode === 'INR'
-                              ? `${unit.currency}${totalRaw.toLocaleString('en-IN')}`
-                              : `${unit.currency}${totalRaw}`;
+                            // The INR branch here (en-IN lakh grouping) went with
+                            // the India rate card — no currency we serve now needs
+                            // special grouping at these amounts.
+                            const totalDisplay = `${unit.currency}${totalRaw}`;
                             return <>{unit.display} each · {totalDisplay} total</>;
                           })()}
                         </span>

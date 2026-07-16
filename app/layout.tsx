@@ -9,7 +9,6 @@ import EmojiNormalizer from "@/components/EmojiNormalizer";
 import PilotPopup from "@/components/PilotPopup";
 import AnalyticsProvider from "@/components/AnalyticsProvider";
 import BookCallModal from "@/components/BookCallModal";
-import PuneInquiryModal from "@/components/PuneInquiryModal";
 import { GeoProvider } from "@/components/GeoProvider";
 import { getServerGeo } from "@/lib/geoServer";
 
@@ -35,7 +34,13 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL("https://echopulse.media"),
   title: {
-    default: "EchoPulse Media — You hit record. We do the rest.",
+    // The old default was "EchoPulse Media — You hit record. We do the rest."
+    // Beautiful brand copy, zero search relevance: it contains no term anyone
+    // types into Google, so the homepage had nothing to rank for. This version
+    // leads with the service + audience and keeps the brand at the end.
+    default:
+      "Done-For-You Content Agency for Founders — Video Editing, LinkedIn & Blogs | EchoPulse",
+    // Service/blog pages already carry their own name, so don't re-append it.
     template: "%s | EchoPulse Media",
   },
   description:
@@ -44,26 +49,10 @@ export const metadata: Metadata = {
   authors: [{ name: "Lakshya Soni", url: "https://www.linkedin.com/in/lakshyasoni/" }],
   creator: "Lakshya Soni",
   publisher: "EchoPulse Media",
-  keywords: [
-    "content studio",
-    "content agency",
-    "video editing agency",
-    "real estate video editing",
-    "real estate marketing agency",
-    "LinkedIn content agency",
-    "blog production agency",
-    "ad creatives agency",
-    "conversion website design",
-    "coach marketing agency",
-    "business owner marketing",
-    "agency for founders",
-    "agency for coaches",
-    "agency for real estate agents",
-    "custom app development agency",
-    "EchoPulse Media",
-    "EchoPulse",
-    "Lakshya Soni",
-  ],
+  // NOTE: the `keywords` meta tag was removed here on purpose. Google has
+  // ignored it since 2009, and the same stuffed 18-term list was rendering on
+  // every single page — which is a low-quality signal to human raters, not a
+  // ranking input. Nothing to gain, something to lose.
   alternates: {
     canonical: "/",
   },
@@ -127,7 +116,12 @@ const structuredData = {
       "@type": "Organization",
       "@id": "https://echopulse.media/#organization",
       name: "EchoPulse Media",
-      alternateName: ["EchoPulse", "EchoPulse Studio"],
+      // "Echo Pulse" (two words) is deliberate. A YouTube vocab channel of that
+      // name currently outranks us for our OWN brand query — most of our search
+      // impressions are people looking for them, not us. Declaring the spaced
+      // variant as an alternateName is how you tell Google the two-word string
+      // is also this entity. Table stakes: you must be #1 for your own name.
+      alternateName: ["EchoPulse", "Echo Pulse", "EchoPulse Studio", "Echo Pulse Media"],
       url: "https://echopulse.media",
       logo: "https://echopulse.media/logo.png",
       description:
@@ -171,7 +165,11 @@ const structuredData = {
         "Content strategy",
       ],
       worksFor: { "@id": "https://echopulse.media/#organization" },
-      url: "https://echopulse.media",
+      // Point the Person entity at the dedicated founder page, not the homepage.
+      // An entity needs one canonical page describing it; /about is that page,
+      // and every blog author box links back to it to reinforce the chain.
+      url: "https://echopulse.media/about",
+      mainEntityOfPage: "https://echopulse.media/about",
       sameAs: [
         "https://www.linkedin.com/in/lakshyasoni/",
         "https://x.com/Lakshya_Creates",
@@ -251,11 +249,9 @@ export default async function RootLayout({
           <AnalyticsProvider />
           {/* Global "Book a call" modal — open from anywhere via window.openBookCallModal() */}
           <BookCallModal />
-          {/* Pune-only on-site shoot inquiry modal — open via
-              window.openPuneInquiryModal(packageName). Required phone field,
-              no Razorpay path; submissions land in #pune-onsite Slack +
-              Sales Pipeline → Discovery Call Booked in Asana. */}
-          <PuneInquiryModal />
+          {/* The Pune-only on-site inquiry modal was removed in July 2026 with
+              the India rate card. components/PuneInquiryModal.tsx and
+              /api/pune-inquiry are now unused. */}
         </GeoProvider>
         <GoogleAnalytics gaId={GA_ID} />
         {/* Shery loads after hydration AND only on desktop pointer devices */}

@@ -24,7 +24,6 @@ const REGION_NAMES: Record<string, { full: string; flag: string; population: str
   CA:    { full: 'Canada',                  flag: '🇨🇦', population: '~40M' },
   EU:    { full: 'European Union (mainland)', flag: '🇪🇺', population: '~450M' },
   UK:    { full: 'United Kingdom',          flag: '🇬🇧', population: '~67M' },
-  IN:    { full: 'India',                   flag: '🇮🇳', population: '~1.4B' },
   OTHER: { full: 'Other (default USD)',     flag: '🌍', population: 'all else' },
 };
 
@@ -36,7 +35,6 @@ const FX_TO_USD: Record<string, number> = {
   CAD: 0.73,
   EUR: 1.08,
   GBP: 1.27,
-  INR: 0.012,
 };
 
 function toUsd(currencyCode: string, price: string): string {
@@ -52,7 +50,8 @@ function toUsd(currencyCode: string, price: string): string {
 export default function PricingMatrixPage() {
   const regions = Object.keys(ALL_REGION_PRICING) as Array<keyof typeof ALL_REGION_PRICING>;
   // Order so US is leftmost (the anchor market) and OTHER last.
-  const ordered: Array<keyof typeof ALL_REGION_PRICING> = ['US', 'CA', 'EU', 'UK', 'IN', 'OTHER'].filter(
+  // 'IN' was dropped in July 2026 — India now falls into OTHER (USD).
+  const ordered: Array<keyof typeof ALL_REGION_PRICING> = ['US', 'CA', 'EU', 'UK', 'OTHER'].filter(
     r => regions.includes(r as keyof typeof ALL_REGION_PRICING),
   ) as Array<keyof typeof ALL_REGION_PRICING>;
 
@@ -125,7 +124,6 @@ export default function PricingMatrixPage() {
               {ordered.map((r, i) => {
                 const data = ALL_REGION_PRICING[r];
                 const meta = REGION_NAMES[r];
-                const isIN = r === 'IN';
                 return (
                   <tr key={r} style={{
                     borderTop: '1px solid rgba(255,255,255,0.06)',
@@ -144,7 +142,7 @@ export default function PricingMatrixPage() {
                         {data.currency} <span style={{ color: 'rgba(242,238,231,0.45)' }}>({data.currencyCode})</span>
                       </span>
                     </td>
-                    <td style={{ ...tdStyle, ...priceStyle, color: isIN ? '#E8541A' : '#F2EEE7' }}>
+                    <td style={{ ...tdStyle, ...priceStyle, color: '#F2EEE7' }}>
                       {data.currency}{data.pilot}
                     </td>
                     <td style={{ ...tdStyle, color: 'rgba(242,238,231,0.45)', textDecoration: 'line-through' }}>
