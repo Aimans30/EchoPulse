@@ -15,10 +15,6 @@ const HOMEPAGE_LINKS: NavLink[] = [
   { label: 'Work', href: '/#work' },
   { label: 'Pricing', href: '/#pricing' },
   { label: 'Blog', href: '/blog' },
-  // /about is the #2 page on the domain by impressions (365, avg position ~4)
-  // and until July 2026 it 404'd and wasn't linked from anywhere. It's now a
-  // real page, and the nav link is what lets crawlers and humans reach it.
-  { label: 'About', href: '/about' },
   { label: 'FAQ', href: '/#faq' },
 ];
 

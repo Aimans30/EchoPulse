@@ -108,8 +108,8 @@ export default function Testimonials() {
               zIndex: 1,
             }}
           >
-            I edit it like I&apos;d{' '}
-            <span style={{ color: '#E8541A' }}>post it myself.</span>
+            I&apos;ve sat in every seat{' '}
+            <span style={{ color: '#E8541A' }}>you&apos;re about to outsource.</span>
           </motion.h2>
         </div>
 
@@ -183,7 +183,7 @@ export default function Testimonials() {
               </div>
             </div>
             <div className="founder-sig-bio" style={{ fontSize: '12.5px', color: 'rgba(242,238,231,0.5)', marginTop: '4px' }}>
-              Editing video professionally since 18 · marketing lead at a Canadian SaaS · ships production code.
+              Editor, marketer, and engineer · cut video professionally since 18 · marketing lead at a Canadian SaaS · writes the code this site runs on.
             </div>
           </div>
         </motion.div>
@@ -264,7 +264,7 @@ export default function Testimonials() {
           transition={{ duration: 0.5, delay: 0.16 }}
           style={{ fontSize: '13.5px', lineHeight: 1.7, color: 'rgba(242,238,231,0.6)', margin: '0 0 28px', maxWidth: '560px' }}
         >
-          EchoPulse Media is a done-for-you content studio built around founder-led content. We handle video editing for founders, short-form video, and LinkedIn content, plus the full content production pipeline, so SaaS founders, coaches, and business owners ship consistently without managing five freelancers.
+          Most agencies are one discipline wearing a suit: an edit shop that outsources the writing, or a copy shop that outsources the video. I have done every seat. Years cutting video at a production studio, marketing lead at a Canadian SaaS where content had to produce pipeline and not just look good, and enough engineering to ship the code this site runs on. That is the whole reason EchoPulse works the way it does: the person reviewing your deliverable has actually cut the footage, written the hook, and run the ad. You are not explaining your business to an account manager who relays it, imperfectly, to someone you will never meet.
         </motion.p>
 
         {/* ── Read-the-full-letter expand ─────────────────────────── */}

@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
+import Nav from '@/components/Nav';
+import Footer from '@/components/Footer';
 import { services } from '@/lib/serviceData';
 
 /**
@@ -113,7 +115,13 @@ export default function AboutPage() {
   };
 
   return (
-    <main className="about-page">
+    <>
+      {/* The About page rendered as a bare <main> with no chrome, so it looked
+          like a detached page. Nav + Footer bring it in line with the rest of
+          the site. Nav uses the default homepage links (/#services, etc.). */}
+      <Nav />
+
+      <main className="about-page">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(aboutSchema) }}
@@ -424,6 +432,9 @@ export default function AboutPage() {
           .about-table td { font-size: 14.5px; }
         }
       `}</style>
-    </main>
+      </main>
+
+      <Footer />
+    </>
   );
 }

@@ -10,6 +10,7 @@ import ICPBookButton from './ICPBookButton';
 import ICPFaq from './ICPFaq';
 import ICPWork from './ICPWork';
 import ICPHeroDevice from './ICPHeroDevice';
+import ICPAuthority from './ICPAuthority';
 
 const ICON_MAP: Record<IcpData['icon'], LucideIcon> = {
   home: Home,
@@ -53,7 +54,11 @@ export default function ICPPage({ data, videos }: { data: IcpData; videos: Video
   const accent = data.accentColor;
   const Icon = ICON_MAP[data.icon];
   const stats = data.stats.slice(0, 4);
-  const deviceAlt = `${data.name} content example: a sample ${data.key === 'real-estate' ? 'property reel' : data.key === 'founders' ? 'LinkedIn post' : data.key === 'coaches' ? 'lead-magnet funnel' : data.key === 'dtc' ? 'set of ad-creative variants' : 'inbound search result and lead'} produced by EchoPulse Media`;
+  // Describes the animated pipeline for screen readers and crawlers: what the
+  // client supplies, what EchoPulse produces, and how it compounds.
+  const deviceAlt = `How EchoPulse works for ${data.name.toLowerCase()}: ${data.pipeline.input.label.toLowerCase()}, and EchoPulse produces ${data.pipeline.outputs
+    .map((o) => o.label.toLowerCase())
+    .join(', ')} — driving ${data.pipeline.outcomes.join(', then ').toLowerCase()}.`;
 
   return (
     <>
@@ -62,7 +67,11 @@ export default function ICPPage({ data, videos }: { data: IcpData; videos: Video
       <main style={{ background: '#F2EEE7', color: '#0C0C0B' }}>
         {/* ── 1. HERO (dark) — the page's single <h1> ── */}
         <section className="icp-hero" data-dark-bg="true">
-          <div aria-hidden="true" className="icp-hero-glow" style={{ background: `radial-gradient(ellipse 70% 60% at 75% 25%, ${accent}22 0%, transparent 60%)` }} />
+          {/* Fades through the accent's OWN alpha (…22 → …00), not the CSS
+              `transparent` keyword. `transparent` resolves to transparent-black,
+              so a warm accent fading to it crosses grey and bands visibly on
+              dark backgrounds. Extra mid-stop keeps the falloff smooth. */}
+          <div aria-hidden="true" className="icp-hero-glow" style={{ background: `radial-gradient(ellipse 70% 60% at 75% 25%, ${accent}22 0%, ${accent}0d 38%, ${accent}00 68%)` }} />
           <div className="icp-container icp-hero-grid">
             <div>
               <h1 className="icp-h1">
@@ -78,7 +87,7 @@ export default function ICPPage({ data, videos }: { data: IcpData; videos: Video
               </div>
             </div>
             <div className="icp-hero-visual">
-              <ICPHeroDevice icp={data.key} accent={accent} alt={deviceAlt} />
+              <ICPHeroDevice accent={accent} alt={deviceAlt} pipeline={data.pipeline} />
             </div>
           </div>
         </section>
@@ -131,11 +140,17 @@ export default function ICPPage({ data, videos }: { data: IcpData; videos: Video
           </div>
         </section>
 
+        {/* ── 3b. THE EDUCATION (light) — why this matters to THEM, with the
+             psychology sequence: reframe → sourced evidence → both-sides
+             completeness → handed conclusion. Sits before the services so the
+             reader wants the thing before we show them the thing. ── */}
+        <ICPAuthority data={data.authority} accent={accent} />
+
         {/* ── 4. THE SOLUTION (light) — services in priority order ── */}
-        <section id="services" className="icp-section icp-section-light">
+        <section id="services" className="icp-section icp-section-light" style={{ paddingTop: 0 }}>
           <div className="icp-container">
             <Reveal>
-              <Eyebrow label="How we solve it" accent={accent} Icon={Icon} />
+              <Eyebrow label="What we run for you" accent={accent} Icon={Icon} />
               <h2 className="icp-h2">One team. <span style={{ color: accent }}>Every channel you need.</span></h2>
               <p className="icp-lead">{data.starterStack}</p>
             </Reveal>
@@ -156,9 +171,13 @@ export default function ICPPage({ data, videos }: { data: IcpData; videos: Video
                         </span>
                       </div>
                       <p className="icp-svc-why">{svc.why}</p>
-                      <span className="icp-svc-link" style={{ color: accent }}>
-                        See the service
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
+                      {/* No "See the service →" push. These pages exist to book
+                          the call, not to fan traffic out to service pages —
+                          the card itself still links for whoever wants depth,
+                          but the visible affordance is informational. */}
+                      <span className="icp-svc-link" style={{ color: '#9a958c' }}>
+                        Included in your plan
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" aria-hidden="true"><path d="M20 6L9 17l-5-5" /></svg>
                       </span>
                     </a>
                   </Reveal>
@@ -174,9 +193,9 @@ export default function ICPPage({ data, videos }: { data: IcpData; videos: Video
             <Reveal>
               <div className="icp-eyebrow-line" style={{ color: 'rgba(242,238,231,0.55)' }}>
                 <span style={{ width: 22, height: 1, background: accent, display: 'block' }} />
-                What you get
+                What paying us actually buys
               </div>
-              <h2 className="icp-h2" style={{ color: '#F2EEE7' }}>Everything you receive, <span style={{ color: accent }}>built to ship.</span></h2>
+              <h2 className="icp-h2" style={{ color: '#F2EEE7' }}>Not deliverables. <span style={{ color: accent }}>Outcomes with receipts.</span></h2>
             </Reveal>
             <div className="icp-deliv-list">
               {data.deliverables.map((d, i) => (
@@ -250,6 +269,36 @@ export default function ICPPage({ data, videos }: { data: IcpData; videos: Video
           )}
         </section>
 
+        {/* ── 7b. RISK REVERSAL (light) — the strongest close available without
+             published client metrics. Loss-aversion runs the decision at this
+             point in the page, so every line removes a specific downside:
+             money (small pilot, keep the work), lock-in (month to month),
+             quality (redo until right), attention (owner-operated, 48h). ── */}
+        <section className="icp-section icp-section-light" style={{ paddingTop: 0 }}>
+          <div className="icp-container">
+            <Reveal>
+              <Eyebrow label="Why trying us is safe" accent={accent} Icon={Icon} />
+              <h2 className="icp-h2">Built so the risk sits <span style={{ color: accent }}>on our side.</span></h2>
+            </Reveal>
+            <div className="icp-risk-grid">
+              {[
+                { t: '$299 Pilot, 14 days', d: 'Real deliverables on your brand before any retainer. You keep everything we make, whether you continue or not.' },
+                { t: 'No contracts', d: 'Month to month after the Pilot, cancel with 30 days notice. We have to earn the next month, every month.' },
+                { t: 'Redone until right', d: 'If a deliverable does not sound like you, we redo it at no charge until you would post it under your own name.' },
+                { t: '48-hour turnaround', d: 'Standard on every deliverable, with senior review before anything reaches you. Owner-operated, 3-hour replies in every workday.' },
+              ].map((item, i) => (
+                <Reveal key={item.t} delay={Math.min(i * 0.05, 0.2)}>
+                  <div className="icp-risk-card">
+                    <span className="icp-risk-num" style={{ color: accent }}>{`0${i + 1}`}</span>
+                    <h3 className="icp-risk-title">{item.t}</h3>
+                    <p className="icp-risk-desc">{item.d}</p>
+                  </div>
+                </Reveal>
+              ))}
+            </div>
+          </div>
+        </section>
+
         {/* ── 8. PRICING (light) — reuse the homepage Pricing component, with
              this segment's tailored feature copy. Falls back to default copy
              when the segment supplies no pricingCopy (e.g. dtc, business-owners). ── */}
@@ -269,11 +318,28 @@ export default function ICPPage({ data, videos }: { data: IcpData; videos: Video
         </section>
 
         {/* ── 10. FINAL CTA (dark) ── */}
-        <section className="icp-section icp-section-dark" data-dark-bg="true" style={{ paddingBottom: 120 }}>
-          <div className="icp-container">
+        <section
+          className="icp-section icp-section-dark"
+          data-dark-bg="true"
+          style={{ paddingBottom: 120, position: 'relative', overflow: 'hidden' }}
+        >
+          {/* The glow lives on the SECTION, not inside the CTA card. Inside the
+              card it was clipped by the card's bounds/radius, which drew a
+              visible rectangle against the identical dark section behind it.
+              At section level it spans the full viewport width and fades into
+              the section's own background with no edge to clip against. */}
+          <div
+            aria-hidden="true"
+            style={{
+              position: 'absolute',
+              inset: 0,
+              background: `radial-gradient(ellipse 60% 55% at 50% 55%, ${accent}1e 0%, ${accent}0a 50%, ${accent}00 100%)`,
+              pointerEvents: 'none',
+            }}
+          />
+          <div className="icp-container" style={{ position: 'relative', zIndex: 1 }}>
             <Reveal>
-              <div className="icp-final" style={{ background: '#0C0C0B' }}>
-                <div aria-hidden="true" style={{ position: 'absolute', inset: 0, background: `radial-gradient(ellipse at 70% 50%, ${accent}26 0%, transparent 65%)`, pointerEvents: 'none' }} />
+              <div className="icp-final" style={{ background: 'transparent' }}>
                 <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
                   <h2 className="icp-final-h">Ready to stop doing it all yourself?</h2>
                   <p className="icp-final-p">
@@ -364,6 +430,13 @@ export default function ICPPage({ data, videos }: { data: IcpData; videos: Video
         .icp-work-section .icp-container { margin-bottom: 40px; }
         .icp-work-placeholder { border: 1px dashed rgba(242,238,231,0.25); border-radius: 18px; padding: 48px 32px; text-align: center; color: rgba(242,238,231,0.6); font-size: 15px; line-height: 1.6; max-width: 720px; margin: 0 auto; }
 
+        /* Risk reversal */
+        .icp-risk-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 44px; }
+        .icp-risk-card { border: 1px solid rgba(12,12,11,0.10); border-radius: 18px; background: rgba(255,255,255,0.55); padding: 26px 24px; height: 100%; }
+        .icp-risk-num { font-family: Inter, sans-serif; font-size: 13px; font-weight: 800; letter-spacing: 1px; }
+        .icp-risk-title { font-family: Inter, sans-serif; font-size: 17px; font-weight: 800; letter-spacing: -0.4px; margin: 10px 0 10px; }
+        .icp-risk-desc { font-size: 13.5px; line-height: 1.62; color: #6E6B63; margin: 0; }
+
         /* Pricing wrap — the homepage Pricing brings its own section padding */
         .icp-pricing-wrap { scroll-margin-top: 96px; background: #F2EEE7; }
 
@@ -378,6 +451,7 @@ export default function ICPPage({ data, videos }: { data: IcpData; videos: Video
           .icp-hero-grid { grid-template-columns: 1fr; gap: 40px; }
           .icp-hero-visual { max-width: 340px; }
           .icp-svc-grid { grid-template-columns: repeat(2, 1fr); }
+          .icp-risk-grid { grid-template-columns: repeat(2, 1fr); }
           .icp-stat-grid-4 { grid-template-columns: repeat(2, 1fr); }
           .icp-cmp-row { grid-template-columns: 1fr 1fr; }
           .icp-cmp-feature { grid-column: 1 / -1; border-bottom: 1px solid rgba(12,12,11,0.06); background: rgba(12,12,11,0.02); }
@@ -390,8 +464,18 @@ export default function ICPPage({ data, videos }: { data: IcpData; videos: Video
           .icp-section { padding: 64px 0; }
           .icp-hero { padding: 104px 0 64px; }
           .icp-h1 { font-size: 34px; letter-spacing: -1.6px; }
-          .icp-hero-visual { display: none; }
+          /* The animation used to be display:none on phones — indefensible for
+             an outreach page where most cold clicks ARE on phones. The visual
+             that explains the entire offer must be the thing mobile visitors
+             see right after the headline. Centered, slightly narrower, after
+             the copy in source order so the CTA stays above it. */
+          .icp-hero-visual { display: block; max-width: 320px; margin: 8px auto 0; }
+          .icp-hero-sub { font-size: 15.5px; }
+          .icp-hero-actions { flex-direction: column; align-items: stretch; }
+          .icp-hero-secondary { text-align: center; }
           .icp-svc-grid { grid-template-columns: 1fr; }
+          .icp-risk-grid { grid-template-columns: 1fr; gap: 12px; }
+          .icp-risk-card { padding: 22px 20px; }
           .icp-stat-grid-2, .icp-stat-grid-3, .icp-stat-grid-4 { grid-template-columns: 1fr 1fr; }
           .icp-stat-block { padding: 26px 18px; }
           .icp-cmp-row { grid-template-columns: 1fr; }

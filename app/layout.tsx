@@ -56,6 +56,13 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/",
   },
+  // Trustpilot domain-ownership verification (one-time check, but harmless to
+  // keep — removing it can un-verify the domain if Trustpilot re-checks).
+  // Renders as: <meta name="trustpilot-one-time-domain-verification-id" content="…">
+  other: {
+    "trustpilot-one-time-domain-verification-id":
+      "c3102d40-64ae-49d1-a3a1-d7253573f122",
+  },
   openGraph: {
     title: "EchoPulse Media — You hit record. We do the rest.",
     description:

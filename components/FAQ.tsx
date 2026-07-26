@@ -10,30 +10,21 @@ import { useGeoPrice } from '@/lib/useGeoPrice';
  * answer copy whose prices match their own tier cards instead of hardcoded
  * US dollars.
  *
- * ─── Why these questions and not the old ones ────────────────────────────────
+ * ─── Question selection ──────────────────────────────────────────────────────
  *
- * The previous set was written as sales objections ("I've been burned by
- * agencies before. What's different here?"). Good instincts, wrong format:
- * nobody types that into Google, and AI assistants only quote a Q&A when the
- * question matches something a real person actually asked.
+ * Trimmed to 8 questions, every one phrased as a real search query a buyer
+ * types into Google or ChatGPT ("how much does a content agency cost", "freelance
+ * video editor vs agency", "do content agencies use AI"). Brand-specific
+ * objection questions that no one searches ("Why is the Pilot $299", "will it
+ * sound like me") were cut — they added length without adding a keyword to rank
+ * for. The objection-handling still lives inside the answers.
  *
- * So every question below is phrased the way a buyer phrases it in a search bar
- * or to ChatGPT — "how much does a video editing agency cost", "freelance video
- * editor vs agency", "do content agencies use AI". The objection-handling still
- * happens; it just happens inside the answer, under a heading that can rank.
- *
- * Answer rules (these are what get you cited, not just ranked):
- *   1. First sentence answers the question directly. Extraction engines lift
- *      the opening line — if it's throat-clearing, you don't get quoted.
- *   2. Concrete numbers wherever we honestly have them. Our own prices and
- *      turnaround times are facts we can stand behind.
- *   3. No invented industry statistics. Every unsourced "74% of brands..." stat
- *      is a trust liability with both Google's raters and LLMs.
+ * Answer rules that get us cited, not just ranked:
+ *   1. First sentence answers the question directly (extraction engines lift it).
+ *   2. Concrete numbers we can honestly stand behind (our prices, our turnaround).
+ *   3. No invented industry statistics — unsourced stats are a trust liability.
  */
-const buildFaqSections = (pilotPrice: string, growthPrice: string) => [
-  {
-    section: 'Pricing & cost',
-    items: [
+const buildFaqs = (pilotPrice: string, growthPrice: string) => [
       {
         q: 'How much does a content agency cost per month?',
         a: `Ours runs ${growthPrice} per month for the Growth retainer, with no contract. Most content agencies price one of three ways: per deliverable (cheapest headline, most expensive in practice once revisions stack up), per hour (you pay for their inefficiency), or a flat monthly retainer covering a defined output (what we do). Before that, you can run a ${pilotPrice} 14-day Pilot: real work on your brand, 10 deliverables, and you keep everything whether you continue or not. That way you're comparing actual output, not sales decks.`,
@@ -43,52 +34,21 @@ const buildFaqSections = (pilotPrice: string, growthPrice: string) => [
         a: "A freelancer is cheaper per edit. An agency is cheaper per outcome, and the gap widens as volume grows. One freelancer gives you one skill, one timezone, and one point of failure: when they take a holiday, your content stops. You also stay the project manager, writing briefs, chasing revisions, and stitching together an editor, a writer, and a designer who have never spoken. We're the alternative when the coordination cost has started to exceed the production cost. If you publish two videos a month and enjoy managing it, hire a freelancer. That's an honest answer, not a pitch.",
       },
       {
-        q: 'Do I have to sign a long-term contract?',
-        a: "No. After the Pilot it's month-to-month, cancel with 30 days' notice. Six and twelve-month lock-ins exist to protect the agency from its own churn, not to serve you. If you need to pause, give us 30 days and we'll hold your brand brief and strategy so there's no repeat onboarding when you come back. We'd rather keep clients because the work is good than because the paperwork says so.",
-      },
-      {
-        q: `Why is the Pilot ${pilotPrice} instead of free?`,
-        a: `Because free trials produce work neither side is invested in. At ${pilotPrice} you get senior people producing 10 real deliverables in 14 days, and you signal you're a serious buyer rather than a tire-kicker. It covers a portion of genuine production cost, not the full amount. And unlike a free sample, you keep everything we make. If the work isn't for you, you spent ${pilotPrice} to learn that instead of ${growthPrice} a month.`,
-      },
-    ],
-  },
-  {
-    section: 'What you actually get',
-    items: [
-      {
-        q: 'What is a done-for-you content agency?',
-        a: "A done-for-you content agency handles the entire pipeline from raw footage to published post, so the only thing you do is show up and record. In practice that means: you send us a video call recording, a podcast episode, or 30 minutes of talking to your phone, and we return edited short-form video, LinkedIn posts, blog articles, and ad creative built from it. The distinction from a normal agency is scope. Most agencies do one channel and hand you the rest. EchoPulse covers video editing, LinkedIn ghostwriting, blogs, ads, websites, and automations under one team and one invoice.",
-      },
-      {
         q: 'What is included in a monthly content retainer?',
         a: `The Growth retainer at ${growthPrice} a month covers a defined output across video, social, and written content, plus strategy and monthly reporting. The exact mix is set during onboarding, because a real estate agent needs listing videos and a SaaS founder needs LinkedIn essays, and pretending those are the same package would be dishonest. What is fixed regardless of mix: senior review on every deliverable, a 3-hour reply window during business hours, and unlimited revisions within scope. Book a call and we'll spec the exact deliverable count for your channels.`,
       },
-      {
-        q: 'How fast is the turnaround on video edits?',
-        a: "48 to 72 hours for short-form edits in a standard week, and the Pilot delivers 10 assets inside 14 days. Turnaround is the metric we hold ourselves to hardest, because content that arrives late is content that missed its moment. If a deadline is genuinely at risk we tell you before it slips, not after.",
-      },
-    ],
-  },
-  {
-    section: 'Quality & AI',
-    items: [
       {
         q: 'Do content agencies use AI to write the content?',
         a: "Many do, and most will not tell you. Here is our position, stated plainly: we use AI for research, transcription, and first-pass structuring. We do not use it to generate the final voice of your content, because AI writes in the average of everyone, and the entire point of founder-led content is that it sounds like one specific person. Every deliverable is written and reviewed by a human who has read your brand brief. If you can tell a post was machine-written, so can your buyer, and so can the algorithm that decides whether to distribute it.",
       },
       {
-        q: 'How do you make the content actually sound like me?',
-        a: "We build a brand brief from a 90-minute onboarding interview, not from your website copy. In that session we pull your actual phrases, opinions, and the hot takes you'd only say out loud. Every writer and editor on your account reads that brief before touching a draft. If the first batch doesn't sound like you, we redo it, no charge and no argument. Voice match isn't a nice-to-have. Generic content doesn't convert, and you'd spot it immediately.",
+        q: 'What is a done-for-you content agency?',
+        a: "A done-for-you content agency handles the entire pipeline from raw footage to published post, so the only thing you do is show up and record. In practice that means: you send us a video call recording, a podcast episode, or 30 minutes of talking to your phone, and we return edited short-form video, LinkedIn posts, blog articles, and ad creative built from it. The distinction from a normal agency is scope. Most agencies do one channel and hand you the rest. EchoPulse covers video editing, LinkedIn ghostwriting, blogs, ads, websites, and automations under one team and one invoice.",
       },
       {
-        q: 'Do you have experience in my industry?',
-        a: "We work across four verticals: founders and startups, coaches, business owners, and real estate agents. We've produced listing tour scripts, coach authority content, B2B LinkedIn posts, and founder newsletters. But you know your niche better than we do, and we'll say so rather than pretend otherwise. The onboarding interview exists so you transfer that knowledge in one structured session instead of correcting us for six months. We arrive knowing the vocabulary. You supply the nuance.",
+        q: 'How fast is the turnaround on video edits?',
+        a: "48 to 72 hours for short-form edits in a standard week, and the Pilot delivers 10 assets inside 14 days. Turnaround is the metric we hold ourselves to hardest, because content that arrives late is content that missed its moment. If a deadline is genuinely at risk we tell you before it slips, not after.",
       },
-    ],
-  },
-  {
-    section: 'Results & timelines',
-    items: [
       {
         q: 'How long does it take to see results from content marketing?',
         a: "It depends on the channel, and any agency giving you one number is guessing. LinkedIn and short-form video can produce inbound DMs and profile visits within 2 to 4 weeks when the content lands. Ad creative generates usable data in week one but needs 2 to 4 weeks to optimise. SEO and blogging realistically take 3 to 6 months before meaningful organic traffic, and nobody can compress that. We put these expectations in writing before month one, because setting them honestly is cheaper for both of us than resetting them in month three.",
@@ -97,18 +57,11 @@ const buildFaqSections = (pilotPrice: string, growthPrice: string) => [
         q: 'Can a content agency guarantee leads or sales?',
         a: "No, and any agency that guarantees leads is either lying or about to redefine the word 'lead'. Too much of the outcome sits outside our control: your offer, your pricing, your sales calls, your market. What we do guarantee is what we control, which is output quality, turnaround speed, and revision responsiveness. What we measure and report monthly: profile views, engagement rate, reach, content-driven website traffic, and blog time-on-page. When something isn't performing we flag it and change direction, rather than quietly producing more of it.",
       },
-      {
-        q: 'Does content marketing work if I have a small following?',
-        a: "Yes, and starting small is often easier than inheriting a large audience built on inconsistent content. The clients who grow fastest are usually the ones with 200 followers who commit to 90 days of targeted, consistent output, not the ones with 5,000 followers who post at random. You need the right foundation first: clear positioning, a channel choice matched to where your buyers actually spend time, and output that compounds. We'll tell you honestly if a channel isn't worth your money at your current stage.",
-      },
-    ],
-  },
 ];
 
-type FaqSection = ReturnType<typeof buildFaqSections>[number];
-type FaqItem = FaqSection['items'][number];
+type FaqItem = ReturnType<typeof buildFaqs>[number];
 
-function FaqRow({
+function FaqCard({
   faq,
   index,
   open,
@@ -125,15 +78,24 @@ function FaqRow({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 12 }}
+      initial={{ opacity: 0, y: 16 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-40px' }}
-      transition={{ duration: 0.45, delay: Math.min(index * 0.03, 0.24) }}
-      className={`faq-row${isOpen ? ' open' : ''}`}
+      transition={{ duration: 0.5, delay: Math.min(index * 0.04, 0.3) }}
+      className={`faq-card${isOpen ? ' open' : ''}`}
+      style={{
+        background: isOpen
+          ? 'linear-gradient(180deg, rgba(232,84,26,0.07) 0%, rgba(232,84,26,0.03) 100%)'
+          : 'rgba(255,255,255,0.55)',
+        border: `1px solid ${isOpen ? 'rgba(232,84,26,0.18)' : 'rgba(12,12,11,0.06)'}`,
+        borderRadius: '18px',
+        transition: 'background 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease',
+        boxShadow: isOpen ? '0 10px 28px rgba(12,12,11,0.06)' : '0 1px 0 rgba(12,12,11,0.02)',
+      }}
     >
-      {/* The question is an <h3>, not a <span>.
-          Headings are how both Google and AI extraction engines identify a Q&A
-          block. A styled <span> reads as decorative text and carries no weight. */}
+      {/* The question is an <h3> wrapping a full-width toggle button.
+          Heading = how Google and AI extraction identify a Q&A block; a styled
+          <span> (the previous version) reads as decorative text. */}
       <h3 style={{ margin: 0 }}>
         <button
           id={buttonId}
@@ -146,21 +108,40 @@ function FaqRow({
         >
           <span className="faq-q">{faq.q}</span>
 
-          {/* Plus / minus — the vertical stroke rotates flat on open. */}
-          <span className="faq-toggle" aria-hidden="true">
-            <span className="faq-bar" />
-            <span className={`faq-bar faq-bar-v${isOpen ? ' flat' : ''}`} />
-          </span>
+          {/* Circular chip: + when closed, filled black circle with × when open. */}
+          <motion.span
+            className="faq-toggle"
+            aria-hidden="true"
+            animate={{
+              background: isOpen ? '#0C0C0B' : 'rgba(255,255,255,0.85)',
+              borderColor: isOpen ? '#0C0C0B' : 'rgba(12,12,11,0.10)',
+            }}
+            transition={{ duration: 0.3 }}
+          >
+            <span
+              className="faq-bar"
+              style={{
+                background: isOpen ? '#fff' : '#0C0C0B',
+                transform: isOpen ? 'rotate(45deg)' : 'rotate(0deg)',
+              }}
+            />
+            <span
+              className="faq-bar"
+              style={{
+                background: isOpen ? '#fff' : '#0C0C0B',
+                transform: isOpen ? 'rotate(-45deg)' : 'rotate(90deg)',
+              }}
+            />
+          </motion.span>
         </button>
       </h3>
 
       {/*
-        The answer stays MOUNTED whether open or closed — it is only collapsed
-        to zero height. The previous version wrapped this in <AnimatePresence>
-        and unmounted it on close, which meant the served HTML contained exactly
-        ONE answer (the open one) and crawlers never saw the other eleven. The
-        FAQPage schema claimed twelve Q&As the visible page couldn't back up.
-        Collapsing with height keeps every answer in the DOM and crawlable.
+        Answer stays MOUNTED whether open or closed — only collapsed to zero
+        height. The earlier card version wrapped this in <AnimatePresence> and
+        unmounted it on close, so the served HTML carried exactly ONE answer and
+        crawlers never saw the rest, while the FAQPage schema claimed all of
+        them. Collapsing by height keeps every answer in the DOM and crawlable.
       */}
       <motion.div
         id={panelId}
@@ -181,10 +162,15 @@ export default function FAQ() {
   const [open, setOpen] = useState<number | null>(0);
   const { currency, prices } = useGeoPrice();
 
-  const faqSections = buildFaqSections(`${currency}${prices.pilot}`, `${currency}${prices.growth}`);
-  const flatFaqs = faqSections.flatMap((s) => s.items);
+  // One flat list — no section grouping. The section labels ("Pricing &
+  // comparison" / "Results & delivery") split 8 questions into two visually
+  // disconnected blocks, which read as two separate FAQs rather than one.
+  const flatFaqs = buildFaqs(`${currency}${prices.pilot}`, `${currency}${prices.growth}`);
 
-  let runningIndex = 0;
+  // Split down the middle so the two columns fill evenly.
+  const half = Math.ceil(flatFaqs.length / 2);
+  const leftItems = flatFaqs.slice(0, half);
+  const rightItems = flatFaqs.slice(half);
 
   return (
     <section id="faq" style={{ padding: '128px 56px', background: '#F2EEE7' }}>
@@ -204,29 +190,49 @@ export default function FAQ() {
           }),
         }}
       />
+      <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+        {/* Header row — eyebrow + headline on the left, description on the right */}
+        <div className="faq-header" style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: '48px', marginBottom: '64px', flexWrap: 'wrap' }}>
+          <div style={{ flex: '1 1 460px', minWidth: 0 }}>
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              style={{
+                fontSize: '10px',
+                fontWeight: 600,
+                letterSpacing: '4px',
+                textTransform: 'uppercase',
+                color: '#6E6B63',
+                marginBottom: '18px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '14px',
+              }}
+            >
+              <span style={{ width: '22px', height: '1px', background: '#E8541A', display: 'block' }} />
+              FAQ
+            </motion.div>
 
-      <div style={{ maxWidth: '860px', margin: '0 auto' }}>
-        {/* Header — centred over a single column now, instead of a split row. */}
-        <div className="faq-header">
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="faq-eyebrow"
-          >
-            <span className="faq-eyebrow-rule" />
-            FAQ
-          </motion.div>
-
-          <motion.h2
-            className="faq-h2"
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-          >
-            Questions <span style={{ color: '#E8541A' }}>answered.</span>
-          </motion.h2>
+            <motion.h2
+              className="faq-h2"
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+              style={{
+                fontFamily: 'Inter, sans-serif',
+                fontSize: 'clamp(40px, 5.5vw, 84px)',
+                fontWeight: 900,
+                letterSpacing: 'clamp(-1.5px, -0.045em, -3.5px)',
+                lineHeight: 0.98,
+                margin: 0,
+                color: '#0C0C0B',
+              }}
+            >
+              Questions <span style={{ color: '#E8541A' }}>answered.</span>
+            </motion.h2>
+          </div>
 
           <motion.p
             className="faq-sub"
@@ -234,141 +240,119 @@ export default function FAQ() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.7, delay: 0.1 }}
+            style={{
+              flex: '0 0 320px',
+              fontSize: '15px',
+              lineHeight: 1.7,
+              color: '#6E6B63',
+              margin: '0 0 8px',
+              fontWeight: 400,
+            }}
           >
             What buyers actually ask before they hire a content agency. If yours isn&apos;t
             here, book a call and we&apos;ll answer it straight.
           </motion.p>
         </div>
 
-        {/*
-          Single column, divider-separated list.
-
-          The old layout split each section into two side-by-side columns, so
-          cards of different heights left ragged gaps and the reading order
-          jumped left-right-left. A stacked list reads top to bottom, keeps every
-          question the same width, and matches the vertical rhythm crawlers and
-          humans both prefer.
-        */}
-        {faqSections.map((section) => {
-          const start = runningIndex;
-          runningIndex += section.items.length;
-
-          return (
-            <div key={section.section} className="faq-section-group">
-              <motion.div
-                className="faq-section-label"
-                initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-40px' }}
-              >
-                {section.section}
-              </motion.div>
-
-              <div className="faq-list">
-                {section.items.map((faq, i) => (
-                  <FaqRow
-                    key={faq.q}
-                    faq={faq}
-                    index={start + i}
-                    open={open}
-                    setOpen={setOpen}
-                  />
-                ))}
-              </div>
-            </div>
-          );
-        })}
+        {/* One continuous 2-column card grid. Left column holds the first half,
+           right column the second, so reading order stays top-to-bottom within
+           each column and the two columns end level. */}
+        <div className="faq-grid" style={{ display: 'flex', gap: '14px', alignItems: 'flex-start' }}>
+          <div className="faq-col" style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {leftItems.map((faq, i) => (
+              <FaqCard key={faq.q} faq={faq} index={i} open={open} setOpen={setOpen} />
+            ))}
+          </div>
+          <div className="faq-col" style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {rightItems.map((faq, i) => (
+              <FaqCard key={faq.q} faq={faq} index={half + i} open={open} setOpen={setOpen} />
+            ))}
+          </div>
+        </div>
       </div>
 
       <style>{`
-        /* ── Header ─────────────────────────────────────────────────────── */
-        .faq-header { margin-bottom: 56px; }
-        .faq-eyebrow {
-          font-size: 10px; font-weight: 600; letter-spacing: 4px;
-          text-transform: uppercase; color: #6E6B63; margin-bottom: 18px;
-          display: flex; align-items: center; gap: 14px;
-        }
-        .faq-eyebrow-rule { width: 22px; height: 1px; background: #E8541A; display: block; }
-        .faq-h2 {
-          font-family: Inter, sans-serif;
-          font-size: clamp(40px, 5.5vw, 72px);
-          font-weight: 900; letter-spacing: -0.045em; line-height: 0.98;
-          margin: 0 0 20px; color: #0C0C0B;
-        }
-        .faq-sub {
-          font-size: 15px; line-height: 1.7; color: #6E6B63;
-          margin: 0; font-weight: 400; max-width: 520px;
-        }
-
-        /* ── Section grouping ───────────────────────────────────────────── */
-        .faq-section-group { margin-bottom: 44px; }
-        .faq-section-label {
-          font-size: 11px; font-weight: 700; letter-spacing: 2px;
-          text-transform: uppercase; color: #A8A49B;
-          padding-bottom: 12px; margin-bottom: 4px;
-          border-bottom: 1px solid rgba(12,12,11,0.10);
-        }
-
-        /* ── Rows: hairline dividers, no cards ──────────────────────────── */
-        .faq-list { display: flex; flex-direction: column; }
-        .faq-row { border-bottom: 1px solid rgba(12,12,11,0.07); }
-        .faq-row:last-child { border-bottom: none; }
-
         .faq-q-btn {
-          width: 100%; display: flex; align-items: center;
-          justify-content: space-between; gap: 24px;
-          background: none; border: none; text-align: left;
-          padding: 22px 4px; cursor: none; font-family: inherit;
-          transition: opacity 0.25s ease;
-        }
-        .faq-q-btn:hover { opacity: 0.58; }
-        .faq-q-btn:focus-visible {
-          outline: 2px solid #E8541A; outline-offset: 4px; border-radius: 6px;
+          width: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 20px;
+          background: none;
+          border: none;
+          text-align: left;
+          padding: 22px 26px;
+          cursor: none;
+          font-family: inherit;
         }
         .faq-q {
           font-family: Inter, sans-serif;
-          font-size: 17px; font-weight: 600; letter-spacing: -0.2px;
-          color: #0C0C0B; line-height: 1.45;
+          font-size: 16px;
+          font-weight: 700;
+          letter-spacing: -0.2px;
+          color: #0C0C0B;
+          line-height: 1.4;
         }
-        .faq-row.open .faq-q { color: #0C0C0B; }
-
-        /* Toggle: bare +/- glyph. The circular chip read as a button on a card;
-           without the card it just adds noise. */
         .faq-toggle {
-          flex-shrink: 0; position: relative;
-          width: 16px; height: 16px;
-          display: flex; align-items: center; justify-content: center;
+          flex-shrink: 0;
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          border: 1px solid rgba(12,12,11,0.10);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          position: relative;
         }
         .faq-bar {
-          position: absolute; width: 14px; height: 1.6px;
-          background: #0C0C0B; border-radius: 2px;
-          transition: transform 0.3s cubic-bezier(0.16,1,0.3,1), background 0.3s ease;
+          position: absolute;
+          width: 11px;
+          height: 1.8px;
+          border-radius: 2px;
+          transition: transform 0.3s ease, background 0.3s ease;
         }
-        .faq-bar-v { transform: rotate(90deg); }
-        .faq-bar-v.flat { transform: rotate(0deg); }
-        .faq-row.open .faq-bar { background: #E8541A; }
-
+        .faq-q-btn:focus-visible {
+          outline: 2px solid #E8541A;
+          outline-offset: -4px;
+          border-radius: 18px;
+        }
         .faq-a {
-          margin: 0 0 24px; padding-right: 40px;
-          font-size: 15px; line-height: 1.75; color: #6E6B63; font-weight: 400;
+          margin: 0 26px 22px;
+          font-size: 14.5px;
+          line-height: 1.7;
+          color: #6E6B63;
+          font-weight: 400;
         }
 
-        /* ── Mobile ─────────────────────────────────────────────────────── */
+        .faq-card:hover {
+          background: rgba(255,255,255,0.85) !important;
+          border-color: rgba(12,12,11,0.10) !important;
+          box-shadow: 0 6px 18px rgba(12,12,11,0.05) !important;
+        }
+        .faq-card.open:hover {
+          background: linear-gradient(180deg, rgba(232,84,26,0.09) 0%, rgba(232,84,26,0.04) 100%) !important;
+        }
+
+        @media (max-width: 900px) {
+          .faq-grid { flex-direction: column !important; gap: 12px !important; }
+          .faq-header { flex-direction: column !important; align-items: flex-start !important; gap: 16px !important; margin-bottom: 28px !important; }
+          .faq-header > div { flex: none !important; min-width: 0 !important; width: 100% !important; }
+          .faq-sub { flex: none !important; flex-basis: auto !important; max-width: 560px; }
+        }
         @media (max-width: 640px) {
           section#faq { padding: 72px 18px !important; }
-          .faq-header { margin-bottom: 32px; }
-          .faq-h2 { font-size: 38px; letter-spacing: -1.4px; }
-          .faq-sub { font-size: 14px; line-height: 1.6; }
-          .faq-section-group { margin-bottom: 32px; }
-          .faq-section-label { font-size: 10px; }
-          .faq-q-btn { padding: 18px 0; gap: 16px; }
-          .faq-q { font-size: 15.5px; }
-          .faq-a { font-size: 14.5px; line-height: 1.7; padding-right: 0; margin-bottom: 20px; }
+          .faq-header { gap: 12px !important; margin-bottom: 24px !important; }
+          .faq-h2 { font-size: 38px !important; letter-spacing: -1.4px !important; }
+          .faq-sub { font-size: 14px !important; line-height: 1.6 !important; }
+          .faq-q-btn { padding: 18px 18px !important; gap: 14px !important; }
+          .faq-q { font-size: 15px !important; line-height: 1.4 !important; }
+          .faq-a { font-size: 14px !important; line-height: 1.65 !important; margin: 0 18px 18px !important; }
+          .faq-toggle { width: 34px !important; height: 34px !important; }
         }
         @media (max-width: 380px) {
           section#faq { padding: 60px 14px !important; }
-          .faq-h2 { font-size: 34px; letter-spacing: -1.2px; }
-          .faq-q { font-size: 15px; }
+          .faq-h2 { font-size: 34px !important; letter-spacing: -1.2px !important; }
+          .faq-q { font-size: 14.5px !important; }
         }
       `}</style>
     </section>

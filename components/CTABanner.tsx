@@ -47,8 +47,12 @@ export default function CTABanner() {
           style={{
             position: 'absolute',
             inset: 0,
+            // Explicitly sized so the glow reaches zero alpha INSIDE the box.
+            // An unsized `ellipse at 70% 50%` runs to the farthest corner and is
+            // still tinted at the element bounds, which clips into a visible
+            // rectangle against the matching dark background behind it.
             background:
-              'radial-gradient(ellipse at 70% 50%, rgba(232,84,26,0.12) 0%, transparent 65%)',
+              'radial-gradient(ellipse 55% 70% at 68% 50%, rgba(232,84,26,0.12) 0%, rgba(232,84,26,0.05) 45%, rgba(232,84,26,0) 100%)',
             pointerEvents: 'none',
           }}
         />

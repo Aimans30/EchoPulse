@@ -82,7 +82,15 @@ export default function PilotPopup() {
           </button>
 
           <div className="ep-pilot-row">
-            <div className="ep-pilot-mark" aria-hidden="true">EP</div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/logo.png"
+              alt=""
+              aria-hidden="true"
+              width={40}
+              height={40}
+              className="ep-pilot-mark"
+            />
             <div className="ep-pilot-text">
               <div className="ep-pilot-brand">EchoPulse</div>
               <div className="ep-pilot-headline">
