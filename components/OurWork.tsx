@@ -22,6 +22,26 @@ const SPEED           = 0.55; // px / frame
 
 const cardWidth = (o?: Orientation) => o === 'horizontal' ? CARD_W_HORIZ : CARD_W_VERTICAL;
 
+// ─── Mobile delivery tuning ─────────────────────────────────────────────────
+// lib/videos.ts asks Cloudinary for a 700px-wide (vertical) or 1500px-wide
+// (horizontal) rendition, sized for the 230px / 726px desktop cards. The
+// mobile CSS at the bottom of this file shrinks those same cards to 101px and
+// 320px, so a phone was downloading and decoding roughly five to seven times
+// more pixels than its screen can physically show, on the connection least
+// able to afford it. These widths still leave a comfortable margin for a 3x
+// DPR panel. Rewritten here rather than in lib/videos.ts because that module
+// is shared with the ICP landing pages, which size their cards differently.
+const MOBILE_W_VERTICAL   = 360;
+const MOBILE_W_HORIZONTAL = 720;
+
+const mobileSrc = (src: string | null, o: Orientation): string | null => {
+  if (!src) return src;
+  const w = o === 'horizontal' ? MOBILE_W_HORIZONTAL : MOBILE_W_VERTICAL;
+  // Only the transformation segment carries a `w_` token, and only the first
+  // one is the scale directive previewMp4Src injected.
+  return src.replace(/([,/])w_\d+/, `$1w_${w}`);
+};
+
 // ─── VideoModal — isolated so opening it doesn't re-render the carousel ─────
 function VideoModal({ src, onClose }: { src: string; onClose: () => void }) {
   useEffect(() => {
@@ -71,6 +91,23 @@ export default function OurWork() {
   const [pendingTab, setPendingTab] = useState('all');
   const [modalSrc,   setModalSrc  ] = useState<string | null>(null);
 
+  // Device capabilities, resolved ONCE and synchronously on the first client
+  // render. This component is a dynamic({ ssr: false }) import so there is no
+  // server render to stay in sync with, and reading these in an effect
+  // instead would mean the first render mounts <video> elements pointing at
+  // desktop-sized files and the second render swaps the src, downloading
+  // every clip twice, which is the opposite of the point.
+  //   640px matches the card-shrinking breakpoint in the stylesheet below.
+  const [caps] = useState(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) {
+      return { isPhone: false, reducedMotion: false };
+    }
+    return {
+      isPhone: window.matchMedia('(max-width: 640px)').matches,
+      reducedMotion: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+    };
+  });
+
   // ── Auto-orientation detection ──────────────────────────────────────────
   // Adding a new video should be one line: paste { url, type, brand, label }
   // and forget. We read the real videoWidth/videoHeight from the file as
@@ -97,6 +134,9 @@ export default function OurWork() {
     [detected],
   );
 
+  // The <section> itself, watched so the carousel does no work at all while
+  // it is nowhere near the viewport (see the visibility effect below).
+  const sectionRef = useRef<HTMLElement>(null);
   // Outer clip container — used as IntersectionObserver root so only cards
   // actually visible inside the carousel rect trigger play/pause.
   const trackRef  = useRef<HTMLDivElement>(null);
@@ -241,6 +281,10 @@ export default function OurWork() {
   const startRAF = useCallback(() => {
     const inner = innerRef.current;
     if (!inner) return;
+    // Someone who has asked the OS for reduced motion should not be served an
+    // infinite marquee. Freezing it also means we never schedule a frame
+    // callback for them at all. The row still renders, it just holds still.
+    if (caps.reducedMotion) return;
 
     const tick = () => {
       if (!pauseRef.current && fitsTrackRef.current) {
@@ -256,20 +300,72 @@ export default function OurWork() {
 
     if (rafRef.current) cancelAnimationFrame(rafRef.current);
     rafRef.current = requestAnimationFrame(tick);
+  }, [caps.reducedMotion]);
+
+  const stopRAF = useCallback(() => {
+    if (rafRef.current) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = undefined;
+    }
   }, []);
 
+  // ── Only animate / decode while the section is anywhere near the screen ───
+  // Previously the marquee started on mount and ran until unmount. Because the
+  // card-level observer above uses the TRACK as its root rather than the
+  // viewport, cards stayed "visible" to it no matter where the page was
+  // scrolled, so on a phone the portfolio kept translating 60 times a second
+  // and kept several hardware video decoders busy the entire time the visitor
+  // was reading pricing or the FAQ thousands of pixels below. That is
+  // continuous main-thread and GPU contention against every tap they make,
+  // which is exactly what INP measures, plus a battery drain a phone notices.
+  //
+  // Same treatment for a backgrounded tab: nothing on screen, nothing to do.
   useEffect(() => {
-    // Don't reset position or pause between tab switches — keeps the RAF
-    // loop running continuously so the carousel never visibly stops. The
-    // doubled array means the loop math is self-correcting at any offset.
-    if (!rafRef.current) startRAF();
-    return () => {
-      if (rafRef.current) {
-        cancelAnimationFrame(rafRef.current);
-        rafRef.current = undefined;
-      }
+    const el = sectionRef.current;
+    if (!el) return;
+
+    const pauseAllVideos = () => {
+      trackRef.current?.querySelectorAll<HTMLVideoElement>('video').forEach(v => v.pause());
     };
-  }, [startRAF]);
+
+    // Coming back on screen has to hand control back to the card-level
+    // observer, and that observer only speaks in CHANGES of intersection.
+    // The cards never moved relative to the track while we were away, so it
+    // has nothing to report and the clips we paused would stay frozen
+    // forever. Re-observing the same targets on the existing observer queues
+    // a fresh initial notification for each one, which restores exactly the
+    // play/pause pattern that observer would have chosen on its own.
+    const resumeVideos = () => {
+      const root = trackRef.current;
+      const obs = (root as (HTMLElement & { _vidObserver?: IntersectionObserver }) | null)?._vidObserver;
+      if (!root || !obs) return;
+      obs.disconnect();
+      root.querySelectorAll<HTMLElement>('.vid-card').forEach(card => obs.observe(card));
+    };
+
+    let onScreen = false;
+    const sync = () => {
+      if (onScreen && !document.hidden) { startRAF(); resumeVideos(); }
+      else { stopRAF(); pauseAllVideos(); }
+    };
+
+    // 300px of lead-in so the carousel is already moving by the time it
+    // scrolls into view, so the visitor never sees it start from a standstill.
+    const io = new IntersectionObserver(
+      ([entry]) => { onScreen = entry.isIntersecting; sync(); },
+      { rootMargin: '300px 0px' },
+    );
+    io.observe(el);
+
+    const onVisibility = () => sync();
+    document.addEventListener('visibilitychange', onVisibility);
+
+    return () => {
+      io.disconnect();
+      document.removeEventListener('visibilitychange', onVisibility);
+      stopRAF();
+    };
+  }, [startRAF, stopRAF]);
 
   // When the card set changes (tab switch), just refresh the loop bounds.
   // No reset, no pause — visual continuity. xOffsetRef is clamped against
@@ -309,7 +405,7 @@ export default function OurWork() {
   }, []);
 
   return (
-    <section id="work" style={{ padding: '140px 0 100px', scrollMarginTop: '80px', background: '#F2EEE7', overflow: 'hidden' }}>
+    <section ref={sectionRef} id="work" style={{ padding: '140px 0 100px', scrollMarginTop: '80px', background: '#F2EEE7', overflow: 'hidden' }}>
       <style>{`
         .work-track-outer { overflow: hidden; position: relative; }
         .work-track {
@@ -545,7 +641,9 @@ export default function OurWork() {
               // Resolve orientation through manual override → runtime-detected
               // → vertical-fallback so newly-added videos auto-fit their cards.
               const orient = orientationOf(video);
-              const previewSrc = previewMp4Src(video.url, orient);
+              const previewSrc = caps.isPhone
+                ? mobileSrc(previewMp4Src(video.url, orient), orient)
+                : previewMp4Src(video.url, orient);
               // Duplicate items (second half) use preload="none" — browser
               // caches the src from the first copy so playback is instant.
               const isFirstCopy = i < filtered.length;
@@ -568,7 +666,16 @@ export default function OurWork() {
                         // based on actual visibility inside the carousel rect.
                         // This keeps concurrent decode threads at ~3 max instead
                         // of all 22 fighting for GPU simultaneously.
-                        preload={isFirstCopy ? 'metadata' : 'none'}
+                        //
+                        // On a phone even `metadata` is too eager: it fires a
+                        // range request per clip, so mounting this section
+                        // opened ~22 parallel connections to Cloudinary purely
+                        // to read moov atoms for cards sitting far off screen.
+                        // On 4G that is bandwidth stolen from whatever the
+                        // visitor is actually looking at. `none` defers every
+                        // byte until the observer calls play(), which triggers
+                        // the load itself. Desktop keeps the warm-up.
+                        preload={caps.isPhone ? 'none' : isFirstCopy ? 'metadata' : 'none'}
                         // Reads videoWidth/videoHeight as soon as the file
                         // header lands → tells the parent to flip the card
                         // size if our manual orientation hint was missing or

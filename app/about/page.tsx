@@ -428,8 +428,66 @@ export default function AboutPage() {
           .about-hero { padding-top: 110px !important; }
           .about-founder { grid-template-columns: 1fr; gap: 32px; }
           .about-founder-photo { max-width: 240px; }
-          .about-table th { width: 120px; font-size: 14.5px; }
-          .about-table td { font-size: 14.5px; }
+
+          /* Two-column rows do not survive a 360px screen. A 120px label
+             column left ~170px for the value, so "Founders, coaches, course
+             creators, business owners, real estate agents" rendered as a
+             six-line sliver, and 14.5px is under the 16px reading floor.
+             Stacking label over value gives the value the full width back and
+             lets the type go up rather than down. The markup stays a real
+             <table> with <th scope="row">, which is what makes this block the
+             most quotable thing on the page for answer engines. */
+          .about-table,
+          .about-table tbody,
+          .about-table tr,
+          .about-table th,
+          .about-table td { display: block; width: auto; }
+          .about-table tr {
+            padding: 14px 0;
+            border-bottom: 1px solid rgba(12,12,11,0.07);
+          }
+          .about-table tr:last-child { border-bottom: none; }
+          .about-table th {
+            padding: 0 0 4px;
+            border-bottom: none;
+            font-size: 12px;
+            letter-spacing: 0.4px;
+            text-transform: uppercase;
+            color: #A8A49B;
+          }
+          .about-table td {
+            padding: 0;
+            border-bottom: none;
+            font-size: 16px;
+            line-height: 1.55;
+            color: #2E2C28;
+          }
+
+          /* globals.css enforces a 44px touch target on links, then exempts
+             li a so that inline links inside prose lists are not inflated.
+             Both link rows below ARE list items, so they inherited the
+             exemption while being standalone buttons: a 37px pill and a 20px
+             text link. Restoring a real target for the two that are actually
+             tapped. */
+          .about-service-list a {
+            min-height: 44px;
+            display: inline-flex;
+            align-items: center;
+            padding: 10px 18px;
+          }
+          /* The orange underline has to keep hugging the text, so this one
+             grows its hit area with a pseudo-element instead of its box.
+             Horizontal expansion stays under the 20px flex gap so neighbouring
+             targets cannot overlap. */
+          .about-links a { position: relative; }
+          .about-links a::before {
+            content: "";
+            position: absolute;
+            top: -13px;
+            right: -8px;
+            bottom: -13px;
+            left: -8px;
+          }
         }
       `}</style>
       </main>

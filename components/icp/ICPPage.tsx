@@ -446,6 +446,15 @@ export default function ICPPage({ data, videos }: { data: IcpData; videos: Video
         .icp-final-p { font-size: 16px; line-height: 1.65; color: rgba(242,238,231,0.6); margin: 0; max-width: 560px; }
         .icp-final-note { font-size: 12.5px; color: rgba(242,238,231,0.4); }
 
+        /* The site swaps the system cursor for a custom dot, and these three
+           surfaces hid the system one to make room for it. Cursor.tsx does not
+           mount that dot on a coarse pointer, so an ungated \`cursor: none\`
+           left touch and hybrid users with no affordance on the exact controls
+           these outreach pages exist to get tapped. */
+        @media (hover: hover) and (pointer: fine) {
+          .icp-book-btn, .icp-faq-card, .icp-svc-card { cursor: none; }
+        }
+
         /* Responsive */
         @media (max-width: 1000px) {
           .icp-hero-grid { grid-template-columns: 1fr; gap: 40px; }
@@ -472,7 +481,15 @@ export default function ICPPage({ data, videos }: { data: IcpData; videos: Video
           .icp-hero-visual { display: block; max-width: 320px; margin: 8px auto 0; }
           .icp-hero-sub { font-size: 15.5px; }
           .icp-hero-actions { flex-direction: column; align-items: stretch; }
-          .icp-hero-secondary { text-align: center; }
+          /* The fullWidthMobile prop on ICPBookButton set this class but
+             nothing ever defined it. The stretch above happened to widen the
+             button anyway; stating it means the prop does what its name says. */
+          .icp-book-btn-fw { width: 100%; }
+          .icp-hero-secondary { text-align: center; padding: 16px 26px; }
+          /* 26px of side padding on a 320px content column costs a fifth of
+             the measure. The 22px block padding, which is what makes the row a
+             comfortable tap target, is untouched. */
+          .icp-faq-card { padding: 22px 20px !important; }
           .icp-svc-grid { grid-template-columns: 1fr; }
           .icp-risk-grid { grid-template-columns: 1fr; gap: 12px; }
           .icp-risk-card { padding: 22px 20px; }

@@ -123,9 +123,20 @@ export default function Nav({
   }, []);
 
   useEffect(() => {
-    // Detect if a Loader is currently mounted (homepage). If so, hold the nav until it fades.
-    const hasLoader = typeof document !== 'undefined' && document.querySelector('[data-loader="true"]') !== null;
-    const delay = hasLoader ? 1.2 : 0.2;
+    // Detect if a Loader is currently VISIBLE (homepage, desktop first visit).
+    // If so, hold the nav until it fades.
+    //
+    // Existence alone is not the right test: on phones the splash element is
+    // still rendered for the first frames (app/page.tsx unmounts it in an
+    // effect) but globals.css already hides it with `display: none` under
+    // (max-width: 767.98px). Checking only for the node made every mobile
+    // visitor stare at a nav-less page for 1.2s after hydration, waiting on a
+    // splash they never see. Read the computed display so hidden means gone.
+    const loaderEl =
+      typeof document !== 'undefined' ? document.querySelector('[data-loader="true"]') : null;
+    const loaderVisible =
+      !!loaderEl && typeof window !== 'undefined' && window.getComputedStyle(loaderEl).display !== 'none';
+    const delay = loaderVisible ? 1.2 : 0.2;
     gsap.fromTo(navRef.current, { y: -80, opacity: 0 }, { y: 0, opacity: 1, duration: 0.9, ease: 'power3.out', delay });
   }, []);
 
@@ -214,7 +225,10 @@ export default function Nav({
           border-radius: 100px;
           font-size: 13px;
           font-weight: 600;
-          cursor: none;
+          /* Touch devices have no cursor to hide, and `cursor: none` there only
+             risks leaving a pointer-capable hybrid with no affordance at all.
+             Real hover + fine pointer gets the custom cursor treatment below. */
+          cursor: pointer;
           font-family: Inter, sans-serif;
           white-space: nowrap;
           text-decoration: none;
@@ -234,6 +248,9 @@ export default function Nav({
         .nav-cta-btn:hover::before { transform: translateX(0); }
         .nav-cta-btn:hover { transform: scale(1.03); }
         .nav-cta-btn span { position: relative; z-index: 1; }
+        @media (hover: hover) and (pointer: fine) {
+          .nav-cta-btn { cursor: none; }
+        }
 
         .nav-hamburger {
           display: none;
@@ -282,7 +299,13 @@ export default function Nav({
           /* Hide the image logo on phone to free up space; text logo stays */
           .nav-pill > a[href="/"] > img { display: none !important; }
           .nav-pill > a[href="/"] > span { font-size: 15px !important; }
-          .nav-pill > a[href="/"] { gap: 0 !important; }
+          /* The wordmark is a real link home, so it needs a real tap target.
+             Height comes from padding, not from scaling the type. */
+          .nav-pill > a[href="/"] {
+            gap: 0 !important;
+            min-height: 44px !important;
+            padding-right: 12px !important;
+          }
           .nav-hamburger {
             width: 44px !important;
             height: 44px !important;
@@ -303,7 +326,9 @@ export default function Nav({
             gap: 10px !important;
           }
           .nav-pill > a[href="/"] > span { font-size: 14px !important; }
-          .nav-hamburger { width: 42px !important; height: 42px !important; }
+          /* Stays 44px: the menu toggle is the only navigation on a 320px
+             screen, and there is width to spare in the pill for it. */
+          .nav-hamburger { width: 44px !important; height: 44px !important; }
         }
 
         /* Mobile dropdown menu — full-height so the page underneath is hidden,
@@ -318,7 +343,9 @@ export default function Nav({
           -webkit-backdrop-filter: blur(32px);
           border-bottom: 1px solid rgba(12,12,11,0.07);
           z-index: 499;
-          padding: 96px 24px calc(28px + env(safe-area-inset-bottom));
+          /* Top inset keeps the first link clear of the notch in landscape;
+             bottom inset keeps the CTA above the iPhone home indicator. */
+          padding: calc(96px + env(safe-area-inset-top)) 24px calc(28px + env(safe-area-inset-bottom));
           display: flex;
           flex-direction: column;
           gap: 0;
@@ -360,7 +387,7 @@ export default function Nav({
           box-sizing: border-box;
         }
         @media (max-width: 380px) {
-          .mobile-nav-menu { padding: 88px 20px calc(24px + env(safe-area-inset-bottom)); }
+          .mobile-nav-menu { padding: calc(88px + env(safe-area-inset-top)) 20px calc(24px + env(safe-area-inset-bottom)); }
           .mobile-nav-link { font-size: 21px; padding: 16px 4px; }
         }
       `}</style>

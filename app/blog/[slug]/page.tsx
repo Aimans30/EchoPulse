@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import type { Metadata } from 'next';
 import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
@@ -10,6 +11,32 @@ import { urlFor } from '@/lib/sanity';
 import { extractHeadings } from '@/lib/toc';
 
 const SITE_URL = 'https://echopulse.media';
+
+/**
+ * next.config.ts whitelists a fixed list of remote image hosts. `mainImageUrl`
+ * is a free-form string field in Sanity and older posts point at hosts that
+ * were never on that list, so an unguarded <Image> would throw at render and
+ * 500 the article. Anything not known-good keeps the plain <img> path.
+ */
+function isOptimizableHost(url?: string | null): boolean {
+  if (!url) return false;
+  return url.startsWith('/') || url.startsWith('https://cdn.sanity.io/');
+}
+
+/**
+ * Sanity CDN filenames carry their intrinsic size (`<hash>-1200x630.png`).
+ * next/image needs a width and height to reserve the box before the bytes
+ * land, and reading it off the URL is what removes the layout shift the
+ * covers were causing partway down the article on every phone load.
+ */
+function sanityDims(url?: string | null): { w: number; h: number } | null {
+  if (!url) return null;
+  const m = url.match(/-(\d{2,5})x(\d{2,5})(?:[-.]|$)/);
+  if (!m) return null;
+  const w = Number(m[1]);
+  const h = Number(m[2]);
+  return w > 0 && h > 0 ? { w, h } : null;
+}
 
 export async function generateStaticParams() {
   const slugs = await getAllPostSlugs();
@@ -68,6 +95,29 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     ? urlFor(post.mainImage).width(1600).height(900).fit('crop').auto('format').url()
     : post.mainImageUrl || null;
 
+  // The cover is the article's LCP element on a phone. It was requested at a
+  // flat 1600px wide with no width/height attributes, so a 390px handset
+  // downloaded a desktop-sized file AND reflowed the byline when it decoded.
+  // 16/9 when we cropped it ourselves; parsed from the filename otherwise.
+  const headerImageDims = post.mainImage?.asset
+    ? { w: 1600, h: 900 }
+    : sanityDims(post.mainImageUrl);
+  const headerImageOptimizable = isOptimizableHost(headerImageSrc) && !!headerImageDims;
+  // The article column tops out at 760px, so nothing wider is ever painted.
+  const HEADER_SIZES = '(max-width: 900px) 100vw, 760px';
+
+  // Word count for BlogPosting schema. Walks the portable-text blocks and sums
+  // the spans; depth signals matter to answer engines deciding whether a page
+  // is substantive enough to quote.
+  const wordCount = Array.isArray(post.content)
+    ? post.content.reduce((total: number, block: unknown) => {
+        const b = block as { _type?: string; children?: { text?: string }[] };
+        if (b?._type !== 'block' || !Array.isArray(b.children)) return total;
+        const text = b.children.map((c) => c?.text ?? '').join(' ').trim();
+        return total + (text ? text.split(/\s+/).length : 0);
+      }, 0)
+    : 0;
+
   const fmtDate = (iso?: string) =>
     iso
       ? new Date(iso).toLocaleDateString('en-US', {
@@ -96,18 +146,40 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   // answer engines weight most heavily.
   const articleLd = {
     '@context': 'https://schema.org',
-    '@type': 'Article',
+    // BlogPosting is a narrower subtype of Article. Being specific helps
+    // answer engines classify the page instead of guessing.
+    '@type': 'BlogPosting',
     headline: post.title,
     description: post.excerpt || undefined,
     datePublished: post.publishedAt || undefined,
     dateModified: post._updatedAt || post.publishedAt || undefined,
+    // @id reference wires the byline into the Person node declared once in the
+    // root layout, so "Lakshya Soni" resolves to a single entity across the
+    // whole site rather than a bare string repeated on 43 pages.
     author:
       authorName === 'Lakshya Soni'
         ? { '@id': `${SITE_URL}/#founder` }
         : { '@type': 'Person', name: authorName },
     publisher: { '@id': `${SITE_URL}/#organization` },
     mainEntityOfPage: { '@type': 'WebPage', '@id': `${SITE_URL}/blog/${slug}` },
-    image: headerImageSrc ? [headerImageSrc] : undefined,
+    // Full ImageObject rather than a bare URL string: gives the cover image a
+    // caption and creator, which is what makes it eligible for image search
+    // and lets AI attribute the visual when it summarises the post.
+    image: headerImageSrc
+      ? {
+          '@type': 'ImageObject',
+          url: headerImageSrc,
+          caption: post.title,
+          creditText: 'EchoPulse Media',
+          creator: { '@id': `${SITE_URL}/#organization` },
+        }
+      : undefined,
+    // articleSection maps to the category taxonomy, so a crawler can see this
+    // post belongs to a topical cluster rather than sitting on its own.
+    articleSection: resolveCategory(post) || undefined,
+    inLanguage: 'en',
+    isAccessibleForFree: true,
+    wordCount: wordCount || undefined,
   };
 
   // Breadcrumb schema — Home → Blog → This Post for rich-snippet eligibility.
@@ -230,11 +302,16 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                       justifyContent: 'center',
                     }}
                   >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
+                    {/* 44px on screen, so 44px is all any device should ever
+                        download. The raw tag was shipping the full-resolution
+                        founder headshot to every phone for a thumbnail. */}
+                    <Image
                       src={avatarSrc}
                       alt={isFounder ? authorName : ''}
                       aria-hidden={isFounder ? undefined : true}
+                      width={44}
+                      height={44}
+                      sizes="44px"
                       style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
                     />
                   </div>
@@ -266,23 +343,53 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
             {/* Hero image */}
             {headerImageSrc && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={headerImageSrc}
-                alt={post.title}
-                loading="eager"
-                decoding="async"
-                style={{
-                  width: '100%',
-                  aspectRatio: '16/9',
-                  objectFit: 'cover',
-                  borderRadius: '18px',
-                  marginBottom: '40px',
-                  display: 'block',
-                  boxShadow: '0 16px 40px rgba(12,12,11,0.10)',
-                }}
-              />
+              headerImageOptimizable && headerImageDims ? (
+                <Image
+                  src={headerImageSrc}
+                  alt={post.title}
+                  width={headerImageDims.w}
+                  height={headerImageDims.h}
+                  sizes={HEADER_SIZES}
+                  priority
+                  style={{
+                    width: '100%',
+                    aspectRatio: '16/9',
+                    objectFit: 'cover',
+                    borderRadius: '18px',
+                    marginBottom: '40px',
+                    display: 'block',
+                    boxShadow: '0 16px 40px rgba(12,12,11,0.10)',
+                  }}
+                />
+              ) : (
+                // Legacy posts point mainImageUrl at hosts next.config.ts does
+                // not whitelist. aspect-ratio still reserves the box, so the
+                // shift is fixed even where the byte saving is not available.
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img
+                  src={headerImageSrc}
+                  alt={post.title}
+                  width={1600}
+                  height={900}
+                  loading="eager"
+                  decoding="async"
+                  style={{
+                    width: '100%',
+                    aspectRatio: '16/9',
+                    objectFit: 'cover',
+                    borderRadius: '18px',
+                    marginBottom: '40px',
+                    display: 'block',
+                    boxShadow: '0 16px 40px rgba(12,12,11,0.10)',
+                  }}
+                />
+              )
             )}
+
+            {/* Collapsed section index. The sticky sidebar is display:none
+                under 1024px, so without this a phone reader had no way to move
+                around a long post other than scrolling it end to end. */}
+            <TableOfContents headings={headings} variant="mobile" />
 
             {/* Body content */}
             {post.content && post.content.length > 0 ? (
@@ -368,7 +475,12 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             display: inline-flex;
             align-items: center;
             gap: 5px;
-            cursor: none;
+            cursor: pointer;
+          }
+          /* Hide the system cursor only where the custom dot cursor replaces
+             it. On touch, cursor:none just removes an affordance. */
+          @media (hover: hover) and (pointer: fine) {
+            .blog-post-crumb-link { cursor: none; }
           }
           .blog-post-crumb-link:hover { text-decoration: underline; }
           .blog-post-crumb-sep { color: #C4BFB6; }
@@ -452,7 +564,24 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             .blog-post-crumb-current { max-width: 60vw; }
           }
           @media (max-width: 480px) {
-            .blog-post-layout, .blog-post-breadcrumb, .blog-post-related { padding: 0 16px !important; }
+            .blog-post-layout, .blog-post-breadcrumb, .blog-post-related { padding: 0 18px !important; }
+          }
+
+          /* globals.css carries a blanket mobile rule, \`main article {
+             padding-left: 18px !important; padding-right: 18px !important }\`.
+             It stacks ON TOP of the 18-20px this layout already applies, so a
+             360px phone was reading a ~284px measure (roughly 38 characters a
+             line, well under the 45-75 comfortable range) and every related
+             card had its flush cover image inset by 18px on both sides.
+             A single-class selector out-specifies the two-element one, so the
+             double padding is cancelled here without touching a global sheet
+             that other pages depend on. */
+          @media (max-width: 900px) {
+            .blog-post-article,
+            .blog-related-card {
+              padding-left: 0 !important;
+              padding-right: 0 !important;
+            }
           }
         `}</style>
       </main>
@@ -466,6 +595,18 @@ function RelatedCard({ post }: { post: BlogPostSummary }) {
   const imageSrc = post.mainImage?.asset
     ? urlFor(post.mainImage).width(700).height(420).fit('crop').auto('format').url()
     : post.mainImageUrl || null;
+
+  // Three cards on desktop, one full-width card on a phone. The card is never
+  // wider than ~350px on the widest layout, so a 700px source was two to three
+  // times more pixels than any screen resolves.
+  const dims = post.mainImage?.asset ? { w: 700, h: 420 } : sanityDims(post.mainImageUrl);
+  const optimizable = isOptimizableHost(imageSrc) && !!dims;
+  const imgStyle: React.CSSProperties = {
+    width: '100%',
+    aspectRatio: '16/9',
+    objectFit: 'cover',
+    display: 'block',
+  };
 
   return (
     <Link
@@ -487,14 +628,27 @@ function RelatedCard({ post }: { post: BlogPostSummary }) {
         }}
       >
         {imageSrc && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={imageSrc}
-            alt={post.title}
-            loading="lazy"
-            decoding="async"
-            style={{ width: '100%', aspectRatio: '16/9', objectFit: 'cover', display: 'block' }}
-          />
+          optimizable && dims ? (
+            <Image
+              src={imageSrc}
+              alt={post.title}
+              width={dims.w}
+              height={dims.h}
+              sizes="(max-width: 720px) 100vw, (max-width: 1024px) 50vw, 350px"
+              style={imgStyle}
+            />
+          ) : (
+            /* eslint-disable-next-line @next/next/no-img-element */
+            <img
+              src={imageSrc}
+              alt={post.title}
+              width={700}
+              height={420}
+              loading="lazy"
+              decoding="async"
+              style={imgStyle}
+            />
+          )
         )}
         <div style={{ padding: '18px 20px 20px', display: 'flex', flexDirection: 'column', flex: 1 }}>
           <span

@@ -86,6 +86,12 @@ export default function Process() {
 
       <style>{`
         .process-wrap { max-width: 1180px; margin: 0 auto; position: relative; z-index: 1; }
+        .process-cta { cursor: pointer; }
+        /* The custom cursor only exists on hover-capable pointers, so that is
+           the only place the native one should be hidden. */
+        @media (hover: hover) and (pointer: fine) {
+          .process-card, .process-cta { cursor: none; }
+        }
         .process-grid {
           display: grid;
           grid-template-columns: repeat(5, 1fr);
@@ -117,7 +123,9 @@ export default function Process() {
             display: grid !important;
             grid-auto-flow: column !important;
             grid-template-columns: none !important;
-            grid-auto-columns: 64% !important;
+            /* Widened from 64%: the step description now sits at the 15px body
+               floor, and 64% of a 320px screen gave it a ~180px measure. */
+            grid-auto-columns: 78% !important;
             grid-template-rows: auto !important;
             align-items: stretch !important;
             gap: 10px !important;
@@ -137,20 +145,29 @@ export default function Process() {
             height: 100%;
           }
           /* Restore desc — carousel has room for it now */
-          .process-card-desc { display: block !important; font-size: 11.5px !important; line-height: 1.55 !important; }
+          .process-card-desc { display: block !important; font-size: 15px !important; line-height: 1.6 !important; }
           /* Slightly bigger icon box in the swipe view */
           .process-card .process-icon-box { width: 38px !important; height: 38px !important; border-radius: 10px !important; margin-bottom: 10px !important; }
-          .process-card-title { font-size: 14px !important; letter-spacing: -0.2px !important; margin-bottom: 6px !important; }
+          .process-card-title { font-size: 16px !important; letter-spacing: -0.2px !important; margin-bottom: 6px !important; }
           .process-cta-wrap { margin-top: 22px !important; padding: 0 18px !important; }
-          .process-cta { padding: 12px 22px !important; font-size: 12px !important; min-height: 44px; }
+          /* Full-width pill: a centred 12px label in a 44px box is a small
+             target on the section that leads straight to the booking modal. */
+          .process-cta {
+            padding: 15px 24px !important;
+            font-size: 15px !important;
+            min-height: 52px;
+            width: 100%;
+            justify-content: center;
+          }
 
           .process-swipe-cue { display: flex !important; }
         }
         @media (max-width: 380px) {
           .process-title { font-size: 25px !important; }
           .process-card { padding: 14px 12px !important; }
-          .process-card-title { font-size: 13px !important; }
-          .process-grid { grid-auto-columns: 70% !important; }
+          .process-card-title { font-size: 15.5px !important; }
+          /* Wider, not narrower, at 320px: the card has to hold a paragraph. */
+          .process-grid { grid-auto-columns: 84% !important; }
         }
 
         /* Swipe cue — mobile only */
@@ -280,7 +297,8 @@ export default function Process() {
                     : '0 2px 12px rgba(12,12,11,0.03), inset 0 1px 0 rgba(255,255,255,0.85)',
                   position: 'relative',
                   overflow: 'hidden',
-                  cursor: 'none',
+                  // Cursor lives in CSS (.process-card) so it can be gated to
+                  // hover devices; an inline value would always win.
                   transition: 'background 0.6s cubic-bezier(0.16,1,0.3,1), border-color 0.6s cubic-bezier(0.16,1,0.3,1), box-shadow 0.6s cubic-bezier(0.16,1,0.3,1)',
                 }}
               >
@@ -373,7 +391,7 @@ export default function Process() {
             type="button"
             data-cursor-hover
             className="process-cta"
-            style={{ background: '#E8541A', color: '#fff', padding: '15px 32px', borderRadius: '100px', fontSize: '13px', fontWeight: 700, cursor: 'none', transition: 'all 0.3s', textDecoration: 'none', fontFamily: 'Inter, sans-serif', display: 'inline-flex', alignItems: 'center', gap: '8px', boxShadow: '0 8px 32px rgba(232,84,26,0.3)', border: 'none' }}
+            style={{ background: '#E8541A', color: '#fff', padding: '15px 32px', borderRadius: '100px', fontSize: '13px', fontWeight: 700, transition: 'all 0.3s', textDecoration: 'none', fontFamily: 'Inter, sans-serif', display: 'inline-flex', alignItems: 'center', gap: '8px', boxShadow: '0 8px 32px rgba(232,84,26,0.3)', border: 'none' }}
             onClick={() => {
               (window as unknown as { openBookCallModal?: () => void }).openBookCallModal?.();
             }}

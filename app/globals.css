@@ -558,8 +558,14 @@ img {
   content-visibility: auto;
   /* contain-intrinsic-size gives the browser a size hint so layout doesn't
      jump when the section is un-skipped during scroll. 1px width + estimate
-     of section height (1000px is a safe overestimate). */
-  contain-intrinsic-size: 0 1000px;
+     of section height (1000px is a safe overestimate).
+     The `auto` keyword added here makes the browser REMEMBER each section's
+     real rendered height after the first time it is painted, and use that
+     instead of the 1000px guess from then on. That matters for CLS: these
+     sections are far taller than 1000px on a 375px-wide phone, so every
+     first scroll past one was resizing it from 1000px to its true height
+     and shoving everything below it down the page. */
+  contain-intrinsic-size: auto 1000px;
 }
 
 /* ── Apple emoji normalization ──
@@ -685,21 +691,42 @@ textarea,
   border-radius: 4px;
 }
 
-/* ── PERFORMANCE: GPU hints on hover-animating elements ── */
-.btn-p, .btn-o, .nav-cta-btn, .cta-primary, .cta-secondary,
-.service-row, .service-card, .wwww-card, .promise-card, .process-card,
-.vid-card, .blog-card, .pricing-grid > * {
-  will-change: transform;
-  transform: translateZ(0); /* GPU compositor layer */
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
+/* ── PERFORMANCE: GPU hints on hover-animating elements ──
+   Gated to real hover devices on purpose. These hints exist to make the
+   :hover transitions cheap, and a touchscreen has no hover, so on a
+   phone they bought nothing and cost plenty: `will-change: transform`
+   is a standing instruction to keep every one of these elements on its
+   own compositor layer forever. A pricing page or blog index has dozens
+   of them, and a mid-range Android pays for that in GPU memory, which
+   it reclaims by dropping frames during scroll. Desktop rules are
+   byte-identical to before. */
+@media (hover: hover) and (pointer: fine) {
+  .btn-p, .btn-o, .nav-cta-btn, .cta-primary, .cta-secondary,
+  .service-row, .service-card, .wwww-card, .promise-card, .process-card,
+  .vid-card, .blog-card, .pricing-grid > * {
+    will-change: transform;
+    transform: translateZ(0); /* GPU compositor layer */
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
 }
 
 /* Text rendering */
 body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
+}
+/* `text-rendering: optimizeLegibility` forces the shaper to run the full
+   kerning + ligature pass over every text node on the page, and it is a
+   documented cause of multi-hundred-millisecond text-layout stalls on
+   low-end mobile CPUs. Inter already ships kerning that browsers apply
+   under the default `auto`, so the phone rendering is the same glyphs
+   for less work. Kept on desktop, where the CPU budget is not the
+   constraint and the setting is free. */
+@media (hover: hover) and (pointer: fine) {
+  body {
+    text-rendering: optimizeLegibility;
+  }
 }
 
 ::selection {
@@ -720,5 +747,68 @@ img, video {
   max-width: 100%;
   height: auto;
   display: block;
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   MOBILE LCP: PAINT THE HERO FROM STATIC HTML, NOT AFTER HYDRATION
+   ══════════════════════════════════════════════════════════════════════
+   WHY THIS EXISTS (read before touching app/page.tsx):
+
+   app/page.tsx must render the SAME first frame on the server and the
+   client or React drops into hydration-recovery and tears down every
+   event handler (that was the old "scroll goes dead" bug). To satisfy
+   that, it ships `showLoader = true` / `loaded = false` in the initial
+   state, so the PRE-RENDERED HTML contains the full-screen loader
+   splash and a page wrapper pinned at `opacity: 0`. The mobile skip
+   only happens in a `useEffect`.
+
+   Consequence on a phone: nothing of the actual page is painted until
+   the JS bundle has downloaded, parsed and hydrated. Largest Contentful
+   Paint therefore measured "time to hydration" on 4G instead of "time
+   to first paint": several seconds of pure, avoidable LCP.
+
+   CSS is the only thing that can act before hydration while keeping the
+   server and client markup byte-identical, so we do the mobile skip
+   here. Same end state as the JS path, just several seconds earlier.
+
+   The two rules below are a PAIR and must stay together: hiding the
+   splash without revealing the wrapper would leave phones staring at a
+   blank page. The `+ div` is the page wrapper that app/page.tsx renders
+   immediately after <Loader/>; do not insert a sibling between them.
+   ────────────────────────────────────────────────────────────────────── */
+@media (max-width: 767.98px), (prefers-reduced-motion: reduce) {
+  /* Matches the `innerWidth < 768` / reduced-motion skip in app/page.tsx. */
+  [data-loader="true"] {
+    display: none !important;
+  }
+  [data-loader="true"] + div {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+  }
+}
+
+/* Hero entrance animation, pinned to its FINAL state on phones.
+   Two reasons, both measurable:
+     1. LCP. With the splash gone (above), the hero now paints from
+        static HTML. Hero's GSAP timeline runs `fromTo(..., {opacity: 0})`
+        at hydration, which would blink already-painted copy back out
+        seconds after the user has read it.
+     2. INP/TBT. The timeline animates five element groups for ~0.85s at
+        exactly the moment a phone is busiest (hydration + first taps).
+        Pinning the end state means GSAP's style writes are overridden,
+        so the compositor does no work for them.
+   Every value here is the value the timeline finishes on, so the settled
+   design is pixel-identical. `.hero-h1-mobile` (the actual mobile LCP
+   element) is deliberately untouched: it was never animated. */
+@media (max-width: 767.98px), (prefers-reduced-motion: reduce) {
+  .hero-sub,
+  .hero-actions,
+  .hero-right {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .hl-inner {
+    transform: none !important;
+  }
 }
 

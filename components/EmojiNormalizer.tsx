@@ -50,12 +50,15 @@ export default function EmojiNormalizer() {
     let cancelled = false;
     let observer: MutationObserver | null = null;
     let scheduled = false;
+    // Elements queued for a scoped re-parse. See the comment on the observer.
+    let pending: Set<HTMLElement> = new Set();
 
-    const parseAll = () => {
+    const parseNode = (node: HTMLElement) => {
       if (cancelled) return;
       if (!window.twemoji?.parse) return;
+      if (!node.isConnected) return;
       try {
-        window.twemoji.parse(document.body, {
+        window.twemoji.parse(node, {
           className: 'apple-emoji',
           callback: (icon) => {
             try {
@@ -71,35 +74,65 @@ export default function EmojiNormalizer() {
       }
     };
 
+    const parseAll = () => parseNode(document.body);
+
+    const flush = () => {
+      scheduled = false;
+      const batch = pending;
+      pending = new Set();
+      for (const node of batch) parseNode(node);
+    };
+
     const scheduleParse = () => {
       if (scheduled) return;
       scheduled = true;
-      requestAnimationFrame(() => {
-        scheduled = false;
-        parseAll();
-      });
+      requestAnimationFrame(flush);
     };
 
     const startObserving = () => {
       if (cancelled) return;
       // Initial parse covers everything currently rendered
       parseAll();
-      // Watch for new nodes (tooltips, dynamic imports, etc.) and re-parse them
+      // Watch for new nodes (tooltips, dynamic imports, etc.) and re-parse them.
+      //
+      // This used to re-run twemoji.parse(document.body) on EVERY batch of
+      // added nodes, which means a full walk of every text node on the page.
+      // On the homepage that is a long task, and the things that add nodes
+      // are the things that add them constantly: the portfolio carousel, the
+      // modals, framer-motion mounts. The result was a repeating main-thread
+      // stall that landed squarely on INP. Parsing only the subtrees that
+      // were actually added produces identical output for a fraction of the
+      // work, because a node that was already parsed cannot have gained an
+      // unparsed emoji without a mutation of its own.
       observer = new MutationObserver((muts) => {
         for (const m of muts) {
-          if (m.addedNodes.length > 0) {
-            scheduleParse();
-            return;
+          for (const node of m.addedNodes) {
+            if (node.nodeType === Node.ELEMENT_NODE) {
+              pending.add(node as HTMLElement);
+            } else if (node.nodeType === Node.TEXT_NODE && node.parentElement) {
+              // A bare text node cannot be handed to twemoji.parse, so scope
+              // to its parent element instead.
+              pending.add(node.parentElement);
+            }
           }
         }
+        if (pending.size > 0) scheduleParse();
       });
       observer.observe(document.body, { childList: true, subtree: true });
     };
 
-    // Load script if not already loaded
-    if (window.twemoji) {
-      startObserving();
-    } else {
+    // Load the (third-party, ~40KB) twemoji parser only once the browser is
+    // genuinely idle. Emoji substitution is cosmetic and nothing above the
+    // fold depends on it, but as written it competed for bandwidth and
+    // main-thread time with hydration on the very connection where that
+    // hurts most. requestIdleCallback with a hard timeout keeps the old
+    // behaviour as a worst case while getting out of the way of LCP on 4G.
+    const load = () => {
+      if (cancelled) return;
+      if (window.twemoji) {
+        startObserving();
+        return;
+      }
       const existing = document.querySelector(`script[src="${TWEMOJI_SRC}"]`) as HTMLScriptElement | null;
       if (existing) {
         existing.addEventListener('load', startObserving, { once: true });
@@ -111,10 +144,18 @@ export default function EmojiNormalizer() {
         s.addEventListener('load', startObserving, { once: true });
         document.head.appendChild(s);
       }
-    }
+    };
+
+    const ric = (window as unknown as {
+      requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
+    }).requestIdleCallback;
+    const idleHandle = ric ? ric(load, { timeout: 3000 }) : window.setTimeout(load, 1200);
 
     return () => {
       cancelled = true;
+      const cic = (window as unknown as { cancelIdleCallback?: (h: number) => void }).cancelIdleCallback;
+      if (ric && cic) cic(idleHandle);
+      else window.clearTimeout(idleHandle);
       observer?.disconnect();
     };
   }, []);

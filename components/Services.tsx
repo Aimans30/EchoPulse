@@ -579,6 +579,11 @@ export default function Services() {
   // Apply Shery.js makeMagnet to service cards once the library is loaded.
   useEffect(() => {
     if (typeof window === 'undefined') return;
+    // Shery.js is loaded desktop-only, and makeMagnet is a cursor-proximity
+    // effect that a finger cannot trigger. Without this guard every phone ran
+    // 60 polls over 6 seconds for a library that is never coming, waking the
+    // main thread 60 times during the most latency-sensitive part of the visit.
+    if (window.matchMedia('(pointer: coarse)').matches) return;
     let attempts = 0;
     let cancelled = false;
     const tryInit = () => {
@@ -629,12 +634,16 @@ export default function Services() {
           border: 1px solid rgba(255,255,255,0.08);
           border-radius: 14px;
           overflow: hidden;
-          cursor: none;
+          cursor: pointer;
           display: flex;
           flex-direction: column;
           gap: 10px;
           transition: all 0.4s cubic-bezier(0.16,1,0.3,1);
           min-height: 240px;
+        }
+        /* Hiding the pointer is only meaningful where the custom cursor runs. */
+        @media (hover: hover) and (pointer: fine) {
+          .service-card { cursor: none; }
         }
         .service-card:hover {
           background: rgba(255,255,255,0.045);
@@ -729,7 +738,10 @@ export default function Services() {
           .services-shell { padding: 28px 20px 24px !important; border-radius: 22px !important; }
           .services-head { gap: 20px !important; margin-bottom: 24px !important; }
           .services-head h2 { font-size: 34px !important; letter-spacing: -1.2px !important; max-width: none !important; }
-          .services-head p { max-width: none !important; font-size: 12.5px !important; }
+          /* Was 12.5px, i.e. SMALLER on a tablet than on desktop (13px inline).
+             Type should get bigger as the reading distance shortens, not
+             smaller. Phones hide this paragraph entirely below 700px. */
+          .services-head p { max-width: none !important; font-size: 14.5px !important; line-height: 1.65 !important; }
         }
         @media (max-width: 700px) {
           #services { padding: 40px 0 48px !important; }
@@ -739,12 +751,16 @@ export default function Services() {
           .services-head p { display: none !important; }
           /* Hide desktop grid, show mobile list */
           .services-grid { display: none !important; }
-          .svc-mobile-list { display: flex !important; }
+          .svc-mobile-list { display: flex !important; gap: 8px !important; }
+          /* Fixed height clipped the label as soon as it wrapped; min-height
+             keeps the 44px+ target and lets a long name breathe. */
+          .svc-mobile-tile { height: auto !important; min-height: 56px !important; }
+          .svc-mobile-tile-name { font-size: 15px !important; line-height: 1.25 !important; }
         }
         @media (max-width: 380px) {
           .services-head h2 { font-size: 20px !important; }
-          .svc-mobile-tile { height: 50px !important; }
-          .svc-mobile-tile-name { font-size: 13px !important; }
+          .svc-mobile-tile { min-height: 54px !important; padding: 10px 12px !important; gap: 10px !important; }
+          .svc-mobile-tile-name { font-size: 14.5px !important; }
         }
         /* Desktop: hide mobile list */
         .svc-mobile-list { display: none; }

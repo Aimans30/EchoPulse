@@ -29,6 +29,11 @@ export default function MobileStickyCTA() {
   const [keyboardOpen, setKeyboardOpen] = useState(false);
   const [scrollingDown, setScrollingDown] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
+  // Measured, not guessed: the bar's own height is what the page has to
+  // reserve at the bottom, and it changes with the geo price string and with
+  // font scaling. See the reserve-space effect below.
+  const [barHeight, setBarHeight] = useState(0);
+  const barRef = useRef<HTMLDivElement>(null);
   const lastY = useRef(0);
   const { currency, prices } = useGeoPrice();
 
@@ -78,11 +83,44 @@ export default function MobileStickyCTA() {
     return () => vv.removeEventListener('resize', onResize);
   }, [isMobile]);
 
+  // Reserve the bar's height at the bottom of the document.
+  //
+  // The bar is position:fixed, so without this it parks on top of whatever
+  // ends the page: the footer's last links, a form's submit button, the final
+  // CTA. <body> ships a flat `pb-20` (80px) utility, which is short of what
+  // this bar actually measures once the price line wraps. Measuring means the
+  // reservation is always exactly right instead of a magic number that rots.
+  useEffect(() => {
+    if (!isMobile) return;
+    const el = barRef.current;
+    if (!el) return;
+    const measure = () => setBarHeight(Math.round(el.getBoundingClientRect().height));
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [isMobile]);
+
   if (!isMobile) return null;
   const visible = scrolledPast && !keyboardOpen && scrollingDown;
 
   return (
+    <>
+    {/* The measured height already contains env(safe-area-inset-bottom),
+        because the bar's own bottom padding does, so this must NOT add it a
+        second time. Padding stays applied whether or not the bar is currently
+        on screen: it can reappear on any downward scroll, and a padding that
+        toggled would reflow the page mid-scroll. 767px matches Tailwind's md
+        breakpoint, so desktop keeps its `md:pb-0`. */}
+    {barHeight > 0 && (
+      <style>{`
+        @media (max-width: 767px) {
+          body { padding-bottom: ${barHeight}px !important; }
+        }
+      `}</style>
+    )}
     <div
+      ref={barRef}
       aria-hidden={!visible}
       style={{
         position: 'fixed',
@@ -91,10 +129,14 @@ export default function MobileStickyCTA() {
         right: 0,
         zIndex: 800,
         padding: '12px 16px calc(10px + env(safe-area-inset-bottom)) 16px',
-        background: 'rgba(242, 238, 231, 0.92)',
-        backdropFilter: 'blur(24px) saturate(180%)',
-        WebkitBackdropFilter: 'blur(24px) saturate(180%)',
-        borderTop: '1px solid rgba(12, 12, 11, 0.07)',
+        // Solid, not translucent-plus-blur. This component only ever renders
+        // under 768px, so the old `blur(24px) saturate(180%)` was a permanent
+        // full-width backdrop filter on the one class of device least able to
+        // afford it: the compositor re-samples everything behind the bar on
+        // every scroll frame, for a session-long element. A flat cream fill
+        // reads the same at arm's length and costs nothing per frame.
+        background: '#F2EEE7',
+        borderTop: '1px solid rgba(12, 12, 11, 0.10)',
         boxShadow: '0 -10px 36px rgba(12, 12, 11, 0.08)',
         display: 'flex',
         flexDirection: 'column',
@@ -133,6 +175,8 @@ export default function MobileStickyCTA() {
           whiteSpace: 'nowrap',
           boxShadow: '0 10px 28px rgba(12,12,11,0.22)',
           cursor: 'pointer',
+          // Kills the 300ms double-tap-zoom wait on the primary conversion tap.
+          touchAction: 'manipulation',
         }}
       >
         Book a free strategy call
@@ -149,14 +193,20 @@ export default function MobileStickyCTA() {
           color: '#6E6B63',
           textDecoration: 'none',
           letterSpacing: '0.1px',
-          padding: '4px 8px',
-          minHeight: '24px',
+          // 8px of vertical padding turns an 11.5px line of text into a ~32px
+          // strip. globals.css exempts `span a` / `p a` from its 44px touch
+          // floor, and this link sits inside neither, but it is a real second
+          // action, so it gets a thumb-sized band of its own.
+          padding: '8px 12px',
+          minHeight: '32px',
           display: 'inline-flex',
           alignItems: 'center',
+          touchAction: 'manipulation',
         }}
       >
         Or see the <span style={{ color: '#E8541A', fontWeight: 700, marginLeft: 4 }}>{currency}{prices.pilot} 14-day Pilot</span>
       </a>
     </div>
+    </>
   );
 }

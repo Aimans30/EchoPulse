@@ -282,8 +282,12 @@ export default function FAQ() {
           border: none;
           text-align: left;
           padding: 22px 26px;
-          cursor: none;
+          cursor: pointer;
           font-family: inherit;
+        }
+        /* Custom-cursor treatment only where a pointer actually exists. */
+        @media (hover: hover) and (pointer: fine) {
+          .faq-q-btn { cursor: none; }
         }
         .faq-q {
           font-family: Inter, sans-serif;
@@ -340,19 +344,26 @@ export default function FAQ() {
           .faq-sub { flex: none !important; flex-basis: auto !important; max-width: 560px; }
         }
         @media (max-width: 640px) {
-          section#faq { padding: 72px 18px !important; }
+          section#faq { padding: 64px 18px !important; }
           .faq-header { gap: 12px !important; margin-bottom: 24px !important; }
           .faq-h2 { font-size: 38px !important; letter-spacing: -1.4px !important; }
-          .faq-sub { font-size: 14px !important; line-height: 1.6 !important; }
-          .faq-q-btn { padding: 18px 18px !important; gap: 14px !important; }
-          .faq-q { font-size: 15px !important; line-height: 1.4 !important; }
-          .faq-a { font-size: 14px !important; line-height: 1.65 !important; margin: 0 18px 18px !important; }
+          .faq-sub { font-size: 15px !important; line-height: 1.65 !important; }
+          /* globals.css pads .faq-card itself below 480px, which would double up
+             with the button's own padding and cost ~36px of usable width on a
+             320px screen. The card is a frame; the button owns the inset. */
+          .faq-card { padding: 0 !important; }
+          .faq-q-btn { padding: 18px 16px !important; gap: 14px !important; min-height: 56px !important; }
+          .faq-q { font-size: 15px !important; line-height: 1.45 !important; }
+          /* Answers are the payload of this section. 15px floor, looser leading
+             than desktop because the measure is much narrower. */
+          .faq-a { font-size: 15px !important; line-height: 1.72 !important; margin: 0 16px 18px !important; }
           .faq-toggle { width: 34px !important; height: 34px !important; }
         }
         @media (max-width: 380px) {
-          section#faq { padding: 60px 14px !important; }
-          .faq-h2 { font-size: 34px !important; letter-spacing: -1.2px !important; }
-          .faq-q { font-size: 14.5px !important; }
+          section#faq { padding: 56px 14px !important; }
+          .faq-h2 { font-size: 32px !important; letter-spacing: -1.2px !important; }
+          .faq-q-btn { padding: 16px 14px !important; gap: 10px !important; }
+          .faq-a { margin: 0 14px 16px !important; }
         }
       `}</style>
     </section>

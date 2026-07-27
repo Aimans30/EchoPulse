@@ -42,9 +42,33 @@ export default function BottomBlur() {
         pointerEvents: 'none',
         zIndex: 40,
         opacity: hidden ? 0 : 1,
-        transition: 'opacity 0.35s ease',
+        // `opacity: 0` alone does not reliably stop a backdrop-filter from
+        // being evaluated: the compositor can still read back and blur the
+        // region behind a fully transparent layer on every scroll frame.
+        // `visibility: hidden` takes the element out of that work entirely.
+        // The delayed transition keeps the 0.35s fade-out exactly as it was
+        // (visibility only flips once the fade has finished) while flipping
+        // back instantly on the way in.
+        visibility: hidden ? 'hidden' : 'visible',
+        transition: hidden
+          ? 'opacity 0.35s ease, visibility 0s linear 0.35s'
+          : 'opacity 0.35s ease, visibility 0s linear 0s',
       }}
     >
+      <style>{`
+        /* The second blur pass is desktop-only. A fixed, full-width
+           backdrop-filter is the most expensive thing you can put on a
+           mobile GPU: the region behind it has to be read back and
+           re-blurred every single scroll frame, and two stacked layers
+           means doing it twice, permanently, for the entire session. The
+           8px pass below does the visible frosting; this 2px pass only
+           softens the very top of the gradient, which is invisible on a
+           phone where the sticky CTA sits over that band anyway. */
+        .ep-bottom-blur-2 { display: none; }
+        @media (hover: hover) and (pointer: fine) {
+          .ep-bottom-blur-2 { display: block; }
+        }
+      `}</style>
       {/* Progressive blur — strongest at the bottom, fades to none at the top
           via a mask so the transition into clear content is seamless. */}
       <div
@@ -59,6 +83,7 @@ export default function BottomBlur() {
       />
       {/* Second, lighter blur layer higher up for a smoother gradient of blur */}
       <div
+        className="ep-bottom-blur-2"
         style={{
           position: 'absolute',
           inset: 0,

@@ -60,6 +60,8 @@ export default function Footer() {
             <a
               key={s.label}
               href={s.href}
+              className="footer-social"
+              aria-label="EchoPulse on LinkedIn"
               style={{
                 width: '44px',
                 height: '44px',
@@ -72,7 +74,7 @@ export default function Footer() {
                 justifyContent: 'center',
                 fontSize: '12px',
                 fontWeight: 800,
-                cursor: 'none',
+                // Cursor handled in CSS so it can be gated to hover devices.
                 transition: 'all 0.25s',
                 textDecoration: 'none',
                 color: '#0C0C0B',
@@ -219,15 +221,26 @@ export default function Footer() {
         .site-footer a[href^="http"] {
           display: inline-block;
         }
+        .site-footer .footer-social { cursor: pointer; }
+        /* `cursor: none` only makes sense where a real cursor exists and the
+           custom one replaces it. On touch it is a no-op at best. */
+        @media (hover: hover) and (pointer: fine) {
+          .site-footer .footer-social { cursor: none; }
+        }
         @media (max-width: 1200px) { .site-footer { grid-template-columns: 1fr 1fr !important; gap: 40px !important; } }
         @media (max-width: 768px) {
           .site-footer {
             grid-template-columns: 1fr !important;
-            padding: 56px 22px 32px !important;
+            /* Bottom padding clears BOTH the phone sticky CTA bar (globals.css
+               reserves 96px for it) and the iPhone home indicator. Without the
+               inset the last row of links sits under the gesture bar. */
+            padding: 56px 22px calc(96px + env(safe-area-inset-bottom)) !important;
             gap: 36px !important;
           }
-          /* Pad list-item links so the row meets a 44px tap target */
-          .site-footer ul { gap: 4px !important; }
+          /* Pad list-item links so the row meets a 44px tap target.
+             The 8px gap matters as much as the 44px: at 4px two neighbouring
+             hit areas were close enough for one thumb to cover both. */
+          .site-footer ul { gap: 8px !important; }
           .site-footer ul li a {
             display: block !important;
             padding: 12px 0 !important;
@@ -237,8 +250,8 @@ export default function Footer() {
           }
           /* Section heading spacing tightens */
           .site-footer h4 { margin-bottom: 10px !important; }
-          /* Brand intro paragraph: snug font + spacing */
-          .site-footer p { font-size: 14px !important; }
+          /* Brand intro paragraph: at the 15px body floor, looser leading */
+          .site-footer p { font-size: 15px !important; line-height: 1.65 !important; }
           /* Bottom bar — stack copyright + tagline so each reads cleanly */
           .site-footer > div:last-of-type {
             flex-direction: column !important;
@@ -246,10 +259,13 @@ export default function Footer() {
             gap: 10px !important;
             padding-top: 24px !important;
           }
-          .site-footer > div:last-of-type p { font-size: 12.5px !important; }
+          .site-footer > div:last-of-type p { font-size: 13px !important; line-height: 1.5 !important; }
         }
         @media (max-width: 380px) {
-          .site-footer { padding: 48px 16px 28px !important; gap: 32px !important; }
+          .site-footer {
+            padding: 48px 16px calc(92px + env(safe-area-inset-bottom)) !important;
+            gap: 32px !important;
+          }
         }
       `}</style>
     </footer>

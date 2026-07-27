@@ -59,6 +59,32 @@ export default function ICPPipelineAnimation({
 }) {
   const [stage, setStage] = useState(0);
   const [reduced, setReduced] = useState(false);
+  // Starts true so the very first frames animate identically to before even
+  // if the observer has not reported yet.
+  const [inView, setInView] = useState(true);
+  const frameRef = useRef<HTMLDivElement>(null);
+
+  /**
+   * The stage clock only runs while the animation is actually on screen.
+   *
+   * This lives in the hero of five outreach pages, so it scrolls out of view
+   * within a second or two and never comes back. Left alone, the interval kept
+   * firing a React state update every 780ms for the rest of the session, and
+   * each one re-rendered roughly twenty framer-motion nodes. On a mid-range
+   * phone that is continuous main-thread work competing with the scroll the
+   * visitor is actually doing. Nothing visual changes: an animation nobody can
+   * see is the only thing that stops.
+   */
+  useEffect(() => {
+    const el = frameRef.current;
+    if (!el || typeof IntersectionObserver === 'undefined') return;
+    const io = new IntersectionObserver(
+      ([entry]) => setInView(entry.isIntersecting),
+      { rootMargin: '120px 0px' },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
 
   useEffect(() => {
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -67,9 +93,10 @@ export default function ICPPipelineAnimation({
       setStage(STAGES - 1);
       return;
     }
+    if (!inView) return;
     const id = setInterval(() => setStage((s) => (s + 1) % STAGES), STAGE_MS);
     return () => clearInterval(id);
-  }, []);
+  }, [inView]);
 
   const on = (from: number) => reduced || stage >= from;
   const shownOutputs = reduced ? 4 : Math.max(0, Math.min(4, stage - 1));
@@ -77,7 +104,7 @@ export default function ICPPipelineAnimation({
   const resultLevel = reduced ? 1 : stage >= 7 ? 1 : stage >= 6 ? 0.62 : 0;
 
   return (
-    <div className="pa-frame" role="img" aria-label={alt}>
+    <div className="pa-frame" ref={frameRef} role="img" aria-label={alt}>
       {/* soft ambient glow that breathes with production */}
       <motion.div
         className="pa-glow"

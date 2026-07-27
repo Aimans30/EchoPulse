@@ -47,8 +47,14 @@ export default function ICPBookButton({
         fontFamily: 'Inter, sans-serif',
         display: 'inline-flex',
         alignItems: 'center',
+        justifyContent: 'center',
         gap: 9,
-        cursor: 'none',
+        // `cursor: none` moved to a (hover: hover) and (pointer: fine) rule in
+        // ICPPage's stylesheet. It is only correct where the custom dot cursor
+        // actually mounts, and this is the primary conversion control on five
+        // pages that are sent almost entirely to phones.
+        cursor: 'pointer',
+        touchAction: 'manipulation',
         boxShadow: solid ? `0 8px 32px ${accent}55` : '0 8px 28px rgba(0,0,0,0.18)',
         minHeight: 48,
         whiteSpace: 'nowrap',

@@ -1,10 +1,29 @@
 'use client';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 // Cursor — dot + trailing ring, dark-bg aware, 60fps via direct transform writes.
 export default function Cursor() {
   const d = useRef<HTMLDivElement>(null);
   const r = useRef<HTMLDivElement>(null);
+
+  // Nothing here renders until we have confirmed a fine pointer.
+  //
+  // The effect below already bailed on touch, but the MARKUP shipped
+  // regardless: this component sits inside the root layout, so every phone
+  // was parsing the <style> block and building two fixed-position elements
+  // for a cursor that can never exist on a touchscreen. Starting at `false`
+  // on both the server and the first client render keeps hydration
+  // byte-identical (the server cannot know the pointer type), then the
+  // effect promotes desktop to the real thing one tick later. Desktop ends
+  // up in exactly the same state; the dot simply stops being painted at
+  // 0,0 in the corner during the pre-hydration window.
+  const [finePointer, setFinePointer] = useState(false);
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (window.matchMedia('(pointer:coarse)').matches) return;
+    if (window.matchMedia('(prefers-reduced-motion:reduce)').matches) return;
+    setFinePointer(true);
+  }, []);
 
   useEffect(() => {
     const dot = d.current;
@@ -181,7 +200,13 @@ export default function Cursor() {
       // Restore the native cursor — the custom one is no longer running.
       html.classList.remove('ep-cursor-ready');
     };
-  }, []);
+    // Depends on `finePointer` because the dot/ring refs do not exist until
+    // that flips true and the elements are actually rendered.
+  }, [finePointer]);
+
+  // Touch device (or reduced motion): render nothing at all. No style block,
+  // no elements, no listeners, no rAF loop.
+  if (!finePointer) return null;
 
   return (
     <>

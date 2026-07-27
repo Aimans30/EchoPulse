@@ -21,6 +21,13 @@ export default function PilotPopup() {
   useEffect(() => {
     if (typeof window === 'undefined') return;
     if (window.innerWidth < MIN_VIEWPORT_WIDTH) return;
+    // Width alone is not a phone test. A modern handset in landscape reports
+    // 850-950px and would have sailed past MIN_VIEWPORT_WIDTH, which is
+    // exactly the case Google's intrusive-interstitial rule is written about
+    // (it evaluates the mobile rendering, not the CSS breakpoint we chose).
+    // A coarse pointer is the honest signal for "this is a touchscreen", and
+    // it also covers tablets, where an auto-appearing card is equally rude.
+    if (window.matchMedia('(pointer: coarse)').matches) return;
     if (sessionStorage.getItem(SESSION_KEY) === '1') return;
     // Respect reduced-motion preference — keyboard / a11y users don't want a
     // popup animating in either. Skip showing the notification entirely.
@@ -160,6 +167,19 @@ export default function PilotPopup() {
               padding: 0;
               z-index: 2;
               transition: color 0.2s, background 0.2s;
+              touch-action: manipulation;
+            }
+            /* The visible dot stays 22px so the card looks the same, but the
+               hit area is pushed out to ~44px. Dismissing has to be the
+               easiest thing on this card, and a 22px target is a miss-tap on
+               any hybrid touch laptop that still reports a fine pointer. */
+            .ep-pilot-close::before {
+              content: "";
+              position: absolute;
+              top: -11px;
+              right: -11px;
+              bottom: -11px;
+              left: -11px;
             }
             .ep-pilot-close:hover {
               color: #0C0C0B;

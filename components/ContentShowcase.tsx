@@ -23,15 +23,26 @@ export default function ContentShowcase() {
         .showcase-right-panel { flex-shrink:0; width:440px; display:flex; flex-direction:column; gap:16px; }
         @media(max-width:1060px){ .showcase-right-panel{ width:380px; } }
         @media(max-width:900px){ .showcase-right-panel{ display:none!important; } }
-        @media(max-width:640px){ .showcase-wrap{ padding:0!important; } .showcase-section{ padding:80px 24px!important; } }
 
         .pain-row { display:flex; align-items:flex-start; gap:14px; padding:16px 0; border-bottom:1px solid rgba(12,12,11,0.07); }
         .pain-row:last-child { border-bottom:none; }
 
+        /* ── Phone ──
+           The before/after row is two columns of prose either side of an arrow.
+           At 320px each column is ~120px, which breaks the copy into two-word
+           ribbons. Stack it and turn the arrow to point down instead. */
+        @media(max-width:640px){
+          .showcase-wrap{ padding:0!important; }
+          .showcase-section{ padding:56px 20px!important; }
+          .pain-row{ flex-direction:column; align-items:stretch; gap:8px; padding:14px 0; }
+          .pain-row > div{ font-size:15px!important; line-height:1.5!important; }
+          .pain-row > svg{ transform:rotate(90deg); align-self:flex-start; margin-left:2px; }
+        }
+
         .cta-primary {
           background:#0C0C0B; color:#F2EEE7;
           border:none; padding:17px 32px; border-radius:100px;
-          font-size:14px; font-weight:700; cursor:none;
+          font-size:14px; font-weight:700; cursor:pointer;
           text-decoration:none; display:inline-flex; align-items:center; gap:10px;
           font-family:Inter,sans-serif; transition:all 0.35s cubic-bezier(0.16,1,0.3,1);
           position:relative; overflow:hidden;
@@ -44,11 +55,15 @@ export default function ContentShowcase() {
         .cta-secondary {
           background:transparent; color:#0C0C0B;
           border:1.5px solid rgba(12,12,11,0.14); padding:17px 28px; border-radius:100px;
-          font-size:14px; font-weight:700; cursor:none;
+          font-size:14px; font-weight:700; cursor:pointer;
           text-decoration:none; display:inline-flex; align-items:center; gap:8px;
           font-family:Inter,sans-serif; transition:all 0.3s;
         }
         .cta-secondary:hover { background:#0C0C0B; color:#F2EEE7; border-color:#0C0C0B; }
+        /* Custom cursor only exists on hover-capable, fine pointers. */
+        @media (hover: hover) and (pointer: fine) {
+          .cta-primary, .cta-secondary { cursor:none; }
+        }
 
         .stat-card {
           background:rgba(255,255,255,0.72);
@@ -58,6 +73,20 @@ export default function ContentShowcase() {
           border-radius:18px;
           padding:28px 32px;
           box-shadow:0 4px 24px rgba(12,12,11,0.06), inset 0 1px 0 rgba(255,255,255,0.95);
+        }
+
+        /* Declared last on purpose: these override the .cta-* base rules above,
+           which have identical specificity, so document order decides.
+           Full-width CTAs, because both were sized to their label and the
+           primary only just cleared a comfortable thumb target at 320px. */
+        @media(max-width:640px){
+          .cta-primary, .cta-secondary{
+            width:100%;
+            justify-content:center;
+            min-height:52px;
+            padding:15px 24px;
+            font-size:15px;
+          }
         }
       `}</style>
 

@@ -39,6 +39,15 @@ export default function AnalyticsProvider() {
           }
         }
         raf = 0;
+        // All four milestones are one-shot, so once the last one has fired
+        // this handler can never do anything again. Detaching it stops a
+        // rAF from being scheduled on every scroll frame for the rest of
+        // the session, which on a phone is the difference between a
+        // scroll that hands the main thread straight back to the
+        // compositor and one that queues work behind every gesture.
+        if (firedMilestones.current.size === milestones.length) {
+          window.removeEventListener('scroll', onScroll);
+        }
       });
     };
     onScroll();
@@ -71,14 +80,24 @@ export default function AnalyticsProvider() {
 
   return (
     <>
-      {/* Microsoft Clarity — only when env var is set */}
+      {/* Microsoft Clarity — only when env var is set.
+          IMPORTANT: app/layout.tsx also ships a Clarity snippet with a
+          hard-coded project id. Whenever NEXT_PUBLIC_CLARITY_ID is set in the
+          environment BOTH used to run, so the tag was fetched and the page
+          instrumented twice: two sets of DOM-mutation and input listeners on
+          every interaction, which is paid for directly in INP. The
+          `if (c[a]) return` guard (mirrored in layout.tsx) makes whichever
+          one boots first the only one that boots.
+          `lazyOnload` for the same reason as layout.tsx: a session recorder
+          has no business competing with hydration for main-thread time. */}
       {CLARITY_ID && (
         <Script
           id="ms-clarity"
-          strategy="afterInteractive"
+          strategy="lazyOnload"
           dangerouslySetInnerHTML={{
             __html: `
               (function(c,l,a,r,i,t,y){
+                if(c[a])return;
                 c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
                 t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
                 y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);

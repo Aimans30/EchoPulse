@@ -20,14 +20,23 @@ export default function ICPFaq({ faq, accent }: { faq: { q: string; a: string }[
         return (
           <div
             key={item.q}
+            className="icp-faq-card"
             onClick={() => setOpen(isOpen ? null : i)}
             data-cursor-hover
             style={{
               background: isOpen ? `${accent}0d` : 'rgba(255,255,255,0.55)',
               border: `1px solid ${isOpen ? `${accent}30` : 'rgba(12,12,11,0.06)'}`,
               borderRadius: 18,
+              // The whole card is the toggle, so 22px of block padding around a
+              // 16px question is already a ~66px tap row. Keeping it and only
+              // trimming the side inset on phones (see ICPPage's stylesheet)
+              // buys back measure without shrinking the target.
               padding: '22px 26px',
-              cursor: 'none',
+              // Gated to (hover: hover) and (pointer: fine) in ICPPage's
+              // stylesheet: on a touchscreen the custom dot cursor never
+              // mounts, so `cursor: none` only removes an affordance.
+              cursor: 'pointer',
+              touchAction: 'manipulation',
               transition: 'background 0.3s, border-color 0.3s',
             }}
           >

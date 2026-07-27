@@ -139,7 +139,7 @@ export default function CTABanner() {
               borderRadius: '100px',
               fontSize: '15px',
               fontWeight: 700,
-              cursor: 'none',
+              // Cursor handled in CSS below so it can be gated to hover devices.
               transition: 'background 0.3s',
               fontFamily: 'Inter, sans-serif',
               whiteSpace: 'nowrap',
@@ -168,18 +168,34 @@ export default function CTABanner() {
       </motion.div>
 
       <style>{`
+        .cta-banner-btn { cursor: pointer; }
+        /* The native cursor is only worth hiding where the custom one runs. */
+        @media (hover: hover) and (pointer: fine) {
+          .cta-banner-btn { cursor: none; }
+        }
+
         @media (max-width: 900px) {
           .cta-banner-inner { padding: 60px 48px !important; }
           .cta-banner-h { font-size: clamp(28px, 6vw, 44px) !important; letter-spacing: -1px !important; }
         }
         @media (max-width: 640px) {
-          .cta-banner-wrap { margin: 36px 16px 80px !important; }
-          .cta-banner-inner { padding: 48px 28px !important; gap: 28px !important; }
+          /* Bottom margin trimmed: the footer already reserves space for the
+             sticky CTA bar, so 80px here was pure dead scroll on a phone. */
+          .cta-banner-wrap { margin: 32px 16px 48px !important; }
+          .cta-banner-inner { padding: 40px 22px !important; gap: 24px !important; }
           .cta-banner-h { font-size: 28px !important; letter-spacing: -0.8px !important; line-height: 1.1 !important; }
           .cta-banner-text { flex-basis: 100% !important; }
-          .cta-banner-p { font-size: 14px !important; margin-top: 16px !important; }
+          .cta-banner-p { font-size: 15px !important; line-height: 1.65 !important; margin-top: 16px !important; }
           .cta-banner-action { width: 100% !important; align-items: stretch !important; }
-          .cta-banner-btn { width: 100% !important; padding: 16px 24px !important; }
+          .cta-banner-btn { width: 100% !important; padding: 17px 24px !important; min-height: 54px !important; }
+          /* The reassurance line under the CTA sat at 0.28 alpha on near-black,
+             which is effectively invisible on a phone screen outdoors. */
+          .cta-banner-action > span { color: rgba(242,238,231,0.5) !important; font-size: 12.5px !important; }
+        }
+        @media (max-width: 380px) {
+          .cta-banner-wrap { margin: 28px 12px 44px !important; }
+          .cta-banner-inner { padding: 32px 18px !important; }
+          .cta-banner-h { font-size: 26px !important; }
         }
       `}</style>
     </div>

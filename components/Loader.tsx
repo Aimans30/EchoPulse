@@ -24,6 +24,29 @@ import { gsap } from 'gsap';
  *   - Loader sets pointer-events:none during exit so it can't block scroll
  *   - Forcibly clears any inherited body overflow:hidden on unmount
  */
+/**
+ * True when this splash is not actually on screen: phones and anyone who
+ * asked for reduced motion.
+ *
+ * app/globals.css hides `[data-loader="true"]` under exactly the same
+ * conditions so the page can paint from static HTML before hydration (see
+ * the long comment there). This is the JS half of that pair: without it the
+ * component would happily build and run a full GSAP timeline, tweening
+ * letters, a blurred glow and two SVG rings, for an element with
+ * `display: none`. Keep the two conditions in sync.
+ */
+function isSplashHidden(): boolean {
+  if (typeof window === 'undefined') return false;
+  try {
+    return (
+      window.matchMedia('(max-width: 767.98px)').matches ||
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    );
+  } catch {
+    return false;
+  }
+}
+
 export default function Loader({ onDone }: { onDone: () => void }) {
   const loaderRef = useRef<HTMLDivElement>(null);
   const barRef = useRef<HTMLDivElement>(null);
@@ -37,6 +60,10 @@ export default function Loader({ onDone }: { onDone: () => void }) {
 
   // Failsafe: hide loader after 4.5s no matter what.
   useEffect(() => {
+    // Skip on hidden-splash devices: there is nothing to fail safe against,
+    // and holding a 3.5s timer alive keeps this whole component (and its
+    // GSAP refs) retained on a memory-constrained phone for no reason.
+    if (isSplashHidden()) return;
     const failsafe = window.setTimeout(() => { onDoneRef.current?.(); }, 3500);
     return () => window.clearTimeout(failsafe);
   }, []);
@@ -52,6 +79,16 @@ export default function Loader({ onDone }: { onDone: () => void }) {
   }, []);
 
   useEffect(() => {
+    // Phone / reduced motion: the splash is display:none, so hand off
+    // immediately instead of animating an invisible element. This fires the
+    // `ep:loaded` handoff a full frame earlier than app/page.tsx's own
+    // mobile skip does, and it never creates the timeline in the first
+    // place, so no GSAP tick ever competes with hydration on a phone.
+    if (isSplashHidden()) {
+      onDoneRef.current?.();
+      return;
+    }
+
     const letters = wordRef.current?.querySelectorAll('.l');
     if (!letters || !letters.length) {
       onDoneRef.current?.();

@@ -208,28 +208,45 @@ export default async function RootLayout({
   return (
     <html lang="en" className={inter.variable}>
       <head>
-        {/* Microsoft Clarity */}
-        <Script id="clarity-init" strategy="afterInteractive">{`
+        {/* Microsoft Clarity.
+            `lazyOnload` (was `afterInteractive`): Clarity is a session
+            recorder, not a conversion tag, and it instruments every DOM
+            mutation and input event on the page. Loading it while React is
+            still hydrating put ~40KB of parse + a permanent listener set
+            directly in the way of the first tap on a phone, which is exactly
+            the interaction INP scores. Waiting for the load event costs us
+            about a second of recording and takes that work off the critical
+            path entirely.
+            The `window.clarity` guard is a de-dupe: components/AnalyticsProvider
+            ships a SECOND Clarity snippet gated on NEXT_PUBLIC_CLARITY_ID, so
+            whenever that env var is set both used to boot and the tag was
+            downloaded and instrumented twice. First one in wins now. */}
+        <Script id="clarity-init" strategy="lazyOnload">{`
           (function(c,l,a,r,i,t,y){
+            if(c[a])return;
             c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
             t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
             y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
           })(window, document, "clarity", "script", "ukzjzunyk5");
         `}</Script>
-        {/* Preconnect to font/script CDNs for faster handshake */}
-        <link rel="preconnect" href="https://unpkg.com" crossOrigin="" />
-        {/* Cal.com preconnect — DNS + TLS handshake done BEFORE the user clicks
-            "Book a call", so when the modal opens the iframe starts at full speed. */}
-        <link rel="preconnect" href="https://cal.com" />
+        {/* Cal.com: DNS resolved early, but NO preconnect.
+            A preconnect opens a real TCP + TLS connection immediately, and on
+            4G those two round trips compete for bandwidth with the hero paint
+            for every single visitor, including the ~99% who never open the
+            booking modal. DNS is the part that is genuinely slow on mobile
+            networks (100-300ms) and dns-prefetch is nearly free, so we keep
+            that and let the TLS handshake happen on click, where it is hidden
+            behind the modal's own open animation. */}
         <link rel="dns-prefetch" href="https://cal.com" />
-        <link rel="preconnect" href="https://app.cal.com" />
         <link rel="dns-prefetch" href="https://app.cal.com" />
-        {/* Shery.js stylesheet — only loaded on devices that can hover (skipped via media on mobile) */}
-        <link
-          rel="stylesheet"
-          href="https://unpkg.com/sheryjs/dist/Shery.css"
-          media="(hover: hover) and (pointer: fine)"
-        />
+        {/* NOTE: the unpkg preconnect and the Shery.css <link> used to live
+            here. A stylesheet with a non-matching `media` is still DOWNLOADED
+            by every browser (just at low priority and without blocking
+            render), so the "skipped via media on mobile" comment was wrong:
+            phones were paying for Shery's CSS, its DNS lookup and its TLS
+            handshake to serve a magnetic-hover effect that a touchscreen can
+            never trigger. Both are now injected by the desktop-only loader at
+            the bottom of <body>. */}
       </head>
       <body className="pb-20 md:pb-0">
         {/* Skip-to-content — first focusable element. Invisible until the
@@ -261,11 +278,34 @@ export default async function RootLayout({
               /api/pune-inquiry are now unused. */}
         </GeoProvider>
         <GoogleAnalytics gaId={GA_ID} />
-        {/* Shery loads after hydration AND only on desktop pointer devices */}
-        <Script
-          src="https://unpkg.com/sheryjs/dist/Shery.js"
-          strategy="lazyOnload"
-        />
+        {/* Shery.js is genuinely desktop-only now.
+            The previous `<Script src="...Shery.js">` was unconditional: every
+            phone downloaded and parsed the library (it bundles its own copies
+            of three.js and GSAP, so it is one of the heaviest single requests
+            on the site) purely so components/Services.tsx could call
+            Shery.makeMagnet() on hover, an effect that does not exist on a
+            touchscreen. Swapping the tag for a guarded injector means the
+            request is never made below the hover/pointer test, while desktop
+            gets exactly the same library at exactly the same point in the
+            lifecycle (still lazyOnload, i.e. after the load event). The
+            stylesheet rides along with it because it is useless on its own. */}
+        <Script id="shery-desktop-only" strategy="lazyOnload">{`
+          (function(){
+            try {
+              if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+              if (document.getElementById('shery-css')) return;
+              var css = document.createElement('link');
+              css.id = 'shery-css';
+              css.rel = 'stylesheet';
+              css.href = 'https://unpkg.com/sheryjs/dist/Shery.css';
+              document.head.appendChild(css);
+              var js = document.createElement('script');
+              js.src = 'https://unpkg.com/sheryjs/dist/Shery.js';
+              js.async = true;
+              document.body.appendChild(js);
+            } catch (e) { /* decorative only, never break the page */ }
+          })();
+        `}</Script>
       </body>
     </html>
   );

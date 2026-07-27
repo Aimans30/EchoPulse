@@ -12,11 +12,29 @@ import type { TocHeading } from '@/lib/toc';
  * - Smooth-scrolls on click and reflects the active state immediately.
  * - Hidden on mobile (the two-column layout collapses to one column there);
  *   the `.blog-toc` wrapper is display:none under 1024px via the page CSS.
+ *
+ * `variant="mobile"` renders the same links as a COLLAPSED <details> placed in
+ * the article flow instead. Under 1024px the sidebar disappears entirely, so
+ * phone readers, who are most of the organic traffic, previously had no way to
+ * jump between sections of a 2,500-word post at all. Collapsed by default so
+ * it costs roughly one line of the first screen rather than eating it, and
+ * <details> means the open/close behaviour is native (works before hydration,
+ * keyboard-operable, and announced correctly).
  */
-export default function TableOfContents({ headings }: { headings: TocHeading[] }) {
+export default function TableOfContents({
+  headings,
+  variant = 'sidebar',
+}: {
+  headings: TocHeading[];
+  variant?: 'sidebar' | 'mobile';
+}) {
   const [activeId, setActiveId] = useState<string>(headings[0]?.id ?? '');
 
   useEffect(() => {
+    // Scroll-spy is a sidebar affordance: the mobile list is closed almost all
+    // of the time, so observing every heading there would be pure overhead on
+    // the device with the least to spare.
+    if (variant === 'mobile') return;
     if (headings.length === 0) return;
 
     const elements = headings
@@ -48,7 +66,7 @@ export default function TableOfContents({ headings }: { headings: TocHeading[] }
 
     elements.forEach((el) => observer.observe(el));
     return () => observer.disconnect();
-  }, [headings]);
+  }, [headings, variant]);
 
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
     e.preventDefault();
@@ -61,6 +79,125 @@ export default function TableOfContents({ headings }: { headings: TocHeading[] }
   };
 
   if (headings.length === 0) return null;
+
+  if (variant === 'mobile') {
+    // Jumping to a section and leaving the whole index expanded on top of it
+    // wastes the screen the reader just asked to see, so the panel closes
+    // itself on selection.
+    const closeAfterJump = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
+      handleClick(e, id);
+      e.currentTarget.closest('details')?.removeAttribute('open');
+    };
+
+    return (
+      <nav className="blog-toc-m" aria-label="Table of contents">
+        <details>
+          <summary className="blog-toc-m-summary">
+            <span className="blog-toc-m-label">Quick Navigation</span>
+            <span className="blog-toc-m-chev" aria-hidden="true" />
+          </summary>
+          <ul className="blog-toc-m-list">
+            {headings.map((h) => (
+              <li key={h.id} className={h.level === 3 ? 'blog-toc-m-sub' : undefined}>
+                <a
+                  href={`#${h.id}`}
+                  onClick={(e) => closeAfterJump(e, h.id)}
+                  className="blog-toc-m-link"
+                >
+                  {h.level === 2 && <span className="blog-toc-m-dot" aria-hidden="true" />}
+                  <span>{h.text}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </details>
+
+        {/* Deliberately self-contained rather than reusing the sidebar's
+            classes: the sidebar is display:none at this width, and inheriting
+            styles from a hidden sibling is the kind of coupling that breaks
+            silently the next time either one is touched. */}
+        <style>{`
+          /* Only exists where the sticky sidebar does not. */
+          .blog-toc-m { display: none; }
+          @media (max-width: 1024px) {
+            .blog-toc-m {
+              display: block;
+              margin: 0 0 32px;
+              background: rgba(255,255,255,0.55);
+              border: 1px solid rgba(12,12,11,0.08);
+              border-radius: 14px;
+              overflow: hidden;
+            }
+          }
+          .blog-toc-m-summary {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            /* 16px block padding around a 10px label still clears a 48px row,
+               so the toggle is a comfortable thumb target, not a hairline. */
+            padding: 16px 18px;
+            min-height: 48px;
+            cursor: pointer;
+            list-style: none;
+            user-select: none;
+            touch-action: manipulation;
+          }
+          .blog-toc-m-summary::-webkit-details-marker { display: none; }
+          .blog-toc-m-label {
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 1.8px;
+            text-transform: uppercase;
+            color: #9a958c;
+          }
+          .blog-toc-m-chev {
+            width: 9px;
+            height: 9px;
+            flex-shrink: 0;
+            border-right: 1.8px solid #9a958c;
+            border-bottom: 1.8px solid #9a958c;
+            transform: rotate(45deg) translate(-2px, -2px);
+            transition: transform 0.22s ease;
+          }
+          .blog-toc-m details[open] .blog-toc-m-chev {
+            transform: rotate(-135deg) translate(-2px, -2px);
+          }
+          .blog-toc-m-list {
+            list-style: none;
+            margin: 0;
+            padding: 0 8px 10px;
+          }
+          .blog-toc-m-sub { margin-left: 14px; }
+          .blog-toc-m-link {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            /* Full-width 44px rows: a mis-tap here drops the reader into the
+               wrong section of a 2,500-word article. */
+            padding: 12px 10px;
+            min-height: 44px;
+            border-radius: 9px;
+            font-size: 14px;
+            line-height: 1.35;
+            font-weight: 500;
+            color: #6E6B63;
+            text-decoration: none;
+            touch-action: manipulation;
+          }
+          .blog-toc-m-sub .blog-toc-m-link { font-size: 13.5px; color: #8a857c; }
+          .blog-toc-m-dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: currentColor;
+            flex-shrink: 0;
+            opacity: 0.55;
+          }
+        `}</style>
+      </nav>
+    );
+  }
 
   return (
     <nav className="blog-toc" aria-label="Table of contents">
@@ -133,7 +270,13 @@ export default function TableOfContents({ headings }: { headings: TocHeading[] }
           color: #6E6B63;
           text-decoration: none;
           transition: background 0.2s ease, color 0.2s ease;
-          cursor: none;
+          cursor: pointer;
+        }
+        /* The custom dot cursor only exists where a pointer does. An
+           unqualified cursor:none leaves a touch or hybrid user with no
+           visible affordance at all on a link. */
+        @media (hover: hover) and (pointer: fine) {
+          .blog-toc-link { cursor: none; }
         }
         .blog-toc-item-sub .blog-toc-link {
           font-size: 12.5px;

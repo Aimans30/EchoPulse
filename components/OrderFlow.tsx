@@ -564,6 +564,17 @@ export default function OrderFlow() {
           .orderflow-sub { font-size: 14px !important; }
           .orderflow-nav button { padding: 12px 18px !important; font-size: 12.5px !important; }
         }
+        /* The step-4 primary reads "Proceed · US$1,299". Next to a Back button
+           on a 360px screen that is wider than the row, and \`space-between\`
+           with no wrap pushed it off the edge. Wrapping onto its own full-width
+           line also makes the commit action the obvious one. */
+        @media (max-width: 420px) {
+          .orderflow-nav { flex-wrap: wrap !important; }
+          .orderflow-nav > button:last-child {
+            flex: 1 1 100% !important;
+            justify-content: center !important;
+          }
+        }
       `}</style>
     </section>
   );
@@ -1154,17 +1165,44 @@ function StepDetails({ client, setClient }: { client: ClientDetails; setClient: 
         Only your name, email, and footage link are required. The direction section is optional — every detail makes the edit sharper, but skip anything you don&apos;t need.
       </p>
 
-      {/* ── Group 1 — Contact ── */}
+      {/* ── Group 1 — Contact ──
+          Every field below carries the autocomplete token the platform
+          keyboard needs. Without them a phone buyer retypes their own name,
+          email, and number by hand on the last screen before payment, which is
+          exactly where a checkout leaks. `inputMode` is what swaps the on-screen
+          keyboard (an @ key for email, a keypad for phone) rather than making
+          them hunt through a symbol layer. */}
       <FormGroup title="Your details" required>
         <div className="orderflow-form-grid">
           <Field label="Full name" required>
-            <input value={client.fullName} onChange={upd('fullName')} placeholder="e.g. Lakshya Soni" />
+            <input
+              value={client.fullName}
+              onChange={upd('fullName')}
+              placeholder="e.g. Lakshya Soni"
+              autoComplete="name"
+              autoCapitalize="words"
+            />
           </Field>
           <Field label="Email" required>
-            <input type="email" value={client.email} onChange={upd('email')} placeholder="you@brand.com" />
+            <input
+              type="email"
+              value={client.email}
+              onChange={upd('email')}
+              placeholder="you@brand.com"
+              autoComplete="email"
+              inputMode="email"
+              autoCapitalize="none"
+              autoCorrect="off"
+              spellCheck={false}
+            />
           </Field>
           <Field label="Brand or channel name">
-            <input value={client.brand} onChange={upd('brand')} placeholder="EchoPulse Studio" />
+            <input
+              value={client.brand}
+              onChange={upd('brand')}
+              placeholder="EchoPulse Studio"
+              autoComplete="organization"
+            />
           </Field>
           <Field label="Niche or industry">
             <input value={client.niche} onChange={upd('niche')} placeholder="Real estate, SaaS, coaching, e-comm..." />
@@ -1180,6 +1218,7 @@ function StepDetails({ client, setClient }: { client: ClientDetails; setClient: 
               onChange={upd('phone')}
               placeholder="+91 9XXXX XXXXX  /  +1 555 1234567"
               autoComplete="tel"
+              inputMode="tel"
             />
           </Field>
         </div>
@@ -1189,10 +1228,19 @@ function StepDetails({ client, setClient }: { client: ClientDetails; setClient: 
       <FormGroup title="Your footage" required>
         <div className="orderflow-form-grid">
           <Field label="Google Drive or Dropbox link" required full>
+            {/* inputMode="url" (not type="url") gives the URL keyboard without
+                switching on native validation that would reject a perfectly
+                good pasted share link. Autocapitalise and autocorrect off:
+                both corrupt a pasted URL on iOS. */}
             <input
               value={client.fileLink}
               onChange={upd('fileLink')}
               placeholder="https://drive.google.com/... &nbsp; make sure sharing is set to 'Anyone with the link'"
+              inputMode="url"
+              autoComplete="url"
+              autoCapitalize="none"
+              autoCorrect="off"
+              spellCheck={false}
             />
           </Field>
         </div>
@@ -1205,11 +1253,16 @@ function StepDetails({ client, setClient }: { client: ClientDetails; setClient: 
         </p>
         <div className="orderflow-form-grid">
           <Field label="Sample edits you love" full hint="Paste links to Reels, Shorts, YouTube videos, or TikToks whose feel you want to reference. We'll study the pacing, motion, and color.">
+            {/* A list of pasted URLs, so the same iOS autocapitalise and
+                autocorrect suppression applies here. */}
             <textarea
               value={client.inspiration}
               onChange={upd('inspiration')}
               rows={3}
               placeholder="https://youtu.be/...&#10;https://instagram.com/reel/...&#10;https://tiktok.com/@..."
+              autoCapitalize="none"
+              autoCorrect="off"
+              spellCheck={false}
             />
           </Field>
           <Field label="Brand assets" full hint="Logo, brand colors, fonts, brand guide PDF. Paste hex codes, drop a Drive folder link, or just describe your palette in a sentence.">

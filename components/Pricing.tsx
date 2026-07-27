@@ -336,7 +336,8 @@ export default function Pricing({ pricingCopy }: { pricingCopy?: PricingCopy } =
                 boxShadow: plan.featured
                   ? '0 20px 56px rgba(12,12,11,0.22)'
                   : '0 2px 20px rgba(12,12,11,0.05), inset 0 1px 0 rgba(255,255,255,0.95)',
-                cursor: 'none',
+                // Cursor moved to CSS (.pricing-card) so it can be gated to
+                // hover devices instead of applying to touch as well.
                 display: 'flex',
                 flexDirection: 'column',
               }}
@@ -609,7 +610,6 @@ export default function Pricing({ pricingCopy }: { pricingCopy?: PricingCopy } =
                   borderRadius: '100px',
                   fontSize: '12.5px',
                   fontWeight: 700,
-                  cursor: 'none',
                   transition: 'all 0.3s',
                   fontFamily: 'Inter, sans-serif',
                   textAlign: 'center',
@@ -640,6 +640,14 @@ export default function Pricing({ pricingCopy }: { pricingCopy?: PricingCopy } =
       </div>
 
       <style>{`
+        .tier-cta { cursor: pointer; }
+        /* The custom cursor is a desktop affordance. Hiding the pointer on a
+           touch device does nothing useful, so the rule is gated. Declared
+           after the pointer default on purpose: same specificity, later wins. */
+        @media (hover: hover) and (pointer: fine) {
+          .pricing-card, .tier-cta { cursor: none; }
+        }
+
         @media (max-width: 900px) {
           .pricing-grid { grid-template-columns: 1fr !important; gap: 14px !important; }
           .pricing-grid > * { transform: scale(1) !important; }
@@ -654,7 +662,7 @@ export default function Pricing({ pricingCopy }: { pricingCopy?: PricingCopy } =
         ────────────────────────────────────────────────────────── */
         @media (max-width: 640px) {
           section#pricing { padding: 24px 0 36px !important; }
-          section#pricing > div:not(.pricing-mobile-swipe) { padding-left: 12px; padding-right: 12px; }
+          section#pricing > div:not(.pricing-mobile-swipe) { padding-left: 10px; padding-right: 10px; }
 
           /* Swap the layouts: hide the stacked cards + old picker, show the swipe rail. */
           section#pricing .pricing-grid { display: none !important; }
@@ -664,11 +672,13 @@ export default function Pricing({ pricingCopy }: { pricingCopy?: PricingCopy } =
           /* ── Horizontal scroll rail ── */
           .pms-rail {
             display: flex;
-            gap: 14px;
+            gap: 12px;
             overflow-x: auto;
             scroll-snap-type: x mandatory;
             -webkit-overflow-scrolling: touch;
-            padding: 8px 16px 18px;
+            /* Was 16px each side. Every wrapper above this one also pads, and
+               at 320px that chain left the card ~200px wide. */
+            padding: 8px 10px 18px;
             scrollbar-width: none;
             -ms-overflow-style: none;
           }
@@ -676,7 +686,9 @@ export default function Pricing({ pricingCopy }: { pricingCopy?: PricingCopy } =
 
           /* ── Plan card ── */
           .pms-card {
-            flex: 0 0 86%;
+            /* Fixed 26px peek instead of a percentage: at 320px a percentage
+               peek ate width the copy needed, at 430px it wasted it. */
+            flex: 0 0 calc(100% - 26px);
             max-width: 360px;
             scroll-snap-align: center;
             scroll-snap-stop: always;
@@ -734,16 +746,18 @@ export default function Pricing({ pricingCopy }: { pricingCopy?: PricingCopy } =
             line-height: 1;
           }
           .pms-per {
-            font-size: 12.5px;
+            font-size: 13.5px;
             color: rgba(12,12,11,0.55);
             font-weight: 600;
           }
 
           .pms-tagline {
-            font-size: 12.5px;
-            color: rgba(12,12,11,0.55);
+            /* This is the sentence that sells the tier. It was two sizes below
+               the mobile body floor. */
+            font-size: 15px;
+            color: rgba(12,12,11,0.62);
             margin: 6px 0 16px;
-            line-height: 1.45;
+            line-height: 1.55;
           }
 
           .pms-feature-list {
@@ -760,8 +774,10 @@ export default function Pricing({ pricingCopy }: { pricingCopy?: PricingCopy } =
             grid-template-columns: 20px 1fr;
             gap: 10px;
             align-items: start;
-            font-size: 13.5px;
-            line-height: 1.4;
+            /* 15px floor + looser leading: this list is the whole reason the
+               card exists and it was the smallest text on the card. */
+            font-size: 15px;
+            line-height: 1.5;
             color: rgba(12,12,11,0.84);
           }
           .pms-check {
@@ -777,7 +793,7 @@ export default function Pricing({ pricingCopy }: { pricingCopy?: PricingCopy } =
             margin-top: 1px;
           }
           .pms-feature-more {
-            font-size: 12px;
+            font-size: 13.5px;
             color: rgba(12,12,11,0.5);
             font-style: italic;
             padding-left: 30px;
@@ -809,10 +825,11 @@ export default function Pricing({ pricingCopy }: { pricingCopy?: PricingCopy } =
           }
 
           .pms-cta-fine {
-            font-size: 11.5px;
-            color: rgba(12,12,11,0.5);
+            font-size: 12.5px;
+            color: rgba(12,12,11,0.55);
             text-align: center;
             margin: 10px 0 0;
+            line-height: 1.4;
           }
 
           /* ── Dots indicator ── */
@@ -1014,21 +1031,23 @@ export default function Pricing({ pricingCopy }: { pricingCopy?: PricingCopy } =
             border-radius: 18px !important;
           }
           section#pricing .pricing-h2 {
-            font-size: 20px !important;
-            letter-spacing: -0.5px !important;
-            line-height: 1.1 !important;
-            margin-bottom: 6px !important;
-          }
-          section#pricing .pricing-sub {
-            font-size: 11.5px !important;
-            line-height: 1.45 !important;
+            font-size: 26px !important;
+            letter-spacing: -0.7px !important;
+            line-height: 1.12 !important;
             margin-bottom: 8px !important;
           }
+          section#pricing .pricing-sub {
+            /* Was 11.5px, which is unreadable at arm's length. This paragraph
+               carries the "why us" argument straight above the price. */
+            font-size: 15px !important;
+            line-height: 1.55 !important;
+            margin-bottom: 12px !important;
+          }
           section#pricing .pricing-region {
-            font-size: 9px !important;
-            padding: 3px 9px !important;
-            gap: 5px !important;
-            margin-bottom: 10px !important;
+            font-size: 11px !important;
+            padding: 5px 11px !important;
+            gap: 6px !important;
+            margin-bottom: 12px !important;
           }
 
           /* Clean stacked tier cards — visual style modeled on premium
@@ -1191,12 +1210,19 @@ export default function Pricing({ pricingCopy }: { pricingCopy?: PricingCopy } =
         }
 
         @media (max-width: 380px) {
-          section#pricing { padding: 36px 10px 44px !important; }
-          section#pricing .pricing-panel { padding: 18px 10px 16px !important; }
-          section#pricing .pricing-h2 { font-size: 20px !important; }
-          .pricing-card { padding: 8px 6px 10px !important; }
-          .pricing-card .tier-price { font-size: 16px !important; }
-          .pricing-card .tier-cta { font-size: 9px !important; padding: 8px 3px !important; }
+          /* Horizontal padding stays at 0 here on purpose. The swipe rail is a
+             direct-descendant of two wrappers that already pad, and adding a
+             third level squeezed the card to ~200px at 320px wide.
+             The old .pricing-card overrides that used to live in this block
+             (8px padding, 16px price, a 9px CTA label) were dead code: the
+             stacked grid is display:none below 640px. They are gone rather
+             than left as a trap if that layout is ever switched back on. */
+          section#pricing { padding: 32px 0 40px !important; }
+          section#pricing > div:not(.pricing-mobile-swipe) { padding-left: 8px; padding-right: 8px; }
+          section#pricing .pricing-panel { padding: 16px 10px 14px !important; }
+          section#pricing .pricing-h2 { font-size: 23px !important; }
+          .pms-card { padding: 20px 16px !important; }
+          .pms-price { font-size: 30px !important; }
         }
       `}</style>
     </section>

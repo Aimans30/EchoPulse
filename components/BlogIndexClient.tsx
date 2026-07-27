@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 /**
  * Post shape the index client needs. The server precomputes `resolvedCategory`
@@ -21,6 +22,92 @@ export type IndexPost = {
 };
 
 const ALL = 'All';
+
+/**
+ * `imageSrc` is either a URL this app built from a Sanity asset or the raw
+ * `mainImageUrl` string an author typed into Sanity, which on older posts
+ * points at hosts next.config.ts never whitelisted. next/image throws on an
+ * un-whitelisted host, and this is the index page, so one bad row would take
+ * the whole listing down. Anything not known-good keeps the plain <img>.
+ */
+function isOptimizableHost(url?: string | null): boolean {
+  if (!url) return false;
+  return url.startsWith('/') || url.startsWith('https://cdn.sanity.io/');
+}
+
+/**
+ * Sanity CDN filenames state their intrinsic size (`<hash>-1200x630.png`).
+ * Reading it back is what lets next/image reserve the card's image box, so
+ * the grid stops re-flowing under the reader's thumb as covers stream in.
+ */
+function sanityDims(url?: string | null): { w: number; h: number } | null {
+  if (!url) return null;
+  const m = url.match(/-(\d{2,5})x(\d{2,5})(?:[-.]|$)/);
+  if (!m) return null;
+  const w = Number(m[1]);
+  const h = Number(m[2]);
+  return w > 0 && h > 0 ? { w, h } : null;
+}
+
+// The server requests every index cover at a flat 900x560 (see app/blog/page.tsx),
+// so that is the ratio when the URL came from the image builder. When it came
+// from a raw mainImageUrl we read the ratio out of the filename instead.
+function cardDims(src: string): { w: number; h: number } | null {
+  if (src.includes('cdn.sanity.io') && src.includes('w=900')) return { w: 900, h: 560 };
+  return sanityDims(src);
+}
+
+/**
+ * One cover, rendered through next/image where the host allows it.
+ *
+ * Every card on this page was a raw <img> pointed at a single fixed 900px
+ * Sanity render with no width/height, so a phone downloaded a desktop-sized
+ * file for a ~330px card and the grid re-flowed as each one decoded. `sizes`
+ * is what makes the browser pick a width that matches the slot it is filling.
+ */
+function CoverImage({
+  src,
+  alt,
+  className,
+  sizes,
+  priority,
+}: {
+  src: string;
+  alt: string;
+  className: string;
+  sizes: string;
+  priority?: boolean;
+}) {
+  const dims = cardDims(src);
+  if (!isOptimizableHost(src) || !dims) {
+    // Un-whitelisted host or unreadable size: explicit width/height still
+    // reserves the box, which is the layout-shift half of the problem.
+    return (
+      /* eslint-disable-next-line @next/next/no-img-element */
+      <img
+        className={className}
+        src={src}
+        alt={alt}
+        width={900}
+        height={560}
+        loading={priority ? 'eager' : 'lazy'}
+        decoding="async"
+      />
+    );
+  }
+  return (
+    <Image
+      className={className}
+      src={src}
+      alt={alt}
+      width={dims.w}
+      height={dims.h}
+      sizes={sizes}
+      priority={priority}
+      loading={priority ? undefined : 'lazy'}
+    />
+  );
+}
 
 // Accent color + icon per category. Cycled in order for categories not
 // explicitly listed, so a new Sanity category never renders unstyled.
@@ -134,9 +221,17 @@ export default function BlogIndexClient({ posts }: { posts: IndexPost[] }) {
       {/* Featured hero card */}
       {featured && (
         <Link href={`/blog/${featured.slug}`} className="blogx-featured" data-cursor-hover>
+          {/* The LCP element on /blog for most visitors, hence `priority`. It
+              is one column of a 1.15/1 split on desktop and full-bleed below
+              860px, which is what `sizes` has to say. */}
           {featured.imageSrc && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img className="blogx-featured-img" src={featured.imageSrc} alt={featured.title} loading="eager" decoding="async" />
+            <CoverImage
+              className="blogx-featured-img"
+              src={featured.imageSrc}
+              alt={featured.title}
+              sizes="(max-width: 860px) 100vw, 520px"
+              priority
+            />
           )}
           <div className="blogx-featured-body">
             <div className="blogx-featured-tags">
@@ -164,9 +259,15 @@ export default function BlogIndexClient({ posts }: { posts: IndexPost[] }) {
       <div className="blogx-grid">
         {rest.map((post) => (
           <Link key={post._id} href={`/blog/${post.slug}`} className="blogx-card" data-cursor-hover>
+            {/* Three columns at desktop width, two at 1024, one on a phone.
+                A ~330px card was being handed a 900px file on every screen. */}
             {post.imageSrc && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img className="blogx-card-img" src={post.imageSrc} alt={post.title} loading="lazy" decoding="async" />
+              <CoverImage
+                className="blogx-card-img"
+                src={post.imageSrc}
+                alt={post.title}
+                sizes="(max-width: 620px) 100vw, (max-width: 1024px) 50vw, 330px"
+              />
             )}
             <div className="blogx-card-body">
               <span className="blogx-cat">{post.resolvedCategory}</span>
@@ -203,7 +304,7 @@ export default function BlogIndexClient({ posts }: { posts: IndexPost[] }) {
           background: rgba(255,255,255,0.6);
           font-family: Inter, sans-serif;
           text-align: left;
-          cursor: none;
+          cursor: pointer;
           transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
         }
         .blogx-pill:hover {
@@ -259,7 +360,6 @@ export default function BlogIndexClient({ posts }: { posts: IndexPost[] }) {
           text-decoration: none;
           color: inherit;
           margin-bottom: 56px;
-          cursor: none;
           transition: transform 0.4s cubic-bezier(0.16,1,0.3,1), box-shadow 0.4s;
         }
         .blogx-featured:hover {
@@ -355,7 +455,6 @@ export default function BlogIndexClient({ posts }: { posts: IndexPost[] }) {
           overflow: hidden;
           text-decoration: none;
           color: inherit;
-          cursor: none;
           transition: transform 0.35s cubic-bezier(0.16,1,0.3,1), box-shadow 0.35s, background 0.2s;
         }
         .blogx-card:hover {
@@ -418,6 +517,15 @@ export default function BlogIndexClient({ posts }: { posts: IndexPost[] }) {
         }
         .blogx-card:hover .blogx-card-read { transform: translateX(3px); }
 
+        /* The site's custom dot cursor replaces the system one, so these three
+           surfaces hid it. Behind a pointer query, because on a touchscreen
+           \`cursor: none\` cannot summon a dot cursor that never mounts (see
+           Cursor.tsx, which bails on coarse pointers), it only strips the
+           affordance a hybrid touch laptop would otherwise show. */
+        @media (hover: hover) and (pointer: fine) {
+          .blogx-pill, .blogx-featured, .blogx-card { cursor: none; }
+        }
+
         /* ── Responsive ── */
         @media (max-width: 1024px) {
           .blogx-grid { grid-template-columns: repeat(2, 1fr); }
@@ -433,6 +541,13 @@ export default function BlogIndexClient({ posts }: { posts: IndexPost[] }) {
             grid-template-columns: repeat(2, 1fr);
             margin-bottom: 32px;
           }
+          /* Two pills across a 360px screen leaves ~100px for the label, and
+             the desktop \`white-space: nowrap\` made longer categories
+             ("Content Ops", "Real Estate") spill straight out past the pill
+             border. Wrapping keeps them inside the card. */
+          .blogx-pill { padding: 12px 13px; gap: 10px; }
+          .blogx-pill-label { white-space: normal; line-height: 1.25; }
+          .blogx-pill-icon { width: 32px; height: 32px; }
           .blogx-featured { margin-bottom: 40px; }
         }
       `}</style>

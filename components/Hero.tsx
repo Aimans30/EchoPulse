@@ -564,6 +564,15 @@ export default function Hero() {
   const rightRef     = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // PHONES SKIP THE TIMELINE ENTIRELY.
+    // globals.css pins .hero-sub / .hero-actions / .hero-right / .hl-inner to
+    // their finished values under the same (max-width: 767.98px) query, and the
+    // rule below pins #grid-bg, so every element the timeline touches is already
+    // in its end state before hydration. Running the tween anyway cost ~0.85s of
+    // main-thread and compositor work at exactly the moment a phone is busiest,
+    // and bought nothing visible. Desktop is untouched.
+    if (typeof window !== 'undefined' && window.matchMedia('(max-width: 767.98px)').matches) return;
+
     const lines = headlineRef.current?.querySelectorAll('.hl-inner');
     // SHORT timeline — total play time ~0.85s. Starts immediately on mount
     // so by the time the loader (1.4s) is done, the Hero animation has
@@ -588,6 +597,12 @@ export default function Hero() {
           mask-image: radial-gradient(ellipse 80% 80% at 50% 0%,black 20%,transparent 100%);
           -webkit-mask-image: radial-gradient(ellipse 80% 80% at 50% 0%,black 20%,transparent 100%);
         }
+        /* The entrance timeline is skipped on phones (see the effect below), and
+           it was the only thing that faded the grid in. Pin its end value here
+           or the backdrop would simply never appear on mobile. */
+        @media (max-width: 767.98px) {
+          #grid-bg { opacity: 1; }
+        }
         .hero-badge { display:inline-flex;align-items:center;gap:7px;padding:5px 14px 5px 8px;background:rgba(232,84,26,0.09);border:1px solid rgba(232,84,26,0.22);border-radius:100px;font-size:11px;font-weight:700;color:#E8541A; }
         .badge-dot  { width:6px;height:6px;border-radius:50%;background:#E8541A;animation:bdot 2s ease-in-out infinite; }
         @keyframes bdot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.6)}}
@@ -595,13 +610,18 @@ export default function Hero() {
         .hl-wrap  { display:block; overflow:hidden; padding-top:0.12em; margin-top:-0.12em; padding-bottom:0.18em; margin-bottom:-0.18em; }
         .hl-inner { display:block; }
 
-        .btn-p { background:#0C0C0B;color:#F2EEE7;border:none;padding:15px 28px;border-radius:100px;font-size:13px;font-weight:700;cursor:none;text-decoration:none;display:inline-flex;align-items:center;gap:8px;font-family:Inter,sans-serif;transition:all 0.3s cubic-bezier(0.16,1,0.3,1);position:relative;overflow:hidden; }
+        .btn-p { background:#0C0C0B;color:#F2EEE7;border:none;padding:15px 28px;border-radius:100px;font-size:13px;font-weight:700;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:8px;font-family:Inter,sans-serif;transition:all 0.3s cubic-bezier(0.16,1,0.3,1);position:relative;overflow:hidden; }
         .btn-p::before{content:'';position:absolute;inset:0;background:#E8541A;transform:translateX(-101%);transition:transform 0.4s cubic-bezier(0.16,1,0.3,1);z-index:0;}
         .btn-p:hover::before{transform:translateX(0);}
         .btn-p:hover{transform:scale(1.03);box-shadow:0 8px 30px rgba(232,84,26,0.28);}
         .btn-p span,.btn-p svg{position:relative;z-index:1;}
-        .btn-o{background:rgba(255,255,255,0.55);backdrop-filter:blur(12px);color:#0C0C0B;border:1px solid rgba(12,12,11,0.13);padding:15px 28px;border-radius:100px;font-size:13px;font-weight:700;cursor:none;text-decoration:none;display:inline-block;font-family:Inter,sans-serif;transition:all 0.3s;}
+        .btn-o{background:rgba(255,255,255,0.55);backdrop-filter:blur(12px);color:#0C0C0B;border:1px solid rgba(12,12,11,0.13);padding:15px 28px;border-radius:100px;font-size:13px;font-weight:700;cursor:pointer;text-decoration:none;display:inline-block;font-family:Inter,sans-serif;transition:all 0.3s;}
         .btn-o:hover{background:#0C0C0B;color:#F2EEE7;border-color:#0C0C0B;}
+        /* The custom cursor replaces the native one, so hiding it is only ever
+           correct on a device that has one. Touch keeps a normal affordance. */
+        @media (hover: hover) and (pointer: fine) {
+          .btn-p, .btn-o { cursor: none; }
+        }
         .scroll-hint{position:absolute;bottom:24px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:6px;color:#A8A49B;font-size:9px;letter-spacing:3px;text-transform:uppercase;font-weight:600;}
         .scroll-line{width:1px;height:28px;background:linear-gradient(to bottom,#E8541A,transparent);animation:sline 1.8s ease-in-out infinite;}
         @keyframes sline{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
@@ -684,11 +704,14 @@ export default function Hero() {
             font-style:italic;
           }
           .hero-sub{
-            font-size: 14.5px !important;
-            line-height: 1.55 !important;
+            /* 15px floor: this is the first block of body copy a phone visitor
+               reads, and it was landing under it. Line-height goes looser than
+               desktop, not tighter, because the measure is narrower. */
+            font-size: 15.5px !important;
+            line-height: 1.62 !important;
             color:#6B675E !important;
             margin: 0 auto 28px !important;
-            max-width: 300px !important;
+            max-width: 320px !important;
             text-align: center !important;
             font-weight: 400 !important;
           }
@@ -863,7 +886,10 @@ export default function Hero() {
           }
         }
         @media(max-width:380px){
-          .hero-inner{ padding:76px 20px 40px !important; }
+          /* Top padding must clear the fixed nav pill, which sits at top:20px
+             and is ~56px tall on phone. 76px put the headline directly under it
+             on first paint at 320px. */
+          .hero-inner{ padding:94px 20px 40px !important; }
           .hero-h1-mobile{
             font-size: 27px !important;
             letter-spacing: -0.5px !important;
@@ -871,14 +897,17 @@ export default function Hero() {
             max-width: 290px !important;
           }
           .hero-sub{
-            font-size: 13.5px !important;
-            line-height: 1.55 !important;
+            /* Still at the 15px legibility floor on a 320px screen. */
+            font-size: 15px !important;
+            line-height: 1.6 !important;
             margin: 0 auto 24px !important;
-            max-width: 280px !important;
+            max-width: 285px !important;
           }
           .hero-actions{ gap: 12px !important; }
-          .hero-actions .btn-p{ padding: 12px 22px !important; font-size: 13px !important; min-height: 44px !important; }
-          .hero-actions .btn-o{ padding: 12px 18px !important; font-size: 13px !important; min-height: 44px !important; }
+          /* Keep both pills at 48px on the smallest phones: the label shrinking
+             below 14px was making the primary CTA read as secondary. */
+          .hero-actions .btn-p{ padding: 13px 22px !important; font-size: 14px !important; min-height: 48px !important; }
+          .hero-actions .btn-o{ padding: 13px 18px !important; font-size: 14px !important; min-height: 48px !important; }
           .hero-trust-item .v{ font-size:13.5px !important; }
           .hero-trust-item .k{ font-size:8.5px !important; letter-spacing:0.6px !important; }
           .hero-services-grid{ gap:8px !important; }
@@ -954,7 +983,9 @@ export default function Hero() {
                   trackCallClick('hero_primary');
                   (window as unknown as { openBookCallModal?: () => void }).openBookCallModal?.();
                 }}
-                style={{ border: 'none', cursor: 'none' }}
+                // Cursor is left to the .btn-p rule so the hover-device gate
+                // there can do its job (an inline value would always win).
+                style={{ border: 'none' }}
               >
                 <span>Book a strategy call</span>
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>

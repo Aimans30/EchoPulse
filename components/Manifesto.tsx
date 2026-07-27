@@ -141,8 +141,10 @@ export default function Manifesto() {
           .manifesto-section { padding: 48px 20px !important; }
           .manifesto-eyebrow {
             margin-bottom: 10px !important;
-            font-size: 9px !important;
-            letter-spacing: 3px !important;
+            /* 9px + 3px tracking on a dark background is at the edge of
+               legible on a phone. 10.5px costs no vertical space. */
+            font-size: 10.5px !important;
+            letter-spacing: 2.5px !important;
           }
           /* Arrow icon: don't shove right on mobile, nest tight to text. */
           .manifesto-line > svg {

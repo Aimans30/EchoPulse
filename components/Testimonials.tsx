@@ -277,6 +277,7 @@ export default function Testimonials() {
         >
           <button
             type="button"
+            className="founder-expand-btn"
             onClick={() => setExpanded((v) => !v)}
             aria-expanded={expanded}
             data-cursor-hover
@@ -495,7 +496,11 @@ export default function Testimonials() {
 
         /* ── Phone ──────────────────────────────────────────────── */
         @media (max-width: 640px) {
-          .founder-section { padding: 72px 0 !important; }
+          /* 72px top and bottom made this the tallest gap on the phone page
+             (every neighbouring section sits at 40 to 56). Matching the rhythm
+             pulls roughly a third of a screen of dead space out of the scroll
+             between the hero and the pricing. */
+          .founder-section { padding: 56px 0 48px !important; }
           .founder-container { padding: 0 20px !important; }
           .founder-quote-mark {
             font-size: 110px !important;
@@ -521,20 +526,36 @@ export default function Testimonials() {
             border: 1px solid rgba(255,255,255,0.07) !important;
             border-radius: 14px !important;
           }
+          /* The letter is the longest read on the page. 13.5px was below the
+             mobile body floor and the leading was tuned for a wider measure. */
+          .founder-support {
+            font-size: 15px !important;
+            line-height: 1.72 !important;
+          }
+          /* Uppercase micro-label on a 44px target: give it enough size to
+             read as the affordance it is. */
+          .founder-expand-btn {
+            font-size: 13px !important;
+            min-height: 48px !important;
+            padding: 6px 2px !important;
+          }
           .founder-ctas {
             flex-direction: column !important;
             align-items: stretch !important;
-            gap: 8px !important;
+            /* 10px keeps a clear thumb-width gap between two stacked CTAs. */
+            gap: 10px !important;
           }
           .founder-cta {
             width: 100% !important;
             justify-content: center !important;
+            min-height: 50px !important;
+            font-size: 14px !important;
           }
         }
 
         /* ── Tiny phones (≤ 380px) ─────────────────────────────── */
         @media (max-width: 380px) {
-          .founder-section { padding: 60px 0 !important; }
+          .founder-section { padding: 48px 0 40px !important; }
           .founder-container { padding: 0 16px !important; }
           .founder-quote-mark {
             font-size: 110px !important;

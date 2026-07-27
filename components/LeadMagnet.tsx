@@ -236,7 +236,8 @@ export default function LeadMagnet() {
         @media (max-width: 640px) {
           .lead-magnet { padding: 72px 18px !important; }
           .lm-h2 { font-size: 30px !important; letter-spacing: -1px !important; line-height: 1.1 !important; }
-          .lm-sub { font-size: 14px !important; margin-bottom: 28px !important; }
+          /* 15px body floor: this line is the whole value proposition. */
+          .lm-sub { font-size: 15px !important; line-height: 1.65 !important; margin-bottom: 28px !important; }
           .lm-teaser { font-size: 12.5px !important; padding: 11px 14px !important; }
           /* Stack form vertically on phone, full-width controls */
           .lm-form { gap: 10px !important; }
@@ -247,10 +248,14 @@ export default function LeadMagnet() {
             min-height: 52px !important;
           }
           .lm-btn { font-size: 15px !important; }
+          /* Stacked input + button: 10px of separation so a thumb aiming for
+             submit cannot land in the field instead. */
+          .lm-form { row-gap: 12px !important; }
         }
         @media (max-width: 380px) {
           .lead-magnet { padding: 60px 14px !important; }
           .lm-h2 { font-size: 26px !important; }
+          .lm-teaser { font-size: 12px !important; padding: 10px 12px !important; }
         }
       `}</style>
     </section>

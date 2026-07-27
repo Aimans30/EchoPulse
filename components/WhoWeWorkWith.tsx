@@ -159,8 +159,13 @@ export default function WhoWeWorkWith() {
           border-radius: 20px;
           padding: 40px 36px;
           overflow: hidden;
-          cursor: none;
+          cursor: pointer;
           transition: box-shadow 0.4s cubic-bezier(0.16,1,0.3,1);
+        }
+        .wwww-cta { cursor: pointer; }
+        /* Only hide the native cursor where the custom one replaces it. */
+        @media (hover: hover) and (pointer: fine) {
+          .wwww-card, .wwww-cta { cursor: none; }
         }
         .wwww-card-link { text-decoration: none; color: inherit; display: block; }
         .wwww-card-link .wwww-view { opacity: 0.85; transition: gap 0.25s ease, opacity 0.25s ease; }
@@ -254,7 +259,10 @@ export default function WhoWeWorkWith() {
             gap: 16px !important;
           }
           .wwww-headline { font-size: clamp(32px, 7.5vw, 44px) !important; letter-spacing: -1.6px !important; }
-          .wwww-subhead { max-width: none !important; font-size: 13.5px !important; }
+          /* 13.5px here was smaller than the 14px desktop value. Same reasoning
+             as the Services subhead: shorter viewing distance wants more type,
+             not less. Hidden entirely below 640px. */
+          .wwww-subhead { max-width: none !important; font-size: 15px !important; line-height: 1.65 !important; }
         }
         @media(max-width:640px){
           /* Tight section padding so headline + carousel both fit in one viewport */
@@ -277,22 +285,22 @@ export default function WhoWeWorkWith() {
           .icp-grid::-webkit-scrollbar { display: none !important; }
           .icp-grid > * { scroll-snap-align: start !important; min-width: 0 !important; }
 
-          /* Cards: shorter, with tight typography. Description trimmed to
-             2 lines max via line-clamp so cards stay short and uniform. */
-          .wwww-card { padding: 14px 12px !important; border-radius: 14px !important; height: auto !important; }
-          .wwww-card h3 { font-size: 15px !important; letter-spacing: -0.3px !important; margin: 6px 0 4px !important; }
-          .wwww-card p {
-            font-size: 11.5px !important;
-            line-height: 1.45 !important;
-            display: -webkit-box !important;
-            -webkit-line-clamp: 2 !important;
-            -webkit-box-orient: vertical !important;
-            overflow: hidden !important;
+          /* Cards: tighter frame, but the copy inside stays readable.
+             NOTE: the old rules here targeted .wwww-card h3 / .wwww-card p and
+             matched nothing — the title and description both render as <div>.
+             So the description was never clamped and never resized; it shipped
+             at its inline 13px. Targeting the real elements now. */
+          .wwww-card { padding: 16px 14px !important; border-radius: 14px !important; height: auto !important; }
+          .wwww-card .wwww-title { font-size: 17px !important; letter-spacing: -0.3px !important; margin: 6px 0 6px !important; }
+          .wwww-card .wwww-desc {
+            font-size: 15px !important;
+            line-height: 1.55 !important;
           }
           .wwww-card .wwww-num,
           .wwww-card > div:first-child { font-size: 9.5px !important; }
-          .wwww-card .wwww-icon,
-          .wwww-card svg { width: 28px !important; height: 28px !important; }
+          /* Scoped to the icon chip: the blanket `svg` selector was also
+             inflating the 13px "View page" arrow to 28px. */
+          .wwww-card .wwww-icon { width: 32px !important; height: 32px !important; }
 
           /* Headline + subhead tightened so the carousel sits closer */
           .wwww-headline {
@@ -308,9 +316,10 @@ export default function WhoWeWorkWith() {
           .wwww-header { margin-bottom: 14px !important; }
           /* Header column collapses so headline sits tight to the top */
           .wwww-header > div { gap: 8px !important; }
-          /* Card width: 68% lets 1.5 cards show — next card clearly peeks in
-             affordance that the strip slides. */
-          .icp-grid { grid-auto-columns: 76% !important; margin-top: 22px !important; }
+          /* Card width: the next card still peeks in (the affordance that the
+             strip slides), but the card itself now has to hold a 15px
+             paragraph, so it takes more of the viewport than the old 76%. */
+          .icp-grid { grid-auto-columns: 82% !important; margin-top: 22px !important; }
           /* Disable the float animation on phones — saves paint and stops
              cards bobbing while the user is trying to read them. */
           .float-a, .float-b { animation: none !important; }
@@ -322,9 +331,11 @@ export default function WhoWeWorkWith() {
         }
         @media(max-width:380px){
           .wwww-section { padding: 56px 0 40px !important; }
-          .wwww-card { padding: 20px 18px !important; }
+          /* Was 20px 18px, i.e. MORE inset than the 640px rule on a smaller
+             screen. Keep the frame tight so the copy keeps its measure. */
+          .wwww-card { padding: 16px 14px !important; }
           .wwww-headline { font-size: 28px !important; }
-          .icp-grid { grid-auto-columns: 86% !important; padding: 4px 16px 16px !important; }
+          .icp-grid { grid-auto-columns: 88% !important; padding: 4px 16px 16px !important; }
         }
       `}</style>
 
@@ -401,6 +412,7 @@ export default function WhoWeWorkWith() {
                 {card.num}
               </div>
               <div
+                className="wwww-icon"
                 style={{
                   width: '36px',
                   height: '36px',
@@ -415,10 +427,10 @@ export default function WhoWeWorkWith() {
               >
                 <card.Icon size={18} strokeWidth={1.6} color={card.accentLine} aria-hidden="true" />
               </div>
-              <div style={{ fontFamily: 'Inter, sans-serif', fontSize: '18px', fontWeight: 800, marginBottom: '10px', letterSpacing: '-0.3px', color: card.dark ? '#F2EEE7' : '#0C0C0B' }}>
+              <div className="wwww-title" style={{ fontFamily: 'Inter, sans-serif', fontSize: '18px', fontWeight: 800, marginBottom: '10px', letterSpacing: '-0.3px', color: card.dark ? '#F2EEE7' : '#0C0C0B' }}>
                 {card.title}
               </div>
-              <div style={{ fontSize: '13px', color: card.dark ? 'rgba(242,238,231,0.45)' : '#6E6B63', lineHeight: 1.7 }}>
+              <div className="wwww-desc" style={{ fontSize: '13px', color: card.dark ? 'rgba(242,238,231,0.45)' : '#6E6B63', lineHeight: 1.7 }}>
                 {card.desc}
               </div>
 
@@ -445,7 +457,8 @@ export default function WhoWeWorkWith() {
                   onClick={() => {
                     (window as unknown as { openBookCallModal?: () => void }).openBookCallModal?.();
                   }}
-                  style={{ display: 'inline-block', marginTop: '24px', background: '#E8541A', color: '#fff', border: 'none', padding: '12px 24px', borderRadius: '100px', fontSize: '13px', fontWeight: 700, cursor: 'none', transition: 'all 0.3s', textDecoration: 'none', fontFamily: 'Inter, sans-serif', boxShadow: '0 4px 20px rgba(232,84,26,0.3)', minHeight: '44px' }}
+                  className="wwww-cta"
+                  style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', marginTop: '24px', background: '#E8541A', color: '#fff', border: 'none', padding: '12px 24px', borderRadius: '100px', fontSize: '13px', fontWeight: 700, transition: 'all 0.3s', textDecoration: 'none', fontFamily: 'Inter, sans-serif', boxShadow: '0 4px 20px rgba(232,84,26,0.3)', minHeight: '44px' }}
                   onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = '#d94a14'; (e.currentTarget as HTMLElement).style.transform = 'scale(1.03)'; }}
                   onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = '#E8541A'; (e.currentTarget as HTMLElement).style.transform = 'scale(1)'; }}
                 >

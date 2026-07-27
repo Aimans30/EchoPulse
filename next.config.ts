@@ -33,6 +33,15 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "emojicdn.elk.sh" },         // Apple emoji proxy
       { protocol: "https", hostname: "res.cloudinary.com" },      // Cloudinary asset CDN (videos + future posters)
       { protocol: "https", hostname: "player.cloudinary.com" },   // Cloudinary embed player (older video links)
+      // Sanity is where every blog cover and in-article image lives, and it
+      // was the one host missing from this list, which meant next/image
+      // physically could not be used for them, so the blog ships raw <img>
+      // tags requesting one fixed desktop width (900px cards, a 1600px hero)
+      // to every phone. Whitelisting the host does not change a single byte
+      // on its own; it removes the build-time blocker so app/blog/** and
+      // components/Blog*.tsx can be converted to <Image> with a responsive
+      // `sizes`, which is where the actual saving is.
+      { protocol: "https", hostname: "cdn.sanity.io" },           // Sanity image CDN (blog covers + article images)
     ],
   },
 

@@ -1,7 +1,45 @@
+import Image from 'next/image';
 import { PortableText, type PortableTextComponents } from '@portabletext/react';
 import type { PortableTextBlock } from '@portabletext/types';
 import { urlFor } from '@/lib/sanity';
 import { slugifyHeading, blockToPlainText } from '@/lib/toc';
+
+/**
+ * Intrinsic size of a Sanity asset, read off the id it is already carrying.
+ *
+ * A Sanity asset `_ref` is `image-<hash>-1200x630-png`, and a Sanity CDN
+ * filename is `<hash>-1200x630.png`. Both state the original dimensions, which
+ * is the one thing next/image needs and the one thing these blocks never
+ * passed. Without it the phone reserved no box, so every article image shoved
+ * the paragraph the reader was mid-sentence on down the page as it decoded.
+ *
+ * Only the RATIO matters to next/image, so handing it the original numbers is
+ * correct even when the rendered image is a 1400px-wide derivative.
+ */
+function sanityDims(idOrUrl?: string): { w: number; h: number } | null {
+  if (!idOrUrl) return null;
+  const m = idOrUrl.match(/-(\d{2,5})x(\d{2,5})(?:[-.]|$)/);
+  if (!m) return null;
+  const w = Number(m[1]);
+  const h = Number(m[2]);
+  return w > 0 && h > 0 ? { w, h } : null;
+}
+
+/**
+ * next.config.ts only whitelists specific remote hosts, and `imageUrl` blocks
+ * are free-form strings authored in Sanity: older posts point at hosts that
+ * were never whitelisted. Passing one of those to next/image throws at render
+ * and takes the whole article down, so anything that is not a known-good host
+ * keeps the plain <img> path.
+ */
+function isOptimizableHost(url?: string): boolean {
+  if (!url) return false;
+  return url.startsWith('/') || url.startsWith('https://cdn.sanity.io/');
+}
+
+// The article column is capped at 760px, so past that breakpoint the browser
+// never needs more than 760 CSS px of image regardless of screen width.
+const ARTICLE_SIZES = '(max-width: 900px) 100vw, 760px';
 
 /**
  * Renderer for the rich-text `content` field on a Sanity blog post.
@@ -134,22 +172,36 @@ function buildComponents(): PortableTextComponents {
     image: ({ value }) => {
       if (!value?.asset) return null;
       const url = urlFor(value).width(1400).fit('max').auto('format').url();
+      const dims = sanityDims(value.asset?._ref);
+      const imgStyle: React.CSSProperties = {
+        width: '100%',
+        height: 'auto',
+        borderRadius: '14px',
+        display: 'block',
+        boxShadow: '0 12px 36px rgba(12,12,11,0.08)',
+      };
       return (
         <figure style={{ margin: '32px 0' }}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={url}
-            alt={value.alt || ''}
-            loading="lazy"
-            decoding="async"
-            style={{
-              width: '100%',
-              height: 'auto',
-              borderRadius: '14px',
-              display: 'block',
-              boxShadow: '0 12px 36px rgba(12,12,11,0.08)',
-            }}
-          />
+          {dims ? (
+            <Image
+              src={url}
+              alt={value.alt || ''}
+              width={dims.w}
+              height={dims.h}
+              sizes={ARTICLE_SIZES}
+              style={imgStyle}
+            />
+          ) : (
+            // No parsable ref: keep the original tag rather than risk a throw.
+            /* eslint-disable-next-line @next/next/no-img-element */
+            <img
+              src={url}
+              alt={value.alt || ''}
+              loading="lazy"
+              decoding="async"
+              style={imgStyle}
+            />
+          )}
           {value.caption && (
             <figcaption
               style={{
@@ -167,22 +219,36 @@ function buildComponents(): PortableTextComponents {
     },
     imageUrl: ({ value }) => {
       if (!value?.url) return null;
+      const dims = isOptimizableHost(value.url) ? sanityDims(value.url) : null;
+      const imgStyle: React.CSSProperties = {
+        width: '100%',
+        height: 'auto',
+        borderRadius: '14px',
+        display: 'block',
+        boxShadow: '0 12px 36px rgba(12,12,11,0.08)',
+      };
       return (
         <figure style={{ margin: '32px 0' }}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={value.url}
-            alt={value.alt || ''}
-            loading="lazy"
-            decoding="async"
-            style={{
-              width: '100%',
-              height: 'auto',
-              borderRadius: '14px',
-              display: 'block',
-              boxShadow: '0 12px 36px rgba(12,12,11,0.08)',
-            }}
-          />
+          {dims ? (
+            <Image
+              src={value.url}
+              alt={value.alt || ''}
+              width={dims.w}
+              height={dims.h}
+              sizes={ARTICLE_SIZES}
+              style={imgStyle}
+            />
+          ) : (
+            // Unknown host or unknown size: a raw <img> is the only safe render.
+            /* eslint-disable-next-line @next/next/no-img-element */
+            <img
+              src={value.url}
+              alt={value.alt || ''}
+              loading="lazy"
+              decoding="async"
+              style={imgStyle}
+            />
+          )}
           {value.caption && (
             <figcaption
               style={{
@@ -204,9 +270,22 @@ function buildComponents(): PortableTextComponents {
     },
   },
   block: {
-    h1: ({ children }) => (
-      <h1 style={blogH1Style}>{children}</h1>
-    ),
+    // Rendered as an <h2>, not an <h1>, on purpose.
+    //
+    // The page already emits the post title as the single <h1>. Several older
+    // Sanity documents also open their body with an h1 block, which produced
+    // TWO h1s on the same page and duplicated the title visibly under the
+    // author box. Downgrading here fixes every existing post at once, with no
+    // content migration, and keeps the heading hierarchy legal for crawlers.
+    // The h1 visual style is retained so nothing looks different.
+    h1: ({ children, value }) => {
+      const id = headingId(blockToPlainText(value as PortableTextBlock));
+      return (
+        <h2 id={id} style={{ ...blogH1Style, scrollMarginTop: '120px' }}>
+          {children}
+        </h2>
+      );
+    },
     h2: ({ children, value }) => {
       const id = headingId(blockToPlainText(value as PortableTextBlock));
       // scroll-margin-top keeps the heading clear of the fixed nav when an
@@ -271,6 +350,9 @@ function buildComponents(): PortableTextComponents {
           padding: '2px 6px',
           background: 'rgba(12,12,11,0.06)',
           borderRadius: '4px',
+          // A single unbroken token (an API key, a long URL) is otherwise wider
+          // than a 360px phone and pushes the whole article sideways.
+          overflowWrap: 'anywhere',
         }}
       >
         {children}
@@ -283,7 +365,49 @@ function buildComponents(): PortableTextComponents {
 }
 
 export default function BlogContent({ value }: { value: PortableTextBlock[] }) {
-  return <PortableText value={value} components={buildComponents()} />;
+  return (
+    <div className="blog-prose">
+      <PortableText value={value} components={buildComponents()} />
+      <style>{`
+        /* Anything wide that an author can put in a post has to scroll inside
+           its own box rather than widen the article. On a phone a single
+           overflowing table or code fence makes the ENTIRE page pannable
+           sideways, which reads as broken and is very hard to recover from
+           mid-article. Every rule here is a containment rule, not a restyle. */
+        .blog-prose pre {
+          overflow-x: auto;
+          -webkit-overflow-scrolling: touch;
+          max-width: 100%;
+        }
+        .blog-prose table {
+          display: block;
+          overflow-x: auto;
+          -webkit-overflow-scrolling: touch;
+          max-width: 100%;
+        }
+        .blog-prose img,
+        .blog-prose video,
+        .blog-prose iframe { max-width: 100%; }
+        /* Long unbroken URLs pasted as link text are the other common cause. */
+        .blog-prose a { overflow-wrap: anywhere; }
+
+        /* Phone reading floor. 17px/1.78 already clears the 16px minimum, so
+           this only guards the two places the type dips: list items inherit
+           fine, but blockquotes were set at 20px with a 20px rule inset that
+           eats a chunk of a 328px content column. */
+        @media (max-width: 640px) {
+          .blog-prose blockquote {
+            font-size: 18px !important;
+            padding-left: 16px !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+          }
+          .blog-prose ul,
+          .blog-prose ol { padding-left: 20px !important; }
+        }
+      `}</style>
+    </div>
+  );
 }
 
 // ── inline style objects ──────────────────────────────────────────────

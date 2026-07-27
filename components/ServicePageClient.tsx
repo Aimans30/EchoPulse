@@ -819,7 +819,10 @@ export default function ServicePageClient({ service }: { service: ServiceData })
                   padding: '28px 0',
                   borderBottom: '1px solid rgba(12,12,11,0.12)',
                   alignItems: 'center',
-                  cursor: 'none',
+                  // Gated to a real pointer in the stylesheet below. On touch,
+                  // hiding the cursor buys nothing (Cursor.tsx never mounts the
+                  // custom dot on a coarse pointer) and can only take away.
+                  cursor: 'default',
                   transition: 'all 0.4s cubic-bezier(0.16,1,0.3,1)',
                 }}
               >
@@ -846,6 +849,9 @@ export default function ServicePageClient({ service }: { service: ServiceData })
 
         <style>{`
           .deliverable-row:hover h3 { color: #E8541A !important; }
+          @media (hover: hover) and (pointer: fine) {
+            .deliverable-row { cursor: none; }
+          }
           @media (max-width: 768px) {
             .deliverable-row { grid-template-columns: 50px 1fr 40px !important; }
             .deliverable-row > p { display: none !important; }
@@ -1460,6 +1466,14 @@ export default function ServicePageClient({ service }: { service: ServiceData })
       <style>{`
         /* ─── SERVICE PAGE MOBILE OVERRIDES ──────────────────────────── */
 
+        /* The custom dot cursor replaces the system one, but only where a
+           pointer exists. Cursor.tsx skips coarse pointers entirely, so an
+           ungated \`cursor: none\` on the FAQ toggle just removed the
+           affordance for hybrid touch devices. */
+        @media (hover: hover) and (pointer: fine) {
+          .svc-faq-toggle { cursor: none; }
+        }
+
         /* Hide the desktop floating pill CTA on phones — MobileStickyCTA handles it */
         @media (max-width: 768px) {
           .svc-sticky-cta { display: none !important; }
@@ -1584,6 +1598,7 @@ function FAQItem({ item, i, color }: { item: { q: string; a: string }; i: number
       style={{ borderTop: i === 0 ? '1px solid rgba(12,12,11,0.12)' : 'none', borderBottom: '1px solid rgba(12,12,11,0.12)' }}
     >
       <button
+        className="svc-faq-toggle"
         onClick={() => setOpen((p) => !p)}
         style={{
           width: '100%',
@@ -1596,7 +1611,10 @@ function FAQItem({ item, i, color }: { item: { q: string; a: string }; i: number
           alignItems: 'center',
           justifyContent: 'space-between',
           gap: '20px',
-          cursor: 'none',
+          // See the pointer-gated rule in the page stylesheet. A FAQ row that
+          // shows no affordance on touch is the accordion looking inert.
+          cursor: 'pointer',
+          touchAction: 'manipulation',
           fontFamily: 'Inter,sans-serif',
           fontSize: 'clamp(16px, 1.6vw, 20px)',
           fontWeight: 700,
