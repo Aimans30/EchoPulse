@@ -34,12 +34,12 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL("https://echopulse.media"),
   title: {
-    // The old default was "EchoPulse Media — You hit record. We do the rest."
+    // The old default was "EchoPulse Media. You hit record. We do the rest."
     // Beautiful brand copy, zero search relevance: it contains no term anyone
     // types into Google, so the homepage had nothing to rank for. This version
     // leads with the service + audience and keeps the brand at the end.
     default:
-      "Done-For-You Content Agency for Founders — Video Editing, LinkedIn & Blogs | EchoPulse",
+      "Done-For-You Content Agency for Founders: Video Editing, LinkedIn & Blogs | EchoPulse",
     // Service/blog pages already carry their own name, so don't re-append it.
     template: "%s | EchoPulse Media",
   },
@@ -64,9 +64,9 @@ export const metadata: Metadata = {
       "c3102d40-64ae-49d1-a3a1-d7253573f122",
   },
   openGraph: {
-    title: "EchoPulse Media — You hit record. We do the rest.",
+    title: "EchoPulse Media. You hit record. We do the rest.",
     description:
-      "EchoPulse Media — a content and AI studio for founders, coaches, business owners, and real estate agents. Video, social, ads, websites, custom software — handled end to end by one team. One bill. $299 14-day Pilot.",
+      "EchoPulse Media is a content and AI studio for founders, coaches, business owners, and real estate agents. Video, social, ads, websites, custom software, handled end to end by one team. One bill. $299 14-day Pilot.",
     url: "https://echopulse.media",
     siteName: "EchoPulse Media",
     type: "website",
@@ -76,15 +76,15 @@ export const metadata: Metadata = {
         url: "/og-image.png",
         width: 1902,
         height: 653,
-        alt: "EchoPulse Media — You hit record. We do the rest.",
+        alt: "EchoPulse Media. You hit record. We do the rest.",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "EchoPulse Media — You hit record. We do the rest.",
+    title: "EchoPulse Media. You hit record. We do the rest.",
     description:
-      "EchoPulse Media — a content and AI studio for founders, coaches, business owners, and real estate agents. Video, social, ads, websites, custom software — handled end to end. Get 20-30 hours a week back.",
+      "EchoPulse Media is a content and AI studio for founders, coaches, business owners, and real estate agents. Video, social, ads, websites, custom software, handled end to end. Get 20-30 hours a week back.",
     creator: "@Lakshya_Creates",
     site: "@Lakshya_Creates",
     images: ["/og-image.png"],
@@ -132,7 +132,7 @@ const structuredData = {
       url: "https://echopulse.media",
       logo: "https://echopulse.media/logo.png",
       description:
-        "EchoPulse Media is a content and AI studio for founders, coaches, business owners, and real estate agents. Video edits, social posts, blogs, ad creative, websites, automations, and custom software — one team, one bill, every channel. Built to give clients 20 to 30 hours back every week.",
+        "EchoPulse Media is a content and AI studio for founders, coaches, business owners, and real estate agents. Video edits, social posts, blogs, ad creative, websites, automations, and custom software. One team, one bill, every channel. Built to give clients 20 to 30 hours back every week.",
       foundingDate: "2025",
       founder: { "@id": "https://echopulse.media/#founder" },
       areaServed: [

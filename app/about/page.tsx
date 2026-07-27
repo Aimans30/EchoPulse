@@ -39,12 +39,12 @@ const SITE_URL = 'https://echopulse.media';
 export const metadata: Metadata = {
   // `absolute` opts out of the root "%s | EchoPulse Media" template so the brand
   // isn't duplicated. Leads with the person, because that's the query.
-  title: { absolute: 'About EchoPulse Media — Lakshya Soni, Founder & Content Studio' },
+  title: { absolute: 'About EchoPulse Media: Lakshya Soni, Founder & Content Studio' },
   description:
     'EchoPulse Media is a done-for-you content studio for founders, coaches, and business owners. Meet Lakshya Soni, the founder, and see how the studio actually runs.',
   alternates: { canonical: `${SITE_URL}/about` },
   openGraph: {
-    title: 'About EchoPulse Media — Lakshya Soni, Founder',
+    title: 'About EchoPulse Media: Lakshya Soni, Founder',
     description:
       'A done-for-you content studio for founders, coaches, and business owners. Video editing, LinkedIn, blogs, and ads under one team.',
     url: `${SITE_URL}/about`,
@@ -78,7 +78,7 @@ const FACTS: { label: string; value: string }[] = [
   { label: 'Model', value: 'Done-for-you content studio' },
   { label: 'Serves', value: 'Founders, coaches, course creators, business owners, real estate agents' },
   { label: 'Markets', value: 'United States, United Kingdom, Canada, Australia, Western Europe' },
-  { label: 'Starts at', value: '$299 — a 14-day paid Pilot, no contract' },
+  { label: 'Starts at', value: '$299 for a 14-day paid Pilot, no contract' },
   { label: 'Commitment', value: 'Month to month after the Pilot, 30 days notice to cancel' },
 ];
 

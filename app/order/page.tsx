@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     'Order a one-off edit from EchoPulse. Reels, long-form YouTube, podcast edits, and content repurposing. No retainer required. Pay only for what you need.',
   alternates: { canonical: '/order' },
   openGraph: {
-    title: 'EchoPulse — Custom Edit Order',
+    title: 'EchoPulse: Custom Edit Order',
     description:
       'À la carte editing. Reels, long-form, podcast, repurpose. Pay only for what you need.',
     url: 'https://echopulse.media/order',

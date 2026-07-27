@@ -176,7 +176,7 @@ export default function OnboardingClient() {
                 textarea
               />
               <Field
-                label="Brand assets — drop a Drive/Dropbox link"
+                label="Brand assets: drop a Drive/Dropbox link"
                 placeholder="Logo, fonts, colors, brand book (or write &lsquo;none yet&rsquo;)"
                 value={form.brandAssets}
                 onChange={(v) => set('brandAssets', v)}

@@ -235,12 +235,12 @@ export const icps: IcpData[] = [
     ],
     transformFrom: 'You post the odd phone photo and hope the listing moves.',
     transformTo:
-      'Every listing ships with a cinematic reel and an ad behind it — and viewings book while you are showing another house.',
+      'Every listing ships with a cinematic reel and an ad behind it, and viewings book while you are showing another house.',
     services: [
       { slug: 'video-editing',      name: 'Real Estate & Cinematic Video', why: 'Property reels, listing walkthroughs, and personal-brand video. The whole ballgame for agents.', weight: 'Core' },
       { slug: 'ad-creatives',       name: 'Ad Creatives',                  why: 'Turn the reels into Meta and Instagram ads that book viewings, not just collect views.',           weight: 'High' },
       { slug: 'linkedin-ghostwriting', name: 'Social & Personal Brand',     why: 'Consistent posting so you stay top-of-mind for referrals between listings.',                       weight: 'Medium' },
-      { slug: 'websites-funnels',   name: 'Listing & Lead Pages',          why: 'A fast listing and lead-capture page — most buyers start on mobile and bounce on slow sites.',     weight: 'Medium' },
+      { slug: 'websites-funnels',   name: 'Listing & Lead Pages',          why: 'A fast listing and lead-capture page. Most buyers start on mobile and bounce on slow sites.',     weight: 'Medium' },
       { slug: 'automations',        name: 'Lead Automations',              why: 'Inquiry-to-booked-viewing flows so leads never sit in a DM overnight.',                            weight: 'Medium' },
     ],
     starterStack: 'Start with Listing Video + Ad Creatives. Add personal-brand social once the listing flow is humming.',
@@ -498,7 +498,7 @@ export const icps: IcpData[] = [
       headline: 'People do not buy courses.',
       headlineAccent: 'They buy the person teaching.',
       intro: [
-        'Every coach who out-earns you with a worse program is winning on one thing: trust at scale. A student cannot evaluate your curriculum before buying, so they evaluate you — how you explain things, whether your thinking feels worth paying for. Your content is the free sample of your teaching, and it is doing the selling long before your sales page does.',
+        'Every coach who out-earns you with a worse program is winning on one thing: trust at scale. A student cannot evaluate your curriculum before buying, so they evaluate you: how you explain things, whether your thinking feels worth paying for. Your content is the free sample of your teaching, and it is doing the selling long before your sales page does.',
         'The trap is that trust-building content takes exactly the energy your teaching already consumes. Launch months mean filming daily while running a cohort. So revenue swings with your energy, and the business never leaves survival mode. The fix is not more effort. It is a machine that keeps teaching-you visible when the real you is off.',
       ],
       split: {
@@ -528,7 +528,7 @@ export const icps: IcpData[] = [
       { title: 'Own your audience, not rent it', desc: 'A complete lead-magnet funnel: magnet, opt-in page, and booking or sales page pouring warm leads into the platform you already use. Your launch size stops depending on what the algorithm felt like that week.' },
       { title: 'Stay visible without filming daily', desc: 'One workshop or session becomes weeks of evergreen clips. Discovery keeps running on your worst weeks, which is exactly when it used to stop.' },
       { title: 'Enroll students while you sleep', desc: 'Email and DM nurture sequences move a lead from curious to committed over a series of touches. The selling happens on autopilot; you find out when they enroll.' },
-      { title: 'Make the course feel worth the price', desc: 'Polished module editing — lecture cuts, chapters, branded intros — for Kajabi, Teachable, Thinkific, or Skool. Production quality is what students screenshot, share, and refer.' },
+      { title: 'Make the course feel worth the price', desc: 'Polished module editing (lecture cuts, chapters, branded intros) for Kajabi, Teachable, Thinkific, or Skool. Production quality is what students screenshot, share, and refer.' },
       { title: 'Scale cold traffic safely', desc: 'Ad creative that drives strangers into the lead magnet instead of straight at your offer, so paid spend feeds the funnel that converts instead of burning on a cold pitch.' },
     ],
     transformFrom: 'Every launch is a manual sprint, heads-down filming or heads-down selling, never both, and revenue swings with your energy.',
@@ -639,7 +639,7 @@ export const icps: IcpData[] = [
       headline: 'Your ad account is fine.',
       headlineAccent: 'Your creative pipeline is not.',
       intro: [
-        'Once targeting went algorithmic, creative became the last real lever in paid social. Meta and TikTok decide who sees the ad; the only input you still control is what the ad is. That is why two brands with identical budgets get wildly different CPAs — the difference is not media buying skill, it is how fast they replace fatigued creative with fresh angles.',
+        'Once targeting went algorithmic, creative became the last real lever in paid social. Meta and TikTok decide who sees the ad; the only input you still control is what the ad is. That is why two brands with identical budgets get wildly different CPAs. The difference is not media buying skill, it is how fast they replace fatigued creative with fresh angles.',
         'Most DTC brands lose this game on cadence, not talent. The designer is busy, the founder approves ads in batches when they can, and by the time a new variant ships the old one has been decaying for a week. Fatigue is not an accident in that system. It is the schedule.',
       ],
       stats: [
@@ -668,7 +668,7 @@ export const icps: IcpData[] = [
         },
       },
       takeaway:
-        'You cannot out-bid creative fatigue. You can only out-produce it, and that is a production problem — our side of the table.',
+        'You cannot out-bid creative fatigue. You can only out-produce it, and that is a production problem. Our side of the table.',
     },
     deliverables: [
       { title: 'Stop CPA creep before it starts', desc: 'Fresh static and video variants ship weekly, so a replacement is live before the current winner fatigues. The account never coasts on decaying creative again.' },
@@ -742,7 +742,7 @@ export const icps: IcpData[] = [
       headline: 'The best client is the one',
       headlineAccent: 'who found you first.',
       intro: [
-        'Think about the last client who came to you by referral: no price haggling, no convincing, already sold before the first conversation. Inbound content produces that same buyer at scale. Someone who reads your article or watches your video and then calls has pre-sold themselves — you are the expert they found, not a vendor they are comparing.',
+        'Think about the last client who came to you by referral: no price haggling, no convincing, already sold before the first conversation. Inbound content produces that same buyer at scale. Someone who reads your article or watches your video and then calls has pre-sold themselves. You are the expert they found, not a vendor they are comparing.',
         'Cold outreach does the opposite. It starts every relationship with you asking, which is why those leads negotiate hardest and churn fastest. The math backs the feeling: content-sourced leads close at multiples of cold ones and cost less each month, because content compounds while ads and cold lists reset to zero.',
       ],
       stats: [

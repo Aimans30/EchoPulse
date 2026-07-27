@@ -199,7 +199,7 @@ export default function Pricing({ pricingCopy }: { pricingCopy?: PricingCopy } =
           >
             Owner-operated, with senior eyes on every deliverable.{' '}
             <strong style={{ color: '#0C0C0B', fontWeight: 700 }}>3-hour replies, re-dos until it&apos;s right, and no surprise invoices</strong>
-            {' '}— which is why we ship sharper than agencies twice our size,
+            {' '}are why we ship sharper than agencies twice our size,
             and at a fraction of the retainer.
           </motion.p>
 

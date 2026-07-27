@@ -813,7 +813,7 @@ function StepConfigure({
 
                 <div style={{ color: 'rgba(242,238,231,0.62)', fontSize: 13, lineHeight: 1.4 }}>
                   {reelsMaxQty === 1
-                    ? <>1 cut per order on this tier — keeps production attention focused.</>
+                    ? <>1 cut per order on this tier, which keeps production attention focused.</>
                     : <>Up to <strong style={{ color: '#F2EEE7' }}>{reelsMaxQty}</strong> per order on this tier.{' '}
                         <span style={{ color: 'rgba(242,238,231,0.45)' }}>
                           {(() => {
@@ -1212,7 +1212,7 @@ function StepDetails({ client, setClient }: { client: ClientDetails; setClient: 
               placeholder="https://youtu.be/...&#10;https://instagram.com/reel/...&#10;https://tiktok.com/@..."
             />
           </Field>
-          <Field label="Brand assets" full hint="Logo, brand colors, fonts, brand guide PDF — paste hex codes, drop a Drive folder link, or just describe your palette in a sentence.">
+          <Field label="Brand assets" full hint="Logo, brand colors, fonts, brand guide PDF. Paste hex codes, drop a Drive folder link, or just describe your palette in a sentence.">
             <textarea
               value={client.brandAssets}
               onChange={upd('brandAssets')}

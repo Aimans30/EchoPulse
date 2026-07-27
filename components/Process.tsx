@@ -27,7 +27,7 @@ type Step = {
 const steps: Step[] = [
   { num: '01', title: 'Strategy Call',    desc: 'Free 45-minute call. We learn your goals, audience, current content situation, and which services fit your stage.',                                Icon: PhoneCall,     iconBg: 'rgba(59,130,246,0.12)', iconColor: '#3b82f6' },
   { num: '02', title: 'Onboarding',       desc: '90-minute recorded session covers your offer, your buyers, your competitors, and the way you already talk about your business. Becomes a brief the whole team works from.', Icon: Mic,           iconBg: 'rgba(139,92,246,0.12)', iconColor: '#8b5cf6' },
-  { num: '03', title: 'We Produce',       desc: 'Editors, writers, designers, and engineers ship video, social posts, blogs, ad creative, websites, and custom software — all to your brand brief.',  Icon: Clapperboard,  iconBg: 'rgba(232,84,26,0.12)', iconColor: '#E8541A' },
+  { num: '03', title: 'We Produce',       desc: 'Editors, writers, designers, and engineers ship video, social posts, blogs, ad creative, websites, and custom software, all to your brand brief.',  Icon: Clapperboard,  iconBg: 'rgba(232,84,26,0.12)', iconColor: '#E8541A' },
   { num: '04', title: 'Review & Refine',  desc: 'You see every deliverable before it ships. Revisions until you are satisfied, no round caps. Every piece scored against your brand brief.',          Icon: CheckCircle2,  iconBg: 'rgba(16,185,129,0.12)', iconColor: '#10b981' },
   { num: '05', title: 'Scale & Iterate',  desc: 'Monthly performance review across every channel. Brand brief refreshed quarterly. Calendar tuned to what is actually working for your business.',     Icon: TrendingUp,    iconBg: 'rgba(245,158,11,0.12)', iconColor: '#f59e0b' },
 ];
