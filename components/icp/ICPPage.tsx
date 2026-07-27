@@ -4,7 +4,7 @@ import Footer from '@/components/Footer';
 import Pricing from '@/components/Pricing';
 import { type IcpData, AGENCY_COMPARISON } from '@/lib/icpData';
 import { type VideoEntry } from '@/lib/videos';
-import { BOOK_CALL_LABEL, BOOK_CALL_LABEL_LONG } from '@/lib/links';
+import { BOOK_CALL_LABEL_LONG } from '@/lib/links';
 import Reveal from './Reveal';
 import ICPBookButton from './ICPBookButton';
 import ICPFaq from './ICPFaq';

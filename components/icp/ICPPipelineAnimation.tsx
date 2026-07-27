@@ -42,7 +42,11 @@ export interface PipelineConfig {
 //  0 input · 1 studio · 2-5 outputs cascade · 6 result rises · 7 result peak · 8 hold
 const STAGES = 9;
 const STAGE_MS = 780;
-const EASE = [0.22, 0.61, 0.36, 1] as const;
+// Typed as a MUTABLE 4-tuple on purpose. `as const` would make it
+// `readonly [...]`, which framer-motion's `ease` (BezierDefinition =
+// [number, number, number, number]) will not accept — that fails the
+// production type-check at every usage even though dev mode is fine.
+const EASE: [number, number, number, number] = [0.22, 0.61, 0.36, 1];
 
 export default function ICPPipelineAnimation({
   accent,
