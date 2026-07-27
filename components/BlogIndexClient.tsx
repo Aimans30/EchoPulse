@@ -352,6 +352,11 @@ export default function BlogIndexClient({ posts }: { posts: IndexPost[] }) {
         .blogx-featured {
           display: grid;
           grid-template-columns: 1.15fr 1fr;
+          /* Grid rows stretch their children by default, which forced the
+             cover image to match the text column's height and re-cropped it
+             no matter what aspect-ratio the image itself declared. Centering
+             lets each column keep its natural height. */
+          align-items: center;
           gap: 0;
           background: rgba(255,255,255,0.6);
           border: 1px solid rgba(12,12,11,0.07);
@@ -366,11 +371,23 @@ export default function BlogIndexClient({ posts }: { posts: IndexPost[] }) {
           transform: translateY(-4px);
           box-shadow: 0 20px 48px rgba(12,12,11,0.12);
         }
+        /* Covers are a designed 1200x630 composition: title typeset on the left
+           panel, illustration on the right. `object-fit: cover` inside a
+           full-height column cropped both ends off, so the headline lost its
+           first characters and the artwork lost its right edge. Locking the
+           slot to the source ratio and using `contain` keeps the whole
+           composition intact. The tinted background fills any leftover space
+           so it still reads as a solid block rather than a floating image. */
+        /* Covers are a designed 1200x630 composition: title typeset on the left
+           panel, illustration on the right. Any crop cuts the headline's first
+           characters or the artwork's edge, so the image is never cropped.
+           `!important` because next/image emits its own inline sizing. */
         .blogx-featured-img {
-          width: 100%;
-          height: 100%;
-          min-height: 320px;
-          object-fit: cover;
+          width: 100% !important;
+          height: auto !important;
+          max-width: 100%;
+          aspect-ratio: 1200 / 630;
+          object-fit: contain !important;
           display: block;
         }
         .blogx-featured-body {
@@ -462,10 +479,13 @@ export default function BlogIndexClient({ posts }: { posts: IndexPost[] }) {
           background: #fff;
           box-shadow: 0 16px 36px rgba(12,12,11,0.10);
         }
+        /* Same reasoning as the featured card: 16/9 cropped a 1200x630 cover,
+           losing the start of the headline on every tile in the grid. */
         .blogx-card-img {
-          width: 100%;
-          aspect-ratio: 16/9;
-          object-fit: cover;
+          width: 100% !important;
+          height: auto !important;
+          aspect-ratio: 1200 / 630;
+          object-fit: contain !important;
           display: block;
         }
         .blogx-card-body {
@@ -532,7 +552,9 @@ export default function BlogIndexClient({ posts }: { posts: IndexPost[] }) {
         }
         @media (max-width: 860px) {
           .blogx-featured { grid-template-columns: 1fr; }
-          .blogx-featured-img { min-height: 220px; aspect-ratio: 16/9; height: auto; }
+          /* Stacked layout, so the cover gets the full card width at its own
+             ratio. The old 16/9 + min-height combination re-cropped it. */
+          .blogx-featured-img { aspect-ratio: 1200 / 630; min-height: 0; }
           .blogx-featured-body { padding: 28px 26px; }
         }
         @media (max-width: 620px) {

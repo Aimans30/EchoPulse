@@ -6,14 +6,17 @@ import { getAllPosts, resolveCategory } from '@/lib/blog';
 import { urlFor } from '@/lib/sanity';
 
 export const metadata: Metadata = {
-  title: 'Blog',
+  // Titled for the search query, not for the nav label. "Blog" ranks for
+  // nothing; "content agency pricing and guides" is closer to what the people
+  // we want are actually typing.
+  title: { absolute: 'Content Agency Pricing, Guides & Comparisons | EchoPulse' },
   description:
-    "EchoPulse Media's blog. Long-form notes on content strategy, voice work, video editing, and the AI-as-infrastructure approach behind everything we ship.",
+    'Real agency pricing, honest comparisons, and the systems behind founder-led content. Every number sourced, written by the team doing the work.',
   alternates: { canonical: '/blog' },
   openGraph: {
-    title: 'Blog | EchoPulse Media',
+    title: 'Content Agency Pricing, Guides & Comparisons | EchoPulse',
     description:
-      'Long-form notes on content strategy, voice work, and the AI-as-infrastructure approach behind everything EchoPulse Media ships.',
+      'Real agency pricing, honest comparisons, and the systems behind founder-led content. Every number sourced.',
     url: 'https://echopulse.media/blog',
     type: 'website',
   },
@@ -85,8 +88,8 @@ export default async function BlogIndexPage() {
                 maxWidth: '880px',
               }}
             >
-              Everything you need to build a content engine that{' '}
-              <span style={{ color: '#E8541A' }}>actually lands.</span>
+              What content actually costs, and what it{' '}
+              <span style={{ color: '#E8541A' }}>actually returns.</span>
             </h1>
             <p
               style={{
@@ -97,8 +100,8 @@ export default async function BlogIndexPage() {
                 maxWidth: '620px',
               }}
             >
-              Strategy, video, funnels, AI marketing, and authority-building — long-form thinking from
-              the EchoPulse team on shipping content that converts.
+              Real pricing, honest comparisons, and the systems behind founder-led content.
+              Written by the people doing the work, with every number sourced.
             </p>
           </div>
 

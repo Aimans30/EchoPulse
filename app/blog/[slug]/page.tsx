@@ -353,8 +353,11 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                   priority
                   style={{
                     width: '100%',
-                    aspectRatio: '16/9',
-                    objectFit: 'cover',
+                    height: 'auto',
+                    // Full 1200x630 cover, never cropped: the headline is
+                    // typeset into the left half of the image itself.
+                    aspectRatio: '1200 / 630',
+                    objectFit: 'contain',
                     borderRadius: '18px',
                     marginBottom: '40px',
                     display: 'block',
@@ -375,8 +378,11 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                   decoding="async"
                   style={{
                     width: '100%',
-                    aspectRatio: '16/9',
-                    objectFit: 'cover',
+                    height: 'auto',
+                    // Full 1200x630 cover, never cropped: the headline is
+                    // typeset into the left half of the image itself.
+                    aspectRatio: '1200 / 630',
+                    objectFit: 'contain',
                     borderRadius: '18px',
                     marginBottom: '40px',
                     display: 'block',
@@ -601,10 +607,14 @@ function RelatedCard({ post }: { post: BlogPostSummary }) {
   // times more pixels than any screen resolves.
   const dims = post.mainImage?.asset ? { w: 700, h: 420 } : sanityDims(post.mainImageUrl);
   const optimizable = isOptimizableHost(imageSrc) && !!dims;
+  // Covers are a designed 1200x630 composition (title left, illustration
+  // right). Cropping to 16/9 cut the start of the headline on every related
+  // card, so the full frame is shown instead.
   const imgStyle: React.CSSProperties = {
     width: '100%',
-    aspectRatio: '16/9',
-    objectFit: 'cover',
+    height: 'auto',
+    aspectRatio: '1200 / 630',
+    objectFit: 'contain',
     display: 'block',
   };
 
