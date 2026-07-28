@@ -184,9 +184,21 @@ export default function MobileStickyCTA() {
       </button>
 
       {/* SECONDARY — tiny, quiet, optional. Reads like a helpful hint, not a pitch. */}
+      {/* href is the absolute `/#pricing` so this never dead-ends: only the
+          homepage and the ICP pages actually contain an `id="pricing"`, and on
+          a blog post or /about a bare `#pricing` scrolls nowhere and looks
+          broken. When the section IS on the current page we intercept and
+          smooth-scroll to it instead of doing a full navigation. */}
       <a
-        href="#pricing"
-        onClick={() => trackPilotClick('mobile_sticky_secondary')}
+        href="/#pricing"
+        onClick={(e) => {
+          trackPilotClick('mobile_sticky_secondary');
+          const local = document.getElementById('pricing');
+          if (local) {
+            e.preventDefault();
+            local.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }}
         style={{
           fontSize: '11.5px',
           fontWeight: 500,

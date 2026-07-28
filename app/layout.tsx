@@ -9,6 +9,7 @@ import EmojiNormalizer from "@/components/EmojiNormalizer";
 import PilotPopup from "@/components/PilotPopup";
 import AnalyticsProvider from "@/components/AnalyticsProvider";
 import BookCallModal from "@/components/BookCallModal";
+import MobileStickyCTA from "@/components/MobileStickyCTA";
 import { GeoProvider } from "@/components/GeoProvider";
 import { getServerGeo } from "@/lib/geoServer";
 
@@ -273,6 +274,13 @@ export default async function RootLayout({
           <AnalyticsProvider />
           {/* Global "Book a call" modal — open from anywhere via window.openBookCallModal() */}
           <BookCallModal />
+          {/* Mobile sticky CTA. Mounted here rather than per-page because <body>
+              already reserves `pb-20` for it on phones — without the component
+              that padding was just a gap at the bottom of every page, and the
+              service and blog routes had no mobile conversion path at all. The
+              component no-ops above 768px and stays hidden until 600px of
+              scroll, so desktop and above-the-fold are untouched. */}
+          <MobileStickyCTA />
           {/* The Pune-only on-site inquiry modal was removed in July 2026 with
               the India rate card. components/PuneInquiryModal.tsx and
               /api/pune-inquiry are now unused. */}
