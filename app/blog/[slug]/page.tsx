@@ -5,6 +5,7 @@ import type { Metadata } from 'next';
 import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
 import BlogContent from '@/components/BlogContent';
+import BlogFooterCTA from '@/components/BlogFooterCTA';
 import TableOfContents from '@/components/TableOfContents';
 import { getPostBySlug, getAllPostSlugs, getRelatedPosts, resolveCategory, resolveAuthor, type BlogPostSummary } from '@/lib/blog';
 import { urlFor } from '@/lib/sanity';
@@ -406,49 +407,10 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               </p>
             )}
 
-            {/* Footer CTA */}
-            <div
-              className="blog-post-footer-cta"
-              style={{
-                marginTop: '72px',
-                padding: '36px',
-                borderRadius: '18px',
-                background: '#0C0C0B',
-                color: '#F2EEE7',
-                textAlign: 'center',
-              }}
-              data-dark-bg="true"
-            >
-              <div
-                style={{
-                  fontFamily: 'Inter, sans-serif',
-                  fontSize: '22px',
-                  fontWeight: 800,
-                  marginBottom: '10px',
-                }}
-              >
-                Want your content to sound like this?
-              </div>
-              <p style={{ color: 'rgba(242,238,231,0.65)', margin: '0 0 22px', fontSize: '15px' }}>
-                The EchoPulse Pilot is $299 for 14 days. See the work before you commit to anything monthly.
-              </p>
-              <Link
-                href="/#pricing"
-                style={{
-                  display: 'inline-block',
-                  background: '#E8541A',
-                  color: '#fff',
-                  padding: '14px 28px',
-                  borderRadius: '100px',
-                  fontWeight: 700,
-                  fontSize: '14px',
-                  textDecoration: 'none',
-                }}
-                data-cursor-hover
-              >
-                See the Pilot →
-              </Link>
-            </div>
+            {/* Footer CTA — topic-aware chip, price-anchored, split into a
+                primary checkout path and a lower-commitment call option.
+                See components/BlogFooterCTA.tsx for why. */}
+            <BlogFooterCTA category={resolveCategory(post)} />
           </article>
         </div>
 
