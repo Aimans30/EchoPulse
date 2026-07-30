@@ -2,6 +2,7 @@ import type { MetadataRoute } from 'next';
 import { services } from '@/lib/serviceData';
 import { icps } from '@/lib/icpData';
 import { getAllPosts } from '@/lib/blog';
+import { urlFor } from '@/lib/sanity';
 
 /**
  * Sitemap — generated at build time. Lists the homepage + every service
@@ -80,15 +81,27 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Blog posts from Sanity — wrapped in try so a Sanity outage never breaks
   // the build. If Sanity is down, the sitemap drops the post URLs gracefully.
+  //
+  // Each entry also carries `images`, which makes this an image sitemap for
+  // the blog: Google indexes the cover separately for Image Search instead of
+  // only discovering it as an <img> inside the crawled page. Same source the
+  // OG image and the blog index card use — no separate asset, just declaring
+  // the one that already exists.
   let blogPosts: MetadataRoute.Sitemap = [];
   try {
     const posts = await getAllPosts();
-    blogPosts = posts.map((post) => ({
-      url: `${SITE_URL}/blog/${post.slug}`,
-      lastModified: post.publishedAt ? new Date(post.publishedAt) : now,
-      changeFrequency: 'monthly' as const,
-      priority: 0.75,
-    }));
+    blogPosts = posts.map((post) => {
+      const image = post.mainImage?.asset
+        ? urlFor(post.mainImage).width(1200).height(630).fit('crop').auto('format').url()
+        : post.mainImageUrl || undefined;
+      return {
+        url: `${SITE_URL}/blog/${post.slug}`,
+        lastModified: post.publishedAt ? new Date(post.publishedAt) : now,
+        changeFrequency: 'monthly' as const,
+        priority: 0.75,
+        ...(image ? { images: [image] } : {}),
+      };
+    });
   } catch {
     // Sanity unreachable — sitemap continues without blog posts.
   }
