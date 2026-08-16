@@ -175,8 +175,8 @@ export const icps: IcpData[] = [
     },
     stats: [
       { value: '403%', label: 'more inquiries on listings marketed with video (NAR)' },
-      { value: '58%', label: 'of buyers expect to see a video of a home listed online' },
-      { value: '9%', label: 'of agents actually make listing videos. That gap is your edge.' },
+      { value: '73%', label: 'of homeowners prefer an agent who uses video (NAR, 2025)' },
+      { value: '26%', label: 'of agents use video on every listing. That gap is your edge.' },
       { value: '48 hr', label: 'standard edit turnaround per deliverable' },
     ],
     pipeline: {
@@ -197,11 +197,16 @@ export const icps: IcpData[] = [
         'By the time a seller sits across from you, they have already looked you up. They have seen your last few listings, watched a video or scrolled past a carousel of photos, and formed an opinion about how their home will be marketed. That judgement happens before the listing appointment, not during it.',
         'This is why a personal brand is not vanity for an agent. It is the only asset that works while you sleep, and the only one a competing agent cannot copy. Your commission split, your brokerage, your CRM are all replicable. The reputation attached to your face is not.',
       ],
+      // Every figure here traces to a named NAR report. The previous version
+      // carried three stats sourced to "Industry research, 2026", which is not
+      // a source anyone can check. One of them ("9% of agents produce listing
+      // video") was also contradicted by NAR's own Real Estate in a Digital Age
+      // data, which puts consistent video use at 26%. The replacements make the
+      // same argument and survive being fact-checked.
       stats: [
         { value: '403%', label: 'more inquiries on listings marketed with video', source: 'NAR' },
-        { value: '58%', label: 'of buyers expect to see a video of a home listed online', source: 'Industry research, 2026' },
-        { value: '9%', label: 'of agents actually produce listing-specific video', source: 'Industry research, 2026' },
-        { value: '~6%', label: 'higher average sale price on homes marketed with video', source: 'Industry research, 2026' },
+        { value: '73%', label: 'of homeowners are more likely to list with an agent who uses video', source: 'NAR Profile of Home Buyers and Sellers, 2025' },
+        { value: '26%', label: 'of agents consistently use video on every listing. That gap is your edge.', source: 'NAR, Real Estate in a Digital Age, 2025' },
       ],
       split: {
         left: {
@@ -642,11 +647,14 @@ export const icps: IcpData[] = [
         'Once targeting went algorithmic, creative became the last real lever in paid social. Meta and TikTok decide who sees the ad; the only input you still control is what the ad is. That is why two brands with identical budgets get wildly different CPAs. The difference is not media buying skill, it is how fast they replace fatigued creative with fresh angles.',
         'Most DTC brands lose this game on cadence, not talent. The designer is busy, the founder approves ads in batches when they can, and by the time a new variant ships the old one has been decaying for a week. Fatigue is not an accident in that system. It is the schedule.',
       ],
-      stats: [
-        { value: '7-14', label: 'days of typical TikTok creative lifespan before fatigue sets in', source: 'Industry benchmarks' },
-        { value: '~3.0', label: 'ad frequency past which CTR reliably drags down', source: 'Industry benchmarks' },
-        { value: '15-25', label: 'active variants performance teams keep in-market per campaign', source: 'Industry benchmarks' },
-      ],
+      // `stats` deliberately omitted. The three figures that used to sit here
+      // (7-14 day creative lifespan, ~3.0 frequency ceiling, 15-25 active
+      // variants) were all sourced to "Industry benchmarks", which is not a
+      // source a reader can check. Per the note on AuthorityStat above, the
+      // rule is to show mechanism rather than invent a number, which is what
+      // the coaches segment already does. The intro and the split below make
+      // the argument on their own without asking anyone to trust an
+      // unverifiable statistic.
       split: {
         left: {
           tag: 'The fatigue cycle',

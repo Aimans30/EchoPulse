@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { getIcp, icps } from '@/lib/icpData';
 import { videosForIcp } from '@/lib/videos';
 import ICPPage from '@/components/icp/ICPPage';
+import { AREA_SERVED } from '@/lib/schema';
 
 const SITE_URL = 'https://echopulse.media';
 
@@ -67,13 +68,7 @@ export default async function IcpLandingPage({ params }: { params: Promise<{ icp
     url,
     provider: { '@id': `${SITE_URL}/#organization` },
     audience: { '@type': 'Audience', audienceType: data.name },
-    areaServed: [
-      { '@type': 'Country', name: 'Canada' },
-      { '@type': 'Country', name: 'United States' },
-      { '@type': 'Country', name: 'United Kingdom' },
-      { '@type': 'Country', name: 'Australia' },
-      { '@type': 'Place', name: 'Western Europe' },
-    ],
+    areaServed: AREA_SERVED,
   };
 
   const faqLd = {

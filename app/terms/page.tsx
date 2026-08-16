@@ -22,7 +22,9 @@ const FUTURE_REGISTERED_OFFICE = 'Gurgaon';
 
 export default function TermsPage() {
   return (
+    // id="main" is the target of the layout's skip-to-content link.
     <main
+      id="main"
       data-dark-bg="true"
       style={{
         background: '#0C0C0B',

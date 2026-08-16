@@ -39,9 +39,14 @@ const SITE_URL = 'https://echopulse.media';
 export const metadata: Metadata = {
   // `absolute` opts out of the root "%s | EchoPulse Media" template so the brand
   // isn't duplicated. Leads with the person, because that's the query.
-  title: { absolute: 'About EchoPulse Media: Lakshya Soni, Founder & Content Studio' },
+  // Was 61 chars (title) and 162 (description), both just over the limits, and
+  // the description was a flat restatement of what the company is. At position
+  // ~4 this page converts at 0.78% when that slot should do far better, so the
+  // snippet is the thing to fix: lead with what the reader gets from opening
+  // it, not with a definition of the company they already searched for.
+  title: { absolute: 'About EchoPulse Media, a Content Studio for Founders' },
   description:
-    'EchoPulse Media is a done-for-you content studio for founders, coaches, and business owners. Meet Lakshya Soni, the founder, and see how the studio actually runs.',
+    'Who runs EchoPulse Media, how the work actually gets done, and what to expect if you hire us. Written by founder Lakshya Soni.',
   alternates: { canonical: `${SITE_URL}/about` },
   openGraph: {
     title: 'About EchoPulse Media: Lakshya Soni, Founder',
@@ -121,7 +126,10 @@ export default function AboutPage() {
           the site. Nav uses the default homepage links (/#services, etc.). */}
       <Nav />
 
-      <main className="about-page">
+      {/* id="main" is the target of the skip-to-content link in app/layout.tsx.
+          That link renders on every page, but only the homepage carried the id,
+          so it was a dead anchor everywhere else. */}
+      <main id="main" className="about-page">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(aboutSchema) }}

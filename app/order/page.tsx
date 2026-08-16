@@ -24,5 +24,11 @@ export const metadata: Metadata = {
 };
 
 export default function OrderPage() {
-  return <OrderFlow />;
+  // <main id="main"> so the root layout's skip-to-content link has a target
+  // here. /order previously rendered no landmark element at all.
+  return (
+    <main id="main">
+      <OrderFlow />
+    </main>
+  );
 }

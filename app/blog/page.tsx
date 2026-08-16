@@ -48,7 +48,9 @@ export default async function BlogIndexPage() {
   return (
     <>
       <Nav />
+      {/* id="main" — target of the layout's skip-to-content link. */}
       <main
+        id="main"
         className="blog-main"
         style={{
           background: '#F2EEE7',

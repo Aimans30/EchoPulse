@@ -225,7 +225,7 @@ export default function Nav({
           border-radius: 100px;
           font-size: 13px;
           font-weight: 600;
-          /* Touch devices have no cursor to hide, and `cursor: none` there only
+          /* Touch devices have no cursor to hide, and "cursor: none" there only
              risks leaving a pointer-capable hybrid with no affordance at all.
              Real hover + fine pointer gets the custom cursor treatment below. */
           cursor: pointer;

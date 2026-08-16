@@ -1162,7 +1162,7 @@ function StepDetails({ client, setClient }: { client: ClientDetails; setClient: 
     <div>
       <SectionTitle eyebrow="Step 3" title="Project brief" />
       <p style={{ marginTop: '8px', fontSize: '13px', color: 'rgba(242,238,231,0.5)', lineHeight: 1.55, maxWidth: '560px' }}>
-        Only your name, email, and footage link are required. The direction section is optional — every detail makes the edit sharper, but skip anything you don&apos;t need.
+        Only your name, email, and footage link are required. The direction section is optional. Every detail makes the edit sharper, but skip anything you don&apos;t need.
       </p>
 
       {/* ── Group 1 — Contact ──
@@ -1278,7 +1278,7 @@ function StepDetails({ client, setClient }: { client: ClientDetails; setClient: 
               value={client.editDirection}
               onChange={upd('editDirection')}
               rows={5}
-              placeholder="Fast-paced with cinematic color. Punchy cuts on beat drops. Lead with the hook at 0:00 — the moment I say 'most agents miss this'. Avoid corporate-stock music."
+              placeholder="Fast-paced with cinematic color. Punchy cuts on beat drops. Lead with the hook at 0:00, the moment I say 'most agents miss this'. Avoid corporate-stock music."
             />
           </Field>
         </div>

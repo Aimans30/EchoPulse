@@ -931,7 +931,6 @@ const LI_PERSONAS = [
       'Fix one and watch activation triple.',
     voiceTarget: 9.1,
     engagement: { likes: 412, comments: 87, reposts: 32 },
-    replyRate: '+428%',
   },
   {
     initials: 'JK',
@@ -951,7 +950,6 @@ const LI_PERSONAS = [
       'Capacity is the moat. Fit is how you protect it.',
     voiceTarget: 8.7,
     engagement: { likes: 318, comments: 64, reposts: 28 },
-    replyRate: '+289%',
   },
   {
     initials: 'AP',
@@ -971,7 +969,6 @@ const LI_PERSONAS = [
       'Cut half the content. Watch completion double.',
     voiceTarget: 8.9,
     engagement: { likes: 524, comments: 112, reposts: 47 },
-    replyRate: '+361%',
   },
 ];
 
@@ -1386,32 +1383,16 @@ function LinkedInPostBuilder({ accent }: { accent: string }) {
                 </motion.div>
               )}
 
-              {/* Reply-rate lift pill — inline inside the post card so it always renders cleanly */}
-              {phase === 'live' && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.85 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.4, delay: 0.45, ease: [0.16, 1, 0.3, 1] }}
-                  style={{
-                    marginTop: '10px',
-                    display: 'inline-flex',
-                    alignSelf: 'flex-start',
-                    alignItems: 'center',
-                    gap: '8px',
-                    padding: '5px 11px',
-                    borderRadius: '100px',
-                    background: `${persona.color}12`,
-                    border: `1px solid ${persona.color}40`,
-                  }}
-                >
-                  <span style={{ fontSize: '12px', fontWeight: 900, color: persona.color, letterSpacing: '-0.3px' }}>
-                    {persona.replyRate}
-                  </span>
-                  <span style={{ fontSize: '9px', fontWeight: 700, color: 'rgba(12,12,11,0.55)', letterSpacing: '0.5px', textTransform: 'uppercase' }}>
-                    Reply rate vs avg
-                  </span>
-                </motion.div>
-              )}
+              {/* The "+428% reply rate vs avg" pill that used to sit here was
+                  removed. The personas in this animation are illustrative and
+                  labelled as such below, but a precise percentage rendered in a
+                  live-looking UI reads as a real client result no matter what
+                  the surrounding code comments say. The video-editing page
+                  states plainly that we have no client testimonials yet and
+                  will not fabricate them; a fabricated performance number two
+                  pages away contradicted that outright. The animation still
+                  shows the process (hooks, drafting, scoring, live) without
+                  claiming an outcome we cannot evidence. */}
             </motion.div>
           )}
         </AnimatePresence>

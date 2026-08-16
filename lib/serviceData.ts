@@ -3,6 +3,17 @@ export interface ServiceData {
   name: string;
   tagline: string;
   heroSub: string;
+  /**
+   * <meta description>, 120 to 160 chars.
+   *
+   * Separate from `heroSub` on purpose. `heroSub` is a 2 to 4 sentence pitch
+   * paragraph written for someone already on the page; it runs 251 to 448
+   * characters. Google truncates snippets around 155, so using it as the
+   * description meant every service page got cut mid-sentence and the actual
+   * value proposition never reached the SERP. lib/icpData.ts already keeps
+   * these fields separate; this matches that.
+   */
+  metaDescription: string;
   accentColor: string;
   problemHeadline: string;
   problemBody: string;
@@ -26,9 +37,10 @@ export const services: ServiceData[] = [
     name: 'Video Editing',
     tagline: 'Every Format. One Editor at Your Disposal.',
     heroSub: 'Whatever needs cutting, we cut it. YouTube long-form, podcast episodes and highlight cuts, course module edits, Reels and TikToks, cinematic property work, talking-head founder content. One production pipeline, every kind of edit you need, retention-tested for the platform it is shipping to.',
+    metaDescription: 'Video editing for founders: Reels, YouTube long-form, podcasts, and course modules. One team, every format, 48-hour turnaround per deliverable.',
     accentColor: '#E8541A',
     problemHeadline: 'Great footage. Mediocre results.',
-    problemBody: 'You record, post, and watch the views stall. The drop-off is brutal, the engagement is flat, and you cannot tell whether the content or the edit is the problem. In 95 percent of cases, it is the edit.',
+    problemBody: 'You record, post, and watch the views stall. The drop-off is brutal, the engagement is flat, and you cannot tell whether the content or the edit is the problem. In our experience it is almost always the edit.',
     problemPoints: [
       'Slow intros that lose viewers in the first 2 seconds on mobile',
       'No retention hooks, no pattern interrupts, no story arc',
@@ -74,6 +86,7 @@ export const services: ServiceData[] = [
     name: 'LinkedIn & Social',
     tagline: 'Posts your buyers actually stop scrolling for.',
     heroSub: 'Done-for-you LinkedIn and social content built around a 90-minute onboarding interview. Written, edited, scheduled, shipped. No "Here is the thing," no em-dashes, no template energy. Just posts that fit your business and earn replies from real buyers.',
+    metaDescription: 'Done-for-you LinkedIn ghostwriting for founders. Built from a 90-minute interview so posts sound like you, not like a template. You approve every draft.',
     accentColor: '#8b5cf6',
     problemHeadline: 'Most LinkedIn content reads like a robot wrote it. Your audience knows.',
     problemBody: 'You hire a $5K per month agency. They send posts that sound exactly like every other agency. Your audience can tell. Replies dry up. The post gets likes from bots and nothing from real buyers, real prospects, or real referrals. Your name is on it, but nothing about it sounds like you.',
@@ -106,13 +119,13 @@ export const services: ServiceData[] = [
       body: 'Every engagement starts with a 90-minute recorded onboarding session where we map your offer, your buyer, and the way you already talk about your business. The transcript becomes the source brief for every post we write for the next 12 months. Refreshed quarterly to stay aligned with how the business is evolving.',
     },
     testimonial: {
-      quote: 'The structured onboarding brief is the single biggest reason clients tell us our work fits their business when nothing else they tried did.',
+      quote: 'The structured onboarding brief is the whole difference. Without it you are guessing at someone\'s voice. With it you are working from the way they already describe their own business.',
       name: 'Lakshya Soni',
       role: 'Founder, EchoPulse',
     },
     faq: [
       { q: 'How is this different from a $200 per month content writer?', a: 'Cheap writers use templates. We use a structured brand brief built from a 90-minute recorded interview with you. The posts fit your business because we built a system around your actual offer and audience, not a template stuffed with industry buzzwords.' },
-      { q: 'Will my audience know it is written by someone else?', a: 'Almost never. We have had clients\' real-life friends comment that the posts sound exactly like them. The brand brief keeps every post anchored to your real way of talking about your business.' },
+      { q: 'Will my audience know it is written by someone else?', a: 'That is the bar we write to. The brand brief is built from a 90-minute recorded interview, so every post is anchored to phrases and stories you have actually used, not to a template. You approve each draft before it goes out, so nothing publishes in a voice you would not use yourself.' },
       { q: 'How many posts per month?', a: 'Standard tier is 16 to 20 posts per month (4 to 5 per week) plus 1 to 2 carousels. Premium tier adds the daily engagement amplifier (5 comment drafts per day on prospect and influencer posts).' },
       { q: 'Do I have to approve every post?', a: 'Yes. You see every draft before it publishes. Revisions are unlimited until you are satisfied with the post. Most clients only revise the first 5 to 10 posts before they trust the system.' },
     ],
@@ -122,6 +135,7 @@ export const services: ServiceData[] = [
     name: 'Blog Production',
     tagline: 'Blogs That Get You Found, Cited, and Chosen.',
     heroSub: 'Long-form content that ranks on Google, gets cited by ChatGPT, Claude, and Perplexity, and earns the kind of recognition that brings inbound. We write the blogs your buyers save and AI assistants quote when prospects ask the questions you sell the answers to.',
+    metaDescription: 'SEO blog writing built to rank on Google and get cited by ChatGPT and Perplexity. Real research, real sources, edited by a human before it ships.',
     accentColor: '#f59e0b',
     problemHeadline: 'Your blog reads like a robot wrote it. Your readers can tell.',
     problemBody: 'You signed up for a content agency. They send you 4 blogs per month. 1,500 words each of vague, recycled prose with zero specific examples. Bounce rate is 80 percent. SEO is flat. Nobody is signing up.',
@@ -170,9 +184,10 @@ export const services: ServiceData[] = [
     name: 'Ad Creatives',
     tagline: 'Ad creative built for returns, not design awards.',
     heroSub: 'Static and video creative built for one job: stopping the scroll and getting the click. Eight to twelve fresh hooks per month so your CPA stops creeping up and your ad spend keeps working. We ship the angle that converts, not the one that wins design contests.',
+    metaDescription: 'Ad creative on subscription: 8 to 12 fresh static and video ads a month, 48-hour turnaround, so creative fatigue stops eating your ad spend.',
     accentColor: '#3b82f6',
     problemHeadline: 'Your ad creative goes stale every 14 days.',
-    problemBody: 'You launch new ads, they perform for two weeks, then CPMs creep up and ROAS tanks. The fix is fresh creative. But your in-house designer is overwhelmed and your freelancer is slow. Most DTC brands lose 40 percent of their ad spend to creative fatigue every quarter.',
+    problemBody: 'You launch new ads, they perform for two weeks, then CPMs creep up and ROAS tanks. The fix is fresh creative. But your in-house designer is overwhelmed and your freelancer is slow, so the same three variations keep running long after they stopped working, and the budget keeps going out the door behind them.',
     problemPoints: [
       'Same 3 ad variations running for 6+ weeks while CPAs creep up',
       'No fresh hooks, no new angles, no new visual language',
@@ -199,7 +214,7 @@ export const services: ServiceData[] = [
       role: 'Production rhythm',
       stat: '48 hr',
       statLabel: 'creative turnaround',
-      body: 'Our creative subscription delivers 8 to 12 fresh ad creatives per month with a 48-hour turnaround on each piece. DTC brands working with us refresh their top ads weekly instead of every 6 weeks. The difference between scaling and stalling.',
+      body: 'Our creative subscription delivers 8 to 12 fresh ad creatives per month with a 48-hour turnaround on each piece. That cadence is what lets you refresh top performers weekly instead of running the same three variations until CPMs climb. The difference between scaling and stalling.',
     },
     testimonial: {
       quote: 'Ad creative is the highest-leverage thing most DTC brands underspend on. A subscription is the cheapest way to fix it.',
@@ -210,7 +225,7 @@ export const services: ServiceData[] = [
       { q: 'What platforms do you produce ads for?', a: 'Meta (Facebook + Instagram), TikTok, Google Display, LinkedIn, and Pinterest. Each ad is exported in the right specs and aspect ratios for the target platform.' },
       { q: 'Do I need to send you raw footage?', a: 'For video ads, yes. Though we can also use stock footage or existing UGC if you have it. For static and motion graphic ads, we work from your existing brand assets.' },
       { q: 'How many revisions per creative?', a: 'Unlimited revisions until you are satisfied. No round caps, no per-hour invoicing. We would rather rework than ship work we are not proud of.' },
-      { q: 'Can I cancel anytime?', a: 'Yes. Month-to-month, 14-day notice. We retain you on output, not a contract.' },
+      { q: 'Can I cancel anytime?', a: 'Yes. Month to month, 30 days notice. We retain you on output, not a contract.' },
     ],
   },
   {
@@ -218,6 +233,7 @@ export const services: ServiceData[] = [
     name: 'Websites and Funnels',
     tagline: 'Stunning sites. Buttery UX. Real conversions.',
     heroSub: 'Beautiful, fast websites for founders, coaches, business owners, real estate agents, and DTC brands. Brand sites, e-commerce stores, landing pages, property listings, course platforms, sales funnels, portfolios. Whatever kind of site your business needs, designed to look stunning and built to convert. Sub-2-second mobile load. Copy and design built together. Every section has a job. Every word moves the visitor closer to working with you.',
+    metaDescription: 'Websites and sales funnels built to convert, not just to look good. Sub-2-second mobile load, conversion copywriting included on every build.',
     // TODO: replace with the dedicated Cal.com event URL for website builds
     // once it's created. While unset, this falls back to the global modal.
     // Suggested event: "Website Strategy Call" (30 min) — different intent
@@ -272,6 +288,7 @@ export const services: ServiceData[] = [
     name: 'Automations',
     tagline: 'A system that catches every lead. So you stop losing them.',
     heroSub: 'Custom AI agents and automation stacks that catch every lead the second it comes in, qualify it for you, and only put the serious ones on your calendar. Built with Make.com, ManyChat, GoHighLevel, and your existing CRM. Live in 14 days. Hours back every week from day one.',
+    metaDescription: 'Automation stacks that catch every lead, qualify it, and book only serious buyers. Built on Make.com, ManyChat, and your CRM. Live in 14 days.',
     accentColor: '#E8541A',
     problemHeadline: 'You are doing manual work a system should be handling.',
     problemBody: 'Every day you reply to the same DMs, chase leads who never respond, and watch warm prospects go cold because the follow-up slipped. This is not a people problem. It is a systems problem. One well-built automation stack ends it.',
@@ -312,7 +329,7 @@ export const services: ServiceData[] = [
       { q: 'Which platforms do you build on?', a: 'Make.com, ManyChat, GoHighLevel, ActiveCampaign, HubSpot, Zapier, Airtable, and your CRM of choice. We work with your existing stack wherever possible.' },
       { q: 'How long does setup take?', a: 'Most full automation stacks are live in 10 to 14 business days. Complex multi-platform builds with custom integrations may extend to 21 days.' },
       { q: 'Do I need a large audience?', a: 'No. Automation works at any audience size. We have built profitable systems for clients with under 1,000 followers. The system itself is what makes the audience profitable.' },
-      { q: 'Will the messages sound robotic?', a: 'No. We write all copy against your brand brief and run test conversations before going live. Most clients say their audience cannot tell the difference between automation and a human reply.' },
+      { q: 'Will the messages sound robotic?', a: 'Not if they are written properly. Every message is written against your brand brief, not pulled from a default template, and we run test conversations end to end before anything goes live so you can read exactly what your audience will receive.' },
     ],
   },
   {
@@ -320,6 +337,7 @@ export const services: ServiceData[] = [
     name: 'Apps & Software',
     tagline: 'Software that runs your business, not the other way around.',
     heroSub: 'Your website is the first handshake with every customer. Your software is the engine your team works inside every day. When both are built around how your business actually operates, customers convert faster, your team moves faster, and you stop paying monthly SaaS rent for tools that almost fit. We design and build websites, apps, and AI tools custom for your business, at a fixed price, in weeks, with the code transferred to you on launch day.',
+    metaDescription: 'Custom apps, client portals, and AI tools at a fixed price in weeks. Full code handover on launch day, so you own it outright. No vendor lock-in.',
     accentColor: '#06b6d4',
     problemHeadline: 'Your software stack is costing you customers and hours every single week.',
     problemBody: 'Most businesses lose deals before the buyer ever talks to them. The site looks identical to three competitors. The booking flow has friction. The portal experience after purchase feels held together with tape. Internally, your team loses 10 or more hours a week jumping between Kajabi, Bonsai, HubSpot, ClickFunnels, Calendly, and a Google Sheet nobody updates. The compounding cost (lost conversions, wasted hours, monthly SaaS rent for tools you outgrew) is bigger than the cost of building something that actually fits. We help you flip the equation.',
@@ -364,7 +382,7 @@ export const services: ServiceData[] = [
       { q: 'Will a custom client portal really save me money on SaaS?', a: 'Yes. Most clients we build for were paying somewhere between $300 and $2,000 a month across Kajabi, Bonsai, HubSpot, ClickFunnels, Calendly, Notion premium, and Drive seats. A custom portal that wraps onboarding, billing, deliverables, and support in one branded experience replaces 3 to 5 of those tools. The math: at $1,000/month in SaaS, a $9,997 portal pays for itself in 10 months, and you own it forever after that.' },
       { q: 'I am not technical. Can I still work with you?', a: 'Yes. You do not need to know how it works. You only need to know what you want customers to experience and how you want your team to work. We translate the rest into code. Most of our clients are coaches, business owners, agency founders, and creators, not engineers. We speak business outcome, not jargon.' },
       { q: 'Why not just use Webflow or Wix?', a: 'Cheaper this month, way more expensive over two years. You will pay $1,500 to $5,000 in subscription fees, look identical to every competitor using the same template, and lose all leverage when the platform changes pricing or features. A custom build is a one-time cost that becomes a real business asset on your balance sheet. You own it, you control it, you can extend it whenever you want.' },
-      { q: 'What does an immersive 3D website actually do for conversions?', a: 'Static sites have one job: communicate. 3D and motion sites do a second job: make the brand stick. As the visitor scrolls, products spin, scenes shift, the page tells a story. We see 3 to 5x longer time-on-page and significantly higher conversion rates on premium-priced offers. Worth the investment for high-ticket coaches, premium DTC, course creators above $500 ACV, and agencies trying to look like an actual studio.' },
+      { q: 'What does an immersive 3D website actually do for conversions?', a: 'Static sites have one job: communicate. 3D and motion sites do a second job: make the brand stick. As the visitor scrolls, products spin, scenes shift, the page tells a story. The honest answer on numbers is that it depends on your offer and traffic, and we would rather tell you that than quote you a multiple we cannot stand behind. It is worth the investment when the price point is high enough that being memorable changes the decision: high-ticket coaching, premium DTC, courses above $500 ACV, and agencies who need to look like an actual studio.' },
       { q: 'What does an AI tool actually do for my business?', a: 'Practical, money-saving stuff. A chatbot that answers customer questions at 2am in your brand voice and books qualified calls. An email assistant that drafts personalized replies your team just edits and sends. A lead-scoring system that triages incoming inquiries so your calendar only fills with serious buyers. A knowledge-base search across your team notes and Slack. The kind of AI that saves 5 to 10 hours a week, not the kind that impresses on a demo.' },
       { q: 'Will I really own the code?', a: 'Yes. On launch day the entire project transfers to your GitHub account. You own it. You can hire any developer in the world to extend it. We do not hold code hostage, we do not run hosting on our credit card, we do not charge retainer fees to access your own product. Full independence, that is the whole point.' },
       { q: 'What if something breaks after launch?', a: '14 days of free fixes included with every build. After that, you can hire us per change at our hourly rate, hand the codebase to any developer, or keep us on a small monthly retainer for ongoing improvements. We ship clean, documented, well-architected code, so any engineer can pick it up without weeks of ramp-up.' },

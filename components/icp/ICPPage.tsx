@@ -58,13 +58,14 @@ export default function ICPPage({ data, videos }: { data: IcpData; videos: Video
   // client supplies, what EchoPulse produces, and how it compounds.
   const deviceAlt = `How EchoPulse works for ${data.name.toLowerCase()}: ${data.pipeline.input.label.toLowerCase()}, and EchoPulse produces ${data.pipeline.outputs
     .map((o) => o.label.toLowerCase())
-    .join(', ')} — driving ${data.pipeline.outcomes.join(', then ').toLowerCase()}.`;
+    .join(', ')}, driving ${data.pipeline.outcomes.join(', then ').toLowerCase()}.`;
 
   return (
     <>
       <Nav links={ICP_NAV_LINKS} sectionIds={ICP_SECTION_IDS} observeCurrentPage />
 
-      <main style={{ background: '#F2EEE7', color: '#0C0C0B' }}>
+      {/* id="main" — target of the layout's skip-to-content link. */}
+      <main id="main" style={{ background: '#F2EEE7', color: '#0C0C0B' }}>
         {/* ── 1. HERO (dark) — the page's single <h1> ── */}
         <section className="icp-hero" data-dark-bg="true">
           {/* Fades through the accent's OWN alpha (…22 → …00), not the CSS

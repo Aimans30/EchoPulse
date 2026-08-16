@@ -27,7 +27,7 @@ import { useGeoPrice } from '@/lib/useGeoPrice';
 const buildFaqs = (pilotPrice: string, growthPrice: string) => [
       {
         q: 'How much does a content agency cost per month?',
-        a: `Ours runs ${growthPrice} per month for the Growth retainer, with no contract. Most content agencies price one of three ways: per deliverable (cheapest headline, most expensive in practice once revisions stack up), per hour (you pay for their inefficiency), or a flat monthly retainer covering a defined output (what we do). Before that, you can run a ${pilotPrice} 14-day Pilot: real work on your brand, 10 deliverables, and you keep everything whether you continue or not. That way you're comparing actual output, not sales decks.`,
+        a: `Ours runs ${growthPrice} per month for the Growth retainer, with no contract. Most content agencies price one of three ways: per deliverable (cheapest headline, most expensive in practice once revisions stack up), per hour (you pay for their inefficiency), or a flat monthly retainer covering a defined output (what we do). Before that, you can run a ${pilotPrice} 14-day Pilot: real work on your brand, 21 deliverables, and you keep everything whether you continue or not. That way you're comparing actual output, not sales decks.`,
       },
       {
         q: 'Is it cheaper to hire a freelance video editor or an agency?',
@@ -47,7 +47,7 @@ const buildFaqs = (pilotPrice: string, growthPrice: string) => [
       },
       {
         q: 'How fast is the turnaround on video edits?',
-        a: "48 to 72 hours for short-form edits in a standard week, and the Pilot delivers 10 assets inside 14 days. Turnaround is the metric we hold ourselves to hardest, because content that arrives late is content that missed its moment. If a deadline is genuinely at risk we tell you before it slips, not after.",
+        a: "48 hours per deliverable as standard, and the Pilot delivers 21 assets inside 14 days. Turnaround is the metric we hold ourselves to hardest, because content that arrives late is content that missed its moment. If a deadline is genuinely at risk we tell you before it slips, not after.",
       },
       {
         q: 'How long does it take to see results from content marketing?',

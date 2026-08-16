@@ -49,7 +49,16 @@ export function extractHeadings(content: PortableTextBlock[] | undefined): TocHe
   for (const block of content) {
     if (block._type !== 'block') continue;
     const style = block.style;
-    if (style !== 'h2' && style !== 'h3') continue;
+    // h1 is NOT emitted as a TOC entry, but it must still advance the de-dupe
+    // counter. components/BlogContent.tsx renders h1 body blocks (several older
+    // Sanity posts open with one) as DOM <h2> elements using a single shared
+    // counter across h1/h2/h3. If an h1's slug collides with a later heading,
+    // BlogContent suffixes that later heading `-2` while this function, having
+    // skipped the h1 entirely, generates the unsuffixed slug. The TOC then
+    // links to #heading while the DOM id is #heading-2, and the anchor is dead.
+    // Counting h1 here keeps both sides in lockstep, which the comments on
+    // each side already claimed but did not actually do.
+    if (style !== 'h1' && style !== 'h2' && style !== 'h3') continue;
 
     const text = blockToPlainText(block);
     if (!text) continue;
@@ -59,6 +68,8 @@ export function extractHeadings(content: PortableTextBlock[] | undefined): TocHe
     const count = seen.get(id) ?? 0;
     seen.set(id, count + 1);
     if (count > 0) id = `${id}-${count + 1}`;
+
+    if (style === 'h1') continue; // counted above, but never shown in the TOC
 
     headings.push({ id, text, level: style === 'h2' ? 2 : 3 });
   }

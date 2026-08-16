@@ -298,7 +298,7 @@ export default function WhoWeWorkWith() {
           }
           .wwww-card .wwww-num,
           .wwww-card > div:first-child { font-size: 9.5px !important; }
-          /* Scoped to the icon chip: the blanket `svg` selector was also
+          /* Scoped to the icon chip: the blanket "svg" selector was also
              inflating the 13px "View page" arrow to 28px. */
           .wwww-card .wwww-icon { width: 32px !important; height: 32px !important; }
 

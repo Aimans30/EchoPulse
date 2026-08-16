@@ -1,6 +1,7 @@
 import { getService, services } from '@/lib/serviceData';
 import { notFound } from 'next/navigation';
 import ServicePageClient from '@/components/ServicePageClient';
+import { AREA_SERVED } from '@/lib/schema';
 
 const SITE_URL = 'https://echopulse.media';
 
@@ -23,18 +24,21 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
   return {
     title: { absolute: pageTitle },
-    description: service.heroSub,
+    // `metaDescription`, not `heroSub`. heroSub is the on-page pitch paragraph
+    // (251 to 448 chars depending on the service) and Google truncates around
+    // 155, so every one of these was getting cut mid-sentence in the SERP.
+    description: service.metaDescription,
     alternates: { canonical },
     openGraph: {
       title: pageTitle,
-      description: service.heroSub,
+      description: service.metaDescription,
       url: canonical,
       type: 'article',
     },
     twitter: {
       card: 'summary_large_image',
       title: pageTitle,
-      description: service.heroSub,
+      description: service.metaDescription,
     },
   };
 }
@@ -56,13 +60,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
     serviceType: service.name,
     url: `${SITE_URL}/services/${slug}`,
     provider: { '@id': `${SITE_URL}/#organization` },
-    areaServed: [
-      { '@type': 'Country', name: 'Canada' },
-      { '@type': 'Country', name: 'United States' },
-      { '@type': 'Country', name: 'United Kingdom' },
-      { '@type': 'Country', name: 'Australia' },
-      { '@type': 'Place', name: 'Western Europe' },
-    ],
+    areaServed: AREA_SERVED,
   };
 
   // Breadcrumb schema — gives Google / answer engines a clean trail
@@ -71,10 +69,15 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
   const breadcrumbLd = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
+    // Two levels, not three. The middle level used to be
+    // `${SITE_URL}/#services`, but a fragment resolves to the homepage, so
+    // positions 1 and 2 pointed at the same URL. A trail that visits the same
+    // page twice is malformed and Google drops the whole breadcrumb, which is
+    // part of why Search Appearance shows nothing. There is no standalone
+    // /services index page to point at, so the honest trail is Home > Service.
     itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Home',     item: SITE_URL },
-      { '@type': 'ListItem', position: 2, name: 'Services', item: `${SITE_URL}/#services` },
-      { '@type': 'ListItem', position: 3, name: service.name, item: `${SITE_URL}/services/${slug}` },
+      { '@type': 'ListItem', position: 1, name: 'Home', item: SITE_URL },
+      { '@type': 'ListItem', position: 2, name: service.name, item: `${SITE_URL}/services/${slug}` },
     ],
   };
 
@@ -88,7 +91,13 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
       />
-      <ServicePageClient service={service} />
+      {/* Service pages had no <main> landmark at all, so the skip-to-content
+          link in the root layout pointed at nothing and screen readers had no
+          way to jump past the nav. Wrapping here rather than inside
+          ServicePageClient keeps the client component focused on presentation. */}
+      <main id="main">
+        <ServicePageClient service={service} />
+      </main>
     </>
   );
 }

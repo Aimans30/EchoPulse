@@ -222,7 +222,7 @@ export default function Footer() {
           display: inline-block;
         }
         .site-footer .footer-social { cursor: pointer; }
-        /* `cursor: none` only makes sense where a real cursor exists and the
+        /* "cursor: none" only makes sense where a real cursor exists and the
            custom one replaces it. On touch it is a no-op at best. */
         @media (hover: hover) and (pointer: fine) {
           .site-footer .footer-social { cursor: none; }

@@ -372,16 +372,13 @@ export default function BlogIndexClient({ posts }: { posts: IndexPost[] }) {
           box-shadow: 0 20px 48px rgba(12,12,11,0.12);
         }
         /* Covers are a designed 1200x630 composition: title typeset on the left
-           panel, illustration on the right. `object-fit: cover` inside a
+           panel, illustration on the right. "object-fit: cover" inside a
            full-height column cropped both ends off, so the headline lost its
            first characters and the artwork lost its right edge. Locking the
-           slot to the source ratio and using `contain` keeps the whole
+           slot to the source ratio and using "contain" keeps the whole
            composition intact. The tinted background fills any leftover space
-           so it still reads as a solid block rather than a floating image. */
-        /* Covers are a designed 1200x630 composition: title typeset on the left
-           panel, illustration on the right. Any crop cuts the headline's first
-           characters or the artwork's edge, so the image is never cropped.
-           `!important` because next/image emits its own inline sizing. */
+           so it still reads as a solid block rather than a floating image.
+           "!important" because next/image emits its own inline sizing. */
         .blogx-featured-img {
           width: 100% !important;
           height: auto !important;

@@ -12,6 +12,7 @@ import BookCallModal from "@/components/BookCallModal";
 import MobileStickyCTA from "@/components/MobileStickyCTA";
 import { GeoProvider } from "@/components/GeoProvider";
 import { getServerGeo } from "@/lib/geoServer";
+import { AREA_SERVED } from "@/lib/schema";
 
 const GA_ID = 'G-3PPKSJLR7F';
 
@@ -39,8 +40,12 @@ export const metadata: Metadata = {
     // Beautiful brand copy, zero search relevance: it contains no term anyone
     // types into Google, so the homepage had nothing to rank for. This version
     // leads with the service + audience and keeps the brand at the end.
-    default:
-      "Done-For-You Content Agency for Founders: Video Editing, LinkedIn & Blogs | EchoPulse",
+    // 58 chars, so it survives Google's ~60-char truncation with the brand
+    // intact. The previous version was 84 chars and put "| EchoPulse" at the
+    // very end, which is exactly the part that got cut — so the ~700 people
+    // per month searching "echopulse" scanned the results, never saw the
+    // brand name, and had no signal this was the right result.
+    default: "EchoPulse Media | Done-For-You Content Studio for Founders",
     // Service/blog pages already carry their own name, so don't re-append it.
     template: "%s | EchoPulse Media",
   },
@@ -136,14 +141,7 @@ const structuredData = {
         "EchoPulse Media is a content and AI studio for founders, coaches, business owners, and real estate agents. Video edits, social posts, blogs, ad creative, websites, automations, and custom software. One team, one bill, every channel. Built to give clients 20 to 30 hours back every week.",
       foundingDate: "2025",
       founder: { "@id": "https://echopulse.media/#founder" },
-      areaServed: [
-        { "@type": "Country", name: "Canada" },
-        { "@type": "Country", name: "United States" },
-        { "@type": "Country", name: "United Kingdom" },
-        { "@type": "Country", name: "Australia" },
-        { "@type": "Country", name: "India" },
-        { "@type": "Place", name: "Western Europe" },
-      ],
+      areaServed: AREA_SERVED,
       sameAs: [
         "https://www.linkedin.com/in/lakshyasoni/",
         "https://x.com/Lakshya_Creates",

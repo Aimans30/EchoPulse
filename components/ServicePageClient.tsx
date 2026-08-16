@@ -992,7 +992,10 @@ export default function ServicePageClient({ service }: { service: ServiceData })
       {/* PROCESS — editorial big numbers */}
       <section style={{ padding: '120px 56px', background: '#F2EEE7', color: '#0C0C0B' }}>
         <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
-          <SectionLabel left="03 / Method" right={`${service.steps.length} STEPS / ${service.steps.length * 2}–7 DAYS`} />
+          {/* "TO", not an en-dash. This renders on every service page and a
+              dash in a number range is the exact pattern we strip everywhere
+              else in the copy. */}
+          <SectionLabel left="03 / Method" right={`${service.steps.length} STEPS / ${service.steps.length * 2} TO 7 DAYS`} />
 
           <motion.h2
             initial={{ opacity: 0, y: 24 }}
