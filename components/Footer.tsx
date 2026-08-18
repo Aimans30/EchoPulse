@@ -143,7 +143,12 @@ export default function Footer() {
         </h4>
         <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {[
-            { label: 'Order a service', href: '/order' },
+            // "Order a service" (/order) was removed from site-wide nav. The
+            // footer renders on blog posts too, so it was handing article
+            // readers a direct route into card-entry checkout before they had
+            // spoken to anyone. /order still exists and is still reachable
+            // from the homepage Pilot card and the service pages; it is just
+            // no longer promoted on every page of the site.
             { label: 'See pricing', href: '/#pricing' },
             { label: 'FAQ', href: '/#faq' },
             { label: 'Blog', href: '/blog' },

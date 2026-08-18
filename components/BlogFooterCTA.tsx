@@ -16,11 +16,17 @@ import { useGeoPrice } from '@/lib/useGeoPrice';
  * codebase rather than inventing new claims:
  *   - Price anchoring: the $599 struck-through original next to $299, same
  *     numbers Pricing.tsx and the Offer schema already use.
- *   - Primary/secondary CTA split: one loud action (the Pilot) plus one quiet
- *     low-friction one (a call), the same pairing MobileStickyCTA uses.
+ *   - Primary/secondary CTA split: one loud action plus one quiet
+ *     low-friction one, the same pairing MobileStickyCTA uses.
  * The three deliverable lines are trimmed straight from
- * Pricing.tsx's DEFAULT_PILOT_FEATURES, not new copy — nothing here is a
+ * Pricing.tsx's DEFAULT_PILOT_FEATURES, not new copy, so nothing here is a
  * claim that isn't already live and sourced somewhere else on the site.
+ *
+ * The primary action books a call. It briefly routed to /order instead, which
+ * let a reader reach the self-serve card-entry checkout cold from an article.
+ * That is far too large a first ask for search traffic that is still
+ * researching, so blog readers are pointed at a conversation on the main site
+ * and the purchase flow stays behind it.
  */
 export default function BlogFooterCTA({ category }: { category?: string }) {
   const { currency, prices } = useGeoPrice();
@@ -91,7 +97,8 @@ export default function BlogFooterCTA({ category }: { category?: string }) {
           See your brand producing content like this.
         </div>
         <p style={{ color: 'rgba(242,238,231,0.65)', margin: '0 0 24px', fontSize: '15px', lineHeight: 1.6 }}>
-          The EchoPulse Pilot puts real, finished work in your hands in 14 days, not a sales deck.
+          Book a call and we will map out what your content should look like. If the
+          14-day Pilot fits, it puts real finished work in your hands, not a sales deck.
         </p>
 
         {/* Deliverables — trimmed from Pricing.tsx's DEFAULT_PILOT_FEATURES,
@@ -136,13 +143,14 @@ export default function BlogFooterCTA({ category }: { category?: string }) {
         <button
           type="button"
           onClick={() => {
-            // Same routing as the Pricing.tsx Pilot card: straight to the
-            // self-serve checkout, not the call modal. The call is the
-            // lower-commitment SECONDARY path below, for anyone not ready to
-            // buy yet — collapsing both into one button was losing that
-            // distinction entirely.
-            trackPilotClick('blog_footer');
-            window.location.href = '/order';
+            // Books a call. This used to send the reader straight into /order
+            // checkout, which was wrong for this audience: someone who arrived
+            // on an article from search is researching, not buying, and a
+            // card-entry page is far too big a first ask. Blog traffic goes to
+            // a conversation instead, which is also what stops people reaching
+            // the self-serve purchase flow cold from an article.
+            trackCallClick('blog_footer');
+            (window as unknown as { openBookCallModal?: () => void }).openBookCallModal?.();
           }}
           data-cursor-hover
           style={{
@@ -158,31 +166,31 @@ export default function BlogFooterCTA({ category }: { category?: string }) {
             boxShadow: '0 10px 28px rgba(232,84,26,0.28)',
           }}
         >
-          Start the {currency}{prices.pilot} Pilot →
+          Book a free strategy call →
         </button>
 
+        {/* Secondary is a plain link to the pricing section on the main site,
+            not a second button doing the same thing. Both used to open the
+            booking modal, which made the pair pointless. This gives the reader
+            who is not ready to talk somewhere useful to go, and it routes blog
+            traffic onto the main site rather than into checkout. */}
         <div style={{ marginTop: '14px' }}>
-          <button
-            type="button"
-            onClick={() => {
-              trackCallClick('blog_footer_secondary');
-              (window as unknown as { openBookCallModal?: () => void }).openBookCallModal?.();
-            }}
+          <a
+            href="/#pricing"
+            onClick={() => trackPilotClick('blog_footer_pricing')}
             data-cursor-hover
             style={{
-              background: 'transparent',
-              border: 'none',
               color: 'rgba(242,238,231,0.55)',
               fontSize: '13px',
               fontWeight: 500,
-              cursor: 'pointer',
               textDecoration: 'underline',
               textUnderlineOffset: '3px',
               padding: '6px',
+              display: 'inline-block',
             }}
           >
-            Or book a free strategy call first
-          </button>
+            Or see what everything costs
+          </a>
         </div>
       </div>
     </div>

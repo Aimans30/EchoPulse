@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { trackPilotClick } from '@/lib/analytics';
 import { useGeoPrice } from '@/lib/useGeoPrice';
@@ -12,14 +13,31 @@ const AUTO_DISMISS_MS = 4_000;
 // the same conversion path with a thumb-friendly bottom bar instead).
 const MIN_VIEWPORT_WIDTH = 768;
 
+/**
+ * Routes this popup must never appear on.
+ *
+ * A reader who arrived on an article from search is mid-sentence, not
+ * shopping. Interrupting that with a sales card is the fastest way to send
+ * them back to the results page, and it works against the whole point of the
+ * blog, which is to earn trust before asking for anything. The article already
+ * ends with its own contextual CTA (components/BlogFooterCTA.tsx), which is
+ * the right place to make the ask.
+ */
+const SUPPRESSED_PREFIXES = ['/blog'];
+
 export default function PilotPopup() {
   const [visible, setVisible] = useState(false);
   const [paused, setPaused] = useState(false);
   const { currency, prices } = useGeoPrice();
   const dismissTimer = useRef<number | null>(null);
+  const pathname = usePathname();
+  const suppressed = SUPPRESSED_PREFIXES.some(
+    (p) => pathname === p || pathname?.startsWith(`${p}/`)
+  );
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
+    if (suppressed) return;
     if (window.innerWidth < MIN_VIEWPORT_WIDTH) return;
     // Width alone is not a phone test. A modern handset in landscape reports
     // 850-950px and would have sailed past MIN_VIEWPORT_WIDTH, which is
@@ -34,7 +52,14 @@ export default function PilotPopup() {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     const t = window.setTimeout(() => setVisible(true), SHOW_DELAY_MS);
     return () => window.clearTimeout(t);
-  }, []);
+  }, [suppressed]);
+
+  // Belt and braces: if a client-side navigation lands on a suppressed route
+  // while the card is already on screen, take it down immediately rather than
+  // waiting for the auto-dismiss timer.
+  useEffect(() => {
+    if (suppressed) setVisible(false);
+  }, [suppressed]);
 
   const dismiss = () => {
     setVisible(false);
@@ -109,8 +134,11 @@ export default function PilotPopup() {
             </div>
           </div>
 
+          {/* Absolute "/#pricing", not a bare "#pricing". Only the homepage and
+              the ICP pages contain that id, so on any other route the bare
+              fragment scrolled nowhere and the button silently did nothing. */}
           <a
-            href="#pricing"
+            href="/#pricing"
             onClick={onClickCta}
             data-cursor-hover
             className="ep-pilot-cta"
