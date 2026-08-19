@@ -493,14 +493,13 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             position: sticky;
             top: 120px;
             align-self: start;
-            /* A long post can have more headings than fit one screen, so the
-               index scrolls internally rather than being clipped. */
-            max-height: calc(100vh - 150px);
-            overflow-y: auto;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
           }
-          .blog-post-sidebar::-webkit-scrollbar { display: none; }
+          /* No max-height and no overflow here on purpose. An earlier version
+             capped the height and scrolled the index internally, which meant
+             the sidebar had its own scrollbar and its own scroll position
+             fighting the page's. The whole index is shown at once and simply
+             rides along with the page, which is how the MagicBnB sidebar this
+             was modelled on behaves. */
 
           .blog-post-meta {
             display: flex;
