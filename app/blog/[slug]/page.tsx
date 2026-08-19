@@ -280,7 +280,12 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                 one of the strongest E-E-A-T / AI-citation trust signals. */}
             {(() => {
               const isFounder = authorName === 'Lakshya Soni';
-              const avatarSrc = isFounder ? '/founder.jpg' : '/logo.png';
+              // founder-avatar.jpg, not founder.jpg. The byline renders a ~44px
+              // circle, so the 150x150 avatar crop is the right source here and
+              // saves shipping a 789KB 1487x1594 portrait to every reader.
+              // /about keeps the full-resolution founder.jpg for its 420x520
+              // portrait, which this crop is far too small to serve.
+              const avatarSrc = isFounder ? '/founder-avatar.jpg' : '/logo.png';
               return (
                 <div
                   style={{

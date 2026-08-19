@@ -147,7 +147,7 @@ export default function Testimonials() {
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/founder.jpg"
+              src="/founder-avatar.jpg"
               alt="Lakshya Soni, founder of EchoPulse"
               loading="lazy"
               decoding="async"
