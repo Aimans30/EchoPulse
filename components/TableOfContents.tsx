@@ -224,17 +224,14 @@ export default function TableOfContents({
       </div>
 
       <style>{`
-        .blog-toc {
-          position: sticky;
-          top: 120px;
-          align-self: start;
-          max-height: calc(100vh - 160px);
-          overflow-y: auto;
-          /* Scrollable but no visible scrollbar — Firefox, IE, then WebKit */
-          scrollbar-width: none;
-          -ms-overflow-style: none;
-        }
-        .blog-toc::-webkit-scrollbar { display: none; }
+        /* Stickiness and the internal scroll now live on .blog-post-sidebar,
+           the parent grid item, in app/blog/[slug]/page.tsx. They were here
+           originally but could never work from this position: the aside above
+           is a grid child under align-items: start, so it hugged its content
+           and left this element no distance to travel inside it. Two competing
+           sticky contexts and two max-heights is also just harder to reason
+           about, so this element is now a plain block and the parent owns the
+           behaviour. */
         .blog-toc-inner {
           background: rgba(255,255,255,0.5);
           border: 1px solid rgba(12,12,11,0.07);

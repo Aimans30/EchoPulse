@@ -473,6 +473,30 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           }
           .blog-post-article { max-width: 760px; min-width: 0; }
 
+          /* The sticky sidebar.
+             This has to live on .blog-post-sidebar, the direct grid child, not
+             on the .blog-toc nav inside it. A sticky element can only travel
+             within its containing block, and because this grid sets
+             align-items: start, the aside collapsed to exactly its content
+             height. The nav inside was therefore already flush against the
+             bottom of its container and had nowhere to move, so it read as a
+             plain static box no matter that it declared position: sticky.
+             Moving the stickiness one level up makes the containing block the
+             full-height grid area instead, which is the travel room it needs.
+             top matches the fixed nav height so it parks just below it. */
+          .blog-post-sidebar {
+            position: sticky;
+            top: 120px;
+            align-self: start;
+            /* A long post can have more headings than fit one screen, so the
+               index scrolls internally rather than being clipped. */
+            max-height: calc(100vh - 150px);
+            overflow-y: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+          }
+          .blog-post-sidebar::-webkit-scrollbar { display: none; }
+
           .blog-post-meta {
             display: flex;
             gap: 12px;
