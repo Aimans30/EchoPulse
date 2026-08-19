@@ -4,195 +4,259 @@ import { trackPilotClick, trackCallClick } from '@/lib/analytics';
 import { useGeoPrice } from '@/lib/useGeoPrice';
 
 /**
- * Blog post footer CTA — replaces the old static card.
+ * Closing CTA band on a blog post.
  *
- * The old version: one vague headline ("Want your content to sound like
- * this?"), one soft hedge line ("before you commit to anything monthly"),
- * one button. No price anchor, no concrete deliverables, no secondary path
- * for someone not ready to spend $299 yet. Every lever direct-response copy
- * actually uses was sitting unused.
+ * Placement: rendered by app/blog/[slug]/page.tsx OUTSIDE the two-column grid,
+ * after Related Articles, at the full 1180px content width. It used to sit
+ * inside <article>, which is capped at 760px, so a wide dark card was wedged
+ * into the prose column and read as cramped. This mirrors the MagicBnB blog,
+ * where the closing CTA is a full-width band and Related Articles comes first.
  *
- * This version applies the same two patterns already proven elsewhere in the
- * codebase rather than inventing new claims:
- *   - Price anchoring: the $599 struck-through original next to $299, same
- *     numbers Pricing.tsx and the Offer schema already use.
- *   - Primary/secondary CTA split: one loud action plus one quiet
- *     low-friction one, the same pairing MobileStickyCTA uses.
- * The three deliverable lines are trimmed straight from
- * Pricing.tsx's DEFAULT_PILOT_FEATURES, not new copy, so nothing here is a
- * claim that isn't already live and sourced somewhere else on the site.
+ * The old background was a single unsized radial gradient anchored off the
+ * card's top-right corner. Because the card clips its own overflow, the soft
+ * edge of that circle landed inside the visible area and drew a faint diagonal
+ * seam across the panel. Fixed by using a linear base plus a radial that is
+ * fully contained, so there is no visible terminator.
  *
- * The primary action books a call. It briefly routed to /order instead, which
- * let a reader reach the self-serve card-entry checkout cold from an article.
- * That is far too large a first ask for search traffic that is still
- * researching, so blog readers are pointed at a conversation on the main site
- * and the purchase flow stays behind it.
+ * Every claim below already exists elsewhere on the site:
+ *   - $299 / $599 come from lib/useGeoPrice.ts, the same pair Pricing.tsx and
+ *     the Offer schema render.
+ *   - The deliverable lines are trimmed from Pricing.tsx DEFAULT_PILOT_FEATURES.
+ *   - "Revisions until you are satisfied" and the 48-hour turnaround are the
+ *     standing terms on every service page.
+ * Nothing here is a new promise invented for the sake of the pitch.
  */
 export default function BlogFooterCTA({ category }: { category?: string }) {
   const { currency, prices } = useGeoPrice();
 
+  const REASONS = [
+    'A 30-day content plan built around your business, yours to keep either way',
+    '8 short-form videos and 5 long-form SEO blogs, written, edited, delivered',
+    'Revisions until you would post it under your own name',
+    'No contract, no retainer, no auto-renew. It ends on day 14 unless you say otherwise.',
+  ];
+
   return (
     <div
-      className="blog-footer-cta"
+      className="blog-cta"
       data-dark-bg="true"
-      style={{
-        marginTop: '72px',
-        borderRadius: '20px',
-        background: '#0C0C0B',
-        color: '#F2EEE7',
-        position: 'relative',
-        overflow: 'hidden',
-        padding: '40px 36px',
-      }}
     >
-      {/* Single warm highlight, contained by the card's own overflow:hidden —
-          the pattern CTABanner already uses. A second nested glow is what
-          caused the earlier clipping bug, so this stays the only one. */}
-      <div
-        aria-hidden="true"
-        style={{
-          position: 'absolute',
-          top: '-30%',
-          right: '-15%',
-          width: '60%',
-          height: '160%',
-          background: 'radial-gradient(circle, rgba(232,84,26,0.24) 0%, rgba(232,84,26,0) 70%)',
-          pointerEvents: 'none',
-        }}
-      />
+      <div className="blog-cta-inner">
+        <span className="blog-cta-chip">
+          <span className="blog-cta-chip-dot" aria-hidden="true" />
+          {category ? `${category} · 14-day Pilot` : '14-day Pilot'}
+        </span>
 
-      <div style={{ position: 'relative', maxWidth: '480px', margin: '0 auto', textAlign: 'center' }}>
-        {/* Eyebrow chip — ties back to the post's own category when there is
-            one, same orange-pill language as the cover art. */}
-        <div
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '6px',
-            background: 'rgba(232,84,26,0.14)',
-            border: '1px solid rgba(232,84,26,0.35)',
-            color: '#F0763F',
-            fontSize: '11px',
-            fontWeight: 700,
-            letterSpacing: '1.2px',
-            textTransform: 'uppercase',
-            padding: '6px 14px',
-            borderRadius: '100px',
-            marginBottom: '18px',
-          }}
-        >
-          {category ? `${category} · 14-Day Pilot` : '14-Day Pilot'}
-        </div>
+        <h2 className="blog-cta-head">
+          Stop reading about content.
+          <br />
+          <span className="blog-cta-head-accent">Go and look at yours.</span>
+        </h2>
 
-        <div
-          style={{
-            fontFamily: 'Inter, sans-serif',
-            fontSize: '26px',
-            fontWeight: 800,
-            letterSpacing: '-0.6px',
-            lineHeight: 1.15,
-            marginBottom: '10px',
-          }}
-        >
-          See your brand producing content like this.
-        </div>
-        <p style={{ color: 'rgba(242,238,231,0.65)', margin: '0 0 24px', fontSize: '15px', lineHeight: 1.6 }}>
-          Book a call and we will map out what your content should look like. If the
-          14-day Pilot fits, it puts real finished work in your hands, not a sales deck.
+        <p className="blog-cta-sub">
+          Most agencies ask you to sign a six-month retainer based on a slide deck.
+          We would rather just do the work first and let you judge it. That is the
+          entire idea behind the Pilot.
         </p>
 
-        {/* Deliverables — trimmed from Pricing.tsx's DEFAULT_PILOT_FEATURES,
-            not new copy. Concrete beats vague: this is what actually lands
-            the click, more than the headline does. */}
-        <ul
-          style={{
-            listStyle: 'none',
-            padding: 0,
-            margin: '0 0 26px',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '9px',
-            textAlign: 'left',
-          }}
-        >
-          {[
-            '8 short-form videos + 5 long-form SEO blogs, written and edited',
-            'A 30-day content plan built around your brand',
-            'No retainer. See the work before you commit to anything monthly.',
-          ].map((line) => (
-            <li key={line} style={{ display: 'flex', gap: '10px', fontSize: '14px', color: 'rgba(242,238,231,0.85)', lineHeight: 1.5 }}>
-              <span style={{ color: '#E8541A', fontWeight: 800, flexShrink: 0 }}>✓</span>
-              {line}
+        <ul className="blog-cta-list">
+          {REASONS.map((line) => (
+            <li key={line}>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M5 12.5l4.5 4.5L19 7.5" stroke="#E8541A" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              <span>{line}</span>
             </li>
           ))}
         </ul>
 
-        {/* Price anchor — same $599 → $299 pair Pricing.tsx and the Offer
-            schema already show. Loss aversion works, but only because this
-            is the site's one real price, not a made-up "discount". */}
-        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: '10px', marginBottom: '22px' }}>
-          <span style={{ fontSize: '34px', fontWeight: 900, letterSpacing: '-1px', color: '#F2EEE7' }}>
-            {currency}{prices.pilot}
-          </span>
-          <span style={{ fontSize: '17px', color: 'rgba(242,238,231,0.4)', textDecoration: 'line-through' }}>
-            {currency}{prices.pilotOriginal}
-          </span>
-          <span style={{ fontSize: '13px', color: 'rgba(242,238,231,0.5)' }}>one-time</span>
+        <div className="blog-cta-price">
+          <span className="blog-cta-price-now">{currency}{prices.pilot}</span>
+          <span className="blog-cta-price-was">{currency}{prices.pilotOriginal}</span>
+          <span className="blog-cta-price-note">one time, not a subscription</span>
         </div>
 
         <button
           type="button"
           onClick={() => {
-            // Books a call. This used to send the reader straight into /order
-            // checkout, which was wrong for this audience: someone who arrived
-            // on an article from search is researching, not buying, and a
-            // card-entry page is far too big a first ask. Blog traffic goes to
-            // a conversation instead, which is also what stops people reaching
-            // the self-serve purchase flow cold from an article.
             trackCallClick('blog_footer');
             (window as unknown as { openBookCallModal?: () => void }).openBookCallModal?.();
           }}
           data-cursor-hover
-          style={{
-            display: 'inline-block',
-            background: '#E8541A',
-            color: '#fff',
-            padding: '15px 32px',
-            borderRadius: '100px',
-            fontWeight: 700,
-            fontSize: '14.5px',
-            border: 'none',
-            cursor: 'pointer',
-            boxShadow: '0 10px 28px rgba(232,84,26,0.28)',
-          }}
+          className="blog-cta-btn"
         >
-          Book a free strategy call →
+          Book a free strategy call
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" aria-hidden="true">
+            <path d="M5 12h14M12 5l7 7-7 7" />
+          </svg>
         </button>
 
-        {/* Secondary is a plain link to the pricing section on the main site,
-            not a second button doing the same thing. Both used to open the
-            booking modal, which made the pair pointless. This gives the reader
-            who is not ready to talk somewhere useful to go, and it routes blog
-            traffic onto the main site rather than into checkout. */}
-        <div style={{ marginTop: '14px' }}>
-          <a
-            href="/#pricing"
-            onClick={() => trackPilotClick('blog_footer_pricing')}
-            data-cursor-hover
-            style={{
-              color: 'rgba(242,238,231,0.55)',
-              fontSize: '13px',
-              fontWeight: 500,
-              textDecoration: 'underline',
-              textUnderlineOffset: '3px',
-              padding: '6px',
-              display: 'inline-block',
-            }}
-          >
-            Or see what everything costs
-          </a>
-        </div>
+        <p className="blog-cta-reassure">
+          Free, 30 minutes, and you will get the plan whether or not you hire us.
+        </p>
+
+        <a
+          href="/#pricing"
+          onClick={() => trackPilotClick('blog_footer_pricing')}
+          data-cursor-hover
+          className="blog-cta-alt"
+        >
+          Or see what everything costs
+        </a>
       </div>
+
+      <style>{`
+        .blog-cta {
+          position: relative;
+          overflow: hidden;
+          border-radius: 24px;
+          background:
+            radial-gradient(120% 120% at 88% 8%, rgba(232,84,26,0.30) 0%, rgba(232,84,26,0) 55%),
+            linear-gradient(135deg, #14110F 0%, #0C0C0B 55%, #17110D 100%);
+          color: #F2EEE7;
+          border: 1px solid rgba(232,84,26,0.18);
+          box-shadow: 0 30px 80px -20px rgba(12,12,11,0.45);
+        }
+        .blog-cta-inner {
+          position: relative;
+          max-width: 620px;
+          margin: 0 auto;
+          padding: 56px 40px 48px;
+          text-align: center;
+        }
+        .blog-cta-chip {
+          display: inline-flex;
+          align-items: center;
+          gap: 7px;
+          background: rgba(232,84,26,0.13);
+          border: 1px solid rgba(232,84,26,0.32);
+          color: #F0763F;
+          font-size: 10.5px;
+          font-weight: 800;
+          letter-spacing: 1.4px;
+          text-transform: uppercase;
+          padding: 7px 15px;
+          border-radius: 100px;
+          margin-bottom: 22px;
+        }
+        .blog-cta-chip-dot {
+          width: 5px;
+          height: 5px;
+          border-radius: 50%;
+          background: #E8541A;
+          flex-shrink: 0;
+        }
+        .blog-cta-head {
+          font-family: Inter, sans-serif;
+          font-size: 34px;
+          font-weight: 900;
+          letter-spacing: -1.1px;
+          line-height: 1.1;
+          margin: 0 0 16px;
+          color: #F2EEE7;
+        }
+        .blog-cta-head-accent { color: #E8541A; }
+        .blog-cta-sub {
+          font-size: 15.5px;
+          line-height: 1.65;
+          color: rgba(242,238,231,0.62);
+          margin: 0 auto 28px;
+          max-width: 500px;
+        }
+        .blog-cta-list {
+          list-style: none;
+          padding: 0;
+          margin: 0 auto 30px;
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+          text-align: left;
+          max-width: 460px;
+        }
+        .blog-cta-list li {
+          display: flex;
+          gap: 11px;
+          align-items: flex-start;
+          font-size: 14.5px;
+          line-height: 1.5;
+          color: rgba(242,238,231,0.88);
+        }
+        .blog-cta-list svg { flex-shrink: 0; margin-top: 2px; }
+        .blog-cta-price {
+          display: flex;
+          align-items: baseline;
+          justify-content: center;
+          flex-wrap: wrap;
+          gap: 10px;
+          margin-bottom: 26px;
+        }
+        .blog-cta-price-now {
+          font-size: 40px;
+          font-weight: 900;
+          letter-spacing: -1.4px;
+          color: #F2EEE7;
+          line-height: 1;
+        }
+        .blog-cta-price-was {
+          font-size: 18px;
+          color: rgba(242,238,231,0.35);
+          text-decoration: line-through;
+        }
+        .blog-cta-price-note {
+          font-size: 13px;
+          color: rgba(242,238,231,0.5);
+        }
+        .blog-cta-btn {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 9px;
+          background: #E8541A;
+          color: #fff;
+          padding: 16px 34px;
+          border-radius: 100px;
+          font-family: Inter, sans-serif;
+          font-weight: 700;
+          font-size: 15px;
+          letter-spacing: -0.1px;
+          border: none;
+          cursor: pointer;
+          box-shadow: 0 12px 30px rgba(232,84,26,0.32);
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
+          touch-action: manipulation;
+        }
+        .blog-cta-btn:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 16px 38px rgba(232,84,26,0.42);
+        }
+        .blog-cta-reassure {
+          font-size: 12.5px;
+          color: rgba(242,238,231,0.45);
+          margin: 14px 0 0;
+        }
+        .blog-cta-alt {
+          display: inline-block;
+          margin-top: 16px;
+          font-size: 13px;
+          font-weight: 500;
+          color: rgba(242,238,231,0.5);
+          text-decoration: underline;
+          text-underline-offset: 3px;
+          padding: 6px;
+        }
+        .blog-cta-alt:hover { color: rgba(242,238,231,0.8); }
+
+        @media (max-width: 720px) {
+          .blog-cta { border-radius: 20px; }
+          .blog-cta-inner { padding: 40px 22px 36px; }
+          .blog-cta-head { font-size: 26px; letter-spacing: -0.8px; }
+          .blog-cta-sub { font-size: 14.5px; margin-bottom: 24px; }
+          .blog-cta-list li { font-size: 14px; }
+          .blog-cta-price-now { font-size: 34px; }
+          /* Full-width tap target on phones. */
+          .blog-cta-btn { width: 100%; padding: 16px 22px; }
+        }
+      `}</style>
     </div>
   );
 }

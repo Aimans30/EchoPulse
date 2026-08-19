@@ -414,14 +414,16 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               </p>
             )}
 
-            {/* Footer CTA — topic-aware chip, price-anchored, split into a
-                primary checkout path and a lower-commitment call option.
-                See components/BlogFooterCTA.tsx for why. */}
-            <BlogFooterCTA category={resolveCategory(post)} />
           </article>
         </div>
 
-        {/* Related posts — full content width below the two-column layout */}
+        {/* Order below the article is deliberate: Related Articles first, then
+            the CTA last. The CTA used to sit inside <article>, which is capped
+            at 760px, so a wide dark card was squeezed into the narrow prose
+            column and read as cramped. It now sits outside the two-column grid
+            at the full 1180px content width, and it is the final thing on the
+            page, so a reader who is not ready to talk still has three more
+            articles to fall into first. */}
         {related.length > 0 && (
           <section className="blog-post-related">
             <h2 className="blog-post-related-title">Related Articles</h2>
@@ -432,6 +434,10 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             </div>
           </section>
         )}
+
+        <section className="blog-post-cta-band">
+          <BlogFooterCTA category={resolveCategory(post)} />
+        </section>
 
         <style>{`
           .blog-post-breadcrumb {
@@ -526,6 +532,14 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             margin: 96px auto 0;
             padding: 0 56px;
           }
+          /* The closing CTA band. Same 1180px content width as Related above
+             it, so the two blocks line up rather than the CTA being inset
+             inside the 760px prose column the way it was. */
+          .blog-post-cta-band {
+            max-width: 1180px;
+            margin: 72px auto 0;
+            padding: 0 56px;
+          }
           .blog-post-related-title {
             font-family: Inter, sans-serif;
             font-size: 24px;
@@ -552,17 +566,17 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           }
           @media (max-width: 900px) {
             .blog-post-main { padding-top: 100px !important; }
-            .blog-post-layout, .blog-post-breadcrumb, .blog-post-related { padding: 0 32px !important; }
+            .blog-post-layout, .blog-post-breadcrumb, .blog-post-related, .blog-post-cta-band { padding: 0 32px !important; }
           }
           @media (max-width: 720px) {
             .blog-post-main { padding-top: 84px !important; padding-bottom: 72px !important; }
-            .blog-post-layout, .blog-post-breadcrumb, .blog-post-related { padding: 0 20px !important; }
+            .blog-post-layout, .blog-post-breadcrumb, .blog-post-related, .blog-post-cta-band { padding: 0 20px !important; }
             .blog-post-related { margin-top: 64px !important; }
             .blog-post-related-grid { grid-template-columns: 1fr !important; }
             .blog-post-crumb-current { max-width: 60vw; }
           }
           @media (max-width: 480px) {
-            .blog-post-layout, .blog-post-breadcrumb, .blog-post-related { padding: 0 18px !important; }
+            .blog-post-layout, .blog-post-breadcrumb, .blog-post-related, .blog-post-cta-band { padding: 0 18px !important; }
           }
 
           /* globals.css carries a blanket mobile rule, \`main article {
