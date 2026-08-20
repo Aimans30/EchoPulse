@@ -27,9 +27,18 @@ body {
   background: var(--cream);
   color: var(--black);
   /* clip, not hidden — see the note on the html, body rule further down.
-     `hidden` here would make body a scroll container and break sticky. */
+     `hidden` here would make body a scroll container and break sticky.
+
+     overflow-y is deliberately NOT set. It used to be `auto`, added so that
+     nothing could implicitly hide the page scroll, but `overflow-y: auto` on
+     body makes body a scroll container in its own right, which disables
+     position: sticky for every descendant just as surely as overflow-x:
+     hidden did. Leaving it at the default `visible` means the viewport stays
+     the scroll container and sticky works. The stuck-scroll case that rule was
+     defending against is already handled properly by the MutationObserver in
+     components/SmoothScroll.tsx, which clears any stray inline
+     overflow: hidden off html and body. */
   overflow-x: clip;
-  overflow-y: auto;          /* explicit so nothing can implicitly hide it */
 }
 
 /* Only hide the native cursor once the custom JS cursor has confirmed it's
