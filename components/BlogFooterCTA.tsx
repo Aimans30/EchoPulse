@@ -1,7 +1,10 @@
 'use client';
 
+import { motion } from 'framer-motion';
 import { trackPilotClick, trackCallClick } from '@/lib/analytics';
 import { useGeoPrice } from '@/lib/useGeoPrice';
+import { fadeUp, stagger, DUR, RISE } from '@/lib/motion';
+import { MagneticButton, ShimmerText } from '@/components/ui/Premium';
 
 /**
  * Closing CTA band on a blog post.
@@ -42,54 +45,64 @@ export default function BlogFooterCTA({ category }: { category?: string }) {
       data-dark-bg="true"
     >
       <div className="blog-cta-inner">
-        <span className="blog-cta-chip">
+        {/* Each block reveals on the shared scale rather than all at once.
+            The order (chip, headline, sub, reasons, price, button) is the order
+            a reader's eye takes anyway, so the motion follows attention instead
+            of competing with it. */}
+        <motion.span className="blog-cta-chip" {...fadeUp({ y: RISE.sm, duration: DUR.md })}>
           <span className="blog-cta-chip-dot" aria-hidden="true" />
           {category ? `${category} · 14-day Pilot` : '14-day Pilot'}
-        </span>
+        </motion.span>
 
-        <h2 className="blog-cta-head">
+        <motion.h2 className="blog-cta-head" {...fadeUp({ delay: stagger(1) })}>
           Stop reading about content.
           <br />
-          <span className="blog-cta-head-accent">Go and look at yours.</span>
-        </h2>
+          {/* The one shimmering element on the page. It works because it is
+              rare and because it is the line the whole card turns on. */}
+          <ShimmerText base="rgba(232,84,26,0.55)" highlight="#FF7A45">
+            Go and look at yours.
+          </ShimmerText>
+        </motion.h2>
 
-        <p className="blog-cta-sub">
+        <motion.p className="blog-cta-sub" {...fadeUp({ delay: stagger(2) })}>
           Most agencies ask you to sign a six-month retainer based on a slide deck.
           We would rather just do the work first and let you judge it. That is the
           entire idea behind the Pilot.
-        </p>
+        </motion.p>
 
         <ul className="blog-cta-list">
-          {REASONS.map((line) => (
-            <li key={line}>
+          {REASONS.map((line, i) => (
+            <motion.li key={line} {...fadeUp({ y: RISE.sm, duration: DUR.md, delay: stagger(i + 3) })}>
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                 <path d="M5 12.5l4.5 4.5L19 7.5" stroke="#E8541A" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
               <span>{line}</span>
-            </li>
+            </motion.li>
           ))}
         </ul>
 
-        <div className="blog-cta-price">
+        <motion.div className="blog-cta-price" {...fadeUp({ delay: stagger(7) })}>
           <span className="blog-cta-price-now">{currency}{prices.pilot}</span>
           <span className="blog-cta-price-was">{currency}{prices.pilotOriginal}</span>
           <span className="blog-cta-price-note">one time, not a subscription</span>
-        </div>
+        </motion.div>
 
-        <button
-          type="button"
+        {/* MagneticButton: drifts a few px toward the cursor. Deliberately
+            subtle enough that most people never consciously notice it, which
+            is the point. It reads as the interface being responsive rather
+            than as an effect. No-ops on touch and under prefers-reduced-motion. */}
+        <MagneticButton
           onClick={() => {
             trackCallClick('blog_footer');
             (window as unknown as { openBookCallModal?: () => void }).openBookCallModal?.();
           }}
-          data-cursor-hover
           className="blog-cta-btn"
         >
           Book a free strategy call
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" aria-hidden="true">
             <path d="M5 12h14M12 5l7 7-7 7" />
           </svg>
-        </button>
+        </MagneticButton>
 
         <p className="blog-cta-reassure">
           Free, 30 minutes, and you will get the plan whether or not you hire us.

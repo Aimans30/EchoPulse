@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { useGeoPrice } from '@/lib/useGeoPrice';
 import { BOOK_CALL_URL } from '@/lib/links';
 import { trackPilotClick, trackCallClick } from '@/lib/analytics';
+import { DUR, EASE } from '@/lib/motion';
 
 /**
  * Drive the mobile swipe-carousel dots indicator. When the user swipes the
@@ -429,7 +430,13 @@ export default function Pricing({ pricingCopy }: { pricingCopy?: PricingCopy } =
                       initial={{ scale: 2.55, y: 24 }}
                       whileInView={{ scale: 1, y: 0 }}
                       viewport={{ once: true, margin: '-80px' }}
-                      transition={{ duration: 0.6, delay: 0.55, ease: [0.5, 0, 0.2, 1] }}
+                      // EASE.inOut, not the house EASE.out. This is the one
+                      // legitimate exception: the price is moving between two
+                      // on-screen positions rather than entering the page, and
+                      // an expo-out on a shrink looks like it snaps. The delay
+                      // is choreography (it overlaps the strike-through below)
+                      // so it stays hand-tuned rather than on the delay scale.
+                      transition={{ duration: DUR.lg, delay: 0.55, ease: EASE.inOut }}
                       style={{
                         position: 'absolute',
                         top: 0,
@@ -451,7 +458,11 @@ export default function Pricing({ pricingCopy }: { pricingCopy?: PricingCopy } =
                         initial={{ scaleX: 0 }}
                         whileInView={{ scaleX: 1 }}
                         viewport={{ once: true, margin: '-80px' }}
-                        transition={{ duration: 0.32, delay: 0.30, ease: [0.65, 0, 0.35, 1] }}
+                        // Also EASE.inOut: a line drawing across is on-screen
+                        // movement, same category as the shrink above. Starting
+                        // at 0.30 while the price is still large is what makes
+                        // the two read as one motion instead of two.
+                        transition={{ duration: DUR.sm, delay: 0.30, ease: EASE.inOut }}
                         style={{
                           position: 'absolute',
                           left: 0,

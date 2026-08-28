@@ -8,6 +8,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Link from 'next/link';
 import { type ServiceData, services as ALL_SERVICES } from '@/lib/serviceData';
 import { useGeoPrice } from '@/lib/useGeoPrice';
+import { DUR, EASE } from '@/lib/motion';
 import Nav from './Nav';
 
 // ServiceHeroVisual is 2.4K lines of SVG / animation code per service.
@@ -573,7 +574,7 @@ export default function ServicePageClient({ service }: { service: ServiceData })
       <motion.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ duration: DUR.sm, ease: EASE.out }}
         style={{ background: '#F2EEE7', minHeight: '100vh', position: 'relative' }}
       >
 
