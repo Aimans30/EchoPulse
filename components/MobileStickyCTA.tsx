@@ -18,13 +18,31 @@
  */
 
 import { useEffect, useState, useRef } from 'react';
+import { usePathname } from 'next/navigation';
 import { trackPilotClick, trackCallClick } from '@/lib/analytics';
 import { useGeoPrice } from '@/lib/useGeoPrice';
 
 const SCROLL_TRIGGER_PX = 600;
 const KEYBOARD_HEIGHT_THRESHOLD = 0.75;
 
+/**
+ * Routes this bar must never appear on.
+ *
+ * Same reasoning as components/PilotPopup.tsx: an article reader arrived from
+ * search to read something, and a permanent sales bar pinned over the bottom
+ * of the text is an interruption rather than an offer. It also competes with
+ * the closing CTA the post already ends with (components/BlogFooterCTA.tsx),
+ * which is the right place to make the ask because the reader has finished by
+ * then. On a phone the bar covers a meaningful share of the screen, so on the
+ * one page type where the whole goal is reading, it costs more than it earns.
+ */
+const SUPPRESSED_PREFIXES = ['/blog'];
+
 export default function MobileStickyCTA() {
+  const pathname = usePathname();
+  const suppressed = SUPPRESSED_PREFIXES.some(
+    (p) => pathname === p || pathname?.startsWith(`${p}/`)
+  );
   const [scrolledPast, setScrolledPast] = useState(false);
   const [keyboardOpen, setKeyboardOpen] = useState(false);
   const [scrollingDown, setScrollingDown] = useState(true);
@@ -45,6 +63,10 @@ export default function MobileStickyCTA() {
   }, []);
 
   useEffect(() => {
+    // Bail on suppressed routes too, not just desktop. Without this a blog
+    // post still attaches a scroll listener and runs a rAF tick on every
+    // frame of every scroll for a bar that is never going to render.
+    if (suppressed) return;
     if (!isMobile) return;
     let raf = 0;
     const onScroll = () => {
@@ -67,7 +89,7 @@ export default function MobileStickyCTA() {
       if (raf) cancelAnimationFrame(raf);
       window.removeEventListener('scroll', onScroll);
     };
-  }, [isMobile]);
+  }, [isMobile, suppressed]);
 
   // Detect virtual keyboard so the bar doesn't sit on top of an active input
   useEffect(() => {
@@ -101,6 +123,10 @@ export default function MobileStickyCTA() {
     return () => ro.disconnect();
   }, [isMobile]);
 
+  // Returned before the bar renders AND before the body-padding <style> below
+  // is emitted, so a blog post gets neither the bar nor the reserved gap at the
+  // bottom of the page that the bar would otherwise need.
+  if (suppressed) return null;
   if (!isMobile) return null;
   const visible = scrolledPast && !keyboardOpen && scrollingDown;
 
