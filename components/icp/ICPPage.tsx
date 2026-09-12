@@ -478,7 +478,17 @@ export default function ICPPage({ data, videos }: { data: IcpData; videos: Video
         .icp-work-placeholder { border: 1px dashed rgba(242,238,231,0.25); border-radius: 18px; padding: 48px 32px; text-align: center; color: rgba(242,238,231,0.6); font-size: 15px; line-height: 1.6; max-width: 720px; margin: 0 auto; }
 
         /* Risk reversal */
-        .icp-risk-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 44px; }
+        /* Six columns, each card spanning two: three across the top row, the
+           remaining two centred underneath. This grid held four cards until a
+           fifth was added (the one naming Lakshya, Shaurya and Aiman, which is
+           the strongest trust signal on the page), and repeat(4, 1fr) left that
+           fifth card alone in a row at a quarter width. repeat(5, 1fr) would fit
+           it but squeezes every card to about 227px. The nth-child rule below is
+           scoped with :nth-last-child(2) so it only fires when there are exactly
+           five cards; add or remove one and the layout falls back cleanly. */
+        .icp-risk-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 16px; margin-top: 44px; }
+        .icp-risk-grid > * { grid-column: span 2; }
+        .icp-risk-grid > *:nth-child(4):nth-last-child(2) { grid-column: 2 / span 2; }
         .icp-risk-card { border: 1px solid rgba(12,12,11,0.10); border-radius: 18px; background: rgba(255,255,255,0.55); padding: 26px 24px; height: 100%; }
         .icp-risk-num { font-family: Inter, sans-serif; font-size: 13px; font-weight: 800; letter-spacing: 1px; }
         .icp-risk-title { font-family: Inter, sans-serif; font-size: 17px; font-weight: 800; letter-spacing: -0.4px; margin: 10px 0 10px; }
@@ -508,6 +518,7 @@ export default function ICPPage({ data, videos }: { data: IcpData; videos: Video
           .icp-hero-visual { max-width: 340px; }
           .icp-svc-grid { grid-template-columns: repeat(2, 1fr); }
           .icp-risk-grid { grid-template-columns: repeat(2, 1fr); }
+          .icp-risk-grid > *, .icp-risk-grid > *:nth-child(4):nth-last-child(2) { grid-column: auto; }
           .icp-stat-grid-4 { grid-template-columns: repeat(2, 1fr); }
           .icp-cmp-row { grid-template-columns: 1fr 1fr; }
           .icp-cmp-feature { grid-column: 1 / -1; border-bottom: 1px solid rgba(12,12,11,0.06); background: rgba(12,12,11,0.02); }

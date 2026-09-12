@@ -251,8 +251,16 @@ export const icps: IcpData[] = [
     starterStack: 'Start with Listing Video + Ad Creatives. Add personal-brand social once the listing flow is humming.',
     faq: [
       { q: 'Do I have to shoot the footage myself?', a: 'Either works. If you have a phone or a drone and a steady hand, shoot it and send us the raw clips, and we will guide you on what to capture. If you would rather not, we direct the shot list so a local videographer (or you) captures exactly what the edit needs. Then we handle the cinematic edit, captions, music, and exports.' },
-      { q: 'How fast do I get a listing reel back?', a: 'Standard turnaround is 48 hours per deliverable. For a hot listing that cannot wait, message us directly and we will confirm whether 24-hour turnaround is possible that week. Rush carries a 30 percent surcharge.' },
-      { q: 'What if a listing goes live on a weekend or needs same-day turnaround?', a: 'Hot listings do not wait for Monday. Message us directly when one needs same-day or weekend attention and we will confirm what is possible before you send the footage. Standard turnaround stays 48 hours per deliverable. Rush carries a 30 percent surcharge and is arranged with us directly rather than through the order page.' },
+      // These were two FAQs asking the same question. One covered turnaround,
+      // the other covered weekends, and both repeated the 48 hours, the rush
+      // path and the 30 percent surcharge. To an agent already suspicious of
+      // marketers, near-identical answers two rows apart read as padding.
+      // Merged into one, which freed a slot for the question he actually had.
+      { q: 'How fast do I get a listing reel back, including on a weekend?', a: 'Standard turnaround is 48 hours per deliverable, and a listing that goes live on a Saturday is part of that conversation rather than excluded from it. When one cannot wait, message us directly and we will confirm whether 24 hours is possible that week before you send the footage. Rush carries a 30 percent surcharge and is arranged with us directly, not through the order page.' },
+      // Every persona who read this page asked what it costs them in hours and
+      // could not find an answer. The founders page has carried this reassurance
+      // for months; an agent working evenings and weekends needs it more.
+      { q: 'How much of my time does this actually take each month?', a: 'Roughly 2 to 3 hours after onboarding. You shoot listing footage on your phone during walkthroughs you are already doing, we send a short shot list so you are not guessing, and the rest is batched approvals. If you would rather not shoot at all, we direct the shoot instead.' },
       { q: 'Can you make ads from the listing videos too?', a: 'Yes. We cut the reel into Meta and Instagram ad variants built to book viewings, with proper aspect ratios, hooks in the first two seconds, and a clear call to action. Ads are a separate line item from the edit.' },
       { q: 'What formats do you deliver for?', a: 'Vertical reels for Instagram, TikTok, and YouTube Shorts; horizontal cuts for YouTube and listing-site embeds; and MLS/portal-ready MP4 exports. One shoot, every format you list on.' },
       { q: 'I tried a videographer once and the turnaround killed me. How is this different?', a: 'That is the exact frustration this is built for. You get a 48-hour standard cycle, a shared folder you drop footage into, revisions until you are satisfied, and one team that knows real estate shot grammar, not a one-off freelancer you have to re-brief every time.' },
@@ -473,7 +481,7 @@ export const icps: IcpData[] = [
     // the sub now names all three models outright.
     metaTitle: 'Content & Funnels for Coaches',
     metaDescription:
-      'Evergreen short-form, ad creative, and a nurture funnel that sells whether you run cohorts, an ongoing program, or a membership. Fill your roster without living in the DMs.',
+      'Evergreen short-form, ad creative, and a nurture funnel that sells for cohorts, ongoing programs and memberships alike. Fill your roster, not your DMs.',
     eyebrow: 'For Coaches & Course Creators',
     heroHeadline: 'Fill your roster',
     heroHeadlineAccent: 'without living in the DMs.',
@@ -485,8 +493,8 @@ export const icps: IcpData[] = [
       headlineAccent: 'barely converts anymore.',
       body: [
         'The money was never in pointing an ad straight at your offer. It is in the warm middle: a lead magnet that earns the email, a nurture sequence that builds trust, then the offer to someone who already wants it. Warm, nurtured audiences convert at multiples of cold traffic hitting a sales page for the first time.',
-        'The problem is that running that machine takes content volume and funnel plumbing most coaches do not have time to build. So the default becomes manual: live launches that drain you, DMs you answer one by one, revenue that swings with how much energy you had that month. You are either heads-down filming or heads-down selling, never both.',
-        'Evergreen content and an automated funnel change the shape of the business. The top of funnel fills without you filming daily, the nurture sequence does the selling while you teach, and a launch becomes opening the cart to a primed list instead of starting from zero. The tooling to run this is cheaper and better than it has ever been. The coaches who set it up now stop trading energy for revenue.',
+        'The problem is that running that machine takes content volume and funnel plumbing most coaches do not have time to build. So the default becomes manual: pushes that drain you, DMs you answer one by one, revenue that swings with how much energy you had that month. You are either heads-down filming or heads-down selling, never both.',
+        'Evergreen content and an automated funnel change the shape of the business. The top of funnel fills without you filming daily, the nurture sequence does the selling while you coach, and signing someone becomes an offer to a primed list instead of starting from zero. The tooling to run this is cheaper and better than it has ever been. The coaches who set it up now stop trading energy for revenue.',
       ],
     },
     // "~2x qualified leads" and "Multiples higher conversion" were removed.
@@ -514,11 +522,17 @@ export const icps: IcpData[] = [
     },
     authority: {
       eyebrow: 'Why your face is the funnel',
-      headline: 'People do not buy courses.',
-      headlineAccent: 'They buy the person teaching.',
+      // Was "People do not buy courses." The page had already been widened at
+      // the headline and the FAQ to cover ongoing programs and memberships,
+      // then told the coach two sections later that this is about courses
+      // after all. A fitness coach running rolling enrolment stopped reading
+      // here. "The program" covers a course, a cohort, a membership and a
+      // one-to-one roster without inventing a word for them.
+      headline: 'People do not buy the program.',
+      headlineAccent: 'They buy the person teaching it.',
       intro: [
-        'Every coach who out-earns you with a worse program is winning on one thing: trust at scale. A student cannot evaluate your curriculum before buying, so they evaluate you: how you explain things, whether your thinking feels worth paying for. Your content is the free sample of your teaching, and it is doing the selling long before your sales page does.',
-        'The trap is that trust-building content takes exactly the energy your teaching already consumes. Launch months mean filming daily while running a cohort. So revenue swings with your energy, and the business never leaves survival mode. The fix is not more effort. It is a machine that keeps teaching-you visible when the real you is off.',
+        'Every coach who out-earns you with a worse program is winning on one thing: trust at scale. A buyer cannot evaluate what you actually teach before paying for it, so they evaluate you: how you explain things, whether your thinking feels worth paying for. Your content is the free sample of your coaching, and it is doing the selling long before your sales page does.',
+        'The trap is that trust-building content takes exactly the energy your coaching already consumes. A full week of clients means filming happens at night or not at all. So revenue swings with your energy, and the business never leaves survival mode. The fix is not more effort. It is a machine that keeps teaching-you visible when the real you is off.',
       ],
       split: {
         left: {
@@ -526,7 +540,7 @@ export const icps: IcpData[] = [
           title: 'Filling the room',
           points: [
             'Evergreen short-form keeps discovery running daily without you filming daily. One workshop becomes weeks of clips.',
-            'A lead magnet converts viewers into an email list you own, so the algorithm stops deciding your launch size.',
+            'A lead magnet converts viewers into an email list you own, so the algorithm stops deciding how many people hear your offer.',
             'Nurture sequences build the trust that a cold sales page cannot, before the cart ever opens.',
           ],
         },
@@ -534,9 +548,9 @@ export const icps: IcpData[] = [
           tag: 'After the sale',
           title: 'Keeping the room',
           points: [
-            'Polished course modules make the program feel worth what they paid, which is what drives referrals and testimonials.',
-            'Consistent content between cohorts keeps alumni engaged, and alumni are your cheapest future enrollments.',
-            'A launch becomes opening the cart to a warm list instead of a sprint from zero every quarter.',
+            'Polished session and module edits make the program feel worth what they paid, which is what drives referrals and testimonials.',
+            'Consistent content keeps past clients engaged, and a past client is your cheapest future one.',
+            'Signing someone becomes an offer to a warm list instead of a sprint from zero every quarter.',
           ],
         },
       },
@@ -544,21 +558,21 @@ export const icps: IcpData[] = [
         'Your energy should go into teaching. Ours goes into making sure a full room is watching when you do.',
     },
     deliverables: [
-      { title: 'Own your audience, not rent it', desc: 'A complete lead-magnet funnel: magnet, opt-in page, and booking or sales page pouring warm leads into the platform you already use. Your launch size stops depending on what the algorithm felt like that week.' },
+      { title: 'Own your audience, not rent it', desc: 'A complete lead-magnet funnel: magnet, opt-in page, and booking or sales page pouring warm leads into the platform you already use. How many people hear your offer stops depending on what the algorithm felt like that week.' },
       { title: 'Stay visible without filming daily', desc: 'One workshop or session becomes weeks of evergreen clips. Discovery keeps running on your worst weeks, which is exactly when it used to stop.' },
-      { title: 'Enroll students while you sleep', desc: 'Email and DM nurture sequences move a lead from curious to committed over a series of touches. The selling happens on autopilot; you find out when they enroll.' },
-      { title: 'Make the course feel worth the price', desc: 'Polished module editing (lecture cuts, chapters, branded intros) for Kajabi, Teachable, Thinkific, or Skool. Production quality is what students screenshot, share, and refer.' },
+      { title: 'Enroll clients while you sleep', desc: 'Email and DM nurture sequences move a lead from curious to committed over a series of touches. The selling happens on autopilot; you find out when they sign up.' },
+      { title: 'Make the program feel worth the price', desc: 'Polished session and module editing (lecture cuts, chapters, branded intros), including Kajabi, Teachable, Thinkific and Skool if you run a course or membership. Production quality is what clients screenshot, share, and refer.' },
       { title: 'Scale cold traffic safely', desc: 'Ad creative that drives strangers into the lead magnet instead of straight at your offer, so paid spend feeds the funnel that converts instead of burning on a cold pitch.' },
     ],
-    transformFrom: 'Every launch is a manual sprint, heads-down filming or heads-down selling, never both, and revenue swings with your energy.',
+    transformFrom: 'Filling the roster is a manual sprint, heads-down filming or heads-down selling, never both, and revenue swings with your energy.',
     transformTo:
-      'Evergreen content fills the funnel, the nurture sequence does the selling, and cohorts fill without you in the DMs.',
+      'Evergreen content fills the funnel, the nurture sequence does the selling, and your roster fills without you in the DMs.',
     services: [
-      { slug: 'websites-funnels',      name: 'Funnels & Lead Pages', why: 'The core. Lead magnet to opt-in to nurture to booking page. This is what turns scattered content into enrolled students.', weight: 'Core' },
+      { slug: 'websites-funnels',      name: 'Funnels & Lead Pages', why: 'The core. Lead magnet to opt-in to nurture to booking page. This is what turns scattered content into signed clients.', weight: 'Core' },
       { slug: 'video-editing',         name: 'Short-Form Video',     why: 'Evergreen clips that fill the top of funnel daily, without you filming daily.',                                       weight: 'High' },
       { slug: 'automations',           name: 'Automations',          why: 'Email nurture and DM flows. Warm audiences convert at multiples of cold, and it runs without you in the loop.',         weight: 'High' },
       { slug: 'ad-creatives',          name: 'Ad Creatives',         why: 'Drive cold traffic into the lead magnet, not straight at the offer.',                                                 weight: 'Medium' },
-      { slug: 'linkedin-ghostwriting', name: 'Social & Authority',   why: 'Authority content and pre-launch warming so cohorts open to a primed audience.',                                       weight: 'Medium' },
+      { slug: 'linkedin-ghostwriting', name: 'Social & Authority',   why: 'Authority content that keeps the audience warm, whether enrolment is rolling or opens on a date.',                     weight: 'Medium' },
       { slug: 'blog-production',       name: 'Blog Production',       why: 'Evergreen organic discovery for coaches who want SEO, not just paid.',                                                 weight: 'Medium' },
     ],
     starterStack: 'Start with Funnel + Automations (nurture) + Short-Form Video. Add Ad Creatives to scale once the funnel converts.',
@@ -585,7 +599,7 @@ export const icps: IcpData[] = [
         '90-min onboarding strategy session + brand brief',
         '8 short-form + 2 static + 1 carousel + 5 clipped content pieces (authority and audience-nurture)',
         '5 long-form SEO blog drafts (problem-aware articles that feed your funnel, optimized for search and AI answer engines)',
-        'Content audit + 30-day launch-content plan',
+        'Content audit + 30-day content plan',
         'Curated to the channels your audience actually uses',
         '48-hour turnaround per deliverable',
         'Revisions until you are satisfied',
@@ -594,25 +608,25 @@ export const icps: IcpData[] = [
       ],
       growth: [
         'Onboarding strategy session + quarterly brand-brief refresh',
-        '20 nurture-and-authority social posts per month that fill cohorts',
-        '4 long-form SEO blogs per month (launch and nurture content, optimized for search and AI answer engines)',
-        '12 short-form edits + 12 clipped content pieces + 2 long-form (course promo, webinar and launch cuts)',
-        '6 ad creatives per month (4 launch and lead-magnet ads + 2 webinar video ads)',
+        '20 nurture-and-authority social posts per month that fill your roster',
+        '4 long-form SEO blogs per month (problem-aware and nurture content, optimized for search and AI answer engines)',
+        '12 short-form edits + 12 clipped content pieces + 2 long-form (program promo, webinar and session cuts)',
+        '6 ad creatives per month (4 lead-magnet and offer ads + 2 webinar video ads)',
         'Conversion-built funnel and site, rebuilt in month one and tuned every month after',
         'Nurture funnel optimization with conversion tracking and A/B testing built in',
-        'Monthly strategy call with a 30-day launch-content calendar mapped ahead',
+        'Monthly strategy call with a 30-day content calendar mapped ahead',
         '48-hour turnaround on every deliverable, as standard',
         'Monthly performance review tied to opt-ins and enrollments',
         '20% off any custom app or software build (course platforms, membership portals, quiz funnels)',
       ],
       full: [
-        'Everything in Growth, scaled for launches',
-        'Long-form editing (full course modules, webinar replays, masterclass cuts)',
+        'Everything in Growth, scaled for a bigger roster',
+        'Long-form editing (course modules, webinar replays, masterclass cuts)',
         'Podcast editing: full episodes + 8 to 12 highlight cuts each',
-        'Course module editing (Kajabi, Teachable, Thinkific, Skool)',
-        'Company process optimization (launch runbooks, nurture workflows, automations)',
+        'Course and membership module editing (Kajabi, Teachable, Thinkific, Skool)',
+        'Company process optimization (enrolment runbooks, nurture workflows, automations)',
         '30 nurture-and-authority social posts + 8 long-form funnel blogs per month',
-        'Full launch-ad engine across Meta, Instagram, TikTok, YouTube',
+        'Full paid-ad engine across Meta, Instagram, TikTok, YouTube',
         'Custom funnel or membership site build each quarter (4 builds/year)',
         'One small custom app build per quarter included (up to $9,997 scope, quiz or course tools) + 30% off larger builds',
         'Automation stack setup (email nurture, DM flows, CRM enrollment sync)',
@@ -751,7 +765,7 @@ export const icps: IcpData[] = [
     // named first.
     metaTitle: 'Inbound Lead Content for Service Businesses',
     metaDescription:
-      'SEO content that ranks, a conversion-built website, and automations that catch every lead. Built for service businesses, local shops and national consultancies alike.',
+      'SEO content that ranks, a conversion-built website, and automations that catch every lead. Built for service businesses, local shops and national firms alike.',
     eyebrow: 'For Local and National Service Businesses',
     heroHeadline: 'Get inbound leads',
     heroHeadlineAccent: 'instead of chasing cold ones.',
@@ -777,7 +791,7 @@ export const icps: IcpData[] = [
       input: { label: 'You answer our questions', detail: 'One 30-minute interview a month' },
       outputs: [
         { label: 'SEO blogs', benefit: 'Ranks for what buyers search', count: '4/mo', kind: 'doc' },
-        { label: 'Social posts', benefit: 'Keeps you top of mind locally', count: '20/mo', kind: 'post' },
+        { label: 'Social posts', benefit: 'Keeps you top of mind with buyers', count: '20/mo', kind: 'post' },
         { label: 'Short-form video', benefit: 'Puts a face to the business', count: '12/mo', kind: 'reel' },
         { label: 'Site and lead capture', benefit: 'Converts the traffic you earn', count: 'Ongoing', kind: 'site' },
       ],
@@ -823,7 +837,12 @@ export const icps: IcpData[] = [
       { title: 'Get found by people ready to buy', desc: 'Researched articles that rank for what your customers actually type into Google. Content-sourced leads close at multiples of cold ones, and every piece keeps working next year.' },
       { title: 'Turn visits into booked work', desc: 'A fast, conversion-built site so the traffic your content earns actually becomes enquiries, instead of bouncing off a slow page that undersells you.' },
       { title: 'Never miss another lead', desc: 'Every form fill, DM, and call gets captured and routed automatically. The lead that used to slip while you were on a job now gets a same-day follow-up.' },
-      { title: 'Be the obvious choice locally', desc: 'Social and credibility content that keeps your name in front of your area, so prospects arrive already trusting you and negotiate like it.' },
+      // The meta tags were de-localised so a national consultancy would not
+      // bounce, but this card and the Social service line below still said
+      // "your area", which put the geography back three sections later. A
+      // reader who judges a vendor on whether its own copy is precise reads
+      // that as evidence, not as an oversight.
+      { title: 'Be the obvious choice in your market', desc: 'Social and credibility content that keeps your name in front of the buyers you want, whether that is one city or a national category, so prospects arrive already trusting you and negotiate like it.' },
       { title: 'Put a face to the business', desc: 'Short-form video of you and your work. People hire people, and the operator they have watched for a month beats the stranger with a nicer logo.' },
     ],
     transformFrom: 'You chase leads with cold outreach and a site that does not convert the few who show up.',
@@ -833,7 +852,7 @@ export const icps: IcpData[] = [
       { slug: 'blog-production',       name: 'Blog Production (SEO)', why: 'The inbound engine. Ranks, compounds, and is the highest-ROI channel for this segment.',          weight: 'Core' },
       { slug: 'websites-funnels',      name: 'Websites & Funnels',    why: 'A fast, conversion-built site that turns the traffic content earns into actual leads.',            weight: 'High' },
       { slug: 'automations',           name: 'Automations',           why: 'Capture and route every inbound lead so nothing slips while you are running the business.',         weight: 'High' },
-      { slug: 'linkedin-ghostwriting', name: 'Social & Credibility',  why: 'Local visibility and the credibility that makes the phone ring with warm prospects.',               weight: 'Medium' },
+      { slug: 'linkedin-ghostwriting', name: 'Social & Credibility',  why: 'Visibility in your market and the credibility that makes the phone ring with warm prospects.',      weight: 'Medium' },
       { slug: 'video-editing',         name: 'Short-Form Video',      why: 'Trust-building short-form to feed social and put a face to the business.',                          weight: 'Medium' },
       { slug: 'ad-creatives',          name: 'Ad Creatives',          why: 'Paid to accelerate once the organic base is proven.',                                              weight: 'Medium' },
     ],
