@@ -10,7 +10,11 @@ import OrderFlow from '@/components/OrderFlow';
 // and the /order/success confirmation page.
 
 export const metadata: Metadata = {
-  title: 'Custom Order',
+  // Was 'Custom Order', which rendered as "Custom Order | EchoPulse Media" and
+  // told a searcher nothing about video, content or editing. Out of context it
+  // read like a generic e-commerce cart page, which is the weakest possible
+  // title on a site whose problem is a 0.24% CTR from US impressions.
+  title: { absolute: 'Order Video Editing and Content, No Retainer | EchoPulse' },
   description:
     'Order a one-off edit from EchoPulse. Reels, long-form YouTube, podcast edits, and content repurposing. No retainer required. Pay only for what you need.',
   alternates: { canonical: '/order' },

@@ -81,6 +81,29 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
     ],
   };
 
+  // Each service page renders 4 real Q&As ("How fast is the turnaround?",
+  // "How many revisions are included?") and emitted no FAQPage schema at all,
+  // so 28 answered buyer questions across the 7 services were invisible to
+  // answer engines. The ICP pages already do this; service pages were missed.
+  //
+  // Safe to declare because ServicePageClient's accordion collapses by height
+  // and never unmounts the answer, so every one of these is in the served HTML.
+  // Schema that claims content the page does not actually contain gets ignored.
+  //
+  // Google retired FAQ rich results in May 2026, so this earns no SERP real
+  // estate. It is here for Bing and for the retrieval crawlers behind the
+  // answer engines, which is where "how much does X cost" questions now get
+  // answered.
+  const faqLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: service.faq.map((f) => ({
+      '@type': 'Question',
+      name: f.q,
+      acceptedAnswer: { '@type': 'Answer', text: f.a },
+    })),
+  };
+
   return (
     <>
       <script
@@ -90,6 +113,10 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }}
       />
       {/* Service pages had no <main> landmark at all, so the skip-to-content
           link in the root layout pointed at nothing and screen readers had no

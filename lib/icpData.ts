@@ -251,7 +251,7 @@ export const icps: IcpData[] = [
     starterStack: 'Start with Listing Video + Ad Creatives. Add personal-brand social once the listing flow is humming.',
     faq: [
       { q: 'Do I have to shoot the footage myself?', a: 'Either works. If you have a phone or a drone and a steady hand, shoot it and send us the raw clips, and we will guide you on what to capture. If you would rather not, we direct the shot list so a local videographer (or you) captures exactly what the edit needs. Then we handle the cinematic edit, captions, music, and exports.' },
-      { q: 'How fast do I get a listing reel back?', a: 'Standard turnaround is 48 hours per deliverable. For a hot listing that needs to go live same-day, rush 24-hour delivery is available at a 30 percent surcharge.' },
+      { q: 'How fast do I get a listing reel back?', a: 'Standard turnaround is 48 hours per deliverable. For a hot listing that cannot wait, message us directly and we will confirm whether 24-hour turnaround is possible that week. Rush carries a 30 percent surcharge.' },
       { q: 'Can you make ads from the listing videos too?', a: 'Yes. We cut the reel into Meta and Instagram ad variants built to book viewings, with proper aspect ratios, hooks in the first two seconds, and a clear call to action. Ads are a separate line item from the edit.' },
       { q: 'What formats do you deliver for?', a: 'Vertical reels for Instagram, TikTok, and YouTube Shorts; horizontal cuts for YouTube and listing-site embeds; and MLS/portal-ready MP4 exports. One shoot, every format you list on.' },
       { q: 'I tried a videographer once and the turnaround killed me. How is this different?', a: 'That is the exact frustration this is built for. You get a 48-hour standard cycle, a shared folder you drop footage into, revisions until you are satisfied, and one team that knows real estate shot grammar, not a one-off freelancer you have to re-brief every time.' },
@@ -411,7 +411,7 @@ export const icps: IcpData[] = [
       { q: 'Will the content actually sound like me, not a generic ghostwriter?', a: 'That is the whole point. We open with a 90-minute Voice Foundation interview to pull your actual words, opinions, and hot takes, then build a brand brief every writer and editor reads before touching a draft. If the first batch does not sound like you, we redo it at no charge.' },
       { q: 'I already work with a freelancer or two. Can you slot in?', a: 'Yes. Plenty of founders start by handing us the channel that is eating the most of their time, usually LinkedIn or video, and expand once they see the work. You do not have to fire anyone to start.' },
       { q: 'How much of my time does this take each month?', a: 'After onboarding, most founders spend 2 to 3 hours a month with us: one strategy call, batched approvals, and sending raw footage for video. The heavy lift is the onboarding interview up front. After that, you approve, we produce.' },
-      { q: 'Do you lock me into a contract?', a: 'No. After the $299 14-day Pilot, plans are month-to-month, cancel with 30 days notice. We would rather earn the next month than trap you in it.' },
+      { q: 'Do you lock me into a contract?', a: 'No. After the $299 14-day Pilot, plans are month-to-month, cancel with 14 days written notice. We would rather earn the next month than trap you in it.' },
     ],
     // Closest to the default. Explicitly founder-voiced: LinkedIn-led personal
     // brand, category-authority SEO blogs, founder talking-head short-form,

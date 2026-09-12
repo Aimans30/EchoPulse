@@ -10,6 +10,7 @@ import TableOfContents from '@/components/TableOfContents';
 import { getPostBySlug, getAllPostSlugs, getRelatedPosts, resolveCategory, resolveAuthor, type BlogPostSummary } from '@/lib/blog';
 import { urlFor } from '@/lib/sanity';
 import { extractHeadings } from '@/lib/toc';
+import { extractFaqPairs, buildFaqPageLd } from '@/lib/faqSchema';
 
 const SITE_URL = 'https://echopulse.media';
 
@@ -54,7 +55,17 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     : post.mainImageUrl || undefined;
 
   return {
-    title: post.title,
+    // `absolute`, not a bare string. The root layout sets
+    // `template: "%s | EchoPulse Media"`, which silently wraps any plain-string
+    // title from a child route. Every one of the ~43 posts was therefore
+    // shipping as "<full post title> | EchoPulse Media" — and these titles are
+    // already written as standalone SEO titles at 60 to 80 characters, so the
+    // suffix pushed them well past Google's truncation point and the tail of
+    // the actual headline was being cut off in the SERP.
+    //
+    // This is the same bug already fixed on /about, /services/* and /[icp];
+    // blog posts were the one route type missed.
+    title: { absolute: post.title },
     description: post.excerpt || `Read "${post.title}" on the EchoPulse blog.`,
     alternates: { canonical: `${SITE_URL}/blog/${slug}` },
     openGraph: {
@@ -183,6 +194,21 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     wordCount: wordCount || undefined,
   };
 
+  // FAQPage schema — only for posts that genuinely have a visible FAQ section.
+  //
+  // Derived from `post.content`, the exact array BlogContent renders below, so
+  // the markup cannot claim a question the reader cannot see. extractFaqPairs
+  // returns [] whenever the post has no FAQ section or the section does not
+  // parse cleanly, and then nothing is emitted; see lib/faqSchema.ts for the
+  // heading rules and the validity gates, and for why a loose "contains the
+  // word questions" test would have fabricated Q&A on several posts.
+  //
+  // This is safe here in a way it was NOT safe in components/FAQ.tsx: that
+  // accordion once unmounted collapsed answers, so the served HTML held one
+  // answer while the schema claimed all eight. Article bodies collapse nothing.
+  const faqPairs = extractFaqPairs(post.content);
+  const faqLd = buildFaqPageLd(faqPairs, `${SITE_URL}/blog/${slug}`);
+
   // Breadcrumb schema — Home → Blog → This Post for rich-snippet eligibility.
   const breadcrumbLd = {
     '@context': 'https://schema.org',
@@ -204,6 +230,12 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
       />
+      {faqLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }}
+        />
+      )}
       <Nav />
       {/* id="main" — target of the layout's skip-to-content link. */}
       <main

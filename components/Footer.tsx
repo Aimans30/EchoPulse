@@ -3,6 +3,7 @@
 import Link from 'next/link';
 
 import { services } from '@/lib/serviceData';
+import { icps } from '@/lib/icpData';
 
 /**
  * Footer service links.
@@ -19,6 +20,24 @@ import { services } from '@/lib/serviceData';
 const serviceLinks = services.map((s) => ({
   label: s.name,
   href: `/services/${s.slug}`,
+}));
+
+/**
+ * Audience pages, derived from icpData the same way services are.
+ *
+ * These 5 pages are marked priority 0.9 in app/sitemap.ts and described there
+ * as "the primary outbound conversion destinations", yet their only inbound
+ * link anywhere on the site was one card grid on the homepage. Not the footer,
+ * not the nav, not one of the 40+ blog posts. Pages built to rank for
+ * "content agency for coaches" were receiving no internal link equity at all.
+ *
+ * The footer renders on the homepage, /about, the blog index and every blog
+ * post, so adding them here gives each ICP page ~45 internal inbound links
+ * where it previously had one.
+ */
+const audienceLinks = icps.map((i) => ({
+  label: i.name,
+  href: `/${i.key}`,
 }));
 
 export default function Footer() {
@@ -139,6 +158,35 @@ export default function Footer() {
             marginBottom: '20px',
           }}
         >
+          Who We Work With
+        </h4>
+        <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          {audienceLinks.map((a) => (
+            <li key={a.href}>
+              <a
+                href={a.href}
+                style={{ color: '#6E6B63', textDecoration: 'none', fontSize: '14px', transition: 'color 0.2s' }}
+                onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.color = '#0C0C0B')}
+                onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.color = '#6E6B63')}
+              >
+                {a.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div>
+        <h4
+          style={{
+            fontSize: '10px',
+            fontWeight: 700,
+            letterSpacing: '3px',
+            textTransform: 'uppercase',
+            color: '#A8A49B',
+            marginBottom: '20px',
+          }}
+        >
           Quick Links
         </h4>
         <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -149,6 +197,12 @@ export default function Footer() {
             // spoken to anyone. /order still exists and is still reachable
             // from the homepage Pilot card and the service pages; it is just
             // no longer promoted on every page of the site.
+            // /about had ZERO inbound links anywhere on the site despite being
+            // the #2 page by impressions and the page the Person schema points
+            // at as the founder's canonical entity page. It was holding
+            // position ~4 purely on Google's crawl memory with nothing
+            // reinforcing it internally.
+            { label: 'About', href: '/about' },
             { label: 'See pricing', href: '/#pricing' },
             { label: 'FAQ', href: '/#faq' },
             { label: 'Blog', href: '/blog' },

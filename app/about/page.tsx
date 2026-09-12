@@ -84,7 +84,12 @@ const FACTS: { label: string; value: string }[] = [
   { label: 'Serves', value: 'Founders, coaches, course creators, business owners, real estate agents' },
   { label: 'Markets', value: 'United States, United Kingdom, Canada, Australia, Western Europe' },
   { label: 'Starts at', value: '$299 for a 14-day paid Pilot, no contract' },
-  { label: 'Commitment', value: 'Month to month after the Pilot, 30 days notice to cancel' },
+  // 14 days, not 30. app/terms/page.tsx section 3 is the binding document and
+  // states "fourteen (14) calendar days written notice"; public/llms.txt also
+  // already said 14. Three marketing pages had drifted to 30, which both
+  // contradicted the Terms and understated the offer, since a shorter notice
+  // period is the better deal for the client.
+  { label: 'Commitment', value: 'Month to month after the Pilot, 14 days notice to cancel' },
 ];
 
 export default function AboutPage() {
@@ -282,7 +287,11 @@ export default function AboutPage() {
           That is what the Pilot is for. Fourteen days, $299, real deliverables on your
           brand, and you keep everything whether you continue or not.
         </p>
-        <Link href="/order" className="about-cta-btn">
+        {/* Was href="/order". That page is the a-la-carte editing menu and has
+            no Pilot in it, so "Start the Pilot" landed the reader in a
+            different product at different prices. Points at the pricing
+            section, where the Pilot actually is. */}
+        <Link href="/#pricing" className="about-cta-btn">
           Start the Pilot
         </Link>
         <p className="about-cta-alt">

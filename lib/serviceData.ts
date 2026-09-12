@@ -67,7 +67,7 @@ export const services: ServiceData[] = [
       role: 'Production benchmarks',
       stat: '48 hr',
       statLabel: 'standard turnaround',
-      body: 'Our team learned property reels at Vizionary Focus, a Canadian production studio, before going independent. Standard production cycle is 48 hours per individual deliverable, with revisions until you are satisfied. Rush 24-hour delivery available at a 30 percent surcharge.',
+      body: 'Our team learned property reels at Vizionary Focus, a Canadian production studio, before going independent. Standard production cycle is 48 hours per individual deliverable, with revisions until you are satisfied. Rush 24-hour delivery can be arranged directly with us at a 30 percent surcharge when a date genuinely depends on it.',
     },
     testimonial: {
       quote: 'We are a young studio. Our first client testimonials are still in production. What we will not do is fabricate them. We will let you talk to a real client once we have one to introduce you to.',
@@ -75,7 +75,7 @@ export const services: ServiceData[] = [
       role: 'Founder, EchoPulse',
     },
     faq: [
-      { q: 'How fast is the turnaround?', a: 'Standard 48 hours per video deliverable. Rush 24-hour delivery is available at a 30 percent surcharge for time-sensitive launches and listing campaigns.' },
+      { q: 'How fast is the turnaround?', a: 'Standard is 48 hours per video deliverable. If something is genuinely time-sensitive, a launch date or a listing going live, ask on the call or in the shared folder and we will tell you honestly whether we can hit 24 hours that week. Rush carries a 30 percent surcharge and is arranged directly with us rather than through the self-serve order page.' },
       { q: 'How do I send footage?', a: 'We set up a shared Google Drive or Dropbox folder for each client. Upload your raw footage with a brief. We handle the rest.' },
       { q: 'Do you edit for all platforms?', a: 'Yes. Reels, TikTok, YouTube Shorts, YouTube long-form, LinkedIn video, podcast video, and listing-site MP4 exports are all standard.' },
       { q: 'How many revisions are included?', a: 'Unlimited revisions until you are satisfied. We do not cap rounds and we do not invoice per hour for changes within scope. If it takes one round or five, we keep refining until you say it is right.' },
@@ -225,7 +225,7 @@ export const services: ServiceData[] = [
       { q: 'What platforms do you produce ads for?', a: 'Meta (Facebook + Instagram), TikTok, Google Display, LinkedIn, and Pinterest. Each ad is exported in the right specs and aspect ratios for the target platform.' },
       { q: 'Do I need to send you raw footage?', a: 'For video ads, yes. Though we can also use stock footage or existing UGC if you have it. For static and motion graphic ads, we work from your existing brand assets.' },
       { q: 'How many revisions per creative?', a: 'Unlimited revisions until you are satisfied. No round caps, no per-hour invoicing. We would rather rework than ship work we are not proud of.' },
-      { q: 'Can I cancel anytime?', a: 'Yes. Month to month, 30 days notice. We retain you on output, not a contract.' },
+      { q: 'Can I cancel anytime?', a: 'Yes. Month to month, 14 days written notice. We retain you on output, not a contract.' },
     ],
   },
   {
@@ -328,7 +328,7 @@ export const services: ServiceData[] = [
     faq: [
       { q: 'Which platforms do you build on?', a: 'Make.com, ManyChat, GoHighLevel, ActiveCampaign, HubSpot, Zapier, Airtable, and your CRM of choice. We work with your existing stack wherever possible.' },
       { q: 'How long does setup take?', a: 'Most full automation stacks are live in 10 to 14 business days. Complex multi-platform builds with custom integrations may extend to 21 days.' },
-      { q: 'Do I need a large audience?', a: 'No. Automation works at any audience size. We have built profitable systems for clients with under 1,000 followers. The system itself is what makes the audience profitable.' },
+      { q: 'Do I need a large audience?', a: 'No. Automation works at any audience size, and a small engaged list converts better than a large cold one. What matters is that every inbound message gets answered and every interested person gets followed up, which is exactly what the system handles. The size of the audience is what you grow next, not a prerequisite for the system to pay for itself.' },
       { q: 'Will the messages sound robotic?', a: 'Not if they are written properly. Every message is written against your brand brief, not pulled from a default template, and we run test conversations end to end before anything goes live so you can read exactly what your audience will receive.' },
     ],
   },
@@ -347,7 +347,7 @@ export const services: ServiceData[] = [
       'Your team losing 10+ hours a week glueing Zapier, Sheets, and email chains together',
       'Paying $500 to $2,000 a month in SaaS subscriptions for tools that still do not fit',
       'A client portal that is a Notion page held together with sharing permissions',
-      'Quoted $80K to $200K by dev agencies for the build, scoped over 6 months',
+      'Quoted six figures by a dev agency for the build, scoped over six months',
     ],
     solutionHeadline: 'Better experience for your customers. Better control for your team. Built around your actual business.',
     solutionBody: 'We design and ship the websites, apps, and AI tools your business needs, engineered for the two outcomes that move the needle: a buying experience your customers remember, and an operating system your team actually wants to work inside. Your website converts because it was built around YOUR buyer journey, not a Webflow template. Your client portal makes customers feel premium because it was built around YOUR offer. Your internal dashboard saves the team 10 hours a week because it was built around YOUR workflow. Fixed price, fixed timeline, full code handover on launch day. Hosting your call, no vendor lock-in, no monthly rent.',
@@ -370,7 +370,7 @@ export const services: ServiceData[] = [
       role: 'Built by operators, priced like a fair trade',
       stat: '$4,997+',
       statLabel: 'fixed price, code yours on launch',
-      body: 'You get three founders who have shipped websites, software, and AI tools in production. Not a 20-person agency layering project managers, account directors, and strategists on top of every billable hour. Lakshya leads the build. Shaurya and Aiman lead design and delivery. Small team, real engineering experience, fast cycles, zero middle layers. Three transparent tiers. STARTER ($4,997 to $9,997, 2 to 3 weeks): landing page with motion, client portal, internal dashboard, or 3D hero. GROWTH ($9,997 to $19,997, 3 to 5 weeks): immersive 3D brand site, course platform, custom CRM, AI agents. FULL BUILD ($19,997 to $49,997, 4 to 8 weeks): SaaS MVP with auth and payments, marketplace, multi-user product. Every tier includes hosting, full code transfer, documentation, training, and 14 days of free post-launch fixes. Growth retainer clients get 20% off. Full System retainer clients get one small build per quarter included plus 30% off bigger builds. Compare to traditional dev agencies quoting $80K to $200K for the same scope over 6 months with the code locked behind a contract.',
+      body: 'You get three founders who have shipped websites, software, and AI tools in production. Not a 20-person agency layering project managers, account directors, and strategists on top of every billable hour. Lakshya leads the build. Shaurya and Aiman lead design and delivery. Small team, real engineering experience, fast cycles, zero middle layers. Three transparent tiers. STARTER ($4,997 to $9,997, 2 to 3 weeks): landing page with motion, client portal, internal dashboard, or 3D hero. GROWTH ($9,997 to $19,997, 3 to 5 weeks): immersive 3D brand site, course platform, custom CRM, AI agents. FULL BUILD ($19,997 to $49,997, 4 to 8 weeks): SaaS MVP with auth and payments, marketplace, multi-user product. Every tier includes hosting, full code transfer, documentation, training, and 14 days of free post-launch fixes. Growth retainer clients get 20% off. Full System retainer clients get one small build per quarter included plus 30% off bigger builds. Get a quote from a traditional dev agency for the same scope and compare the number, the timeline, and crucially who owns the code at the end of it.',
     },
     testimonial: {
       quote: 'A business is only as good as the experience it gives customers and the system its team works in. We build both. Designed around how your business actually operates, not bent to fit a template. That is what software should have always been.',
@@ -379,7 +379,7 @@ export const services: ServiceData[] = [
     },
     faq: [
       { q: 'How is a custom website actually going to help my business?', a: 'A custom site is engineered around your buyer journey, not a template. That changes three numbers: visitors stay longer (because the page feels designed for them, not for everyone), more of them book or buy (because the call-to-action flow is built around your specific offer, not a generic block), and your brand becomes memorable (because nobody else has it). For most clients the first month of extra conversions covers a chunk of the build cost. Past that, it keeps paying you back.' },
-      { q: 'Will a custom client portal really save me money on SaaS?', a: 'Yes. Most clients we build for were paying somewhere between $300 and $2,000 a month across Kajabi, Bonsai, HubSpot, ClickFunnels, Calendly, Notion premium, and Drive seats. A custom portal that wraps onboarding, billing, deliverables, and support in one branded experience replaces 3 to 5 of those tools. The math: at $1,000/month in SaaS, a $9,997 portal pays for itself in 10 months, and you own it forever after that.' },
+      { q: 'Will a custom client portal really save me money on SaaS?', a: 'Often, yes, and the arithmetic is easy to check against your own invoices. Add up what you currently pay across Kajabi, Bonsai, HubSpot, ClickFunnels, Calendly, Notion premium and Drive seats. A custom portal that wraps onboarding, billing, deliverables and support into one branded experience typically replaces 3 to 5 of those. If that total is around $1,000 a month, a $9,997 portal pays for itself in roughly 10 months and you own it outright after that. If your stack is only costing $200 a month, it does not, and we will tell you so on the call rather than sell you a build.' },
       { q: 'I am not technical. Can I still work with you?', a: 'Yes. You do not need to know how it works. You only need to know what you want customers to experience and how you want your team to work. We translate the rest into code. Most of our clients are coaches, business owners, agency founders, and creators, not engineers. We speak business outcome, not jargon.' },
       { q: 'Why not just use Webflow or Wix?', a: 'Cheaper this month, way more expensive over two years. You will pay $1,500 to $5,000 in subscription fees, look identical to every competitor using the same template, and lose all leverage when the platform changes pricing or features. A custom build is a one-time cost that becomes a real business asset on your balance sheet. You own it, you control it, you can extend it whenever you want.' },
       { q: 'What does an immersive 3D website actually do for conversions?', a: 'Static sites have one job: communicate. 3D and motion sites do a second job: make the brand stick. As the visitor scrolls, products spin, scenes shift, the page tells a story. The honest answer on numbers is that it depends on your offer and traffic, and we would rather tell you that than quote you a multiple we cannot stand behind. It is worth the investment when the price point is high enough that being memorable changes the decision: high-ticket coaching, premium DTC, courses above $500 ACV, and agencies who need to look like an actual studio.' },

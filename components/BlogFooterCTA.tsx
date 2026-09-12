@@ -81,9 +81,12 @@ export default function BlogFooterCTA({ category }: { category?: string }) {
           ))}
         </ul>
 
+        {/* The struck-through pilotOriginal was removed here for the same
+            reason it was removed from Pricing.tsx: it is a static value shown
+            to every visitor forever, so presenting it as a former price was
+            not true. $299 stands on its own. */}
         <motion.div className="blog-cta-price" {...fadeUp({ delay: stagger(7) })}>
           <span className="blog-cta-price-now">{currency}{prices.pilot}</span>
-          <span className="blog-cta-price-was">{currency}{prices.pilotOriginal}</span>
           <span className="blog-cta-price-note">one time, not a subscription</span>
         </motion.div>
 

@@ -116,7 +116,24 @@ export default function Pricing({ pricingCopy }: { pricingCopy?: PricingCopy } =
     {
       tier: 'Pilot',
       price: `${currency}${prices.pilot}`,
-      originalPrice: `${currency}${prices.pilotOriginal}`,
+      // `originalPrice` REMOVED deliberately. It rendered a struck-through
+      // $599 next to $299, a "Save 50%" pill, and "For a limited time only"
+      // with a pulsing dot. None of that was true: pilotOriginal is a static
+      // value in lib/useGeoPrice.ts shown to every visitor on every visit
+      // forever, so the "limited time" was permanent and the "discount" was
+      // an anchor, not a former price.
+      //
+      // That matters more here than on a normal site. This studio's entire
+      // trust position is that it refuses to fabricate: it has no client
+      // testimonials and says so in writing rather than inventing them, and
+      // a fabricated "+428% reply rate" stat was already stripped out of the
+      // LinkedIn service hero for the same reason. A permanent fake sale sat
+      // directly above that honesty and undercut all of it. The audience here
+      // is founders and agency owners who recognise the device instantly.
+      //
+      // $299 is a strong entry price on its own and does not need propping up.
+      // Removing the field makes the price block fall through to the plain
+      // branch below, which drops all three elements at once.
       per: 'one-off / 2 weeks',
       badge: `Try us out · ${currency}${prices.pilot}`,
       tagline: 'See real work in 14 days before you sign anything.',
@@ -129,8 +146,13 @@ export default function Pricing({ pricingCopy }: { pricingCopy?: PricingCopy } =
       tier: 'Growth',
       price: `${currency}${prices.growth}`,
       per: '/month',
-      badge: 'Monthly · Most Popular',
-      tagline: 'The retainer most clients pick. One team, every channel, every month.',
+      // Was "Most Popular" / "The retainer most clients pick". Both assert
+      // purchase-popularity data a studio with no published client roster
+      // cannot evidence, and both sat on the same site that says in writing it
+      // will not fabricate testimonials. Replaced with a claim about scope,
+      // which is verifiable from the feature list directly underneath it.
+      badge: 'Monthly · Full coverage',
+      tagline: 'Every channel handled by one team, every month.',
       features: pricingCopy?.growth ?? DEFAULT_GROWTH_FEATURES,
       cta: 'Book a Call',
       featured: false,
@@ -198,10 +220,15 @@ export default function Pricing({ pricingCopy }: { pricingCopy?: PricingCopy } =
             transition={{ delay: 0.2 }}
             style={{ color: '#6E6B63', fontSize: '14px', maxWidth: '620px', lineHeight: 1.6, margin: '0 0 16px' }}
           >
+            {/* Dropped "why we ship sharper than agencies twice our size".
+                That is an unfalsifiable comparative against unnamed competitors
+                and it leaned on a track record this studio has not published.
+                What replaces it is the same three commitments, stated as terms
+                the reader can hold us to rather than as a boast. */}
             Owner-operated, with senior eyes on every deliverable.{' '}
-            <strong style={{ color: '#0C0C0B', fontWeight: 700 }}>3-hour replies, re-dos until it&apos;s right, and no surprise invoices</strong>
-            {' '}are why we ship sharper than agencies twice our size,
-            and at a fraction of the retainer.
+            <strong style={{ color: '#0C0C0B', fontWeight: 700 }}>3-hour replies during work hours, re-dos until it&apos;s right, and no surprise invoices</strong>
+            {' '}are the terms, not the sales pitch. You are buying output,
+            not a seat in someone&apos;s account-management queue.
           </motion.p>
 
           {/* Region indicator */}
@@ -283,14 +310,20 @@ export default function Pricing({ pricingCopy }: { pricingCopy?: PricingCopy } =
                     className="pms-cta"
                     data-cursor-hover
                     onClick={() => {
+                      // Every tier opens the booking modal, including the Pilot.
+                      //
+                      // The Pilot used to send people to /order, which does not
+                      // sell the Pilot. /order is a separate a-la-carte menu
+                      // (Reels $15-100, Long-form $49-749, Podcast $450+,
+                      // Repurpose $349) with no Pilot line item anywhere in
+                      // lib/orderData.ts. So "Claim the Pilot" dropped the buyer
+                      // into an unrelated checkout at different prices with no
+                      // way to buy the thing they just clicked. Desktop cards
+                      // already open the booking flow, so the same label was
+                      // doing two different things depending on device.
                       trackPilotClick(`pricing_mobile_swipe_${plan.tier.toLowerCase()}`);
-                      if (plan.featured) {
-                        // Pilot → /order self-serve checkout
-                        window.location.href = '/order';
-                      } else {
-                        trackCallClick(`pricing_mobile_swipe_${plan.tier.toLowerCase()}`);
-                        (window as unknown as { openBookCallModal?: () => void }).openBookCallModal?.();
-                      }
+                      trackCallClick(`pricing_mobile_swipe_${plan.tier.toLowerCase()}`);
+                      (window as unknown as { openBookCallModal?: () => void }).openBookCallModal?.();
                     }}
                   >
                     {plan.cta}
@@ -299,7 +332,11 @@ export default function Pricing({ pricingCopy }: { pricingCopy?: PricingCopy } =
                     </svg>
                   </button>
 
-                  <p className="pms-cta-fine">No card. No contracts. Cancel anytime.</p>
+                  {/* "Cancel anytime" was not accurate: retainers require 14
+                      days written notice per the Terms. Overstating it by one
+                      word is the kind of thing that turns into a dispute, and
+                      the real terms are good enough to state plainly. */}
+                  <p className="pms-cta-fine">No card to book. No long contracts. 14 days notice to cancel.</p>
                 </article>
               ))}
             </div>
@@ -415,169 +452,20 @@ export default function Pricing({ pricingCopy }: { pricingCopy?: PricingCopy } =
                 </div>
               )}
 
-              {/* Price block — single fluid timeline, no dead time:
-                  • $599 visible big at price slot (initial)
-                  • Strike line draws across WHILE shrink begins (overlap)
-                  • Shrink completes as $299 starts fading in (overlap)
-                  • Save pill + Limited-time mark fade in last
-                  All motions overlap so it reads as one continuous reveal. */}
-              {'originalPrice' in plan && plan.originalPrice ? (
-                <>
-                  {/* Reserved 18px slot — original price renders here, transforms to look big initially */}
-                  <div className="tier-original-slot" style={{ height: '18px', marginBottom: '2px', position: 'relative' }}>
-                    <motion.div
-                      className="tier-original"
-                      initial={{ scale: 2.55, y: 24 }}
-                      whileInView={{ scale: 1, y: 0 }}
-                      viewport={{ once: true, margin: '-80px' }}
-                      // EASE.inOut, not the house EASE.out. This is the one
-                      // legitimate exception: the price is moving between two
-                      // on-screen positions rather than entering the page, and
-                      // an expo-out on a shrink looks like it snaps. The delay
-                      // is choreography (it overlaps the strike-through below)
-                      // so it stays hand-tuned rather than on the delay scale.
-                      transition={{ duration: DUR.lg, delay: 0.55, ease: EASE.inOut }}
-                      style={{
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        display: 'inline-block',
-                        fontSize: '14px',
-                        fontWeight: 700,
-                        letterSpacing: '-0.3px',
-                        fontFamily: 'Inter, sans-serif',
-                        color: plan.featured ? 'rgba(242,238,231,0.55)' : '#A8A49B',
-                        transformOrigin: 'top left',
-                        whiteSpace: 'nowrap',
-                        willChange: 'transform',
-                      }}
-                    >
-                      {plan.originalPrice}
-                      {/* Strike line draws across while $599 is still big (overlaps with shrink start) */}
-                      <motion.span
-                        initial={{ scaleX: 0 }}
-                        whileInView={{ scaleX: 1 }}
-                        viewport={{ once: true, margin: '-80px' }}
-                        // Also EASE.inOut: a line drawing across is on-screen
-                        // movement, same category as the shrink above. Starting
-                        // at 0.30 while the price is still large is what makes
-                        // the two read as one motion instead of two.
-                        transition={{ duration: DUR.sm, delay: 0.30, ease: EASE.inOut }}
-                        style={{
-                          position: 'absolute',
-                          left: 0,
-                          right: 0,
-                          top: '54%',
-                          height: '1.5px',
-                          background: '#E8541A',
-                          transformOrigin: 'left',
-                          pointerEvents: 'none',
-                          willChange: 'transform',
-                        }}
-                      />
-                    </motion.div>
-                  </div>
-
-                  {/* Big discounted price + Save pill — fade in as the shrink finishes */}
-                  <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginBottom: '4px', minHeight: '36px' }}>
-                    <motion.div
-                      className="tier-price"
-                      initial={{ opacity: 0, y: 10 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true, margin: '-80px' }}
-                      transition={{ duration: 0.5, delay: 0.95, ease: [0.16, 1, 0.3, 1] }}
-                      style={{
-                        fontFamily: 'Inter, sans-serif',
-                        fontSize: '36px',
-                        fontWeight: 900,
-                        letterSpacing: '-1.5px',
-                        lineHeight: 1,
-                        color: plan.featured ? '#F2EEE7' : '#0C0C0B',
-                        willChange: 'transform, opacity',
-                      }}
-                    >
-                      {plan.price}
-                    </motion.div>
-                    <motion.span
-                      initial={{ opacity: 0, scale: 0.85 }}
-                      whileInView={{ opacity: 1, scale: 1 }}
-                      viewport={{ once: true, margin: '-80px' }}
-                      transition={{ duration: 0.38, delay: 1.20, ease: [0.16, 1, 0.3, 1] }}
-                      style={{
-                        background: '#E8541A',
-                        color: '#fff',
-                        fontSize: '9px',
-                        fontWeight: 800,
-                        letterSpacing: '1.5px',
-                        textTransform: 'uppercase',
-                        padding: '3px 8px',
-                        borderRadius: '100px',
-                        flexShrink: 0,
-                        willChange: 'transform, opacity',
-                      }}
-                    >
-                      Save 50%
-                    </motion.span>
-                  </div>
-
-                  <motion.div
-                    className="tier-per"
-                    initial={{ opacity: 0 }}
-                    whileInView={{ opacity: 1 }}
-                    viewport={{ once: true, margin: '-80px' }}
-                    transition={{ duration: 0.4, delay: 1.10, ease: 'easeOut' }}
-                    style={{ fontSize: '12px', color: plan.featured ? 'rgba(242,238,231,0.38)' : '#6E6B63', marginBottom: '8px' }}
-                  >
-                    {plan.per}
-                  </motion.div>
-
-                  {/* "For a limited time only" mark — fades in last */}
-                  <motion.div
-                    className="tier-limited"
-                    initial={{ opacity: 0, y: 4 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, margin: '-80px' }}
-                    transition={{ duration: 0.4, delay: 1.40, ease: [0.16, 1, 0.3, 1] }}
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '6px',
-                      padding: '4px 10px',
-                      marginBottom: '20px',
-                      background: plan.featured ? 'rgba(232,84,26,0.18)' : 'rgba(232,84,26,0.10)',
-                      border: '1px solid rgba(232,84,26,0.32)',
-                      borderRadius: '100px',
-                      fontSize: '9.5px',
-                      fontWeight: 700,
-                      letterSpacing: '1.5px',
-                      textTransform: 'uppercase',
-                      color: '#E8541A',
-                      alignSelf: 'flex-start',
-                    }}
-                  >
-                    <motion.span
-                      animate={{ opacity: [0.45, 1, 0.45] }}
-                      transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
-                      style={{
-                        width: '5px',
-                        height: '5px',
-                        borderRadius: '50%',
-                        background: '#E8541A',
-                      }}
-                    />
-                    For a limited time only
-                  </motion.div>
-                </>
-              ) : (
-                <>
-                  <div className="tier-price" style={{ fontFamily: 'Inter, sans-serif', fontSize: '36px', fontWeight: 900, letterSpacing: '-1.5px', lineHeight: 1, marginBottom: '4px', color: plan.featured ? '#F2EEE7' : '#0C0C0B' }}>
-                    {plan.price}
-                  </div>
-                  <div className="tier-per" style={{ fontSize: '12px', color: plan.featured ? 'rgba(242,238,231,0.38)' : '#6E6B63', marginBottom: '20px' }}>
-                    {plan.per}
-                  </div>
-                </>
-              )}
+              {/* Price block.
+                  The struck-through original, the "Save 50%" pill and the
+                  "For a limited time only" mark used to live here behind an
+                  `originalPrice` ternary. That field was removed from the Pilot
+                  plan above because the "discount" was permanent and therefore
+                  not a discount, so this branch became unreachable. Deleted
+                  rather than left dangling: dead JSX referencing a property no
+                  plan carries is how a future edit reintroduces it by accident. */}
+              <div className="tier-price" style={{ fontFamily: 'Inter, sans-serif', fontSize: '36px', fontWeight: 900, letterSpacing: '-1.5px', lineHeight: 1, marginBottom: '4px', color: plan.featured ? '#F2EEE7' : '#0C0C0B' }}>
+                {plan.price}
+              </div>
+              <div className="tier-per" style={{ fontSize: '12px', color: plan.featured ? 'rgba(242,238,231,0.38)' : '#6E6B63', marginBottom: '20px' }}>
+                {plan.per}
+              </div>
 
               {/* Mobile: compact feature count + tap-to-expand toggle */}
               <button

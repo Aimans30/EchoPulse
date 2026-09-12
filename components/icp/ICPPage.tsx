@@ -75,6 +75,19 @@ export default function ICPPage({ data, videos }: { data: IcpData; videos: Video
           <div aria-hidden="true" className="icp-hero-glow" style={{ background: `radial-gradient(ellipse 70% 60% at 75% 25%, ${accent}22 0%, ${accent}0d 38%, ${accent}00 68%)` }} />
           <div className="icp-container icp-hero-grid">
             <div>
+              {/* data.eyebrow was defined for all 5 ICPs in lib/icpData.ts and
+                  never rendered anywhere — dead data. It is the one string in
+                  the hero carrying the audience-plus-service phrase a buyer
+                  actually types ("For Real Estate Agents & Brokerages", "For
+                  Coaches & Course Creators"), while the H1 below is pure
+                  benefit copy with no keyword in it at all. Rendering it above
+                  the H1 gives the page its topical signal back and tells a
+                  visitor within one line whether this page is for them. */}
+              {data.eyebrow && (
+                <p className="icp-hero-eyebrow" style={{ color: accent }}>
+                  {data.eyebrow}
+                </p>
+              )}
               <h1 className="icp-h1">
                 {data.heroHeadline}
                 {data.heroHeadlineAccent && (
@@ -284,7 +297,7 @@ export default function ICPPage({ data, videos }: { data: IcpData; videos: Video
             <div className="icp-risk-grid">
               {[
                 { t: '$299 Pilot, 14 days', d: 'Real deliverables on your brand before any retainer. You keep everything we make, whether you continue or not.' },
-                { t: 'No contracts', d: 'Month to month after the Pilot, cancel with 30 days notice. We have to earn the next month, every month.' },
+                { t: 'No contracts', d: 'Month to month after the Pilot, cancel with 14 days written notice. We have to earn the next month, every month.' },
                 { t: 'Redone until right', d: 'If a deliverable does not sound like you, we redo it at no charge until you would post it under your own name.' },
                 { t: '48-hour turnaround', d: 'Standard on every deliverable, with senior review before anything reaches you. Owner-operated, 3-hour replies in every workday.' },
               ].map((item, i) => (
@@ -376,6 +389,7 @@ export default function ICPPage({ data, videos }: { data: IcpData; videos: Video
         .icp-hero { position: relative; overflow: hidden; background: #0C0C0B; color: #F2EEE7; padding: 132px 0 96px; scroll-margin-top: 96px; }
         .icp-hero-glow { position: absolute; inset: 0; pointer-events: none; }
         .icp-hero-grid { position: relative; z-index: 1; display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 56px; align-items: center; }
+        .icp-hero-eyebrow { font-family: Inter, sans-serif; font-size: 12px; font-weight: 800; letter-spacing: 2.4px; text-transform: uppercase; margin: 0 0 16px; }
         .icp-h1 { font-family: Inter, sans-serif; font-weight: 900; font-size: clamp(38px, 5.6vw, 76px); letter-spacing: -3px; line-height: 0.98; margin: 0 0 24px; }
         .icp-hero-sub { font-size: clamp(16px, 1.6vw, 20px); line-height: 1.6; color: rgba(242,238,231,0.66); max-width: 560px; margin: 0 0 32px; }
         .icp-hero-actions { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
@@ -473,6 +487,7 @@ export default function ICPPage({ data, videos }: { data: IcpData; videos: Video
           .icp-container { padding: 0 20px; }
           .icp-section { padding: 64px 0; }
           .icp-hero { padding: 104px 0 64px; }
+          .icp-hero-eyebrow { font-size: 10.5px; letter-spacing: 1.8px; margin-bottom: 12px; }
           .icp-h1 { font-size: 34px; letter-spacing: -1.6px; }
           /* The animation used to be display:none on phones — indefensible for
              an outreach page where most cold clicks ARE on phones. The visual

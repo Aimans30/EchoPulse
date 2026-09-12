@@ -12,7 +12,7 @@ import BookCallModal from "@/components/BookCallModal";
 import MobileStickyCTA from "@/components/MobileStickyCTA";
 import { GeoProvider } from "@/components/GeoProvider";
 import { getServerGeo } from "@/lib/geoServer";
-import { AREA_SERVED } from "@/lib/schema";
+import { AREA_SERVED, BUSINESS_ADDRESS } from "@/lib/schema";
 
 const GA_ID = 'G-3PPKSJLR7F';
 
@@ -70,7 +70,12 @@ export const metadata: Metadata = {
       "c3102d40-64ae-49d1-a3a1-d7253573f122",
   },
   openGraph: {
-    title: "EchoPulse Media. You hit record. We do the rest.",
+    // Was "EchoPulse Media. You hit record. We do the rest." The <title> tag
+    // was rewritten away from that tagline because it contains no term anyone
+    // searches, but the OG and Twitter titles were left behind. They drive
+    // every social share, Slack unfurl and link preview, and several AI
+    // browsing tools prefer og:title over <title> when summarising a page.
+    title: "EchoPulse Media | Done-For-You Content Studio for Founders",
     description:
       "EchoPulse Media is a content and AI studio for founders, coaches, business owners, and real estate agents. Video, social, ads, websites, custom software, handled end to end by one team. One bill. $299 14-day Pilot.",
     url: "https://echopulse.media",
@@ -88,7 +93,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "EchoPulse Media. You hit record. We do the rest.",
+    title: "EchoPulse Media | Done-For-You Content Studio for Founders",
     description:
       "EchoPulse Media is a content and AI studio for founders, coaches, business owners, and real estate agents. Video, social, ads, websites, custom software, handled end to end. Get 20-30 hours a week back.",
     creator: "@Lakshya_Creates",
@@ -141,6 +146,13 @@ const structuredData = {
         "EchoPulse Media is a content and AI studio for founders, coaches, business owners, and real estate agents. Video edits, social posts, blogs, ad creative, websites, automations, and custom software. One team, one bill, every channel. Built to give clients 20 to 30 hours back every week.",
       foundingDate: "2025",
       founder: { "@id": "https://echopulse.media/#founder" },
+      // Where we operate FROM (Bhopal, India) vs which markets we SELL INTO
+      // (US/CA/UK/AU/Western Europe) are two different properties. India was
+      // removed from areaServed in Sept 2026 because declaring it as a served
+      // market was pulling 51% of all site clicks from South Asia at a 0%
+      // conversion rate; it lives here instead, where it is true. See
+      // lib/schema.ts for the Search Console numbers behind that decision.
+      address: BUSINESS_ADDRESS,
       areaServed: AREA_SERVED,
       sameAs: [
         "https://www.linkedin.com/in/lakshyasoni/",
