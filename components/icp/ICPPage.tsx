@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { Home, Rocket, GraduationCap, ShoppingBag, Briefcase, type LucideIcon } from 'lucide-react';
 import Nav, { type NavLink } from '@/components/Nav';
 import Footer from '@/components/Footer';
@@ -209,7 +210,13 @@ export default function ICPPage({ data, videos }: { data: IcpData; videos: Video
                 <span style={{ width: 22, height: 1, background: accent, display: 'block' }} />
                 What paying us actually buys
               </div>
-              <h2 className="icp-h2" style={{ color: '#F2EEE7' }}>Not deliverables. <span style={{ color: accent }}>Outcomes with receipts.</span></h2>
+              {/* Was "Outcomes with receipts." Two separate buyers, a 52-year-old
+                  agent and a 48-year-old HVAC owner, flagged the same thing:
+                  "receipts" is slang that reads wrong to the demographic, and
+                  more importantly the section that follows contains no receipts
+                  at all, only benefit blurbs. Promising evidence and then not
+                  producing it is worse than not promising it. */}
+              <h2 className="icp-h2" style={{ color: '#F2EEE7' }}>Not deliverables. <span style={{ color: accent }}>Work that earns its place.</span></h2>
             </Reveal>
             <div className="icp-deliv-list">
               {data.deliverables.map((d, i) => (
@@ -276,8 +283,26 @@ export default function ICPPage({ data, videos }: { data: IcpData; videos: Video
             <ICPWork videos={videos} accent={accent} />
           ) : (
             <div className="icp-container">
+              {/* This placeholder previously read "Sample work for this segment
+                  is being produced. Book a call and we will walk you through
+                  the closest examples." Every single buyer in a 10-person panel
+                  stopped here. Telling someone the proof exists but they have
+                  to book a call to see it is the worst possible trade: it asks
+                  for commitment before giving evidence.
+
+                  There IS one real, permissioned proof asset: a published case
+                  study carrying a genuine Google Search Console export, shared
+                  with the client's written consent. Almost nothing on the site
+                  linked to it. Naming the gap honestly and handing over the one
+                  real thing beats asking them to take it on faith. */}
               <div className="icp-work-placeholder">
-                Sample work for this segment is being produced. Book a call and we will walk you through the closest examples from our portfolio.
+                We have not published work for this segment yet, and we are not going to
+                dress up someone else&apos;s as if we had.{' '}
+                <Link href="/blog/magicbnb-seo-aeo-case-study-2026" style={{ color: accent, fontWeight: 700 }}>
+                  Read the one case study we can show you
+                </Link>
+                , with a real Search Console export published with the client&apos;s permission.
+                It is a different industry, and you can judge the work on its own terms.
               </div>
             </div>
           )}

@@ -448,11 +448,19 @@ function InteractiveGraphic() {
    not inside the orbital panel. All four stats are visible at once
    with a subtle "active" highlight that cycles through them.
    ────────────────────────────────────────────────────────── */
+// Two of these were replaced after buyer research. "∞ revisions until
+// satisfied" was called out by a precision-minded buyer as an unquantified
+// flourish that made her distrust the numbers either side of it, and the real
+// policy (redone until you would post it under your own name) is a standard,
+// not a quantity, so it does not belong in a numeric ticker. "20-30h back to
+// you every week" is not on the verified-facts list and cannot be evidenced.
+// Both swapped for figures that are true and checkable. "7 services" is
+// correct and stays: lib/serviceData.ts defines seven.
 const BAND_STATS = [
-  { value: '48h',     label: 'turnaround per deliverable' },
-  { value: '7',       label: 'services under one roof' },
-  { value: '∞',       label: 'revisions until satisfied' },
-  { value: '20-30h',  label: 'back to you every week' },
+  { value: '48h',   label: 'turnaround per deliverable' },
+  { value: '3h',    label: 'reply window every workday' },
+  { value: '7',     label: 'services under one roof' },
+  { value: '$299',  label: 'Pilot, keep everything made' },
 ];
 
 function StatsBand() {
@@ -964,11 +972,28 @@ export default function Hero() {
                 the words buyers actually search. Doubles as the sentence AI
                 assistants extract when asked "what is EchoPulse Media". */}
             <h2 ref={subRef} className="hero-sub" style={{ fontSize: '16px', color: '#6E6B63', maxWidth: '540px', lineHeight: 1.7, fontWeight: 400, margin: '0 0 36px' }}>
+              {/* Rewritten after a 10-buyer panel. Two problems with the old
+                  line, both structural rather than stylistic.
+                  1. It named three audiences ("founders, coaches, and business
+                     owners") while the site runs FIVE ICP landing pages. Real
+                     estate agents and DTC brands were missing entirely, and
+                     both said they bounced before thinking to look for a page
+                     of their own. A real estate agent put it as: he sells
+                     houses, not "under one roof" services to founders.
+                  2. It led with LinkedIn ghostwriting, which actively repels
+                     three of the five segments. An HVAC owner: "LinkedIn
+                     ghostwriting? I fix furnaces. I need the phone to ring."
+                     A DTC founder read the whole line as a personal-brand shop
+                     rather than a performance-creative one and left.
+                  "You hit record, we do the rest" also framed everything as
+                  video first, which misreads the consultancy and DTC buyers.
+                  Replaced with the owner-review point, which is the actual
+                  differentiator and the one the skeptical buyers responded to. */}
               <span>
-                A done-for-you content agency for founders, coaches, and business owners:
-                video editing, LinkedIn ghostwriting, blogs, and ads under one roof.
+                Content and creative for founders, real estate agents, coaches, DTC brands,
+                and business owners: video, ad creative, blogs, and social, handled by one team.
               </span>{' '}
-              <strong style={{ color: '#0C0C0B', fontWeight: 600 }}>You hit record, we do the rest.</strong>
+              <strong style={{ color: '#0C0C0B', fontWeight: 600 }}>Every deliverable is reviewed by the owner before you see it.</strong>
             </h2>
 
             <div ref={actionsRef} className="hero-actions" style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '0', alignItems: 'center' }}>

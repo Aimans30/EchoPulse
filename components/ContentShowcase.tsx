@@ -126,7 +126,7 @@ export default function ContentShowcase() {
             transition={{ delay:0.15, duration:0.7 }}
             style={{ fontSize:'16px', color:'#6E6B63', lineHeight:1.75, maxWidth:'460px', margin:'0 0 40px' }}
           >
-            We run a 90-minute Voice Foundation interview with every founder so the LinkedIn posts, blogs, video scripts, and ad copy we produce sound like you. Not like a junior copywriter or ChatGPT. Free strategy call to see how it works.
+            We run a 90-minute recorded voice interview with every founder so the LinkedIn posts, blogs, video scripts, and ad copy we produce sound like you. Not like a junior copywriter or ChatGPT. Free strategy call to see how it works.
           </motion.p>
 
           {/* Pain → Gain rows */}
@@ -214,7 +214,7 @@ export default function ContentShowcase() {
             {/* Service highlights */}
             <div style={{ display:'flex', flexDirection:'column', gap:'10px' }}>
               {[
-                { name:'Voice Foundation', result:'90-min founder interview', time:'every client', color:'#E8541A' },
+                { name:'voice brief', result:'90-min founder interview', time:'every client', color:'#E8541A' },
                 { name:'Multi-Stack', result:'6 services in-house',   time:'no vendor juggling', color:'#10b981' },
                 { name:'Standard SLA', result:'48-hour turnaround',     time:'every deliverable',  color:'#8b5cf6' },
               ].map((c, i) => (

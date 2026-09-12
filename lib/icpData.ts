@@ -408,7 +408,7 @@ export const icps: IcpData[] = [
     ],
     starterStack: 'Start with LinkedIn & Social + Short-Form Video + Blog. Add Automations once volume justifies it.',
     faq: [
-      { q: 'Will the content actually sound like me, not a generic ghostwriter?', a: 'That is the whole point. We open with a 90-minute Voice Foundation interview to pull your actual words, opinions, and hot takes, then build a brand brief every writer and editor reads before touching a draft. If the first batch does not sound like you, we redo it at no charge.' },
+      { q: 'Will the content actually sound like me, not a generic ghostwriter?', a: 'That is the whole point. We open with a 90-minute recorded voice interview to pull your actual words, opinions, and hot takes, then build a brand brief every writer and editor reads before touching a draft. If the first batch does not sound like you, we redo it at no charge.' },
       { q: 'I already work with a freelancer or two. Can you slot in?', a: 'Yes. Plenty of founders start by handing us the channel that is eating the most of their time, usually LinkedIn or video, and expand once they see the work. You do not have to fire anyone to start.' },
       { q: 'How much of my time does this take each month?', a: 'After onboarding, most founders spend 2 to 3 hours a month with us: one strategy call, batched approvals, and sending raw footage for video. The heavy lift is the onboarding interview up front. After that, you approve, we produce.' },
       { q: 'Do you lock me into a contract?', a: 'No. After the $299 14-day Pilot, plans are month-to-month, cancel with 14 days written notice. We would rather earn the next month than trap you in it.' },
@@ -482,11 +482,18 @@ export const icps: IcpData[] = [
         'Evergreen content and an automated funnel change the shape of the business. The top of funnel fills without you filming daily, the nurture sequence does the selling while you teach, and a launch becomes opening the cart to a primed list instead of starting from zero. The tooling to run this is cheaper and better than it has ever been. The coaches who set it up now stop trading energy for revenue.',
       ],
     },
+    // "~2x qualified leads" and "Multiples higher conversion" were removed.
+    // Neither carried a source, and "Multiples" is a hedge word standing in
+    // for a number nobody could produce. A hype-literate course creator in
+    // the buyer panel spotted both instantly and said they fired her
+    // funnel-trick radar, which is the precise opposite of what a stat block
+    // is for. Replaced with mechanism and with facts we can actually stand
+    // behind, which is the same call already made on the DTC page.
     stats: [
-      { value: '~2x', label: 'qualified leads from a lead-magnet funnel vs a plain landing page' },
-      { value: 'Multiples', label: 'higher conversion from warm, nurtured audiences vs cold traffic' },
+      { value: 'Own it', label: 'an email list is yours, the algorithm is not' },
       { value: 'Evergreen', label: 'content fills the top of funnel without you filming daily' },
       { value: '48 hr', label: 'standard edit turnaround per deliverable' },
+      { value: '$299', label: 'Pilot, and you keep everything we make' },
     ],
     pipeline: {
       input: { label: 'You teach one session', detail: 'A workshop, client call, or 30 min to camera' },
