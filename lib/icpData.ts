@@ -252,6 +252,7 @@ export const icps: IcpData[] = [
     faq: [
       { q: 'Do I have to shoot the footage myself?', a: 'Either works. If you have a phone or a drone and a steady hand, shoot it and send us the raw clips, and we will guide you on what to capture. If you would rather not, we direct the shot list so a local videographer (or you) captures exactly what the edit needs. Then we handle the cinematic edit, captions, music, and exports.' },
       { q: 'How fast do I get a listing reel back?', a: 'Standard turnaround is 48 hours per deliverable. For a hot listing that cannot wait, message us directly and we will confirm whether 24-hour turnaround is possible that week. Rush carries a 30 percent surcharge.' },
+      { q: 'What if a listing goes live on a weekend or needs same-day turnaround?', a: 'Hot listings do not wait for Monday. Message us directly when one needs same-day or weekend attention and we will confirm what is possible before you send the footage. Standard turnaround stays 48 hours per deliverable. Rush carries a 30 percent surcharge and is arranged with us directly rather than through the order page.' },
       { q: 'Can you make ads from the listing videos too?', a: 'Yes. We cut the reel into Meta and Instagram ad variants built to book viewings, with proper aspect ratios, hooks in the first two seconds, and a clear call to action. Ads are a separate line item from the edit.' },
       { q: 'What formats do you deliver for?', a: 'Vertical reels for Instagram, TikTok, and YouTube Shorts; horizontal cuts for YouTube and listing-site embeds; and MLS/portal-ready MP4 exports. One shoot, every format you list on.' },
       { q: 'I tried a videographer once and the turnaround killed me. How is this different?', a: 'That is the exact frustration this is built for. You get a 48-hour standard cycle, a shared folder you drop footage into, revisions until you are satisfied, and one team that knows real estate shot grammar, not a one-off freelancer you have to re-brief every time.' },
@@ -409,6 +410,7 @@ export const icps: IcpData[] = [
     starterStack: 'Start with LinkedIn & Social + Short-Form Video + Blog. Add Automations once volume justifies it.',
     faq: [
       { q: 'Will the content actually sound like me, not a generic ghostwriter?', a: 'That is the whole point. We open with a 90-minute recorded voice interview to pull your actual words, opinions, and hot takes, then build a brand brief every writer and editor reads before touching a draft. If the first batch does not sound like you, we redo it at no charge.' },
+      { q: 'Can three people actually handle a full content pipeline?', a: 'The studio is owner-operated. Lakshya Soni runs it, Shaurya leads design, Aiman leads delivery, and every deliverable gets senior review before it reaches you. The volume in Growth and Full System is scoped to what that team ships on a 48-hour cycle, not stretched past what three people can actually review.' },
       { q: 'I already work with a freelancer or two. Can you slot in?', a: 'Yes. Plenty of founders start by handing us the channel that is eating the most of their time, usually LinkedIn or video, and expand once they see the work. You do not have to fire anyone to start.' },
       { q: 'How much of my time does this take each month?', a: 'After onboarding, most founders spend 2 to 3 hours a month with us: one strategy call, batched approvals, and sending raw footage for video. The heavy lift is the onboarding interview up front. After that, you approve, we produce.' },
       { q: 'Do you lock me into a contract?', a: 'No. After the $299 14-day Pilot, plans are month-to-month, cancel with 14 days written notice. We would rather earn the next month than trap you in it.' },
@@ -464,14 +466,19 @@ export const icps: IcpData[] = [
     name: 'Coaches & Course Creators',
     icon: 'graduation',
     accentColor: '#8b5cf6',
+    // "Cohort", "pre-launch" and "while you teach" all assume a course with
+    // an intake date. A fitness coach running an ongoing program read the
+    // page and said none of it was his business. "Roster" covers a running
+    // client list, a membership and a cohort without coining a new term, and
+    // the sub now names all three models outright.
     metaTitle: 'Content & Funnels for Coaches',
     metaDescription:
-      'Pre-launch content, evergreen short-form, ad creative, and the funnel that nurtures and sells while you teach. Fill your cohort without living in the DMs.',
+      'Evergreen short-form, ad creative, and a nurture funnel that sells whether you run cohorts, an ongoing program, or a membership. Fill your roster without living in the DMs.',
     eyebrow: 'For Coaches & Course Creators',
-    heroHeadline: 'Fill your cohort',
+    heroHeadline: 'Fill your roster',
     heroHeadlineAccent: 'without living in the DMs.',
     heroSub:
-      'Pre-launch content, evergreen short-form, ad creative, and the funnel that nurtures and sells while you teach. The machine runs when your energy does not.',
+      'Content that fills the top of your funnel, ad creative that scales what works, and the nurture sequence that sells whether you run cohorts, an ongoing coaching program, or a membership. The machine runs when your energy does not.',
     keywords: ['content for coaches', 'course launch content', 'evergreen short-form', 'funnel content for creators'],
     whyNow: {
       headline: 'Cold traffic to a sales page',
@@ -556,10 +563,19 @@ export const icps: IcpData[] = [
     ],
     starterStack: 'Start with Funnel + Automations (nurture) + Short-Form Video. Add Ad Creatives to scale once the funnel converts.',
     faq: [
-      { q: 'I already have a course platform. Do you replace it?', a: 'No, we build the funnel that feeds it. Lead magnet, opt-in, nurture sequence, and booking or sales page that pours warm leads into the platform you already use (Kajabi, Teachable, Thinkific, Skool, and the rest).' },
+      { q: 'I already have a course or coaching platform. Do you replace it?', a: 'No, we build the funnel that feeds it. Lead magnet, opt-in, nurture sequence, and booking or sales page that pour warm leads into whatever you already run on, whether that is a cohort platform, an ongoing coaching program, or a membership (Kajabi, Teachable, Thinkific, Skool, and the rest).' },
       { q: 'Can you edit my course modules too, not just marketing content?', a: 'Yes. Module editing, including lecture cuts, lower thirds, chapter markers, and branded intros, is part of our video service, alongside the evergreen short-form that fills your funnel.' },
       { q: 'How does the nurture actually sell without me?', a: 'We map an email and DM sequence that warms a lead from the lead magnet to the offer over a series of touches. Warm, nurtured audiences convert several times higher than cold traffic hitting a sales page cold, and that sequence runs on autopilot while you teach.' },
-      { q: 'I launch live a few times a year. Does this fit?', a: 'It makes live launches easier. Evergreen content and a nurture funnel keep the audience warm between launches, so when you open the cart you are selling to a primed list instead of starting from zero each time.' },
+      // Reframed from "I launch live a few times a year" so it answers the
+      // coach running rolling enrollment first, then covers launches second.
+      // A fitness coach with an ongoing program read this page and concluded
+      // none of it was his business, because every question assumed a cart
+      // that opens and closes.
+      { q: 'I run an ongoing program rather than launching a few times a year. Does this fit?', a: 'Yes. Evergreen content and a nurture sequence keep new leads warming toward your program on rolling enrollment, with no cart-open date required. If you do run the occasional live launch as well, the same warmed audience is already primed for it instead of starting from zero.' },
+      // Answers the objection a hype-literate coach raises but rarely says out
+      // loud: that automated nurture will feel manipulative to an audience
+      // built on trust.
+      { q: 'Will the nurture automation feel fake or manipulative to my audience?', a: 'Only if a stranger writes it. We build the sequence from your own voice and the way you already talk to clients, so a message triggered by an email open reads like a personal follow-up rather than a drip campaign. You approve the sequence before it goes live and can pull any message that does not sound like you.' },
     ],
     // Same tiers and counts. Video reframed to course promo, testimonial and
     // results clips, and launch/webinar cuts; blogs to launch/nurture SEO;
@@ -639,9 +655,17 @@ export const icps: IcpData[] = [
     pipeline: {
       input: { label: 'You send product and brief', detail: 'Product footage, UGC, or brand assets' },
       outputs: [
-        { label: 'Static ad variants', benefit: 'Beats creative fatigue', count: '20/mo', kind: 'ad' },
-        { label: 'Video ads', benefit: 'Stops the scroll', count: '12/mo', kind: 'reel' },
-        { label: 'UGC-style edits', benefit: 'Converts colder traffic', count: '8/mo', kind: 'video' },
+        // Counts corrected September 2026. These read 20/mo, 12/mo and 8/mo,
+        // which totalled 40 assets, while the Growth tier rendered directly
+        // below on the same page says "6 ad creatives per month (4 static + 2
+        // video)". A DTC founder in a buyer panel caught the gap on a single
+        // scroll and called it a bait and switch, which is exactly what a
+        // roughly 85% shortfall between the pitch and the contract is.
+        // The pricing was the truth and the pipeline was aspirational, so the
+        // pipeline came down rather than the price going up.
+        { label: 'Static ad variants', benefit: 'Beats creative fatigue', count: '4/mo', kind: 'ad' },
+        { label: 'Video ads', benefit: 'Stops the scroll', count: '2/mo', kind: 'reel' },
+        { label: 'UGC-style edits', benefit: 'Converts colder traffic', count: '4/mo', kind: 'video' },
         { label: 'Landing pages', benefit: 'Protects the click you paid for', count: 'Ongoing', kind: 'site' },
       ],
       outcomes: ['Fresh creative', 'Lower CPA', 'More orders'],
@@ -708,6 +732,7 @@ export const icps: IcpData[] = [
       { q: 'How many ad variants do I get per month?', a: 'It depends on the plan, but the model is built around volume. Performance teams typically run 15 to 25 active variants per campaign, and subscription production is what makes that cadence affordable. We agree on a monthly batch size up front and ship fresh hooks before the current ones fatigue.' },
       { q: 'Do you do UGC-style ads or only polished brand content?', a: 'Both, and we lean into UGC-style for performance because it consistently beats polished brand content on CPM and conversion. We mix formats and let the testing data decide what scales.' },
       { q: 'Can you edit the footage we already have from creators?', a: 'Yes. Send us raw UGC, product footage, or creator clips and we cut them into multiple ad variants with different hooks, captions, and formats for each platform.' },
+      { q: 'Do you actually understand performance marketing, or are you just editors?', a: 'We are not media buyers and we do not run your ad account. That stays with you or your buyer. What we own is the creative pipeline: the hooks, formats and variants built around what performs on Meta and TikTok rather than what looks good in a portfolio. We work from your account data and test results, not guesses.' },
       { q: 'Do you manage the ad spend too?', a: 'Our core is the creative engine, the assets that beat fatigue. We work alongside your media buyer (or can advise on structure), but the subscription is built to keep your creative pipeline full, not to run your ad account.' },
     ],
   },
@@ -718,10 +743,16 @@ export const icps: IcpData[] = [
     name: 'Business Owners',
     icon: 'briefcase',
     accentColor: '#3b82f6',
-    metaTitle: 'Inbound Lead Content for Local Business',
+    // "Local" was the first word a reader saw in both the eyebrow and the
+    // meta title. A Toronto consultancy owner selling $40k engagements read
+    // it and concluded the page was not written for her, which is a real
+    // loss because the rest of the copy fits her exactly. Widened to cover a
+    // national consultancy without losing the local operator, who is still
+    // named first.
+    metaTitle: 'Inbound Lead Content for Service Businesses',
     metaDescription:
-      'SEO content that ranks, a conversion-built website, and automations that catch every lead. Get inbound leads instead of chasing cold ones.',
-    eyebrow: 'For Local & Service Business Owners',
+      'SEO content that ranks, a conversion-built website, and automations that catch every lead. Built for service businesses, local shops and national consultancies alike.',
+    eyebrow: 'For Local and National Service Businesses',
     heroHeadline: 'Get inbound leads',
     heroHeadlineAccent: 'instead of chasing cold ones.',
     heroSub:
@@ -809,6 +840,7 @@ export const icps: IcpData[] = [
     starterStack: 'Start with Blog/SEO + Websites & Funnels + Automations.',
     faq: [
       { q: 'How long until SEO content actually brings in leads?', a: 'Honest answer: SEO and blogging typically take 3 to 6 months before meaningful organic traffic. That is industry standard, not something anyone can compress. The upside is it compounds: once it ranks, it brings leads month after month at a fraction of outbound cost. We set these timelines in writing before month one.' },
+      { q: 'Will this work with the CRM and tools I already use?', a: 'Usually yes. Automations route leads into the CRM, calendar or job-management tool you already run on rather than forcing you onto new software. Tell us your stack on the onboarding call. If a direct integration does not exist we build a bridge with Zapier, Make or a webhook so leads still land where your team actually works.' },
       { q: 'Why does the website matter so much?', a: 'Because content earns the click and the site has to convert it. Sites loading under two seconds convert meaningfully better, and a conversion-built layout turns the traffic your content earns into actual booked leads instead of bounces.' },
       { q: 'What does the automation actually do for me?', a: 'It catches and routes every inbound lead, whether a form fill, DM, or call, so nothing slips while you are busy running the business. Lead comes in, gets tagged and routed, you (or your team) get notified, and follow-up happens even when you are heads-down.' },
       { q: 'I am sick of paying for leads that do not close. How is this different?', a: 'Inbound leads close far better than cold ones. SEO leads close near 14.6 percent versus 1 to 2 percent for cold outbound, because they found you and already trust you before they reach out. We build the system that produces those warm leads instead of buying cold ones.' },

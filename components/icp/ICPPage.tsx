@@ -325,6 +325,13 @@ export default function ICPPage({ data, videos }: { data: IcpData; videos: Video
                 { t: 'No contracts', d: 'Month to month after the Pilot, cancel with 14 days written notice. We have to earn the next month, every month.' },
                 { t: 'Redone until right', d: 'If a deliverable does not sound like you, we redo it at no charge until you would post it under your own name.' },
                 { t: '48-hour turnaround', d: 'Standard on every deliverable, with senior review before anything reaches you. Owner-operated, 3-hour replies in every workday.' },
+                // Added on the conversion thesis that a studio with no
+                // testimonials should make claims that require checking rather
+                // than trust. Naming the three people who actually touch the
+                // work is the strongest proof available here: it is verifiable,
+                // it is already true, and it was previously buried in FAQ
+                // question nine where almost nobody reached it.
+                { t: 'You know who does the work', d: 'Lakshya Soni runs the studio and signs off on every deliverable before it ships. Shaurya leads design, Aiman leads delivery. Three named people, not a rotating account team you have to re-brief.' },
               ].map((item, i) => (
                 <Reveal key={item.t} delay={Math.min(i * 0.05, 0.2)}>
                   <div className="icp-risk-card">

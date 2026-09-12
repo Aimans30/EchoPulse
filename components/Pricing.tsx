@@ -162,7 +162,13 @@ export default function Pricing({ pricingCopy }: { pricingCopy?: PricingCopy } =
       price: `${currency}${prices.full}`,
       per: '/month',
       badge: 'All-in. Fixed scope.',
-      tagline: 'For operators going all-in on content. Locked package, no upsells, no scaling tricks.',
+      // "no upsells" softened to "no surprise pricing". The Growth tier one
+      // card to the left offers "20% off any custom app or software build",
+      // so claiming no upsells while discounting a separate product on the
+      // same screen read as the two tiers arguing with each other. An agency
+      // owner in a buyer panel spotted it in about five seconds. The build
+      // discount is a genuine perk and stays; the absolute claim goes.
+      tagline: 'For operators going all-in on content. Locked package, fixed scope, no surprise pricing.',
       features: pricingCopy?.full ?? DEFAULT_FULL_FEATURES,
       cta: 'Talk to Us',
       featured: false,
