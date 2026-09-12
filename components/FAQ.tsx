@@ -57,6 +57,17 @@ const buildFaqs = (pilotPrice: string, growthPrice: string) => [
         q: 'Can a content agency guarantee leads or sales?',
         a: "No, and any agency that guarantees leads is either lying or about to redefine the word 'lead'. Too much of the outcome sits outside our control: your offer, your pricing, your sales calls, your market. What we do guarantee is what we control, which is output quality, turnaround speed, and revision responsiveness. What we measure and report monthly: profile views, engagement rate, reach, content-driven website traffic, and blog time-on-page. When something isn't performing we flag it and change direction, rather than quietly producing more of it.",
       },
+      // Added after a buyer-panel review. The site promises "48-hour
+      // turnaround" and "3-hour replies during work hours" to a US, UK,
+      // Canadian and Australian audience while the team works from India, and
+      // nowhere did it say whose work hours those are. A US buyer with a
+      // time-sensitive job had to either dig through the About page or ask on
+      // the call. Volunteering it is both more honest and less friction, and
+      // it answers the question a cautious buyer is already silently asking.
+      {
+        q: 'Where is the team based, and what hours do you actually cover?',
+        a: "EchoPulse is run from Bhopal, India, by Lakshya Soni, with Shaurya on design and Aiman on delivery. That is on the About page and in our Terms, and we would rather tell you here than have you find it later. In practice it means our working day overlaps comfortably with UK and European mornings and with US East Coast mornings. The 3-hour reply window applies during our workday; a message sent late on a US evening is answered the next morning your time. Turnaround is measured in calendar hours, not business hours, so a 48-hour deliverable is 48 hours regardless of the gap. If you need someone reachable in your own timezone at 5pm on a Friday, say so on the call and we will tell you honestly whether we are the right fit.",
+      },
 ];
 
 type FaqItem = ReturnType<typeof buildFaqs>[number];
