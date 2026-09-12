@@ -15,15 +15,33 @@
  * the entries below. Do not remove an entry unless you have re-published the post.
  */
 
-/** The four cluster survivors. Every dead variant points at one of these. */
+/**
+ * The cluster survivors. Every dead variant points at one of these.
+ *
+ * INVARIANT: every slug in here must be PUBLISHED in Sanity. A redirect whose
+ * destination is unpublished is worse than the 404 it was meant to prevent —
+ * it spends a 301 hop and then 404s anyway, so the equity is lost AND the
+ * crawler pays twice for it.
+ *
+ * Two entries broke that invariant and were repaired in September 2026. A GROQ
+ * check against the published dataset showed `post-production-system-high-volume-b2b-video-2026`
+ * and `the-10-best-social-media-strategies-for-real-estate-agents-to-generate-20-50-clients-in-2025`
+ * are both absent (108 posts published; neither slug among them), so the two
+ * redirects below that pointed at them were 301-into-404. They now point at
+ * live posts in the same topic cluster. Both former keys (`postProduction`,
+ * `realEstate`) are deleted rather than repointed, so the key name cannot
+ * quietly stop describing its value.
+ *
+ * To re-verify after any Sanity unpublish:
+ *   *[_type=="blog" && slug.current in [<every value below>]]{ "s": slug.current }
+ * must return one row per entry.
+ */
 export const SURVIVORS = {
   aiPipeline: "how-to-build-ai-content-pipeline-measurable-roi-2026",
   thoughtLeadership: "how-to-build-thought-leadership-system-high-ticket-clients-2026",
   paidMediaFunnel: "why-paid-media-roi-is-declining-funnel-architecture-fix-2026",
   batchProduction: "batch-production-blueprint-b2b-video-content-system-2026",
-  postProduction: "post-production-system-high-volume-b2b-video-2026",
-  realEstate:
-    "the-10-best-social-media-strategies-for-real-estate-agents-to-generate-20-50-clients-in-2025",
+  realEstateSocial: "real-estate-social-media-marketing-cost",
 } as const;
 
 /**
@@ -65,8 +83,11 @@ export const BLOG_REDIRECTS: Record<string, string> = {
   "video-content-workflow-batch-production-system-2026": `/blog/${SURVIVORS.batchProduction}`,
   "video-content-pipeline-batch-production-system": `/blog/${SURVIVORS.batchProduction}`,
   "per-project-video-production-dead-always-on-content-engine-2026": `/blog/${SURVIVORS.batchProduction}`,
-  // Post-production is its own survivor, so this one points there instead.
-  "post-production-infrastructure-gap-enterprise-brands": `/blog/${SURVIVORS.postProduction}`,
+  // Was pointing at `post-production-system-high-volume-b2b-video-2026`, which
+  // is NOT published, so this 301'd straight into a 404. Repointed to the batch
+  // production survivor — the nearest live post on the same subject (building a
+  // repeatable high-volume B2B video production system).
+  "post-production-infrastructure-gap-enterprise-brands": `/blog/${SURVIVORS.batchProduction}`,
 
   // ── Cluster 3: High-ticket funnel architecture (16 variants) ───────────────
   "why-your-real-cac-keeps-rising-in-2026-and-how-to-lower-it": `/blog/${SURVIVORS.paidMediaFunnel}`,
@@ -107,7 +128,10 @@ export const BLOG_REDIRECTS: Record<string, string> = {
   "fitness-coaches-10-clients-instagram-reels-2026": "/",
 
   // ── Duplicate real-estate post -> the stronger original ────────────────────
-  "real-estate-social-media-strategy-2026": `/blog/${SURVIVORS.realEstate}`,
+  // Was pointing at `the-10-best-social-media-strategies-for-real-estate-agents-...-2025`,
+  // which is NOT published, so this 301'd into a 404. Repointed to the live
+  // real-estate social post.
+  "real-estate-social-media-strategy-2026": `/blog/${SURVIVORS.realEstateSocial}`,
 };
 
 /** Slugs that are still live. Used to avoid redirect chains from /blogs/*. */

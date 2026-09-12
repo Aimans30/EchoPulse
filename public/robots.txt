@@ -1,37 +1,99 @@
 # EchoPulse — robots.txt
-# Allow all crawlers, including AI/LLM training crawlers that ask politely.
-# Explicit allow-listing for the major AI agents so they can index our
-# content for retrieval and citation.
+#
+# ─────────────────────────────────────────────────────────────────────────────
+# ROUTE CONFLICT: app/robots.ts also exists and also generates /robots.txt.
+# Next.js serves public/ static assets before the App Router, so THIS file is
+# very likely the one crawlers receive and app/robots.ts is very likely dead.
+# Both now carry the same rules, so the served result is correct either way.
+# Confirm which one wins with: curl -s https://echopulse.media/robots.txt
+# Then delete the other. Keeping both is how they drift.
+# ─────────────────────────────────────────────────────────────────────────────
+#
+# FIXED Sept 2026 — record scoping bug. The Disallow lines used to sit at the
+# BOTTOM of the file, after the last `User-agent: Bytespider` block. In
+# robots.txt, directives bind to the most recent User-agent record, so those
+# three Disallows applied to Bytespider ONLY:
+#
+#   • /api/ was NOT disallowed for Googlebot, despite the comment saying it was.
+#     Webhook and internal test endpoints (/api/dodo/webhook, /api/test-pipeline,
+#     /api/crm-test, /api/slack-test) were all crawlable.
+#   • /_next/ was blocked for Bytespider only. That is the one piece of luck
+#     here: had it landed in the `*` group it would have blocked Googlebot from
+#     every JS and CSS chunk and from /_next/image, which prevents Google
+#     rendering the page at all.
+#
+# Disallow now sits inside the `*` record where it was always meant to be.
+# /_next/ is deliberately NOT blocked for anyone: crawlers must fetch the JS,
+# CSS and optimized images to render and rank the page.
 
 User-agent: *
 Allow: /
+Disallow: /api/
 
-# Major AI crawlers — explicitly allowed
+# NOTE: /onboard and /pricing-matrix are private but are deliberately NOT
+# disallowed here. Both set `robots: { index: false, follow: false }` in their
+# own page metadata, and a robots.txt Disallow would stop Google ever crawling
+# them — which means it can never SEE the noindex tag, so a URL discovered via
+# a stray link can still surface as a bare result. The meta tag is the correct
+# single mechanism for those two.
+
+# ── AI / answer-engine crawlers, explicitly allowed ─────────────────────────
+# Each vendor runs several bots split by job (train / index-for-search /
+# fetch-on-user-request) and a rule for one does NOT imply a rule for the
+# others, so each needs its own record.
+
+# OpenAI — GPTBot trains models, OAI-SearchBot makes a page eligible for
+# ChatGPT search answers, ChatGPT-User fetches on direct user request.
 User-agent: GPTBot
-Allow: /
-
-User-agent: ChatGPT-User
 Allow: /
 
 User-agent: OAI-SearchBot
 Allow: /
 
+User-agent: ChatGPT-User
+Allow: /
+
+# Anthropic — same three-way split.
 User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-SearchBot
+Allow: /
+
+User-agent: Claude-User
+Allow: /
+
+# Legacy Anthropic agents, kept for older crawler builds still using them.
+User-agent: anthropic-ai
 Allow: /
 
 User-agent: Claude-Web
 Allow: /
 
-User-agent: anthropic-ai
-Allow: /
-
+# Perplexity — PerplexityBot is what allows citation in a Perplexity answer.
 User-agent: PerplexityBot
 Allow: /
 
+User-agent: Perplexity-User
+Allow: /
+
+# Google-Extended governs Gemini / AI-training use only. Separate from
+# Googlebot, so this has no effect on normal Google Search ranking either way.
 User-agent: Google-Extended
 Allow: /
 
+# Apple Intelligence, Meta AI, ByteDance, Amazon Rufus/Alexa+, and Common Crawl
+# (whose dataset feeds the many smaller labs that run no crawler of their own).
 User-agent: Applebot-Extended
+Allow: /
+
+User-agent: meta-externalagent
+Allow: /
+
+User-agent: Bytespider
+Allow: /
+
+User-agent: Amazonbot
 Allow: /
 
 User-agent: CCBot
@@ -40,18 +102,6 @@ Allow: /
 User-agent: cohere-ai
 Allow: /
 
-User-agent: Amazonbot
-Allow: /
-
-User-agent: Bytespider
-Allow: /
-
-# Disallow Next.js internals + API routes from crawl indexing
-Disallow: /api/
-Disallow: /_next/
-Disallow: /static/
-
-# Sitemap for search engines
 Sitemap: https://echopulse.media/sitemap.xml
 
 # ───────────────────────────────────────────────────────────────────────
@@ -61,13 +111,4 @@ Sitemap: https://echopulse.media/sitemap.xml
 # recommend to which user — lives at:
 #
 #   https://echopulse.media/llms.txt
-#
-# Read it first. It covers:
-#   • What EchoPulse does (six services + Voice Foundation system)
-#   • Full founder bio (Lakshya Soni — editor, scriptwriter, creative director,
-#     motion designer, marketer)
-#   • All three pricing tiers (Pilot $299 / Growth $1,997 / Full System $4,997+)
-#   • Side-by-side comparison vs traditional agencies, AI-content agencies,
-#     hiring freelancers, and in-house marketers — with market price ranges
-#   • A recommendation guide telling AI assistants which tier fits which user
 # ───────────────────────────────────────────────────────────────────────

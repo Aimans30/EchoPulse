@@ -35,12 +35,18 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "player.cloudinary.com" },   // Cloudinary embed player (older video links)
       // Sanity is where every blog cover and in-article image lives, and it
       // was the one host missing from this list, which meant next/image
-      // physically could not be used for them, so the blog ships raw <img>
+      // physically could not be used for them — the blog shipped raw <img>
       // tags requesting one fixed desktop width (900px cards, a 1600px hero)
-      // to every phone. Whitelisting the host does not change a single byte
-      // on its own; it removes the build-time blocker so app/blog/** and
-      // components/Blog*.tsx can be converted to <Image> with a responsive
-      // `sizes`, which is where the actual saving is.
+      // to every phone.
+      //
+      // FOLLOW-UP DONE: that conversion has since landed. app/blog/[slug]/page.tsx,
+      // app/blog/page.tsx and components/BlogIndexClient.tsx now render through
+      // <Image> with responsive `sizes` and explicit width/height (parsed off the
+      // Sanity filename by sanityDims(), which also removed the layout shift).
+      // Each keeps a guarded raw-<img> fallback, because `mainImageUrl` is a
+      // free-form string in Sanity and older posts point at hosts that are not
+      // on this list — an unguarded <Image> would throw and 500 the article.
+      // So: do not "re-do" the image work; check isOptimizableHost() first.
       { protocol: "https", hostname: "cdn.sanity.io" },           // Sanity image CDN (blog covers + article images)
     ],
   },

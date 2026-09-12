@@ -3,6 +3,7 @@ import { services } from '@/lib/serviceData';
 import { icps } from '@/lib/icpData';
 import { getAllPosts } from '@/lib/blog';
 import { urlFor } from '@/lib/sanity';
+import { BLOG_REDIRECTS } from '@/lib/redirects';
 
 /**
  * Sitemap — generated at build time. Lists the homepage + every service
@@ -87,21 +88,36 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // only discovering it as an <img> inside the crawled page. Same source the
   // OG image and the blog index card use — no separate asset, just declaring
   // the one that already exists.
+  //
+  // A sitemap must list only canonical, indexable URLs. Any slug carrying a
+  // BLOG_REDIRECTS entry 301s away, so listing it would advertise a URL that
+  // never returns 200 — wasted crawl budget and a contradictory signal (the
+  // sitemap says "index this", the response says "go elsewhere").
+  //
+  // As verified Sept 2026 this filter removes nothing: all 65 redirected slugs
+  // are unpublished in Sanity, so getAllPosts() does not return them. It is
+  // here because that is a property of the DATA, not of the code — the moment
+  // anyone re-publishes one of those posts without removing its redirect entry,
+  // the redirect shadows the page and the sitemap starts advertising a 301.
+  // Cheap guard against a failure mode that is invisible until Search Console
+  // reports it months later.
   let blogPosts: MetadataRoute.Sitemap = [];
   try {
     const posts = await getAllPosts();
-    blogPosts = posts.map((post) => {
-      const image = post.mainImage?.asset
-        ? urlFor(post.mainImage).width(1200).height(630).fit('crop').auto('format').url()
-        : post.mainImageUrl || undefined;
-      return {
-        url: `${SITE_URL}/blog/${post.slug}`,
-        lastModified: post.publishedAt ? new Date(post.publishedAt) : now,
-        changeFrequency: 'monthly' as const,
-        priority: 0.75,
-        ...(image ? { images: [image] } : {}),
-      };
-    });
+    blogPosts = posts
+      .filter((post) => !(post.slug in BLOG_REDIRECTS))
+      .map((post) => {
+        const image = post.mainImage?.asset
+          ? urlFor(post.mainImage).width(1200).height(630).fit('crop').auto('format').url()
+          : post.mainImageUrl || undefined;
+        return {
+          url: `${SITE_URL}/blog/${post.slug}`,
+          lastModified: post.publishedAt ? new Date(post.publishedAt) : now,
+          changeFrequency: 'monthly' as const,
+          priority: 0.75,
+          ...(image ? { images: [image] } : {}),
+        };
+      });
   } catch {
     // Sanity unreachable — sitemap continues without blog posts.
   }
