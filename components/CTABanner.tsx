@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { BOOK_CALL_LABEL_LONG } from '@/lib/links';
+import { BOOK_CALL_LABEL_LONG, BOOK_CALL_REASSURANCE } from '@/lib/links';
 import { trackCallClick } from '@/lib/analytics';
 
 /**
@@ -162,7 +162,12 @@ export default function CTABanner() {
               textAlign: 'center',
             }}
           >
-            No credit card. No contracts. Just a conversation.
+            {/* Was "No credit card. No contracts. Just a conversation."
+                That removed risk but promised nothing. BOOK_CALL_REASSURANCE
+                says what the reader actually walks away with, which is the
+                thing that makes the click feel worth it rather than merely
+                safe. */}
+            {BOOK_CALL_REASSURANCE}
           </span>
         </motion.div>
       </motion.div>

@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { BOOK_CALL_LABEL } from '@/lib/links';
 
 const painPoints = [
   { before: 'LinkedIn posts that sound like every AI ghostwriter', after: 'Voice-driven posts your audience actually replies to' },
@@ -162,8 +163,8 @@ export default function ContentShowcase() {
             transition={{ delay:0.5 }}
             style={{ display:'flex', gap:'12px', flexWrap:'wrap', alignItems:'center' }}
           >
-            <button onClick={() => (window as any).openBookCallModal && (window as any).openBookCallModal()} className="cta-primary" aria-label="Book a Free Strategy Call">
-              <span>Book a Free Strategy Call</span>
+            <button onClick={() => (window as any).openBookCallModal && (window as any).openBookCallModal()} className="cta-primary">
+              <span>{BOOK_CALL_LABEL}</span>
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
             </button>
             <a href="#work" className="cta-secondary">

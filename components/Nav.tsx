@@ -543,7 +543,10 @@ export default function Nav({
           type="button"
           onClick={() => (window as unknown as { openBookCallModal?: () => void }).openBookCallModal?.()}
           className="nav-cta-btn nav-desktop-cta"
-          aria-label={BOOK_CALL_LABEL_LONG}
+          // aria-label removed: it used the _LONG variant while the visible
+          // span uses the short one, so the accessible name was not a superset
+          // of the visible text (WCAG 2.5.3 Label in Name). The visible label
+          // is already descriptive enough to be the accessible name.
           data-cursor-hover
         >
           <span>{BOOK_CALL_LABEL}</span>

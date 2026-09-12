@@ -20,6 +20,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import { trackPilotClick, trackCallClick } from '@/lib/analytics';
+import { BOOK_CALL_LABEL } from '@/lib/links';
 import { useGeoPrice } from '@/lib/useGeoPrice';
 
 const SCROLL_TRIGGER_PX = 600;
@@ -177,7 +178,7 @@ export default function MobileStickyCTA() {
       {/* PRIMARY — the only visually loud element. Opens the Calendly modal. */}
       <button
         type="button"
-        aria-label="Book a free strategy call"
+        aria-label={BOOK_CALL_LABEL}
         onClick={() => {
           trackCallClick('mobile_sticky');
           (window as unknown as { openBookCallModal?: () => void }).openBookCallModal?.();
@@ -205,7 +206,7 @@ export default function MobileStickyCTA() {
           touchAction: 'manipulation',
         }}
       >
-        Book a free strategy call
+        {BOOK_CALL_LABEL}
         <span aria-hidden="true" style={{ fontSize: '12px', opacity: 0.85 }}>→</span>
       </button>
 

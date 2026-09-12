@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { trackPilotClick, trackCallClick } from '@/lib/analytics';
 import { useGeoPrice } from '@/lib/useGeoPrice';
 import { fadeUp, stagger, DUR, RISE } from '@/lib/motion';
+import { BOOK_CALL_LABEL, BOOK_CALL_REASSURANCE } from '@/lib/links';
 import { MagneticButton, ShimmerText } from '@/components/ui/Premium';
 
 /**
@@ -101,15 +102,16 @@ export default function BlogFooterCTA({ category }: { category?: string }) {
           }}
           className="blog-cta-btn"
         >
-          Book a free strategy call
+          {BOOK_CALL_LABEL}
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" aria-hidden="true">
             <path d="M5 12h14M12 5l7 7-7 7" />
           </svg>
         </MagneticButton>
 
-        <p className="blog-cta-reassure">
-          Free, 30 minutes, and you will get the plan whether or not you hire us.
-        </p>
+        {/* Was a local "Free, 30 minutes..." string that said 30 while the
+            booking modal and every other surface say 45. Reads from the shared
+            constant so the duration cannot drift again. */}
+        <p className="blog-cta-reassure">{BOOK_CALL_REASSURANCE}</p>
 
         <a
           href="/#pricing"

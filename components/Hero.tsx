@@ -17,7 +17,7 @@ import {
   Rocket,
   type LucideIcon,
 } from 'lucide-react';
-import { BOOK_CALL_LABEL_LONG } from '@/lib/links';
+import { BOOK_CALL_LABEL } from '@/lib/links';
 import { trackPilotClick, trackCallClick } from '@/lib/analytics';
 
 type Service = { Icon: LucideIcon; name: string; tag: string; color: string };
@@ -977,7 +977,13 @@ export default function Hero() {
               <button
                 type="button"
                 className="btn-p"
-                aria-label={BOOK_CALL_LABEL_LONG}
+                // No aria-label. It previously carried BOOK_CALL_LABEL_LONG
+                // while the visible span said something else entirely, so a
+                // screen-reader or voice-control user was told a different
+                // value proposition than the one on screen, and "click Book a
+                // strategy call" would not match the accessible name (WCAG
+                // 2.5.3 Label in Name). The visible text is a perfectly good
+                // accessible name on its own, so let it be the name.
                 data-cursor-hover
                 onClick={() => {
                   trackCallClick('hero_primary');
@@ -987,7 +993,7 @@ export default function Hero() {
                 // there can do its job (an inline value would always win).
                 style={{ border: 'none' }}
               >
-                <span>Book a strategy call</span>
+                <span>{BOOK_CALL_LABEL}</span>
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
               </button>
               {/* WARM — explore packages */}

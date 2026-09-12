@@ -48,8 +48,11 @@ export default function Footer() {
         borderTop: '1px solid rgba(12,12,11,0.09)',
         padding: '72px 56px 48px',
         display: 'grid',
-        gridTemplateColumns: '1.6fr 1fr 1fr 1fr',
-        gap: '56px',
+        // Five tracks, not four. Adding the "Who We Work With" column gave this
+        // grid a fifth child against four declared tracks, so auto-placement
+        // wrapped Contact onto its own row with three empty cells beside it.
+        gridTemplateColumns: '1.6fr 1fr 1fr 1fr 1fr',
+        gap: '48px',
       }}
       className="site-footer"
     >
