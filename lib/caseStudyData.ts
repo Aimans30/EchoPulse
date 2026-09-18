@@ -1,0 +1,841 @@
+/**
+ * Case studies.
+ *
+ * WHY THIS IS A TYPED FILE AND NOT A SANITY DOCUMENT
+ *
+ * A case study is not an article. It is a structured record: a fixed set of
+ * measured values, a date window, a named source instrument, a list of open
+ * problems. Authoring that as portable text means retyping the same shape by
+ * hand every time and hoping nobody drops a field, and it makes the results
+ * table and the Dataset JSON-LD impossible to generate reliably. Holding it as
+ * typed data means the page, the summary table and the structured data are all
+ * generated from one source that the compiler checks.
+ *
+ * HOW TO ADD THE NEXT ONE
+ *
+ * Copy the whole object below, change the values, and add it to the array. The
+ * type will tell you what is missing. Two rules that are not enforceable by the
+ * compiler and matter more than anything the compiler does check:
+ *
+ *   1. Every number traces to a named, dated export you still have a copy of.
+ *      No estimates, no "roughly", no client-reported figures you cannot see.
+ *   2. `openProblems` is never empty. A case study that reports only wins is an
+ *      advertisement, and a reader who has been sold to before can tell the
+ *      difference in about four seconds. The open list is the reason the rest
+ *      of the page is believable.
+ *
+ * Client consent is required before publishing. `clientUrl` must be a live site
+ * the reader can open and check, because the entire persuasive mechanism here
+ * is that the claims are verifiable rather than trusted.
+ */
+
+export type CaseStudyMetric = {
+  /** Big number. Keep the unit attached: "2,398", "203%", "199". */
+  value: string;
+  label: string;
+  /** Optional qualifier printed small underneath. Use for date context. */
+  note?: string;
+};
+
+export type CaseStudyWorkstream = {
+  name: string;
+  /** Slug in lib/serviceData.ts, so the page can link the service. */
+  serviceSlug?: string;
+  summary: string;
+  points: string[];
+};
+
+export type CaseStudyMonth = {
+  month: string;
+  impressions: string;
+  perDay: string;
+  note: string;
+};
+
+export type CaseStudyFunnelRow = {
+  label: string;
+  before: string;
+  after: string;
+  change: string;
+  /** 'up' and 'down' colour the change. 'down' is not hidden or spun. */
+  direction: 'up' | 'down';
+};
+
+export type CaseStudyOpenProblem = {
+  title: string;
+  detail: string;
+  status: string;
+};
+
+export type CaseStudyProof = {
+  src: string;
+  alt: string;
+  /** Intrinsic pixel size of the file, so next/image reserves the right box. */
+  width: number;
+  height: number;
+  /** Names the property, the window and the export date. Non-negotiable. */
+  caption: string;
+};
+
+/**
+ * Before and after, for engagements whose result is visible rather than
+ * measured.
+ *
+ * A rebuild has no impressions curve. Pretending otherwise, by reaching for a
+ * traffic number nobody exported, is the exact failure this whole section
+ * exists to avoid. What a rebuild does have is a thing you can look at, so the
+ * evidence here is the two screens side by side and a live URL the reader can
+ * open in the next tab and check against.
+ *
+ * `after` is optional. Until a capture of the new site exists, the component
+ * renders the before image on its own next to the live link rather than
+ * shipping a broken slider.
+ */
+/** The daily series behind a measured engagement. See `CaseStudy['chart']`. */
+export type CaseStudyChart = {
+  /** One value per day across the window. */
+  daily: number[];
+  /** Index of the day the change shipped. Drawn as the marker line. */
+  launchIndex: number;
+  launchLabel: string;
+  beforeLabel: string;
+  monthTicks: { index: number; label: string }[];
+  yTicks: { frac: number; label: string }[];
+  ariaLabel: string;
+  caption: string;
+};
+
+export type CaseStudyComparison = {
+  beforeSrc: string;
+  beforeAlt: string;
+  beforeWidth: number;
+  beforeHeight: number;
+  beforeLabel: string;
+  afterSrc?: string;
+  afterAlt?: string;
+  afterWidth?: number;
+  afterHeight?: number;
+  afterLabel: string;
+  /** Live URL so the "after" can be verified rather than taken on trust. */
+  liveUrl: string;
+  caption: string;
+};
+
+export type CaseStudy = {
+  slug: string;
+  /** Client name as they write it themselves. */
+  client: string;
+  /** Live, checkable URL. Emitted as Organization.sameAs. */
+  clientUrl: string;
+  clientTagline: string;
+  industry: string;
+  /** Key in lib/icpData.ts, so the page links the matching landing page. */
+  icpKey: string;
+
+  metaTitle: string;
+  metaDescription: string;
+
+  eyebrow: string;
+  headline: string;
+  headlineAccent: string;
+  /** Two or three sentences. Sits under the H1 and carries the whole result. */
+  summary: string;
+
+  /** Human label, plus ISO bounds for Dataset.temporalCoverage. */
+  windowLabel: string;
+  windowStartISO: string;
+  windowEndISO: string;
+  publishedISO: string;
+
+  services: string[];
+  heroMetrics: CaseStudyMetric[];
+  atAGlance: { label: string; value: string }[];
+
+  /**
+   * EVERYTHING FROM HERE TO `openProblems` IS OPTIONAL.
+   *
+   * The first case study in this file was a search engagement, so the type was
+   * originally written around one: a daily series, a month table, a funnel
+   * comparison, a Dataset to declare. The second was a site rebuild with none
+   * of those, and the honest options were to loosen the type or to invent
+   * numbers to fill it. A required field is a standing invitation to make
+   * something up to satisfy it, so the analytics-shaped parts are now opt-in
+   * and a study renders whichever ones it genuinely has.
+   *
+   * What stays mandatory is the part that makes a case study trustworthy: who
+   * the client is, a live URL, what was done, and what is still broken.
+   */
+  chart?: CaseStudyChart;
+
+  /** Before and after screens. Used instead of `chart` on visible-result work. */
+  comparison?: CaseStudyComparison;
+
+  situation: {
+    headline: string;
+    body: string[];
+    failures: { title: string; detail: string }[];
+  };
+
+  workstreams: CaseStudyWorkstream[];
+  months?: CaseStudyMonth[];
+  funnel?: {
+    intro: string;
+    rows: CaseStudyFunnelRow[];
+    reading: string;
+  };
+
+  /** Measurement screenshots. Empty on engagements with nothing to export. */
+  proof: CaseStudyProof[];
+  /** Extra supporting screens, rendered as a grid under the comparison. */
+  gallery?: { heading: string; intro: string; items: CaseStudyProof[] };
+
+  /** Copy for the mid-page CTA. Written per study so the ask refers to the
+   *  work this reader has just been reading about. */
+  midCtaText: string;
+  /** Accent half of the open-problems heading, after "What is still broken,". */
+  openProblemsAccent: string;
+
+  openProblems: CaseStudyOpenProblem[];
+  notApplicable: { title: string; detail: string }[];
+
+  /** Drives the Dataset JSON-LD block. Only where a real export exists. */
+  dataset?: {
+    name: string;
+    description: string;
+    measurementTechnique: string;
+    variableMeasured: string[];
+  };
+};
+
+/**
+ * MagicBNB. Short-term rental portfolio analytics.
+ *
+ * Every figure below comes from the Search Console property for magicbnb.io
+ * and the matching GA4 property, exported 18 August 2026. The daily series in
+ * `chart.daily` is the raw impressions export, one value per day, 19 February
+ * to 17 August 2026 inclusive. It was previously rendered only inside a blog
+ * post, where the proof was buried in prose and the page was typed as a
+ * BlogPosting, which classified the single strongest trust asset on the domain
+ * as an opinion piece.
+ */
+const magicbnb: CaseStudy = {
+  slug: 'magicbnb-seo-aeo',
+  client: 'MagicBNB',
+  clientUrl: 'https://magicbnb.io',
+  clientTagline: 'Portfolio analytics for short-term rental operators. Connects the property management system to the bank and reconciles the two every night.',
+  industry: 'B2B SaaS, short-term rental analytics',
+  icpKey: 'founders',
+
+  // Title stays short because the root layout appends the brand suffix for the
+  // document title. Description is held to the 140 to 160 band the rest of the
+  // site uses, since it is the second half of the click decision.
+  metaTitle: 'MagicBNB Case Study: 5.8 to 2,398 Impressions',
+  metaDescription:
+    'A rebuild, 199 articles and an answer-engine content model took MagicBNB from 5.8 daily Google impressions to 2,398 in four months. Real export included.',
+
+  eyebrow: 'Case study',
+  headline: '5.8 impressions a day to 2,398',
+  headlineAccent: 'in four months.',
+  summary:
+    'In April 2026 magicbnb.io was shown in Google search results an average of 5.8 times a day. Four months later the best single day hit 2,398. Same company, same product, same market. What changed was the site, the content architecture, and what the content was written to be retrieved by. Here is the whole system, the real Search Console export, and the parts that are still broken.',
+
+  windowLabel: '19 February to 17 August 2026',
+  windowStartISO: '2026-02-19',
+  windowEndISO: '2026-08-17',
+  publishedISO: '2026-08-20',
+
+  services: [
+    'Site rebuild and development',
+    'SEO and answer-engine content',
+    'Blog production',
+    'Founder brand and social',
+    'Paid social and ad creative',
+    'Strategy and planning',
+  ],
+
+  heroMetrics: [
+    { value: '5.8 to 1,574', label: 'daily impressions, April against August', note: 'Daily averages, same property' },
+    { value: '119,387', label: 'total impressions across the window', note: '99.1 percent earned after the relaunch' },
+    { value: '199', label: 'articles published into the new architecture', note: 'Three layers, one job each' },
+    { value: '+203%', label: 'sessions, last 30 days against the prior 31', note: '1,432 against 472' },
+  ],
+
+  atAGlance: [
+    { label: 'Client', value: 'MagicBNB (magicbnb.io)' },
+    { label: 'Industry', value: 'B2B SaaS, short-term rental portfolio analytics' },
+    { label: 'Starting point', value: '5.8 Google impressions a day, declining' },
+    { label: 'Engagement', value: 'Full marketing: site rebuild, SEO and AEO content, ad creative, founder brand, planning' },
+    { label: 'Date window', value: '19 February to 17 August 2026' },
+    { label: 'Change shipped', value: '5 May 2026, rebuilt site live' },
+    { label: 'Measured result', value: '119,387 impressions, 99.1 percent of them after 5 May' },
+    { label: 'How measured', value: 'Google Search Console property for magicbnb.io, plus GA4, exported 18 August 2026' },
+  ],
+
+  chart: {
+    daily: [
+      46, 37, 52, 33, 28, 37, 28, 26, 35, 15, 26, 76, 22, 16, 20, 31, 14, 13, 21, 18,
+      27, 24, 16, 16, 9, 14, 18, 8, 44, 10, 22, 13, 13, 10, 7, 10, 6, 12, 12, 5,
+      4, 1, 4, 3, 4, 4, 3, 8, 3, 3, 3, 1, 3, 5, 2, 4, 4, 12, 3, 12,
+      5, 5, 13, 20, 5, 6, 2, 6, 12, 10, 9, 22, 11, 6, 13, 209, 496, 416, 369, 313,
+      352, 347, 355, 376, 488, 537, 502, 570, 594, 350, 293, 324, 581, 639, 716, 604, 602, 801, 835, 913,
+      1293, 1467, 1011, 697, 720, 778, 559, 553, 635, 896, 969, 1122, 1245, 1188, 1271, 1794, 1620, 1920, 1742, 1625,
+      1621, 1303, 1283, 1415, 1122, 1043, 1126, 1190, 1308, 1354, 1421, 1452, 1433, 1384, 1486, 1818, 2087, 2209, 2074, 2018,
+      2015, 1469, 1617, 1724, 1307, 1301, 1133, 959, 978, 811, 1131, 878, 903, 876, 919, 960, 806, 828, 1065, 980,
+      1026, 1131, 851, 1063, 1479, 1380, 1651, 1619, 1479, 1080, 1280, 1594, 1704, 1451, 1349, 1402, 1808, 1827, 2200, 2398,
+    ],
+    launchIndex: 75,
+    launchLabel: '5 May: rebuilt site ships',
+    beforeLabel: 'before',
+    monthTicks: [
+      { index: 0, label: 'Feb' },
+      { index: 10, label: 'Mar' },
+      { index: 41, label: 'Apr' },
+      { index: 71, label: 'May' },
+      { index: 102, label: 'Jun' },
+      { index: 132, label: 'Jul' },
+      { index: 163, label: 'Aug' },
+    ],
+    yTicks: [
+      { frac: 0, label: '0' },
+      { frac: 0.25, label: '600' },
+      { frac: 0.5, label: '1.2K' },
+      { frac: 0.75, label: '1.8K' },
+      { frac: 1, label: '2.4K' },
+    ],
+    ariaLabel:
+      'MagicBNB daily Google search impressions, February to August 2026. Flat near zero until the 5 May relaunch, then climbing to 2,398 a day.',
+    caption:
+      'Daily impressions, Google Search Console property for magicbnb.io, 19 February to 17 August 2026. The dashed line is 5 May, the day the rebuilt site went live. On 4 May the site earned 13 impressions. On 5 May it earned 209.',
+  },
+
+  situation: {
+    headline: 'The old site was not underperforming. It was structurally incapable of performing.',
+    body: [
+      'Before 5 May 2026, across 75 days, the site earned 1,121 impressions in total. An average of 14.9 a day, trending down. April was the floor at 5.8 a day. That is not a site losing a ranking fight. That is what Google shows you when it has concluded there is nothing on the domain worth surfacing.',
+      'Four things were missing, and none of them could be fixed by publishing more.',
+    ],
+    failures: [
+      {
+        title: 'No content surface',
+        detail: 'A handful of marketing pages, no blog architecture, and no reason for a crawler to ever come back.',
+      },
+      {
+        title: 'No entity definition',
+        detail: 'Nothing stated plainly what MagicBNB is, who it serves, or how it differs from a property management system. Search engines and language models had nothing to learn from.',
+      },
+      {
+        title: 'No extraction structure',
+        detail: 'No question-shaped headings, no comparison tables, no definition sentences, no FAQ schema. Nothing an AI Overview could lift and quote.',
+      },
+      {
+        title: 'A buried conversion path',
+        detail: 'The free trial was hard to find, and the product was described in feature language instead of the language of the problem it solves.',
+      },
+    ],
+  },
+
+  workstreams: [
+    {
+      name: 'Site rebuild and development',
+      serviceSlug: 'websites-funnels',
+      summary:
+        'A full rebuild on Next.js, designed around three jobs: explain the product to a human in ten seconds, prove it to a sceptic in ninety, and give a machine something unambiguous to quote.',
+      points: [
+        'A problem-first homepage that opens on the question the buyer already has, whether they actually know which of their properties make money, then quantifies the cost of not knowing.',
+        'Live product surfaces rendered as working interface on the page rather than static screenshots: portfolio dashboard, per-property profit and loss, owner statements, bank reconciliation.',
+        'A three-step onboarding narrative carrying the real timings, 60 seconds to connect the property management system and 90 for the bank, instead of vague promises.',
+        'Clean crawl paths, canonical discipline, structured metadata, verified search and social properties, and a performance budget that holds Core Web Vitals green as content weight grows.',
+        'A trial-first conversion path with pricing published openly and no request-a-demo wall.',
+      ],
+    },
+    {
+      name: 'Content architecture, shipped before the content',
+      serviceSlug: 'blog-production',
+      summary:
+        'The sequencing is the part most teams get wrong. Publishing 199 articles onto a site that cannot cluster, link or surface them produces 199 orphan pages.',
+      points: [
+        'Blog architecture built to carry hundreds of posts, with category routing, cross-linking slots and related-post surfaces, built and shipped before the first article landed.',
+        'All 199 articles sit in one of three layers. Competitive displacement: head-to-head comparisons where the buyer is already shopping. Operator economics: the maths hosts search at 11pm, which builds the topical authority that makes layer one rankable. Market and regulation reports: city-level and regulatory coverage, which is what earns links.',
+        'The reason the impression curve goes near vertical from the day of the relaunch, rather than creeping up over a year, is that the first wave of writing landed into a structure already built to hold it.',
+        'Nine of the top ten pages by impressions are now editorial. The homepage sits tenth. The brand page stopped being the only door into the business.',
+      ],
+    },
+    {
+      name: 'Choosing what to rank for',
+      serviceSlug: 'blog-production',
+      summary:
+        'The single highest-leverage decision was refusing to fight for head terms. Phrases like short term rental software are owned by companies with a decade of domain authority and budgets a young SaaS does not have.',
+      points: [
+        'We mapped the category frustration instead. The best known name in short-term rental data is expensive and estimates market averages rather than reporting your actual numbers. That combination produces a very specific, very high-intent search behaviour: people looking for a way out.',
+        'The resulting displacement cluster sits between positions 9 and 19, the band where a title rewrite or a single link moves a page onto the first screen.',
+        'The flagship article on alternatives to the category leader has earned 52,793 impressions on its own since May, which is more than the entire pre-relaunch site earned in six months.',
+        'Singapore surfaced as the second largest source of sessions, ahead of Canada. That was not planned. We read it in the data, shipped a dedicated market report, and it is now a top twenty page.',
+      ],
+    },
+    {
+      name: 'Writing for answer engines, not blue links',
+      serviceSlug: 'blog-production',
+      summary:
+        'Zero-click share sat between 99.0 and 99.8 percent every single day. Most agencies would bury that. It is the centre of the strategy.',
+      points: [
+        'When someone searches what a good occupancy rate is, Google increasingly answers in place using text lifted from pages it trusts. The user never clicks. The impression still registers. If the answer being read out is yours, carrying your framing and your brand name, you have been cited to a buyer who never visited the site.',
+        'Question-shaped H2 headings phrased the way people actually type them, because that is the retrieval unit an answer engine matches against.',
+        'A clean definition sentence near the top of every page, at least one comparison table per piece, FAQ answers sized between 40 and 60 words, and key takeaway bullets at the end. These are the four most frequently extracted blocks.',
+        'Entity consistency: the same description of what the company is and who it serves, repeated in consistent language across 199 pages, the metadata and off-site profiles. Models learn entities by repetition across sources.',
+        'The honest read on whether it is working: GA4 attributes about 2 percent of traffic to AI assistant referrers, which is small, and any agency claiming large AI citation numbers in 2026 is measuring badly or making it up. The stronger evidence is in the query export, where the site now surfaces for long conversational queries nobody types into a search box.',
+      ],
+    },
+    {
+      name: 'Founder brand and social',
+      serviceSlug: 'linkedin-ghostwriting',
+      summary:
+        'Software in this category is bought on trust, and trust attaches to a person before it attaches to a logo.',
+      points: [
+        'We run the founder LinkedIn presence as a distribution channel in its own right, with positioning, a repeatable post architecture and a weekly cadence built by repurposing research the blog is already producing.',
+        'A market report becomes a post about what operators in that city are actually earning. The research cost is already paid.',
+        'In the last 30 days Organic Social delivered 285 sessions, third behind Direct at 595 and Organic Search at 339, and ahead of Paid Social at 165.',
+        'The Direct number is itself largely brand recall: people who met the company on LinkedIn and typed the domain in later.',
+      ],
+    },
+    {
+      name: 'Paid social and ad creative',
+      serviceSlug: 'ad-creatives',
+      summary:
+        'Creative produced in house across static, video and carousel, iterated against delivery data rather than opinion.',
+      points: [
+        'Spend in the last 30 days was $596.65, up 107 percent on the prior period, which is the right shape for a programme still in its learning phase.',
+        'The job of paid here is not volume. It is to buy fast feedback on which messages land, then feed the winners back into the organic content and the site copy.',
+        'Ad creative and organic content are produced by the same team from the same research, so a message that wins in paid is in the blog and on LinkedIn the same week.',
+      ],
+    },
+  ],
+
+  months: [
+    { month: 'February 2026', impressions: '337', perDay: '33.7', note: 'Legacy site, declining' },
+    { month: 'March 2026', impressions: '557', perDay: '18.0', note: 'Audit and architecture work, nothing shipped' },
+    { month: 'April 2026', impressions: '175', perDay: '5.8', note: 'The floor. Build in progress' },
+    { month: 'May 2026', impressions: '15,394', perDay: '496.6', note: 'Rebuild ships on the 5th' },
+    { month: 'June 2026', impressions: '35,983', perDay: '1,199.4', note: 'The comparison cluster starts ranking' },
+    { month: 'July 2026', impressions: '40,177', perDay: '1,296.0', note: 'Steady compounding' },
+    { month: 'August 2026, to the 17th', impressions: '26,764', perDay: '1,574.4', note: 'Highest daily average so far, still climbing' },
+  ],
+
+  funnel: {
+    intro:
+      'Impressions on their own are a vanity number. Here is the last 30 days against the preceding 31, from the same Search Console and GA4 properties. Two rows moved the wrong way and they are printed here rather than left out.',
+    rows: [
+      { label: 'Sessions', before: '472', after: '1,432', change: '+203%', direction: 'up' },
+      { label: 'Users', before: '422', after: '1,331', change: '+215%', direction: 'up' },
+      { label: 'Organic search clicks', before: '158', after: '190', change: '+20%', direction: 'up' },
+      { label: 'Impressions', before: '44,592', after: '40,771', change: '-9%', direction: 'down' },
+      { label: 'Average position', before: '10.6', after: '12.1', change: '1.5 worse', direction: 'down' },
+    ],
+    reading:
+      'When a large batch of new pages indexes at once, they enter at weak positions and drag the site-wide average down before they mature. Sessions tripling in the same window is the signal that matters. A site that triples real human sessions while its average position slips has stopped depending on any single page.',
+  },
+
+  midCtaText:
+    'Want to know whether this would work for your site? The audit call opens by looking at your Search Console the same way we looked at this one.',
+  openProblemsAccent: 'taken from the same export.',
+
+  proof: [
+    {
+      src: '/case-studies/magicbnb-gsc-proof.png',
+      alt: 'Google Search Console performance report for magicbnb.io showing total impressions climbing from near zero in February 2026 to a peak above 2,000 a day in August 2026.',
+      width: 1893,
+      height: 895,
+      caption:
+        'Google Search Console, property magicbnb.io, performance report for 19 February to 17 August 2026. Exported 18 August 2026. Published with the client written consent.',
+    },
+  ],
+
+  openProblems: [
+    {
+      title: 'Click-through rate is 0.4 percent',
+      detail:
+        '119,387 impressions produced 477 clicks, which means titles and descriptions are not earning the click the ranking already won. At current volume, moving site-wide CTR from 0.4 to a still-modest 2 percent is roughly 2,000 extra clicks a month without publishing a single new page. This is the highest value work available.',
+      status: 'Next phase',
+    },
+    {
+      title: 'Conversions read zero because they are not instrumented',
+      detail:
+        'GA4 has no key event and the signup webhook is not wired, so we can prove traffic and cannot yet prove trials. This should have been wired at launch and was not.',
+      status: 'Being fixed now',
+    },
+    {
+      title: 'Keyword cannibalisation',
+      detail:
+        'The brand query is split across 23 pages and the flagship comparison query across 14. That is the cost of shipping 199 articles quickly. Consolidation and canonical work is scheduled.',
+      status: 'Scheduled',
+    },
+    {
+      title: 'Three articles are not indexed at all',
+      detail: 'Submitted and being monitored.',
+      status: 'Monitoring',
+    },
+    {
+      title: 'A broken inbound link is sending real visitors to a 404',
+      detail: 'Found in the same export. Being redirected.',
+      status: 'Being fixed now',
+    },
+    {
+      title: 'Bot traffic is 44 percent of sessions',
+      detail:
+        '1,001 bot against 1,262 real. Normal for a site with a large new content surface, but it means raw session counts need filtering before anyone celebrates them. The session figures quoted above are the filtered ones.',
+      status: 'Filtered in reporting',
+    },
+  ],
+
+  notApplicable: [
+    {
+      title: 'You need leads this month',
+      detail:
+        'The curve above took four months to bend and the first two produced nothing visible. If the business needs pipeline inside 30 days, paid and outbound are the honest answer, and this programme runs behind them rather than instead of them.',
+    },
+    {
+      title: 'Your category has no comparison behaviour',
+      detail:
+        'This worked because there is an expensive, well known incumbent that buyers actively search for alternatives to. If nobody is shopping around in your category yet, the displacement layer has nothing to displace and the whole plan changes.',
+    },
+    {
+      title: 'You cannot publish at volume',
+      detail:
+        '199 articles in four months is the input. At a tenth of that volume the architecture still helps, but you should expect a tenth of the surface and a much longer curve, and you should plan for that rather than be surprised by it.',
+    },
+    {
+      title: 'Your product cannot be described honestly',
+      detail:
+        'Every page here was straightforward to write because the product does what it says. Content cannot fix a product that does not, and a large indexed content surface makes that discoverable faster, not slower.',
+    },
+  ],
+
+  dataset: {
+    name: 'MagicBNB Google Search Console daily impressions, February to August 2026',
+    description:
+      'Daily Google Search impression counts for the magicbnb.io Search Console property, 19 February to 17 August 2026 inclusive, 180 daily observations totalling 119,387 impressions. Exported 18 August 2026 and published with the site owner consent.',
+    measurementTechnique: 'Google Search Console performance report export',
+    variableMeasured: ['Search impressions', 'Search clicks', 'Average position', 'Click-through rate'],
+  },
+};
+
+/**
+ * Working With God. Site replacement for Dr. Eliyahu Lotzar.
+ *
+ * This study deliberately carries NO traffic numbers. The old site ran on
+ * GoDaddy Airo and no analytics baseline came across from it, so there is
+ * nothing honest to compare against, and the page says so in the summary table
+ * and again in the open problems rather than quietly leaving the reader to
+ * assume there was a lift. Everything asserted here is either a fact the client
+ * confirmed (the old monthly cost, the one-time build fee, the handover) or
+ * something a reader can verify by opening workingwithgod.live.
+ *
+ * Published with Dr. Lotzar's consent to be named and linked.
+ */
+const workingWithGod: CaseStudy = {
+  slug: 'working-with-god-rebuild',
+  client: 'Working With God, Dr. Eliyahu Lotzar',
+  clientUrl: 'https://workingwithgod.live',
+  clientTagline:
+    'Faith-based executive coaching for Christian professionals. Dr. Eliyahu Lotzar, Ed.D., MSW, author of Working With God: The Ten Modes of Elevated Leadership.',
+  industry: 'Executive coaching and leadership development',
+  icpKey: 'coaches',
+
+  metaTitle: 'Working With God: A GoDaddy Site Replaced',
+  metaDescription:
+    'Two businesses shared one cluttered GoDaddy site. We split them, rebuilt the coaching practice its own home, and cut the monthly platform bill to zero.',
+
+  eyebrow: 'Case study',
+  headline: 'Two businesses were sharing one website.',
+  headlineAccent: 'Neither was winning.',
+  summary:
+    'Dr. Eliyahu Lotzar runs an organizational consulting practice and a faith-based leadership practice. Both lived on the same GoDaddy Airo site, so a Christian executive looking for coaching landed on a page about five-factor organizational health frameworks and revenue targets. We split the two, gave the coaching practice its own site, and took the monthly platform bill to nothing.',
+
+  windowLabel: 'Rebuilt and launched 2026',
+  windowStartISO: '2026-01-01',
+  windowEndISO: '2026-09-19',
+  publishedISO: '2026-09-19',
+
+  services: [
+    'Positioning and brand split',
+    'Conversion copywriting',
+    'Website design',
+    'Website development',
+    'Technical SEO and metadata',
+    'Launch and handover',
+  ],
+
+  heroMetrics: [
+    {
+      value: '$0',
+      label: 'monthly platform bill, down from $50 to $60',
+      note: 'One time $599 for the redesign. No retainer.',
+    },
+    {
+      value: '1 of 7',
+      label: 'how much of the old site the coaching practice got',
+      note: 'One bullet in a service list. Now it has its own site.',
+    },
+    {
+      value: '5 ways in',
+      label: 'two of them free, replacing one generic contact form',
+      note: 'Webinar, Roundtable, coaching, Masters Class, the book',
+    },
+    {
+      value: 'Full handover',
+      label: 'code and content, editable without a developer',
+      note: 'No vendor lock-in and nothing to renew',
+    },
+  ],
+
+  atAGlance: [
+    { label: 'Client', value: 'Dr. Eliyahu Lotzar, Ed.D., MSW. Reframed Reality and Working With God' },
+    { label: 'Industry', value: 'Faith-based executive coaching and leadership development' },
+    { label: 'Starting point', value: 'reframedreality.com on GoDaddy Airo, two businesses sharing one site' },
+    { label: 'Engagement', value: 'Full site replacement: positioning, copy, design, build, launch, handover' },
+    { label: 'What was built', value: 'workingwithgod.live, now live and replacing the old site' },
+    { label: 'Stack', value: 'Static build on Netlify, media on Cloudinary, booking on Calendly, events on Meetup' },
+    { label: 'Cost change', value: '$50 to $60 a month in plugins and add-ons, down to no monthly platform bill. One time $599 for the redesign.' },
+    {
+      label: 'What is NOT measured',
+      value: 'No analytics baseline carried over from the old platform, so this page makes no traffic or conversion claims. Measurement starts at launch.',
+    },
+  ],
+
+  comparison: {
+    beforeSrc: '/case-studies/wwg-before-home.png',
+    beforeAlt:
+      'The old Reframed Reality homepage on GoDaddy Airo: a green and white template with a stock bridge photo, a "Got Growth?" headline, a wall of body copy, and a broken right-hand column where an image is followed by a white gap and a stray sliver of a second image.',
+    beforeWidth: 850,
+    beforeHeight: 1600,
+    beforeLabel: 'Before, on GoDaddy',
+    // afterSrc is intentionally absent until a full-page capture of the new
+    // homepage is saved to /public/case-studies/wwg-after-home.png. Until then
+    // BeforeAfter renders the old screen on its own beside the live link, which
+    // is stronger evidence than a screenshot anyway.
+    afterLabel: 'After, workingwithgod.live',
+    liveUrl: 'https://workingwithgod.live',
+    caption:
+      'Left, the old reframedreality.com homepage on GoDaddy Airo, captured before replacement. Right, workingwithgod.live as it stands today. The new site is live, so you can open it and check it against this rather than take the screenshot for it.',
+  },
+
+  situation: {
+    headline: 'The site was not dated. It was doing two jobs and failing both.',
+    body: [
+      'Dr. Lotzar has been coaching, counselling, consulting and facilitating for over thirty years. He holds an Ed.D. in Executive Leadership and an MSW, he is certified through Adizes, Arbinger and Wiley DiSC, and he wrote the book the coaching method is built on. None of that was the problem.',
+      'The problem was that a visitor could not tell which business they had arrived at, and the site gave them no obvious thing to do next.',
+    ],
+    failures: [
+      {
+        title: 'One site, two audiences',
+        detail:
+          'An operations director hunting for a change-management consultant and a Christian executive looking for faith-based coaching landed on the same navigation. The organizational health page opened on a five-factor framework and revenue targets from $10M to $100M. Working With God was one bullet in a list of seven services.',
+      },
+      {
+        title: 'Old and new stacked on top of each other',
+        detail:
+          'Rounds of edits had been layered onto the template without anything being taken away. On the homepage the right column carried an image, then a white gap, then a stray sliver of a second image. That is what accumulated edits look like by the time they reach a visitor.',
+      },
+      {
+        title: 'No way in',
+        detail:
+          'The single conversion path was a contact form headed "Please specify your interest in the message section." A visitor who was genuinely interested had to invent their own reason to write, decide what to ask for, and hope. Most people close the tab instead.',
+      },
+      {
+        title: 'Paying rent on the problem',
+        detail:
+          '$50 to $60 a month in plugins and add-ons to keep a site builder doing things it was never quite built to do, with the builder badge on every page footer. That is roughly $700 a year spent maintaining the thing that needed replacing.',
+      },
+    ],
+  },
+
+  workstreams: [
+    {
+      name: 'Split the two businesses',
+      summary:
+        'The first decision was not a design decision. One site cannot introduce two practices to two different buyers without weakening both, so the coaching practice was given its own domain, its own name and its own audience.',
+      points: [
+        'workingwithgod.live now speaks to exactly one person: a Christian professional weighing a real decision at work. Nothing on it has to hedge toward a second audience.',
+        'The homepage states the audience in the first line under the headline, "Coaching for Christian Professionals", so nobody has to read three sections to find out whether they are in the right place.',
+        'The organizational consulting work keeps its own identity rather than being diluted by faith-based positioning it was never asking for.',
+      ],
+    },
+    {
+      name: 'Build an offer ladder instead of a contact form',
+      serviceSlug: 'websites-funnels',
+      summary:
+        'A single contact form asks the visitor to commit before they have any reason to. The new site gives five ways to begin, ordered by how much they cost the visitor, and two of them are free.',
+      points: [
+        'A free 60-minute introductory webinar on the method, run through Meetup.',
+        'A free in-person Roundtable on the third Wednesday of the month in Northern Virginia.',
+        'Executive coaching, the two-day Masters Class immersion, and the book, for people ready to go further.',
+        'Every one of them has its own destination and its own button. The reader picks their own depth rather than being funnelled into the one ask the site knows how to make.',
+      ],
+    },
+    {
+      name: 'Put the credentials where the doubt is',
+      serviceSlug: 'websites-funnels',
+      summary:
+        'Thirty years of practice, a doctorate, a clinical qualification and three certifications were spread across a long About page nobody scrolled. They now sit directly under the headline.',
+      points: [
+        'A four-part credential strip immediately below the hero: Author, Ed.D. in Executive Leadership, MSW Therapist, certified by Adizes, Arbinger and DiSC.',
+        'A named client quote from Sylvia Palmer, Chief Impact Officer at Amplify, placed early rather than on a separate testimonials page.',
+        'A six-question FAQ that answers the objections people actually raise, including whether this is about being more religious at work, which is the question that stops the most people.',
+      ],
+    },
+    {
+      name: 'Design and build',
+      serviceSlug: 'websites-funnels',
+      summary:
+        'A static build on Netlify, with media on Cloudinary. No plugin stack, no monthly platform bill, nothing to keep patched.',
+      points: [
+        'Booking runs through Calendly and events through Meetup, so the tools the practice already used stayed in place rather than being replaced for the sake of it.',
+        'Full metadata: canonical URL, Open Graph and Twitter cards with a real preview image, and robots directives set to allow large image previews and full-length snippets.',
+        'A skip-to-content link and a honeypot field on the newsletter signup, which are the two small things almost every small-business build skips.',
+        'Separate pages for the book, services, events, speaking, the Roundtable and about, so each has a URL that can be linked and found on its own.',
+      ],
+    },
+    {
+      name: 'Hand it over completely',
+      summary:
+        'The point of leaving a site builder is not paying less. It is owning the thing. Everything transferred on launch.',
+      points: [
+        'Code and content both handed over. No vendor lock-in, nothing that stops working if we stop answering the phone.',
+        'Set up so the owner, who is not a developer, can change copy and content himself without opening a support ticket or paying for a plugin.',
+        'The $599 was a one-time fee for the redesign. There is no retainer attached to this engagement and no monthly platform bill replacing the old one.',
+      ],
+    },
+  ],
+
+  proof: [],
+
+  gallery: {
+    heading: 'What the old site asked a visitor to work through.',
+    intro:
+      'Captured from reframedreality.com before it was replaced. These are the pages a Christian executive looking for coaching had to navigate to find out whether the practice was for them.',
+    items: [
+      {
+        src: '/case-studies/wwg-before-org.png',
+        alt: 'The old Organization-Level Services page: four dense paragraphs of body copy under small-caps headings, with no calls to action.',
+        width: 1067,
+        height: 1600,
+        caption: 'Organization-Level Services. Four paragraphs, no call to action, framework names and revenue targets in the opening lines.',
+      },
+      {
+        src: '/case-studies/wwg-before-wwg.png',
+        alt: 'The old Working With God page, one section within the wider consulting site.',
+        width: 604,
+        height: 1600,
+        caption: 'Working With God, as one page inside a consulting site rather than a practice with its own home.',
+      },
+      {
+        src: '/case-studies/wwg-before-about.png',
+        alt: 'The old About page: a very long single column of certifications, publications and organizations served, as unbroken bullet lists.',
+        width: 427,
+        height: 1600,
+        caption: 'About. Thirty years of credentials, real and impressive, delivered as bullet lists most visitors never reached.',
+      },
+      {
+        src: '/case-studies/wwg-before-individual.png',
+        alt: 'The old Individual-Level Services page, with two columns of centred body copy.',
+        width: 1132,
+        height: 1600,
+        caption: 'Individual-Level Services. Two columns of centred text, which is the hardest layout to read at length.',
+      },
+      {
+        src: '/case-studies/wwg-before-team.png',
+        alt: 'The old Team-Level Services page: eight stacked sections of dense copy.',
+        width: 588,
+        height: 1600,
+        caption: 'Team-Level Services. Eight stacked sections, each one a wall, competing for the same visitor.',
+      },
+      {
+        src: '/case-studies/wwg-before-contact.png',
+        alt: 'The old Contact Us page: a bare form with the instruction to specify your interest in the message section.',
+        width: 1600,
+        height: 1480,
+        caption: 'Contact Us. "Please specify your interest in the message section." The visitor had to supply the offer themselves.',
+      },
+    ],
+  },
+
+  midCtaText:
+    'If your site is doing two jobs badly, or you are paying a builder every month for something you have outgrown, that is the conversation. We will tell you on the call if a rebuild is not what you actually need.',
+  openProblemsAccent: 'including what this page cannot prove.',
+
+  openProblems: [
+    {
+      title: 'There is no before and after in the numbers, and there will not be',
+      detail:
+        'No analytics baseline came across from the old platform, so there is no honest traffic or conversion comparison to publish and this page does not attempt one. Everything above is either a confirmed fact about the engagement or something you can check by opening the site. Measurement starts from launch.',
+      status: 'Structural',
+    },
+    {
+      title: 'The booking link still carries the old company name',
+      detail:
+        'Every "Book a call" on the new site hands off to a Calendly URL ending reframedreality, so a visitor who has just been reading about Working With God lands on a page branded with the other practice. It is a small inconsistency in exactly the place where hesitation is highest.',
+      status: 'Next up',
+    },
+    {
+      title: 'The booking handoff is not instrumented',
+      detail:
+        'Bookings complete on Calendly, off the site, so as it stands the site cannot tell which page produced a call. Until that is wired, any judgement about which section is working is guesswork. Worth fixing before a penny goes into promoting the site.',
+      status: 'Next up',
+    },
+    {
+      title: 'Redirects from the retired domain need confirming',
+      detail:
+        'The old site is being replaced, and its pages should 301 to their closest match on the new one so that years of accumulated links and any existing rankings are not dropped. This needs verifying against the live configuration rather than assumed.',
+      status: 'To verify',
+    },
+    {
+      title: 'One testimonial on the whole site',
+      detail:
+        'The new site carries a single named quote. A coaching practice is bought on social proof more than almost any other kind of business, and collecting three or four more is the single biggest available lift. That one is on the client, and we have said so.',
+      status: 'With the client',
+    },
+  ],
+
+  notApplicable: [
+    {
+      title: 'Your site is fine and what you need is demand',
+      detail:
+        'A rebuild does not create an audience. If traffic is already arriving and simply not converting, that is a copy and offer problem and it is cheaper to fix. If nothing is arriving at all, a new site will change nothing on its own.',
+    },
+    {
+      title: 'You genuinely serve two audiences equally',
+      detail:
+        'Splitting a brand in two costs a second domain, a second content plan and twice the upkeep. It was right here because one practice was clearly being smothered by the other. Where two lines of business are both healthy and share buyers, keeping them together is usually correct.',
+    },
+    {
+      title: 'You need to restructure pages every week',
+      detail:
+        'The handover covers copy and content, which the owner edits himself. Changing layout and adding new page types still means a developer. If your team genuinely rebuilds page structure constantly, a page builder earns its monthly fee and you should keep it.',
+    },
+    {
+      title: 'You want the numbers before you commit',
+      detail:
+        'Fair, and this page cannot give them to you. If proof by measurement is what you need before hiring anyone, read the MagicBNB case study instead. It carries a real Search Console export, and it is on this site for exactly that reason.',
+    },
+  ],
+};
+
+export const caseStudies: CaseStudy[] = [magicbnb, workingWithGod];
+
+export function getCaseStudy(slug: string): CaseStudy | undefined {
+  return caseStudies.find((c) => c.slug === slug);
+}
+
+/**
+ * The one image that represents a study, for OG cards, the sitemap and the
+ * Article JSON-LD.
+ *
+ * A measured engagement leads with its export screenshot. A rebuild has no
+ * export, so it leads with the "before" screen, which is the image carrying
+ * the argument anyway. Falling back to the generic site OG card instead would
+ * put an EchoPulse logo on a link about someone else's business.
+ */
+export function heroImageFor(study: CaseStudy): { src: string; caption: string } | null {
+  if (study.proof[0]) return { src: study.proof[0].src, caption: study.proof[0].caption };
+  if (study.comparison) return { src: study.comparison.beforeSrc, caption: study.comparison.caption };
+  return null;
+}

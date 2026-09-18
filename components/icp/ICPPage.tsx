@@ -298,11 +298,12 @@ export default function ICPPage({ data, videos }: { data: IcpData; videos: Video
               <div className="icp-work-placeholder">
                 We have not published work for this segment yet, and we are not going to
                 dress up someone else&apos;s as if we had.{' '}
-                <Link href="/blog/magicbnb-seo-aeo-case-study-2026" style={{ color: accent, fontWeight: 700 }}>
+                <Link href="/case-studies/magicbnb-seo-aeo" style={{ color: accent, fontWeight: 700 }}>
                   Read the one case study we can show you
                 </Link>
-                , with a real Search Console export published with the client&apos;s permission.
-                It is a different industry, and you can judge the work on its own terms.
+                , with a real Search Console export published with the client&apos;s permission,
+                and the open problems still on the account listed at the bottom of it. It is a
+                different industry, and you can judge the work on its own terms.
               </div>
             </div>
           )}

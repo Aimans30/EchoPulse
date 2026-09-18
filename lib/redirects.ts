@@ -132,6 +132,22 @@ export const BLOG_REDIRECTS: Record<string, string> = {
   // which is NOT published, so this 301'd into a 404. Repointed to the live
   // real-estate social post.
   "real-estate-social-media-strategy-2026": `/blog/${SURVIVORS.realEstateSocial}`,
+
+  // ── Section move, September 2026: case study out of /blog ──────────────────
+  // This is NOT a consolidation like everything above it. The post is good and
+  // still published in Sanity. It moved because /blog/ classifies a page as
+  // commentary, to a crawler and to a language model alike, and this is the
+  // only proof asset on the domain. It now lives under /case-studies/ as an
+  // Article whose `about` is the client Organization, with the Search Console
+  // export declared as a Dataset. Neither is expressible from a BlogPosting.
+  //
+  // Two consequences of putting it in this map, both wanted: the sitemap
+  // already filters every slug listed here, and lib/blog.ts now filters them
+  // out of the index too, so nothing links at a URL that 301s.
+  //
+  // The Sanity document should be unpublished once this deploys. Until then
+  // the redirect shadows it, so there is no duplicate-content window.
+  "magicbnb-seo-aeo-case-study-2026": "/case-studies/magicbnb-seo-aeo",
 };
 
 /** Slugs that are still live. Used to avoid redirect chains from /blogs/*. */

@@ -4,6 +4,7 @@ import Footer from '@/components/Footer';
 import BlogIndexClient, { type IndexPost } from '@/components/BlogIndexClient';
 import { getAllPosts, resolveCategory } from '@/lib/blog';
 import { urlFor } from '@/lib/sanity';
+import { BLOG_REDIRECTS } from '@/lib/redirects';
 
 export const metadata: Metadata = {
   // Titled for the search query, not for the nav label. "Blog" ranks for
@@ -27,7 +28,14 @@ export const metadata: Metadata = {
 export const revalidate = 60;
 
 export default async function BlogIndexPage() {
-  const posts = await getAllPosts();
+  // A slug carrying a BLOG_REDIRECTS entry 301s away, so listing it here would
+  // hand every reader a card that bounces them to a different URL. Until Sept
+  // 2026 this filter was a no-op, because all 65 redirected slugs were also
+  // unpublished in Sanity and getAllPosts never returned them. That stopped
+  // being true when the MagicBNB case study moved to /case-studies: it is still
+  // published, so without this line the index would keep advertising the old
+  // path. Same guard the sitemap already applies, for the same reason.
+  const posts = (await getAllPosts()).filter((post) => !(post.slug in BLOG_REDIRECTS));
 
   // Enrich server-side so the client component carries no server-only imports
   // (Sanity client / image builder): resolved category + ready-to-use image URL.

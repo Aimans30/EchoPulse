@@ -12,7 +12,11 @@ export type NavLink = { label: string; href: string };
 // set via the `links` prop so the nav stays DRY instead of a forked component.
 const HOMEPAGE_LINKS: NavLink[] = [
   { label: 'Services', href: '/#services' },
-  { label: 'Work', href: '/#work' },
+  // Was "Work" pointing at the homepage video showcase. A nav slot is the most
+  // valuable internal link on the site, and it was spending it on a carousel
+  // with no numbers on it. /case-studies carries the only measured proof we
+  // have. The #work showcase is still on the homepage and still scrolled to.
+  { label: 'Case studies', href: '/case-studies' },
   { label: 'Pricing', href: '/#pricing' },
   { label: 'Blog', href: '/blog' },
   { label: 'FAQ', href: '/#faq' },

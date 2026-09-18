@@ -206,6 +206,7 @@ export default function Footer() {
             // position ~4 purely on Google's crawl memory with nothing
             // reinforcing it internally.
             { label: 'About', href: '/about' },
+            { label: 'Case studies', href: '/case-studies' },
             { label: 'See pricing', href: '/#pricing' },
             { label: 'FAQ', href: '/#faq' },
             { label: 'Blog', href: '/blog' },

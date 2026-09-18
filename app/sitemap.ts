@@ -4,6 +4,7 @@ import { icps } from '@/lib/icpData';
 import { getAllPosts } from '@/lib/blog';
 import { urlFor } from '@/lib/sanity';
 import { BLOG_REDIRECTS } from '@/lib/redirects';
+import { caseStudies, heroImageFor } from '@/lib/caseStudyData';
 
 /**
  * Sitemap — generated at build time. Lists the homepage + every service
@@ -64,6 +65,30 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.2,
   };
 
+  // Case studies. Priority 0.9, the same as the ICP pages and above the
+  // service pages, because these are the only pages on the domain carrying
+  // first-party measured data. Each detail page also declares its underlying
+  // export as a Dataset, which is the node most likely to be cited by an
+  // answer engine, so they need a direct crawl path rather than discovery
+  // through the nav.
+  const caseStudyIndex: MetadataRoute.Sitemap[number] = {
+    url: `${SITE_URL}/case-studies`,
+    lastModified: now,
+    changeFrequency: 'monthly',
+    priority: 0.9,
+  };
+
+  const caseStudyRoutes: MetadataRoute.Sitemap = caseStudies.map((study) => {
+    const hero = heroImageFor(study);
+    return {
+      url: `${SITE_URL}/case-studies/${study.slug}`,
+      lastModified: new Date(study.publishedISO),
+      changeFrequency: 'monthly' as const,
+      priority: 0.9,
+      ...(hero ? { images: [`${SITE_URL}${hero.src}`] } : {}),
+    };
+  });
+
   const serviceRoutes: MetadataRoute.Sitemap = services.map((service) => ({
     url: `${SITE_URL}/services/${service.slug}`,
     lastModified: now,
@@ -122,5 +147,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // Sanity unreachable — sitemap continues without blog posts.
   }
 
-  return [home, about, blogIndex, ...icpRoutes, ...serviceRoutes, ...blogPosts, order, terms];
+  return [
+    home,
+    about,
+    caseStudyIndex,
+    ...caseStudyRoutes,
+    blogIndex,
+    ...icpRoutes,
+    ...serviceRoutes,
+    ...blogPosts,
+    order,
+    terms,
+  ];
 }
