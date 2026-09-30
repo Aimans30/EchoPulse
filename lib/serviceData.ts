@@ -21,6 +21,22 @@ export interface ServiceData {
   solutionHeadline: string;
   solutionBody: string;
   steps: { num: string; title: string; body: string }[];
+  /**
+   * The delivery time shown in the Method section header, e.g.
+   * "48-HOUR TURNAROUND" or "2 TO 8 WEEKS BY SCOPE".
+   *
+   * This exists because the header used to compute the timeline as
+   * `steps.length * 2` and print "6 TO 7 DAYS", which is arithmetic on a step
+   * count rather than a delivery estimate. Every service has three steps, so
+   * every page promised 6 to 7 days, including the one whose own FAQ says a
+   * SaaS MVP takes 4 to 8 weeks and the one whose pricing table lists 4 to 6
+   * week builds. A buyer who read both had been given two different answers by
+   * the same page.
+   *
+   * Must match a claim this service already makes in its own copy. Check
+   * `steps`, `faq` and `deliverables` before changing it.
+   */
+  methodTimeline: string;
   deliverables: { icon: string; title: string; desc: string }[];
   result: { client: string; role: string; stat: string; statLabel: string; body: string };
   testimonial: { quote: string; name: string; role: string };
@@ -49,6 +65,7 @@ export const services: ServiceData[] = [
     ],
     solutionHeadline: 'Every kind of edit. One team.',
     solutionBody: 'YouTube long-form, podcast cuts, course modules, short-form for the algorithm, cinematic real estate, talking-head founder content, motion graphic ads. Speed ramps, sound design, captions, color grade. Whatever the format demands, we cut it with the shot grammar tuned to where it is shipping. One pipeline. One vendor. Every edit you will ever need.',
+    methodTimeline: '48-HOUR TURNAROUND',
     steps: [
       { num: '01', title: 'You Send Footage', body: 'Upload anything: podcast episode, YouTube vlog, course module, drone footage, walkthrough, talking head, ad. Drop it in our shared folder with a 2-line brief on the goal.' },
       { num: '02', title: 'We Edit and Optimize', body: 'Editor cuts retention-first, applies sound design, color grade, and adds platform-specific captions. Optional motion graphic add-ons. 48-hour standard turnaround.' },
@@ -98,6 +115,7 @@ export const services: ServiceData[] = [
     ],
     solutionHeadline: 'One onboarding session. Posts that fit your business.',
     solutionBody: 'Every client starts with a 90-minute onboarding interview at kickoff. We cover your offer, your buyers, your competitors, your wins, and the way you already talk about what you do. That session becomes the brief our writers work from on every post. Every draft gets read by a human who knows the brief, and rewritten if it sounds generic. Result: posts that fit your business and your buyers.',
+    methodTimeline: '48-HOUR TURNAROUND',
     steps: [
       { num: '01', title: 'Onboarding Interview', body: '90-minute recorded session. We cover your offer, your buyers, your competitors, the wins you talk about, and the way you already describe your business. Compiled into a structured brief the whole team works from.' },
       { num: '02', title: 'Editorial Calendar', body: 'Monthly content calendar built from your brief, the questions your buyers actually ask, and what your audience responds to. We pick topics that earn replies, not just impressions. You approve each calendar before we write.' },
@@ -147,6 +165,7 @@ export const services: ServiceData[] = [
     ],
     solutionHeadline: 'Real research. Real writing. Human editing.',
     solutionBody: 'Every blog goes through eight steps: brand strategy, topic research, SERP analysis, outline approval, source research, draft, human edit, SEO and distribution. Real data, real customer examples, real expert quotes (with working source links). A human editor rewrites anything that sounds like generic AI output. The piece ships when it fits your business, not before.',
+    methodTimeline: '48-HOUR TURNAROUND',
     steps: [
       { num: '01', title: 'Topic and Outline', body: 'Monthly topic calendar built from your brief, the questions your buyers are searching, and where you have real authority. You approve each outline before we research or write.' },
       { num: '02', title: 'Research and Draft', body: 'Real statistics with real source links. Real customer examples. Real expert quotes. The first draft is written against your brief, not pulled from a template.' },
@@ -196,6 +215,7 @@ export const services: ServiceData[] = [
     ],
     solutionHeadline: 'A creative subscription that ships before fatigue hits.',
     solutionBody: 'We deliver 8 to 12 fresh ad creatives per month on a subscription. Static images, video ads, motion graphic ads. Built around new hooks tested against your audience. 48-hour standard turnaround. Unlimited revisions per creative until you are satisfied.',
+    methodTimeline: '48-HOUR TURNAROUND',
     steps: [
       { num: '01', title: 'Strategy and Hook Lab', body: 'Monthly creative kickoff: review last month\'s top performers, brainstorm new hooks, identify visual angles. Your team picks the angles you want produced.' },
       { num: '02', title: 'Production', body: 'Static designs in Figma, video ads cut from your existing footage or stock, motion graphic ads built in After Effects. 48-hour standard turnaround per creative.' },
@@ -250,6 +270,7 @@ export const services: ServiceData[] = [
     ],
     solutionHeadline: 'Built to convert. Not just to impress.',
     solutionBody: 'We design and build with conversion architecture at the center. Every section earns its place. Every button has a purpose. Every word is chosen to move the visitor one step closer to working with you. Performance-tuned for sub-2-second load times so you do not lose mobile traffic to slow pages.',
+    methodTimeline: '1 TO 6 WEEKS BY SCOPE',
     steps: [
       { num: '01', title: 'Strategy and Wireframe', body: 'We map your visitor journey, define the single most important action, and wireframe a conversion-optimized layout before a single pixel is designed.' },
       { num: '02', title: 'Design and Copywriting', body: 'Copy and design developed simultaneously so the message reinforces the visual hierarchy. Conversion-driven copywriting included on every project.' },
@@ -300,6 +321,7 @@ export const services: ServiceData[] = [
     ],
     solutionHeadline: 'One stack. Every lead captured. Every call booked.',
     solutionBody: 'We build your full automation stack using Make.com, ManyChat, GoHighLevel, ActiveCampaign, and your existing CRM. Every inquiry gets an instant response. Every interested prospect gets nurtured. Every qualified lead lands on your calendar pre-qualified.',
+    methodTimeline: 'LIVE IN 10 TO 14 DAYS',
     steps: [
       { num: '01', title: 'Audit and Strategy', body: 'We map your full customer journey from first touchpoint to booked call and identify every gap where leads are slipping through. Output is a documented automation blueprint.' },
       { num: '02', title: 'Build and Integrate', body: 'We build your DM flows, email sequences, CRM pipelines, qualification forms, and calendar integration. Tested end-to-end before it goes live.' },
@@ -351,6 +373,7 @@ export const services: ServiceData[] = [
     ],
     solutionHeadline: 'Better experience for your customers. Better control for your team. Built around your actual business.',
     solutionBody: 'We design and ship the websites, apps, and AI tools your business needs, engineered for the two outcomes that move the needle: a buying experience your customers remember, and an operating system your team actually wants to work inside. Your website converts because it was built around YOUR buyer journey, not a Webflow template. Your client portal makes customers feel premium because it was built around YOUR offer. Your internal dashboard saves the team 10 hours a week because it was built around YOUR workflow. Fixed price, fixed timeline, full code handover on launch day. Hosting your call, no vendor lock-in, no monthly rent.',
+    methodTimeline: '2 TO 8 WEEKS BY SCOPE',
     steps: [
       { num: '01', title: 'Map the value', body: 'A 30-minute call where we map exactly where you are losing customers, where your team is losing hours, and what software would change that. You leave with a written scope, a fixed price, and a delivery date in your inbox. If a custom build is not the right move for your stage, we will tell you. We do not pitch builds that will not pay for themselves.' },
       { num: '02', title: 'Build in the open', body: 'Every week you get real working screens you can click through. Not Figma mockups, not status decks. You give feedback in Slack, we ship updates in days. You see your customer experience taking shape, you spot friction early, and the team that uses it daily gets a voice in how it works. This is the part agencies hide behind status reports. We put it on display.' },

@@ -73,9 +73,34 @@ function deliverableIcon(emoji: string): React.ReactNode | null {
   }
 }
 
+/**
+ * Zero-padded list index, 1-based.
+ *
+ * Four places built this as `0${i + 1}`, which is correct for the first nine
+ * items and produces "010" and "011" for the tenth and eleventh. The FAQ on
+ * apps-software has eleven entries, so the sequence shipped as 01 through 09,
+ * 010, 011. padStart caps the padding at two characters instead of prefixing
+ * a zero unconditionally.
+ */
+function ord(i: number): string {
+  return String(i + 1).padStart(2, '0');
+}
+
 type ComparisonRow = { feature: string; us: string; them: string };
 
-// Per-service comparison rows. Each service compares EchoPulse vs the relevant alternative for THAT service.
+/**
+ * Per-service comparison rows. Each service compares EchoPulse against the
+ * relevant alternative for THAT service.
+ *
+ * EVERY SERVICE IN lib/serviceData.ts MUST HAVE AN ENTRY HERE.
+ *
+ * This used to end with `|| comparisonsByService['video-editing']`, and
+ * apps-software was the one slug with no entry, so the software page spent
+ * months telling buyers about shot grammar, colour grades, caption styling and
+ * sound design. Nobody caught it because a silent fallback renders a perfectly
+ * confident table of the wrong thing. The fallback is gone: a missing entry now
+ * drops the section and shouts in the dev console instead of inventing content.
+ */
 const comparisonsByService: Record<string, ComparisonRow[]> = {
   'video-editing': [
     { feature: 'Turnaround',          us: '48 hours standard',                              them: '5 to 7 business days' },
@@ -136,6 +161,18 @@ const comparisonsByService: Record<string, ComparisonRow[]> = {
     { feature: 'Performance dashboard', us: 'Live reporting included',                      them: 'Not included' },
     { feature: 'Maintenance',         us: 'Monthly tune-ups included',                      them: 'Separate retainer' },
     { feature: 'Onboarding',          us: 'Two-week paid Pilot, see work first',            them: 'Pay full setup upfront' },
+  ],
+  // Every row below is drawn from this page's own steps, deliverables and FAQ.
+  // Nothing here is a new claim.
+  'apps-software': [
+    { feature: 'Scoping',             us: 'Fixed price and delivery date in writing before work starts', them: 'Hourly billing, scope grows as it goes' },
+    { feature: 'Build visibility',    us: 'Working screens you can click, every week',      them: 'Status decks and Figma mockups' },
+    { feature: 'Feedback loop',       us: 'Slack, with updates shipped in days',            them: 'Weekly call, changes next sprint' },
+    { feature: 'Code ownership',      us: 'Transferred to your GitHub on launch day',       them: 'Stays in the agency repo' },
+    { feature: 'Hosting',             us: 'Your account, no lock-in, no monthly rent',      them: 'Their platform, monthly fee forever' },
+    { feature: 'Post-launch',         us: '14 days of free fixes, then your call',          them: 'Handover, then per-hour support' },
+    { feature: 'Honest scoping',      us: 'We say so when a build will not pay for itself', them: 'Quotes the biggest build the budget allows' },
+    { feature: 'Handover pack',       us: 'Code, documentation, walkthrough video, team training', them: 'A login and a thank you' },
   ],
 };
 
@@ -517,7 +554,16 @@ export default function ServicePageClient({ service }: { service: ServiceData })
   }, []);
 
   const words = service.tagline.split(' ');
-  const comparisonRows = comparisonsByService[service.slug] || comparisonsByService['video-editing'];
+  // No fallback. A service with no rows of its own renders no comparison
+  // section, which is a visible gap someone will fix, rather than a confident
+  // table about a different service, which is what shipped last time.
+  const comparisonRows = comparisonsByService[service.slug];
+  if (process.env.NODE_ENV !== 'production' && !comparisonRows) {
+    console.error(
+      `[ServicePageClient] No comparison rows for service "${service.slug}". ` +
+        'Add an entry to comparisonsByService in this file. The section is being skipped.',
+    );
+  }
 
   // Localized promise list — patches the __PILOT_PRICE__ placeholder with the
   // visitor's region-appropriate Pilot price ($299 / £239 / ₹4,999 / etc).
@@ -828,7 +874,7 @@ export default function ServicePageClient({ service }: { service: ServiceData })
                 }}
               >
                 <div style={{ fontFamily: 'Inter, sans-serif', fontSize: '20px', fontWeight: 300, color: '#A8A49B', letterSpacing: '-1px' }}>
-                  {`0${i + 1}`}
+                  {ord(i)}
                 </div>
                 <h3 style={{ fontFamily: 'Inter, sans-serif', fontSize: 'clamp(18px, 1.8vw, 24px)', fontWeight: 800, letterSpacing: '-0.6px', color: '#0C0C0B', margin: 0 }}>
                   {d.title}
@@ -860,7 +906,8 @@ export default function ServicePageClient({ service }: { service: ServiceData })
         `}</style>
       </section>
 
-      {/* COMPARISON — kept, refined */}
+      {/* COMPARISON — only where this service has its own rows. */}
+      {comparisonRows && (
       <section
         className="svc-comparison-section"
         data-dark-bg="true"
@@ -989,6 +1036,7 @@ export default function ServicePageClient({ service }: { service: ServiceData })
           }
         `}</style>
       </section>
+      )}
 
       {/* PROCESS — editorial big numbers */}
       <section style={{ padding: '120px 56px', background: '#F2EEE7', color: '#0C0C0B' }}>
@@ -996,7 +1044,7 @@ export default function ServicePageClient({ service }: { service: ServiceData })
           {/* "TO", not an en-dash. This renders on every service page and a
               dash in a number range is the exact pattern we strip everywhere
               else in the copy. */}
-          <SectionLabel left="03 / Method" right={`${service.steps.length} STEPS / ${service.steps.length * 2} TO 7 DAYS`} />
+          <SectionLabel left="03 / Method" right={`${service.steps.length} STEPS / ${service.methodTimeline}`} />
 
           <motion.h2
             initial={{ opacity: 0, y: 24 }}
@@ -1046,7 +1094,7 @@ export default function ServicePageClient({ service }: { service: ServiceData })
                     color: service.accentColor,
                   }}
                 >
-                  {`0${i + 1}`}
+                  {ord(i)}
                 </div>
                 <h3
                   style={{
@@ -1166,7 +1214,7 @@ export default function ServicePageClient({ service }: { service: ServiceData })
                     color: 'rgba(242,238,231,0.3)',
                   }}
                 >
-                  {`0${i + 1} / 04`}
+                  {`${ord(i)} / 04`}
                 </div>
 
                 {/* Massive light-weight stat — the hero element */}
@@ -1628,7 +1676,7 @@ function FAQItem({ item, i, color }: { item: { q: string; a: string }; i: number
         }}
       >
         <span>
-          <span style={{ fontWeight: 300, color: '#A8A49B', marginRight: '16px', fontSize: '0.85em' }}>{`0${i + 1}`}</span>
+          <span style={{ fontWeight: 300, color: '#A8A49B', marginRight: '16px', fontSize: '0.85em' }}>{ord(i)}</span>
           {item.q}
         </span>
         <motion.div

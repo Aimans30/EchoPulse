@@ -241,7 +241,12 @@ export default function Footer() {
         </h4>
         <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {[
-            { label: 'echopulse.media', href: 'https://echopulse.media' },
+            // Was { label: 'echopulse.media', href: 'https://echopulse.media' },
+            // a Contact column whose only entry linked back to the homepage
+            // the reader was already on. The email existed on /about and
+            // nowhere else, so anyone who wanted to write rather than book a
+            // call had to go hunting for it from a column headed "Contact".
+            { label: 'lakshya@echopulse.media', href: 'mailto:lakshya@echopulse.media' },
             { label: 'LinkedIn', href: 'https://www.linkedin.com/in/lakshyasoni/' },
           ].map((c) => (
             <li key={c.label}>

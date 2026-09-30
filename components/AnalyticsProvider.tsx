@@ -15,11 +15,19 @@
 import { useEffect, useRef } from 'react';
 import Script from 'next/script';
 import { track, trackCallBooked, trackScrollDepth } from '@/lib/analytics';
+import { useConsent } from '@/lib/consent';
 
 const CLARITY_ID = process.env.NEXT_PUBLIC_CLARITY_ID;
 
 export default function AnalyticsProvider() {
   const firedMilestones = useRef<Set<number>>(new Set());
+  const consent = useConsent();
+  // The scroll and booking effects below are left running regardless. Every
+  // one of them ends at lib/analytics `track()`, which calls `window.gtag?.()`
+  // with optional chaining, so with GA unloaded they are silent no-ops that
+  // set no cookie and make no request. Gating them too would mean the
+  // milestones a visitor crossed before clicking Allow are lost for no
+  // privacy gain.
 
   // Scroll-depth tracker — fires once each at 25/50/75/100% per pageview
   useEffect(() => {
@@ -80,17 +88,18 @@ export default function AnalyticsProvider() {
 
   return (
     <>
-      {/* Microsoft Clarity — only when env var is set.
-          IMPORTANT: app/layout.tsx also ships a Clarity snippet with a
-          hard-coded project id. Whenever NEXT_PUBLIC_CLARITY_ID is set in the
-          environment BOTH used to run, so the tag was fetched and the page
-          instrumented twice: two sets of DOM-mutation and input listeners on
-          every interaction, which is paid for directly in INP. The
-          `if (c[a]) return` guard (mirrored in layout.tsx) makes whichever
-          one boots first the only one that boots.
-          `lazyOnload` for the same reason as layout.tsx: a session recorder
-          has no business competing with hydration for main-thread time. */}
-      {CLARITY_ID && (
+      {/* Microsoft Clarity — only when the env var is set AND the visitor has
+          allowed analytics.
+          This is the second of the two Clarity snippets that used to exist.
+          The other one lived in app/layout.tsx with a hard-coded project id
+          and has moved into components/ConsentGate.tsx; gating only that one
+          would have left this path firing ungated whenever
+          NEXT_PUBLIC_CLARITY_ID was set, which is the kind of half-fix that
+          looks compliant and is not. The `if (c[a]) return` guard still
+          de-dupes if both ever run.
+          `lazyOnload` for the same reason as before: a session recorder has no
+          business competing with hydration for main-thread time. */}
+      {CLARITY_ID && consent === 'granted' && (
         <Script
           id="ms-clarity"
           strategy="lazyOnload"

@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
-import { GoogleAnalytics } from "@next/third-parties/google";
+import ConsentGate from "@/components/ConsentGate";
 import SmoothScroll from "@/components/SmoothScroll";
 import Cursor from "@/components/Cursor";
 import EmojiNormalizer from "@/components/EmojiNormalizer";
@@ -15,6 +15,8 @@ import { getServerGeo } from "@/lib/geoServer";
 import { AREA_SERVED, BUSINESS_ADDRESS } from "@/lib/schema";
 
 const GA_ID = 'G-3PPKSJLR7F';
+/** Microsoft Clarity project. Both tags are gated by ConsentGate. */
+const CLARITY_ID = 'ukzjzunyk5';
 
 // Slim font weights — only what we actually use, with display:swap for fast first paint
 const inter = Inter({
@@ -219,27 +221,14 @@ export default async function RootLayout({
   return (
     <html lang="en" className={inter.variable}>
       <head>
-        {/* Microsoft Clarity.
-            `lazyOnload` (was `afterInteractive`): Clarity is a session
-            recorder, not a conversion tag, and it instruments every DOM
-            mutation and input event on the page. Loading it while React is
-            still hydrating put ~40KB of parse + a permanent listener set
-            directly in the way of the first tap on a phone, which is exactly
-            the interaction INP scores. Waiting for the load event costs us
-            about a second of recording and takes that work off the critical
-            path entirely.
-            The `window.clarity` guard is a de-dupe: components/AnalyticsProvider
-            ships a SECOND Clarity snippet gated on NEXT_PUBLIC_CLARITY_ID, so
-            whenever that env var is set both used to boot and the tag was
-            downloaded and instrumented twice. First one in wins now. */}
-        <Script id="clarity-init" strategy="lazyOnload">{`
-          (function(c,l,a,r,i,t,y){
-            if(c[a])return;
-            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-          })(window, document, "clarity", "script", "ukzjzunyk5");
-        `}</Script>
+        {/* Microsoft Clarity used to boot from here on every page load.
+            It now lives in components/ConsentGate.tsx, mounted at the bottom
+            of <body>, and does not load at all until the visitor allows it.
+            Clarity is a session recorder: it instruments DOM mutations and
+            input events and replays the session. Running that on a UK or EU
+            visitor before they have been asked is the GDPR problem, and the
+            performance note that used to be here (lazyOnload keeps ~40KB of
+            parse off the interaction path) still holds inside ConsentGate. */}
         {/* Cal.com: DNS resolved early, but NO preconnect.
             A preconnect opens a real TCP + TLS connection immediately, and on
             4G those two round trips compete for bandwidth with the hero paint
@@ -295,7 +284,14 @@ export default async function RootLayout({
               the India rate card. components/PuneInquiryModal.tsx and
               /api/pune-inquiry are now unused. */}
         </GeoProvider>
-        <GoogleAnalytics gaId={GA_ID} />
+        {/* Analytics consent, and the tags it gates. Renders nothing on the
+            server; the banner appears after hydration and GA and Clarity mount
+            only once the visitor has allowed them.
+            CLARITY_ID is the hard-coded project that used to run from <head>.
+            components/AnalyticsProvider carries a second Clarity snippet gated
+            on NEXT_PUBLIC_CLARITY_ID; that one is now consent-gated too, so
+            there is no ungated path left. */}
+        <ConsentGate gaId={GA_ID} clarityId={CLARITY_ID} />
         {/* Shery.js is genuinely desktop-only now.
             The previous `<Script src="...Shery.js">` was unconditional: every
             phone downloaded and parsed the library (it bundles its own copies
