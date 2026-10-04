@@ -10,28 +10,38 @@
 export const BOOK_CALL_URL = 'https://cal.com/lakshya-soni-jvwfee/echopulse-marketing-agency-call';
 
 /**
- * CTA labels.
+ * CTA labels. THREE ONLY. Import from here, never hand-write a button label.
  *
- * These changed from "Book a Free Call" / "Book a Free 45-min Call" because
- * both described what the VISITOR gives up (their calendar) and nothing about
- * what they get. "Free" was doing all the persuasive work, and free is not a
- * benefit when the cost the reader is actually weighing is being trapped on a
- * sales call.
+ * A Sept 2026 audit counted nine different CTA labels across the site: Get a
+ * free content audit, Book a Call, Book a Free Strategy Call, Talk to Us,
+ * Claim the Pilot, Start the Pilot, See how it works, Order this service, and
+ * Let us build this for you. A visitor moving between three pages met three
+ * different asks and had to work out whether they were the same thing.
  *
- * The booking modal already gets this right. Its subtitle reads
- * "45 min · Content audit + growth roadmap · No pitch unless you ask", which
- * names a concrete deliverable, states the time cost, and removes the fear
- * that stops most people clicking. The problem was that this framing only
- * appeared AFTER the click, so it did no work at the moment of hesitation.
- *
- * These labels pull that value forward to the button itself. Use
- * BOOK_CALL_REASSURANCE as the line directly underneath wherever there is room.
+ * On "Get a free content audit": that label was chosen earlier because the
+ * previous one described what the visitor gives up (their calendar) rather
+ * than what they get. The objection to it is that clicking opens a CALL
+ * booking modal, so the label and the next screen disagreed, and a promise the
+ * following screen does not keep costs more trust than a flat label does
+ * interest. Resolved in favour of matching the label to what happens, with
+ * BOOK_CALL_REASSURANCE carrying the value that the old label was carrying.
+ * Render that line under the button wherever there is room.
  */
-export const BOOK_CALL_LABEL = 'Get a free content audit';
-export const BOOK_CALL_LABEL_LONG = 'Get your free content audit';
 
-/** Sub-line for under the CTA. The audit is yours either way is the point. */
-export const BOOK_CALL_REASSURANCE = '45 minutes. You keep the roadmap whether or not you hire us.';
+/** Primary. Every booking CTA site-wide. */
+export const BOOK_CALL_LABEL = 'Book a free strategy call';
+/** Same action, used where the button has room for a possessive. */
+export const BOOK_CALL_LABEL_LONG = 'Book your free strategy call';
+/** Secondary. Scrolls or links to explanatory content, never to booking. */
+export const SECONDARY_CTA_LABEL = 'See how it works';
+/** Paid step ONLY. Never use for a booking link. */
+export const PILOT_CTA_LABEL = 'Start the $299 Pilot';
+
+/**
+ * Sub-line under the CTA. Answers the two questions that stop the click: how
+ * long this costs me, and whether I am about to be sold to.
+ */
+export const BOOK_CALL_REASSURANCE = 'No pitch. You keep the roadmap whether or not you hire us.';
 
 // Anchor target for in-page CTAs that should scroll to the bottom CTA
 // section instead of leaving the page.

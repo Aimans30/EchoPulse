@@ -68,6 +68,28 @@ export default function TableOfContents({
     return () => observer.disconnect();
   }, [headings, variant]);
 
+  // Keep the highlighted entry inside the sidebar's own scroll box.
+  //
+  // On most posts the index fits and .blog-post-sidebar never scrolls, so this
+  // is a no-op. On a long post the sidebar is capped at the viewport height,
+  // and without this the active highlight walks off the bottom of the box as
+  // the reader moves down the article: the index stops showing them where they
+  // are, which is the entire reason it exists. `nearest` means it only moves
+  // when the item is actually out of view, so the panel is not twitching on
+  // every heading change.
+  useEffect(() => {
+    if (variant === 'mobile' || !activeId) return;
+    const link = document.querySelector<HTMLElement>(`.blog-toc-link[href="#${CSS.escape(activeId)}"]`);
+    const box = link?.closest<HTMLElement>('.blog-post-sidebar');
+    if (!link || !box) return;
+    if (box.scrollHeight <= box.clientHeight) return; // not scrolling, nothing to do
+    const l = link.getBoundingClientRect();
+    const b = box.getBoundingClientRect();
+    if (l.top < b.top || l.bottom > b.bottom) {
+      link.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }
+  }, [activeId, variant]);
+
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
     e.preventDefault();
     const el = document.getElementById(id);

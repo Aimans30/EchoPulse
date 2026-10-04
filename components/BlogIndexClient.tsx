@@ -179,8 +179,12 @@ export default function BlogIndexClient({ posts }: { posts: IndexPost[] }) {
               className={`blogx-pill${active === ALL ? ' active' : ''}`}
               onClick={() => setActive(ALL)}
               data-cursor-hover
+              // The category colour is handed to CSS as a custom property so
+              // the active tint, border and glow can all be derived from it
+              // without writing seven hard-coded rules.
+              style={{ '--cat': allStyle.color, '--cat-bg': allStyle.bg } as React.CSSProperties}
             >
-              <span className="blogx-pill-icon" style={{ background: allStyle.bg, color: allStyle.color }}>
+              <span className="blogx-pill-icon">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                   <path d={allStyle.icon} />
                 </svg>
@@ -203,8 +207,9 @@ export default function BlogIndexClient({ posts }: { posts: IndexPost[] }) {
               className={`blogx-pill${active === cat ? ' active' : ''}`}
               onClick={() => setActive(cat)}
               data-cursor-hover
+              style={{ '--cat': style.color, '--cat-bg': style.bg } as React.CSSProperties}
             >
-              <span className="blogx-pill-icon" style={{ background: style.bg, color: style.color }}>
+              <span className="blogx-pill-icon">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                   <path d={style.icon} />
                 </svg>
@@ -287,50 +292,115 @@ export default function BlogIndexClient({ posts }: { posts: IndexPost[] }) {
       </div>
 
       <style>{`
-        /* ── Filter cards ── */
+        /* ── Category filter cards ───────────────────────────────────────
+           Ported from the MagicBnB blog index: a row of glass cards, icon
+           chip stacked above the label and the count, lifting on hover and
+           tinting to the category's own colour when selected.
+
+           Two deliberate differences from the original. First the palette is
+           EchoPulse's, so the tint is derived from --cat (set per button in
+           the markup) instead of MagicBnB's purple. Second, and this is the
+           part that actually makes glass look like glass: MagicBnB sits on a
+           lavender gradient with a radial white wash, so a translucent card
+           has something to refract. This page was flat #F2EEE7, where
+           backdrop-filter is a no-op and a translucent card is just a slightly
+           paler rectangle. The wash behind .blogx-filters below supplies the
+           depth the effect needs. */
         .blogx-filters {
+          position: relative;
           display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
+          grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
           gap: 12px;
           margin-bottom: 48px;
         }
+        /* The thing the cards refract. Sits behind them, bleeds past the grid
+           on both sides, and is purely decorative. */
+        .blogx-filters::before {
+          content: "";
+          position: absolute;
+          inset: -28px -40px;
+          z-index: 0;
+          pointer-events: none;
+          border-radius: 32px;
+          background:
+            radial-gradient(ellipse 60% 70% at 25% 30%, rgba(232,84,26,0.08) 0%, transparent 68%),
+            radial-gradient(ellipse 55% 70% at 80% 60%, rgba(255,255,255,0.75) 0%, transparent 70%),
+            linear-gradient(140deg, rgba(255,255,255,0.55) 0%, rgba(242,238,231,0) 60%);
+        }
         .blogx-pill {
+          position: relative;
+          z-index: 1;
           display: flex;
-          align-items: center;
-          gap: 12px;
-          padding: 14px 16px;
-          border-radius: 16px;
-          border: 1px solid rgba(12,12,11,0.08);
-          background: rgba(255,255,255,0.6);
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 10px;
+          padding: 16px;
+          border-radius: 18px;
+          border: 1px solid rgba(255,255,255,0.85);
+          /* 0.68, not MagicBnB's 0.52. Theirs sits on a lavender gradient so a
+             half-transparent white card separates cleanly. Ours sits on cream,
+             where white at 52% is nearly the same value as the background and
+             the cards dissolve into it. Checked side by side in the browser. */
+          background: rgba(255,255,255,0.68);
+          backdrop-filter: blur(16px);
+          -webkit-backdrop-filter: blur(16px);
+          box-shadow: 0 4px 24px rgba(12,12,11,0.06);
           font-family: Inter, sans-serif;
           text-align: left;
           cursor: pointer;
-          transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+          transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s cubic-bezier(0.16,1,0.3,1), box-shadow 0.2s ease;
         }
         .blogx-pill:hover {
-          background: #fff;
-          border-color: rgba(12,12,11,0.16);
-          transform: translateY(-2px);
-          box-shadow: 0 10px 24px rgba(12,12,11,0.08);
+          background: rgba(255,255,255,0.72);
+          transform: translateY(-4px);
+          box-shadow: 0 12px 32px rgba(12,12,11,0.10);
         }
+        .blogx-pill:focus-visible {
+          outline: 2px solid var(--cat, #E8541A);
+          outline-offset: 3px;
+        }
+        /* Selected: tinted in the category's own colour and lifted, rather
+           than the old solid-black fill. Black read as "disabled" next to the
+           pale cards around it and threw away the colour coding the icons
+           already establish. */
         .blogx-pill.active {
-          background: #0C0C0B;
-          border-color: #0C0C0B;
+          background: color-mix(in srgb, var(--cat, #E8541A) 12%, rgba(255,255,255,0.72));
+          border: 1.5px solid color-mix(in srgb, var(--cat, #E8541A) 42%, transparent);
+          box-shadow: 0 10px 32px color-mix(in srgb, var(--cat, #E8541A) 22%, transparent);
+          transform: translateY(-4px);
         }
+        /* Icon chip colours come from the custom properties on the button, not
+           from an inline style, specifically so the selected rule below can
+           override them. Inline styles beat stylesheets, so with the colours
+           set on the element the chip could never change on selection without
+           a pile of !important. */
         .blogx-pill-icon {
           flex-shrink: 0;
-          width: 36px;
-          height: 36px;
-          border-radius: 10px;
+          width: 38px;
+          height: 38px;
+          border-radius: 12px;
           display: flex;
           align-items: center;
           justify-content: center;
-          transition: background 0.2s ease;
+          background: var(--cat-bg, rgba(12,12,11,0.08));
+          color: var(--cat, #0C0C0B);
+          transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+        }
+        /* Selection has to be unmistakable at a glance, because this row is
+           the only control on the page and a reader who cannot tell whether
+           their click registered will click again and bounce. The tint and
+           lift alone were too quiet against cream, so the chip flips to a
+           solid fill in the category colour with a white glyph. That is the
+           one change nobody can miss. */
+        .blogx-pill.active .blogx-pill-icon {
+          background: var(--cat, #E8541A);
+          color: #fff;
+          transform: scale(1.06);
         }
         .blogx-pill-text {
           display: flex;
           flex-direction: column;
-          gap: 2px;
+          gap: 3px;
           min-width: 0;
         }
         .blogx-pill-label {
@@ -338,15 +408,28 @@ export default function BlogIndexClient({ posts }: { posts: IndexPost[] }) {
           font-weight: 700;
           color: #0C0C0B;
           letter-spacing: -0.1px;
-          white-space: nowrap;
+          line-height: 1.2;
         }
         .blogx-pill-count {
           font-size: 11.5px;
-          font-weight: 500;
+          font-weight: 600;
           color: #9a958c;
         }
-        .blogx-pill.active .blogx-pill-label { color: #F2EEE7; }
-        .blogx-pill.active .blogx-pill-count { color: rgba(242,238,231,0.55); }
+        /* The count takes the category colour, which is what gives the
+           MagicBnB row its liveliness. */
+        .blogx-pill.active .blogx-pill-count { color: var(--cat, #E8541A); }
+
+        @media (max-width: 560px) {
+          .blogx-filters { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+          .blogx-filters::before { inset: -18px -20px; }
+          .blogx-pill { padding: 13px; border-radius: 16px; gap: 8px; }
+          .blogx-pill-icon { width: 32px; height: 32px; border-radius: 10px; }
+          .blogx-pill-label { font-size: 12.5px; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .blogx-pill, .blogx-pill-icon { transition: none; }
+          .blogx-pill:hover, .blogx-pill.active { transform: none; }
+        }
 
         /* ── Featured hero card ── */
         .blogx-featured {

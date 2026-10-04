@@ -204,9 +204,38 @@ const promisesDefault: Promise[] = [
     stat: '__PILOT_PRICE__',
     statLabel: 'Pilot to start',
     headline: 'Try first. Commit when convinced.',
-    body: 'Every relationship starts with a paid two-week Pilot at our intro price of __PILOT_PRICE__. 8 short-form and 5 clipped content pieces, 5 long-form blogs, the onboarding strategy session, and a content audit plus 30-day plan. See the quality before any monthly engagement.',
+    // The scope here used to read "8 short-form and 5 clipped content pieces,
+    // 5 long-form blogs", which is 18 deliverables. The audience pages and the
+    // homepage FAQ both describe 21. The two statics and the carousel were
+    // being quietly dropped on every service page, so a buyer who read a
+    // service page and then an audience page was quoted two different Pilots
+    // for the same $299. The audience-page list is canonical.
+    body: 'Every relationship starts with a paid two-week Pilot at our intro price of __PILOT_PRICE__. 8 short-form videos, 2 statics, 1 carousel, 5 clipped content pieces and 5 long-form blogs, plus the onboarding strategy session and a content audit with a 30-day plan. See the quality before any monthly engagement.',
   },
 ];
+
+/**
+ * Pilot overrides for the two services where a content Pilot makes no sense.
+ *
+ * The default Pilot buys 21 pieces of content. Selling that to someone who
+ * came to the page for an automation build or a custom app is answering a
+ * question they did not ask, and it was the same block on all seven services.
+ * Both of these describe the same $299, the same 14 days and the same
+ * keep-it-either-way terms, applied to the thing that page is actually about.
+ */
+const pilotAutomations: Promise = {
+  stat: '__PILOT_PRICE__',
+  statLabel: 'Automation Audit to start',
+  headline: 'Find the leaks before you commit.',
+  body: 'A __PILOT_PRICE__ Automation Audit to start. We map your full lead flow end to end, show you every place a lead currently goes cold, and ship your first automation live within 14 days. You keep the blueprint whether you continue or not.',
+};
+
+const pilotApps: Promise = {
+  stat: '__PILOT_PRICE__',
+  statLabel: 'Build Blueprint to start',
+  headline: 'Scope it properly before anyone writes code.',
+  body: 'A __PILOT_PRICE__ Build Blueprint to start. A 30-minute scoping call, a written fixed-price scope with a delivery date, and clickable prototype direction within 14 days. You keep the spec whether you continue or not, and if a custom build is not right for your stage we will say so in it.',
+};
 
 /** Patch the __PILOT_PRICE__ placeholder so non-US visitors see the right currency. */
 function localizePromises(list: Promise[], pilotPrice: string): Promise[] {
@@ -250,6 +279,11 @@ const promisesWebsites: Promise[] = [
 
 function getPromisesForSlug(slug: string): Promise[] {
   if (slug === 'websites-funnels') return promisesWebsites;
+  // Same three guarantees, service-appropriate fourth card. The default
+  // fourth card sells 21 pieces of content, which is not what someone on the
+  // automations or apps page is buying.
+  if (slug === 'automations') return [...promisesDefault.slice(0, 3), pilotAutomations];
+  if (slug === 'apps-software') return [...promisesDefault.slice(0, 3), pilotApps];
   return promisesDefault;
 }
 

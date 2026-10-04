@@ -269,6 +269,20 @@ export default function ICPPipelineAnimation({
           font-style: normal; font-size: 10.5px; line-height: 1.3;
           color: rgba(245,242,237,0.45);
         }
+        /* Visually hidden, still announced. Not display:none and not
+           visibility:hidden, either of which would remove it from the
+           accessibility tree and put us back where we started. */
+        .pa-sr {
+          position: absolute;
+          width: 1px;
+          height: 1px;
+          padding: 0;
+          margin: -1px;
+          overflow: hidden;
+          clip-path: inset(50%);
+          white-space: nowrap;
+          border: 0;
+        }
         .pa-out-count {
           font-size: 12px; font-weight: 700; letter-spacing: -0.3px;
           flex-shrink: 0; font-variant-numeric: tabular-nums;
@@ -452,7 +466,15 @@ function Count({
 
   return (
     <span className="pa-out-count" style={{ color: accent }}>
-      {target === null ? value : `${n}${suffix}`}
+      {/* The animated digits count from 0, and before the pipeline goes live
+          they sit AT 0, so the accessibility tree reported every output as
+          "0/mo" on all five audience pages. A screen reader user was being
+          told the deliverable counts were zero.
+          The final value is exposed once as static text and the counting
+          digits are hidden from assistive tech, so the announcement is the
+          real number regardless of where the animation happens to be. */}
+      <span className="pa-sr">{value}</span>
+      <span aria-hidden="true">{target === null ? value : `${n}${suffix}`}</span>
     </span>
   );
 }

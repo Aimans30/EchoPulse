@@ -1401,7 +1401,14 @@ function LinkedInPostBuilder({ accent }: { accent: string }) {
       {/* Reply-rate stat — docked as a corner badge on the post card itself
          so it never overlaps the card content or gets clipped by the container. */}
 
-      {/* Persona indicator — tiny dots showing "we do this for X kinds of founders" */}
+      {/* Carousel indicator for which mock post is on screen.
+          The label used to read "Written for", sitting above a row of
+          anonymous coloured pills. An auditor read that as a client logo bar
+          that had failed to load, which is the charitable interpretation. The
+          worse one is the accurate one: LI_PERSONAS are invented examples
+          (Maya Reddy, Founder at SyncFlow, and so on), so a label saying
+          "Written for" above them implies a client roster that does not
+          exist. Relabelled to say plainly that these are examples. */}
       <div
         style={{
           position: 'absolute',
@@ -1413,9 +1420,11 @@ function LinkedInPostBuilder({ accent }: { accent: string }) {
           gap: '10px',
           zIndex: 3,
         }}
+        role="group"
+        aria-label={`Example post ${personaIdx + 1} of ${LI_PERSONAS.length}. Illustrative, not a client.`}
       >
         <span style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '2px', color: 'rgba(242,238,231,0.45)', textTransform: 'uppercase' }}>
-          Written for
+          Example
         </span>
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
           {LI_PERSONAS.map((p, i) => {

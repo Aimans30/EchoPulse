@@ -66,10 +66,32 @@ select,
 }
 
 /* Restore body scroll only when a modal explicitly requests the lock.
-   Anything else that tries to slip overflow:hidden onto body is overridden. */
+   Anything else that tries to slip overflow:hidden onto body is overridden.
+
+   `visible`, NOT `auto`. THIS IS THE RULE THAT BROKE THE STICKY SIDEBAR, and
+   it survived two previous attempts to fix that bug because it does its damage
+   on the OTHER axis.
+
+   CSS Overflow 3: when one axis is specified `clip` or `visible` and the other
+   is specified as neither, the pair is coerced: `visible` becomes `auto` and
+   `clip` becomes `hidden`. We set `overflow-x: clip !important` further down
+   precisely so html and body never become scroll containers. Pairing that clip
+   with `overflow-y: auto` here silently coerced it:
+
+     specified(clip, auto)    ->  computed(hidden, auto)     scroll container
+     specified(clip, visible) ->  computed(clip, visible)    not a container
+
+   Verified in Chromium. A scroll container on html or body disables
+   `position: sticky` for every descendant on the page, which is why the blog
+   table-of-contents would not stick no matter what was declared on it.
+
+   `visible` keeps this rule's actual job intact: it still outranks any stray
+   `overflow: hidden` a modal or popup leaves behind on html or body, and the
+   page still scrolls normally, because a visible-overflow body scrolls via the
+   viewport rather than via its own scroll box. */
 html:not(.modal-open),
 body:not(.modal-open) {
-  overflow-y: auto !important;
+  overflow-y: visible !important;
 }
 
 @media (max-width: 768px) {

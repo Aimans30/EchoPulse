@@ -531,13 +531,28 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             position: sticky;
             top: 120px;
             align-self: start;
+            /* Matches MagicBnB: sticky, self-start, whole index visible at
+               once, riding along with the page. No internal scrollbar in the
+               normal case.
+
+               The max-height is a safety net, not the default behaviour. A
+               sticky element taller than the space under its own top offset
+               sticks with its bottom hanging below the fold, so on a long post
+               the last few entries become permanently unreachable and the
+               sidebar reads as frozen. MagicBnB never hits this because its
+               posts carry fewer headings in a narrower column. Ours do not: the
+               AI-tools-vs-ghostwriter post has sixteen.
+
+               So the cap engages ONLY when the index genuinely cannot fit, and
+               the scrollbar is hidden when it does, which is the part that was
+               objectionable last time. Identical to MagicBnB whenever MagicBnB's
+               own sidebar would also have fitted. */
+            max-height: calc(100vh - 140px);
+            overflow-y: auto;
+            overscroll-behavior: contain;
+            scrollbar-width: none;
           }
-          /* No max-height and no overflow here on purpose. An earlier version
-             capped the height and scrolled the index internally, which meant
-             the sidebar had its own scrollbar and its own scroll position
-             fighting the page's. The whole index is shown at once and simply
-             rides along with the page, which is how the MagicBnB sidebar this
-             was modelled on behaves. */
+          .blog-post-sidebar::-webkit-scrollbar { width: 0; height: 0; }
 
           .blog-post-meta {
             display: flex;
