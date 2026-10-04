@@ -5,10 +5,14 @@ import { motion } from 'framer-motion';
 import { useGeoPrice } from '@/lib/useGeoPrice';
 
 /**
- * Build the grouped FAQ sections. Takes the localized price tokens
- * (e.g. "$299" / "$1,997", or "£239" / "£1,597" in the UK) so visitors see
- * answer copy whose prices match their own tier cards instead of hardcoded
- * US dollars.
+ * Build the grouped FAQ sections. Takes the price tokens from useGeoPrice so
+ * answer copy always matches the tier cards rather than hardcoding numbers in
+ * two places.
+ *
+ * Retainer pricing went flat USD worldwide in Oct 2026, so these currently
+ * resolve to "$299" and "$1,997" everywhere. The plumbing stays because the
+ * point of it is that the FAQ and the cards cannot drift apart, which matters
+ * just as much when the numbers change as when they vary by region.
  *
  * ─── Question selection ──────────────────────────────────────────────────────
  *

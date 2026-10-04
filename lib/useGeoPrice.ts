@@ -59,24 +59,48 @@ interface RegionPricing {
   full: string;
 }
 
-// PRICING MATRIX — single source of truth for every region's prices.
+// PRICING MATRIX — single source of truth for every region's RETAINER prices.
 // Visible side-by-side at /pricing-matrix so Lakshya can sanity-check
 // every market without poking through the codebase.
 //
-// Policy notes:
-// • "Pilot" is the 1-month intro. Original is the strike-through anchor.
-// • OTHER (the catch-all for non-listed countries, now including India)
-//   defaults to USD pricing — we don't discount unknown markets just because
-//   we don't recognize their currency. If a real ask comes through that needs
-//   PPP, add the country here explicitly instead of auto-discounting.
-const PRICING_BY_REGION: Record<Region, RegionPricing> = {
-  US:    { currency: '$',   currencyCode: 'USD', countryLabel: 'US pricing',     pilot: '299', pilotOriginal: '599', growth: '1,997', full: '4,997+' },
-  CA:    { currency: 'CA$', currencyCode: 'CAD', countryLabel: 'Canada pricing', pilot: '419', pilotOriginal: '839', growth: '2,747', full: '6,997+' },
-  EU:    { currency: '€',   currencyCode: 'EUR', countryLabel: 'EU pricing',     pilot: '279', pilotOriginal: '559', growth: '1,847', full: '4,597+' },
-  UK:    { currency: '£',   currencyCode: 'GBP', countryLabel: 'UK pricing',     pilot: '239', pilotOriginal: '479', growth: '1,597', full: '3,997+' },
-  OTHER: { currency: '$',   currencyCode: 'USD', countryLabel: 'USD pricing',    pilot: '299', pilotOriginal: '599', growth: '1,997', full: '4,997+' },
+// FLAT USD WORLDWIDE, decided Oct 2026.
+//
+// Every region used to carry its own tuned numbers: $299 US, CA$419, EUR 279,
+// GBP 239 for the Pilot, with matching spreads on Growth and Full. That held
+// up until the CTA vocabulary was standardized, because the agreed button
+// label is "Start the $299 Pilot", and a hard-coded $299 sitting directly
+// under a card reading GBP 239 is exactly the two-answers-on-one-screen
+// contradiction the Sept 30 audit was raising everywhere else. The call was to
+// drop regional pricing rather than have the label chase it.
+//
+// This is a real pricing change, not a display change. UK and EU buyers
+// previously paid less than $299; Canadian buyers paid more.
+//
+// The structure is left intact rather than torn out: re-enabling regional
+// pricing later means editing the numbers below and nothing else, and
+// /pricing-matrix still renders the table. If that ever happens, the Pilot CTA
+// has to go back to lib/links.ts `pilotCtaLabel(localizedPrice)`, which is
+// still exported for that reason.
+//
+// SEPARATE SYSTEM, DELIBERATELY UNCHANGED: the a la carte / order-flow prices
+// from lib/orderData.ts are still localized by the multiplier helper further
+// down this file. That was not part of this decision.
+const FLAT_USD = {
+  currency: '$',
+  currencyCode: 'USD' as CurrencyCode,
+  pilot: '299',
+  pilotOriginal: '599',
+  growth: '1,997',
+  full: '4,997+',
 };
 
+const PRICING_BY_REGION: Record<Region, RegionPricing> = {
+  US:    { ...FLAT_USD, countryLabel: 'USD pricing' },
+  CA:    { ...FLAT_USD, countryLabel: 'USD pricing' },
+  EU:    { ...FLAT_USD, countryLabel: 'USD pricing' },
+  UK:    { ...FLAT_USD, countryLabel: 'USD pricing' },
+  OTHER: { ...FLAT_USD, countryLabel: 'USD pricing' },
+};
 // Export for the /pricing-matrix admin page — single source of truth.
 export const ALL_REGION_PRICING = PRICING_BY_REGION;
 

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useGeoPrice } from '@/lib/useGeoPrice';
-import { BOOK_CALL_URL } from '@/lib/links';
+import { BOOK_CALL_URL, BOOK_CALL_LABEL, PILOT_CTA_LABEL } from '@/lib/links';
 import { trackPilotClick, trackCallClick } from '@/lib/analytics';
 import { DUR, EASE } from '@/lib/motion';
 
@@ -139,7 +139,7 @@ export default function Pricing({ pricingCopy }: { pricingCopy?: PricingCopy } =
       tagline: 'See real work in 14 days before you sign anything.',
       // Per-segment override wins; otherwise the default homepage copy.
       features: pricingCopy?.pilot ?? DEFAULT_PILOT_FEATURES,
-      cta: 'Claim the Pilot',
+      cta: PILOT_CTA_LABEL,
       featured: true,
     },
     {
@@ -154,7 +154,7 @@ export default function Pricing({ pricingCopy }: { pricingCopy?: PricingCopy } =
       badge: 'Monthly · Full coverage',
       tagline: 'Every channel handled by one team, every month.',
       features: pricingCopy?.growth ?? DEFAULT_GROWTH_FEATURES,
-      cta: 'Book a Call',
+      cta: BOOK_CALL_LABEL,
       featured: false,
     },
     {
@@ -170,7 +170,7 @@ export default function Pricing({ pricingCopy }: { pricingCopy?: PricingCopy } =
       // discount is a genuine perk and stays; the absolute claim goes.
       tagline: 'For operators going all-in on content. Locked package, fixed scope, no surprise pricing.',
       features: pricingCopy?.full ?? DEFAULT_FULL_FEATURES,
-      cta: 'Talk to Us',
+      cta: BOOK_CALL_LABEL,
       featured: false,
     },
   ];

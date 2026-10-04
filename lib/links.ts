@@ -34,8 +34,24 @@ export const BOOK_CALL_LABEL = 'Book a free strategy call';
 export const BOOK_CALL_LABEL_LONG = 'Book your free strategy call';
 /** Secondary. Scrolls or links to explanatory content, never to booking. */
 export const SECONDARY_CTA_LABEL = 'See how it works';
-/** Paid step ONLY. Never use for a booking link. */
+/**
+ * Paid step ONLY. Never use for a booking link.
+ *
+ * Safe to hard-code the price because Pilot pricing is flat USD worldwide as
+ * of Oct 2026 (see the FLAT_USD note in lib/useGeoPrice.ts). While regional
+ * pricing was live this had to be a function, or a UK visitor got "Start the
+ * $299 Pilot" under a card reading £239.
+ */
 export const PILOT_CTA_LABEL = 'Start the $299 Pilot';
+
+/**
+ * Kept for the day regional pricing comes back. Pass the same localized string
+ * the pricing card is rendering, and the label follows it instead of
+ * contradicting it.
+ */
+export function pilotCtaLabel(localizedPrice: string): string {
+  return `Start the ${localizedPrice} Pilot`;
+}
 
 /**
  * Sub-line under the CTA. Answers the two questions that stop the click: how

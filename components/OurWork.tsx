@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, useCallback, useMemo, useTransition } from 'react';
 import { motion } from 'framer-motion';
 import { videos, previewMp4Src, type Orientation, type VideoEntry } from '@/lib/videos';
+import { BOOK_CALL_LABEL } from '@/lib/links';
 
 // ─── Tab definitions ────────────────────────────────────────────────────────
 const tabs = [
@@ -720,12 +721,11 @@ export default function OurWork() {
           type="button"
           onClick={() => (window as unknown as { openBookCallModal?: () => void }).openBookCallModal?.()}
           data-cursor-hover
-          aria-label="Book a call to see more work"
           style={{ background: '#0C0C0B', color: '#F2EEE7', padding: '14px 32px', borderRadius: '100px', fontSize: '13px', fontWeight: 700, cursor: 'none', transition: 'all 0.3s', border: 'none', fontFamily: 'Inter, sans-serif', display: 'inline-flex', alignItems: 'center', gap: '8px', minHeight: '44px' }}
           onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#E8541A'; }}
           onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#0C0C0B'; }}
         >
-          Book a Call to See More
+          {BOOK_CALL_LABEL}
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </button>
       </motion.div>

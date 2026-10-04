@@ -10,6 +10,7 @@ import { type ServiceData, services as ALL_SERVICES } from '@/lib/serviceData';
 import { useGeoPrice } from '@/lib/useGeoPrice';
 import { DUR, EASE } from '@/lib/motion';
 import Nav from './Nav';
+import { BOOK_CALL_LABEL } from '@/lib/links';
 
 // ServiceHeroVisual is 2.4K lines of SVG / animation code per service.
 // Lazy-loading it strips ~80KB of JS off the initial chunk so the route
@@ -409,7 +410,7 @@ function StickyBottomCTA({ accentColor, bookCall }: { accentColor: string; bookC
           cursor: 'pointer',
         }}
       >
-        Book a Call
+        {BOOK_CALL_LABEL}
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
       </button>
     </motion.div>
@@ -599,8 +600,10 @@ export default function ServicePageClient({ service }: { service: ServiceData })
     );
   }
 
-  // Localized promise list — patches the __PILOT_PRICE__ placeholder with the
-  // visitor's region-appropriate Pilot price ($299 / £239 / ₹4,999 / etc).
+  // Patches the __PILOT_PRICE__ placeholder from useGeoPrice so the promise
+  // card never drifts from the pricing section. Flat USD worldwide since Oct
+  // 2026, so this resolves to $299 everywhere; the indirection stays so there
+  // is still exactly one place to change the number.
   const { currency: localCurrency, prices: localPrices } = useGeoPrice();
   const localizedPromises = localizePromises(
     getPromisesForSlug(service.slug),
@@ -761,7 +764,7 @@ export default function ServicePageClient({ service }: { service: ServiceData })
                     cursor: 'pointer',
                   }}
                 >
-                  Book a Free Strategy Call
+                  {BOOK_CALL_LABEL}
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
                 </button>
                 <a
@@ -1393,7 +1396,7 @@ export default function ServicePageClient({ service }: { service: ServiceData })
                 cursor: 'pointer',
               }}
             >
-              Book a Call →
+              {BOOK_CALL_LABEL}
             </button>
           </motion.div>
         </div>
@@ -1501,7 +1504,7 @@ export default function ServicePageClient({ service }: { service: ServiceData })
                 boxShadow: `0 14px 44px ${service.accentColor}55`,
               }}
             >
-              Order this service
+              Order a service
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
             </Link>
             {/* WARM — talk it through first (opens BookCallModal, respects per-service Cal.com URL) */}
