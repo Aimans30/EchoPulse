@@ -149,6 +149,18 @@ export function parsePost(filePath) {
     else publishAt = d;
   }
 
+  // postType: 'asset' (evergreen, written once, refreshed when stale) or
+  // 'trending' (news-driven; must carry updateBy, the date by which the engine
+  // rewrites it into an asset or folds it into one). Default 'asset'.
+  const postType = str(data.postType) || 'asset';
+  if (!['asset', 'trending'].includes(postType)) errors.push(`postType "${postType}" must be asset or trending`);
+  let updateBy = null;
+  if (data.updateBy != null && data.updateBy !== '') {
+    const d = data.updateBy instanceof Date ? data.updateBy : new Date(String(data.updateBy));
+    if (Number.isNaN(d.getTime())) errors.push(`updateBy "${data.updateBy}" is not a valid ISO date`);
+    else updateBy = d;
+  }
+  if (postType === 'trending' && !updateBy) errors.push('trending posts must set updateBy (the date to rewrite it into an asset)');
   const icp = str(data.icp);
   if (icp && !ICPS.includes(icp)) errors.push(`icp "${icp}" is not one of: ${ICPS.join(', ')}`);
   const service = str(data.service);
@@ -170,7 +182,7 @@ export function parsePost(filePath) {
 
   if (!body.trim()) errors.push('post body is empty');
 
-  const known = new Set(['title', 'slug', 'excerpt', 'category', 'author', 'publishAt', 'icp', 'service', 'tags', 'thumbnailText', 'readTime']);
+  const known = new Set(['title', 'slug', 'excerpt', 'category', 'author', 'publishAt', 'icp', 'service', 'tags', 'thumbnailText', 'readTime', 'postType', 'updateBy']);
   const warnings = [];
   for (const k of Object.keys(data)) if (!known.has(k)) warnings.push(`unknown frontmatter key "${k}" ignored`);
 
@@ -200,7 +212,7 @@ export function parsePost(filePath) {
   return {
     filePath,
     title, slug, excerpt, category, author, publishAt, icp, service, tags,
-    thumbnailText, readTime, wordCount, blocks, warnings,
+    thumbnailText, readTime, wordCount, blocks, warnings, postType, updateBy,
   };
 }
 
@@ -216,6 +228,10 @@ export function buildDocument(post, publishedAt) {
     excerpt: post.excerpt,
     author: post.author,
     readTime: post.readTime,
+    postType: post.postType || 'asset',
+    updateBy: post.updateBy ? post.updateBy.toISOString() : undefined,
+    icp: post.icp || undefined,
+    service: post.service || undefined,
     content: post.blocks,
   };
   return doc;
@@ -297,6 +313,17 @@ async function publishOne(post, { client, dryRun, force, now }) {
     );
   }
   if (existing.length) console.log(`  --force: overwriting ${existing.map((e) => e._id).join(', ')}`);
+  // When refreshing a post that already exists (an update, not a new post),
+  // keep its _id and its original publishedAt. Sanity bumps _updatedAt on
+  // write, which the site shows as "Updated <date>" and sends as dateModified.
+  // Resetting publishedAt would make a 2025 post claim to be new, which Google
+  // treats as a trust problem, and a new _id would leave the old doc behind.
+  const prior = existing.find((e) => !String(e._id).startsWith('drafts.')) || existing[0];
+  const priorFull = prior ? await client.fetch(`*[_id == $id][0]{ _id, publishedAt }`, { id: prior._id }) : null;
+  if (priorFull) {
+    doc._id = priorFull._id;
+    if (priorFull.publishedAt) doc.publishedAt = priorFull.publishedAt;
+  }
 
   // 3. upload the thumbnail
   const asset = await client.assets.upload('image', png, {

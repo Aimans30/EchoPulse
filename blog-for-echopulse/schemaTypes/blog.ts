@@ -55,6 +55,35 @@ export const blog = defineType({
     }),
 
     defineField({
+      name: 'postType',
+      title: 'Post type',
+      type: 'string',
+      options: { list: [{ title: 'Asset (evergreen)', value: 'asset' }, { title: 'Trending (rewrite by updateBy)', value: 'trending' }] },
+      initialValue: 'asset',
+    }),
+
+    defineField({
+      name: 'updateBy',
+      title: 'Update by',
+      type: 'datetime',
+      description: 'Trending posts only: the date by which the engine rewrites this into an evergreen asset.',
+    }),
+
+    defineField({
+      name: 'icp',
+      title: 'Audience (ICP key)',
+      type: 'string',
+      description: 'real-estate | founders | coaches | dtc | business-owners | saas | home-services',
+    }),
+
+    defineField({
+      name: 'service',
+      title: 'Service slug',
+      type: 'string',
+      description: 'video-editing | linkedin-ghostwriting | blog-production | ad-creatives | websites-funnels | automations | apps-software',
+    }),
+
+    defineField({
       name: 'mainImage',
       title: 'Main Image',
       type: 'image',

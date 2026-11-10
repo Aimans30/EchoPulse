@@ -48,6 +48,8 @@ service: video-editing              # optional: video-editing | linkedin-ghostwr
 tags: [video, real estate]          # optional, free text
 thumbnailText: "Short punchy title" # optional, used on the generated image instead of the title
 readTime: 6                         # optional minutes; computed from the word count if omitted
+postType: asset                     # asset (default, evergreen) | trending (news-driven, must set updateBy)
+updateBy: 2026-12-15                # trending only: date by which the engine rewrites it into an asset
 ---
 ```
 
