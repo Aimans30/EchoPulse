@@ -7,7 +7,9 @@
 //   https://cal.com/lakshya-soni-jvwfee/echopulse-website-strategy-call (30m)
 // All other services use the default below.
 
-export const BOOK_CALL_URL = 'https://cal.com/lakshya-soni-jvwfee/echopulse-marketing-agency-call';
+// One booking link everywhere (site, blog CTAs, outreach emails). 15 minutes.
+// Decided 10 Nov 2026; the old `echopulse-marketing-agency-call` event is retired.
+export const BOOK_CALL_URL = 'https://cal.com/lakshya-soni-jvwfee/meeting-with-echopulse-team';
 
 /**
  * CTA labels. THREE ONLY. Import from here, never hand-write a button label.
@@ -62,3 +64,12 @@ export const BOOK_CALL_REASSURANCE = 'No pitch. You keep the roadmap whether or 
 // Anchor target for in-page CTAs that should scroll to the bottom CTA
 // section instead of leaving the page.
 export const BOOK_CALL_ANCHOR = '#book-call';
+
+/**
+ * The free sample. The lowest-friction ask on the site: send footage, get 2
+ * edited videos back within 48 hours, no card, no call. Lives in lib/pricing.ts
+ * as FREE_SAMPLE; these are the link and label every CTA uses.
+ */
+export const FREE_EDITS_LABEL = 'Get 2 free edits';
+export const FREE_EDITS_URL =
+  'mailto:lakshya@echopulse.media?subject=2%20free%20edits&body=Hi%20Lakshya%2C%20here%20is%20a%20link%20to%20my%20footage%3A%20';

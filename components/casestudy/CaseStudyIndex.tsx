@@ -166,7 +166,7 @@ export default function CaseStudyIndex({ studies }: { studies: CaseStudy[] }) {
         <div className="csi-container">
           <Reveal>
             <h2 className="csi-h2 csi-h2-light">
-              Your site, read the same way <span className="csi-accent">on a 45 minute call.</span>
+              Your site, read the same way <span className="csi-accent">on a 15 minute call.</span>
             </h2>
             <p className="csi-sub csi-sub-tight">
               We open your Search Console, tell you what is structurally stopping the site from ranking, and

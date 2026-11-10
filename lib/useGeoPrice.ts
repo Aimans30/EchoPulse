@@ -43,6 +43,7 @@ export interface GeoPricing {
   prices: {
     pilot: string;
     pilotOriginal: string;
+    presence: string;
     growth: string;
     full: string;
   };
@@ -55,6 +56,7 @@ interface RegionPricing {
   countryLabel: string;
   pilot: string;
   pilotOriginal: string;
+  presence: string;
   growth: string;
   full: string;
 }
@@ -88,10 +90,12 @@ interface RegionPricing {
 const FLAT_USD = {
   currency: '$',
   currencyCode: 'USD' as CurrencyCode,
+  // Numbers mirror lib/pricing.ts (the source of truth). Keep them in sync.
   pilot: '299',
   pilotOriginal: '599',
+  presence: '399',
   growth: '1,997',
-  full: '4,997+',
+  full: '4,997',
 };
 
 const PRICING_BY_REGION: Record<Region, RegionPricing> = {
@@ -296,6 +300,7 @@ export function useGeoPrice(): GeoPricing {
     prices: {
       pilot: data.pilot,
       pilotOriginal: data.pilotOriginal,
+      presence: data.presence,
       growth: data.growth,
       full: data.full,
     },

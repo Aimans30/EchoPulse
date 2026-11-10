@@ -15,13 +15,10 @@
 import { useEffect, useRef } from 'react';
 import Script from 'next/script';
 import { track, trackCallBooked, trackScrollDepth } from '@/lib/analytics';
-import { useConsent } from '@/lib/consent';
 
-const CLARITY_ID = process.env.NEXT_PUBLIC_CLARITY_ID;
 
 export default function AnalyticsProvider() {
   const firedMilestones = useRef<Set<number>>(new Set());
-  const consent = useConsent();
   // The scroll and booking effects below are left running regardless. Every
   // one of them ends at lib/analytics `track()`, which calls `window.gtag?.()`
   // with optional chaining, so with GA unloaded they are silent no-ops that
@@ -99,22 +96,8 @@ export default function AnalyticsProvider() {
           de-dupes if both ever run.
           `lazyOnload` for the same reason as before: a session recorder has no
           business competing with hydration for main-thread time. */}
-      {CLARITY_ID && consent === 'granted' && (
-        <Script
-          id="ms-clarity"
-          strategy="lazyOnload"
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function(c,l,a,r,i,t,y){
-                if(c[a])return;
-                c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-                t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-                y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-              })(window, document, "clarity", "script", "${CLARITY_ID}");
-            `,
-          }}
-        />
-      )}
+      {/* Clarity now loads from components/ConsentGate.tsx, gated by region
+          (no banner). Kept out of here so it has exactly one owner. */}
     </>
   );
 }

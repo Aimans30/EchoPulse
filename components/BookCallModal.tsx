@@ -137,7 +137,7 @@ export default function BookCallModal() {
                 <span style={{ background: 'linear-gradient(135deg, #E8541A, #FF7A45)', color: '#fff', fontSize: '9.5px', fontWeight: 700, padding: '2px 7px', borderRadius: '20px', letterSpacing: '0.4px', textTransform: 'uppercase', flexShrink: 0 }}>Free</span>
               </div>
               <div className="bcm-sub" style={{ fontSize: '12px', color: '#8A877F', lineHeight: 1.4 }}>
-                45 min · Content audit + growth roadmap · No pitch unless you ask
+                15 min · Content audit + growth roadmap · No pitch unless you ask
               </div>
             </div>
           </div>

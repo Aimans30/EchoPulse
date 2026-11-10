@@ -553,7 +553,7 @@ export default function OurWork() {
 
           <motion.div initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }}>
             <p style={{ color: '#6E6B63', fontSize: '14px', lineHeight: 1.75, margin: '0 0 20px', maxWidth: '270px' }}>
-              Cinematic edits, motion graphics, talking-head reels, podcast cuts, and ad creative. Real samples coming as we ship paid client work.
+              Cinematic edits, motion graphics, talking-head reels, podcast cuts, and ad creative. Every clip here was cut by Lakshya. Send yours and get 2 back free.
             </p>
             <div className="work-stats" style={{ display: 'flex', gap: '28px' }}>
               {[{ n: '48hrs', l: 'Standard turnaround' }, { n: '6', l: 'Service formats' }].map(s => (

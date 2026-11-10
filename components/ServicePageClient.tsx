@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import GuidesSection from '@/components/GuidesSection';
+import type { Guide } from '@/lib/blogLinks';
 import dynamic from 'next/dynamic';
 import { motion, useScroll, useSpring } from 'framer-motion';
 import { gsap } from 'gsap';
@@ -211,7 +213,7 @@ const promisesDefault: Promise[] = [
     // being quietly dropped on every service page, so a buyer who read a
     // service page and then an audience page was quoted two different Pilots
     // for the same $299. The audience-page list is canonical.
-    body: 'Every relationship starts with a paid two-week Pilot at our intro price of __PILOT_PRICE__. 8 short-form videos, 2 statics, 1 carousel, 5 clipped content pieces and 5 long-form blogs, plus the onboarding strategy session and a content audit with a 30-day plan. See the quality before any monthly engagement.',
+    body: 'Send footage and get 2 edited videos free within 48 hours. Then a two-week Pilot at __PILOT_PRICE__: an onboarding session, 6 short-form videos, 2 posts, 1 sourced SEO blog, a content audit and a 30-day plan. See the quality before any monthly plan.',
   },
 ];
 
@@ -573,7 +575,7 @@ function RelatedServices({ currentSlug }: { currentSlug: string }) {
   );
 }
 
-export default function ServicePageClient({ service }: { service: ServiceData }) {
+export default function ServicePageClient({ service, guides = [] }: { service: ServiceData; guides?: Guide[] }) {
   const heroRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const subRef = useRef<HTMLParagraphElement>(null);
@@ -701,13 +703,19 @@ export default function ServicePageClient({ service }: { service: ServiceData })
                   overflow: 'visible',
                 }}
               >
+                {/* Visually hidden service keyword so the H1 names the service
+                    (crawlers read "EveryFormat.OneEditor" when the words below
+                    carry no literal spaces; see the {' '} after each word). */}
+                <span style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0 0 0 0)', whiteSpace: 'nowrap' }}>
+                  {service.name}:{' '}
+                </span>
                 {words.map((w, i) => (
                   <span
                     key={i}
                     style={{
                       display: 'inline-block',
                       overflow: 'hidden',
-                      marginRight: '0.18em',
+                      marginRight: '0.06em',
                       paddingBottom: '0.18em',
                       marginBottom: '-0.12em',
                       verticalAlign: 'top',
@@ -716,6 +724,7 @@ export default function ServicePageClient({ service }: { service: ServiceData })
                     <span className="word" style={{ display: 'inline-block', color: i === words.length - 1 ? service.accentColor : '#F2EEE7' }}>
                       {w}
                     </span>
+                    {i < words.length - 1 ? ' ' : ''}
                   </span>
                 ))}
               </h1>
@@ -1375,7 +1384,7 @@ export default function ServicePageClient({ service }: { service: ServiceData })
               </span>
             </div>
             <span style={{ fontSize: '14px', color: 'rgba(242,238,231,0.7)', flex: 1, lineHeight: 1.5 }}>
-              Free 45-minute call. No commitment. We send a custom plan whether or not you ever hire us.
+              Free 15-minute call. No commitment. We send a custom plan whether or not you ever hire us.
             </span>
             <button
               type="button"
@@ -1407,6 +1416,13 @@ export default function ServicePageClient({ service }: { service: ServiceData })
           }
         `}</style>
       </section>
+
+      {/* Guides: internal links into the blog for this service */}
+      <GuidesSection
+        heading={`Guides on ${service.name.toLowerCase()}`}
+        intro="What it costs, how to choose, and how we do it. Sourced and dated."
+        guides={guides}
+      />
 
       {/* FAQ */}
       <section style={{ padding: '120px 56px', background: '#F2EEE7', color: '#0C0C0B' }}>
@@ -1481,7 +1497,7 @@ export default function ServicePageClient({ service }: { service: ServiceData })
             transition={{ duration: 0.7, delay: 0.15 }}
             style={{ fontSize: '17px', color: 'rgba(242,238,231,0.5)', lineHeight: 1.7, maxWidth: '600px', margin: '0 0 56px' }}
           >
-            Free 45-minute strategy call. We map your {service.name.toLowerCase()} system end to end and send a plan you can use, with us or without.
+            Free 15-minute strategy call. We map your {service.name.toLowerCase()} system end to end and send a plan you can use, with us or without.
           </motion.p>
 
           <div className="svc-final-actions" style={{ display: 'flex', gap: '14px', flexWrap: 'wrap' }}>

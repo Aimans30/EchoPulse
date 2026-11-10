@@ -116,7 +116,7 @@ export default function PilotPopup() {
           <div className="ep-pilot-row">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/logo.png"
+              src="/logo-128.png"
               alt=""
               aria-hidden="true"
               width={40}
@@ -129,7 +129,7 @@ export default function PilotPopup() {
                 Pilot starts at {currency}{prices.pilot}
               </div>
               <div className="ep-pilot-sub">
-                See real work in 14 days. No retainer commitment.
+                See real work in 14 days. Or send footage first and get 2 edits free.
               </div>
             </div>
           </div>

@@ -1,0 +1,112 @@
+# Publishes the oldest due post from content/blog-queue/ to Sanity, one per day.
+# See content/blog-queue/README.md for the post format and the secrets needed.
+name: Publish blog post
+
+on:
+  schedule:
+    # 06:30 UTC = 12:00 IST, daily.
+    - cron: '30 6 * * *'
+  workflow_dispatch:
+    inputs:
+      max:
+        description: 'How many due posts to publish in this run'
+        required: false
+        default: '1'
+      dry_run:
+        description: 'Rehearse only: convert + render, no Sanity writes, no commit'
+        type: boolean
+        required: false
+        default: false
+  pull_request:
+    paths:
+      - 'content/blog-queue/**'
+      - 'scripts/publish-blog.mjs'
+      - 'scripts/markdown-to-portable-text.mjs'
+      - 'scripts/render-thumbnail.mjs'
+      - '.github/workflows/publish-blog.yml'
+
+# Never let two publishes (or a publish and its commit) overlap.
+concurrency:
+  group: publish-blog-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  validate:
+    # PR check: every queued post must parse and convert.
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run blog:validate
+
+  publish:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          # Full ref so the bot commit lands on the branch the run was started from.
+          ref: ${{ github.ref }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Validate queue
+        run: npm run blog:validate
+
+      - name: Publish
+        id: publish
+        env:
+          SANITY_WRITE_TOKEN: ${{ secrets.SANITY_WRITE_TOKEN }}
+          SANITY_PROJECT_ID: ${{ vars.SANITY_PROJECT_ID || 'qkz53g2a' }}
+          SANITY_DATASET: ${{ vars.SANITY_DATASET || 'production' }}
+        run: |
+          set -euo pipefail
+          MAX="${{ inputs.max || '1' }}"
+          DRY=""
+          if [ "${{ inputs.dry_run }}" = "true" ]; then DRY="--dry-run"; fi
+          npm run blog:publish -- --max "$MAX" $DRY | tee publish.log
+          if grep -q '^  LIVE:' publish.log; then
+            echo "published=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "published=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Commit moved post + LOG.md
+        if: steps.publish.outputs.published == 'true'
+        run: |
+          set -euo pipefail
+          git config user.name "echopulse-bot"
+          git config user.email "echopulse-bot@users.noreply.github.com"
+          git add content/blog-queue content/blog-published
+          if git diff --cached --quiet; then
+            echo "Nothing to commit."
+            exit 0
+          fi
+          SLUGS=$(grep '^  slug:' publish.log | awk '{print $2}' | paste -sd ',' -)
+          git commit -m "blog: publish ${SLUGS} [skip ci]"
+          # Another push may have landed during the run; rebase and retry once.
+          git pull --rebase origin "${GITHUB_REF_NAME}" || true
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+
+      - name: Trigger deploy hook (optional)
+        if: steps.publish.outputs.published == 'true' && secrets.DEPLOY_HOOK_URL != ''
+        env:
+          DEPLOY_HOOK_URL: ${{ secrets.DEPLOY_HOOK_URL }}
+        run: |
+          # The blog pages revalidate every 60s on their own (ISR), so this is a
+          # belt-and-braces full rebuild for setups that need it.
+          curl -fsS -X POST "$DEPLOY_HOOK_URL" > /dev/null && echo "Deploy hook called."

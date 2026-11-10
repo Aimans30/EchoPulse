@@ -17,7 +17,7 @@ const HOMEPAGE_LINKS: NavLink[] = [
   // with no numbers on it. /case-studies carries the only measured proof we
   // have. The #work showcase is still on the homepage and still scrolled to.
   { label: 'Case studies', href: '/case-studies' },
-  { label: 'Pricing', href: '/#pricing' },
+  { label: 'Pricing', href: '/pricing' },
   { label: 'Blog', href: '/blog' },
   { label: 'FAQ', href: '/#faq' },
 ];
@@ -97,7 +97,14 @@ export default function Nav({
       // Sample slightly inside from the left so we don't pick up the page bg
       // through the nav's transparent rounded corner.
       const probeX = Math.max(20, rect.left + 8);
+      // elementFromPoint returned the nav itself (the probe point is inside
+      // the pill), whose ancestors never carry data-dark-bg, so onDark was
+      // false on every dark hero: grey links on a grey pill on /real-estate.
+      // Hide the nav from hit-testing for the one call so we sample the page.
+      const prev = navEl.style.pointerEvents;
+      navEl.style.pointerEvents = 'none';
       const el = document.elementFromPoint(probeX, probeY);
+      navEl.style.pointerEvents = prev;
       if (!el) return;
       let node: Element | null = el;
       let depth = 0;
@@ -488,7 +495,7 @@ export default function Nav({
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/logo.png"
+            src="/logo-128.png"
             alt=""
             aria-hidden="true"
             width={126}

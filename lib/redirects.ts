@@ -148,6 +148,37 @@ export const BLOG_REDIRECTS: Record<string, string> = {
   // The Sanity document should be unpublished once this deploys. Until then
   // the redirect shadows it, so there is no duplicate-content window.
   "magicbnb-seo-aeo-case-study-2026": "/case-studies/magicbnb-seo-aeo",
+
+  // ── Search Console 404 sweep, November 2026 ────────────────────────────────
+  // Every URL in the 10 Nov 2026 GSC "Pages" export was fetched against the
+  // live site. The ones below returned 404 (after following any /blogs/ -> /blog/
+  // and www -> apex hops). Each is pointed at the closest LIVE post, confirmed
+  // against the published dataset and the live sitemap on the same day.
+
+  // Brand query. The old "definitive guide" post is unpublished and the slug
+  // still earns impressions for "what is echopulse media". The answer now lives
+  // on a real page, not a blog post, so both /blog/ and /blogs/ land there.
+  // NOTE: `the-official-guide-to-echopulse-media-founder-vision-and-architecture-2026`
+  // is NOT here on purpose. It is still published in Sanity (checked 10 Nov
+  // 2026, _updatedAt 2026-07-28) and returns 200, so redirecting it would
+  // shadow a live post. Add it here only after unpublishing it.
+  "what-is-echopulse-media-the-definitive-guide-to-retention-engineering-and-growth-architecture": "/what-is-echopulse-media",
+
+  // Two destinations that earlier entries used to point at. Both are
+  // unpublished (see the SURVIVORS note), both still get crawled, and until now
+  // neither had an entry of its own, so they 404ed directly.
+  "post-production-system-high-volume-b2b-video-2026": `/blog/${SURVIVORS.batchProduction}`,
+  "the-10-best-social-media-strategies-for-real-estate-agents-to-generate-20-50-clients-in-2025": `/blog/${SURVIVORS.realEstateSocial}`,
+
+  // Renamed or retired posts whose live replacement covers the same topic.
+  // "...before-your-waste-3-months" is the old slug of the live
+  // "...before-you-build-it" post (same title in Sanity).
+  "validate-your-offer-before-your-waste-3-months": "/blog/validate-your-offer-before-you-build-it",
+  // Old short slug of the live retainer-cost post.
+  "video-editing-retainer-cost": "/blog/video-editing-retainer-cost-per-month",
+  // Podcast audience-growth opinion piece, unpublished. Nearest live post on
+  // podcasts is the clip-workflow guide.
+  "the-joe-rogan-fallacy-why-your-podcast-has-12-listeners-and-how-to-fix-it": "/blog/turn-podcast-episode-into-clips",
 };
 
 /** Slugs that are still live. Used to avoid redirect chains from /blogs/*. */

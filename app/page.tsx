@@ -18,12 +18,17 @@ import BottomBlur from '@/components/BottomBlur';
 // SECTIONS THAT TRULY TOUCH `window` ON FIRST RENDER (animations, IntersectionObserver
 // setup, smooth-scroll wiring) keep `ssr: false` because trying to render them
 // server-side throws.
-const Manifesto = dynamic(() => import('@/components/Manifesto'), { ssr: false });
-const Testimonials = dynamic(() => import('@/components/Testimonials'), { ssr: false });
-const WhoWeWorkWith = dynamic(() => import('@/components/WhoWeWorkWith'), { ssr: false });
-const OurWork = dynamic(() => import('@/components/OurWork'), { ssr: false });
-const Services = dynamic(() => import('@/components/Services'), { ssr: false });
-const Process = dynamic(() => import('@/components/Process'), { ssr: false });
+// Nov 2026: these six were `ssr: false`, so the homepage HTML had no service
+// cards, no audience list, no work, no process and no team block. Googlebot
+// renders JS eventually; ChatGPT, Claude and Perplexity crawlers do not, so
+// to them the homepage was a hero and a price table. They are code-split
+// still (dynamic import) but now pre-rendered.
+const Manifesto = dynamic(() => import('@/components/Manifesto'));
+const Testimonials = dynamic(() => import('@/components/Testimonials'));
+const WhoWeWorkWith = dynamic(() => import('@/components/WhoWeWorkWith'));
+const OurWork = dynamic(() => import('@/components/OurWork'));
+const Services = dynamic(() => import('@/components/Services'));
+const Process = dynamic(() => import('@/components/Process'));
 const Pricing = dynamic(() => import('@/components/Pricing')); // SSR: tier prices + schema in pre-rendered HTML
 // NOTE: the Pune-gated on-site offering section was removed in July 2026 along
 // with the India rate card. components/PuneOffering.tsx is now unused.

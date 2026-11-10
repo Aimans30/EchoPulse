@@ -11,7 +11,8 @@ import AnalyticsProvider from "@/components/AnalyticsProvider";
 import BookCallModal from "@/components/BookCallModal";
 import MobileStickyCTA from "@/components/MobileStickyCTA";
 import { GeoProvider } from "@/components/GeoProvider";
-import { getServerGeo } from "@/lib/geoServer";
+import { pricingOffers } from "@/lib/pricing";
+import { BOOK_CALL_URL } from "@/lib/links";
 import { AREA_SERVED, BUSINESS_ADDRESS } from "@/lib/schema";
 
 const GA_ID = 'G-3PPKSJLR7F';
@@ -47,12 +48,12 @@ export const metadata: Metadata = {
     // very end, which is exactly the part that got cut — so the ~700 people
     // per month searching "echopulse" scanned the results, never saw the
     // brand name, and had no signal this was the right result.
-    default: "EchoPulse Media | Done-For-You Content Studio for Founders",
+    default: "EchoPulse Media | Done-For-You Content Studio (Video, LinkedIn, Websites)",
     // Service/blog pages already carry their own name, so don't re-append it.
     template: "%s | EchoPulse Media",
   },
   description:
-    "Done-for-you content studio for founder-led content. Video editing for founders, LinkedIn content, and short-form video, handled by one team.",
+    "Done-for-you content and website studio for founders, coaches, real estate agents and business owners. Video, LinkedIn, blogs, ads and websites by one owner-operated team. Start with 2 free edits.",
   applicationName: "EchoPulse Media",
   authors: [{ name: "Lakshya Soni", url: "https://www.linkedin.com/in/lakshyasoni/" }],
   creator: "Lakshya Soni",
@@ -77,9 +78,9 @@ export const metadata: Metadata = {
     // searches, but the OG and Twitter titles were left behind. They drive
     // every social share, Slack unfurl and link preview, and several AI
     // browsing tools prefer og:title over <title> when summarising a page.
-    title: "EchoPulse Media | Done-For-You Content Studio for Founders",
+    title: "EchoPulse Media | Done-For-You Content Studio (Video, LinkedIn, Websites)",
     description:
-      "EchoPulse Media is a content and AI studio for founders, coaches, business owners, and real estate agents. Video, social, ads, websites, custom software, handled end to end by one team. One bill. $299 14-day Pilot.",
+      "Done-for-you content and website studio for founders, coaches, real estate agents and business owners. Video, LinkedIn, blogs, ads and websites by one owner-operated team. 2 free edits, then a $299 Pilot.",
     url: "https://echopulse.media",
     siteName: "EchoPulse Media",
     type: "website",
@@ -95,9 +96,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "EchoPulse Media | Done-For-You Content Studio for Founders",
+    title: "EchoPulse Media | Done-For-You Content Studio (Video, LinkedIn, Websites)",
     description:
-      "EchoPulse Media is a content and AI studio for founders, coaches, business owners, and real estate agents. Video, social, ads, websites, custom software, handled end to end. Get 20-30 hours a week back.",
+      "Done-for-you content and website studio. Video, LinkedIn, blogs, ads and websites by one owner-operated team. 2 free edits, then a $299 Pilot.",
     creator: "@Lakshya_Creates",
     site: "@Lakshya_Creates",
     images: ["/og-image.png"],
@@ -143,7 +144,7 @@ const structuredData = {
       // is also this entity. Table stakes: you must be #1 for your own name.
       alternateName: ["EchoPulse", "Echo Pulse", "EchoPulse Studio", "Echo Pulse Media"],
       url: "https://echopulse.media",
-      logo: "https://echopulse.media/logo.png",
+      logo: "https://echopulse.media/logo-512.png",
       description:
         "EchoPulse Media is a content and AI studio for founders, coaches, business owners, and real estate agents. Video edits, social posts, blogs, ad creative, websites, automations, and custom software. One team, one bill, every channel. Built to give clients 20 to 30 hours back every week.",
       foundingDate: "2025",
@@ -160,10 +161,16 @@ const structuredData = {
         "https://www.linkedin.com/in/lakshyasoni/",
         "https://x.com/Lakshya_Creates",
       ],
-      makesOffer: [
-        { "@type": "Offer", name: "Pilot", price: "299", priceCurrency: "USD", description: "14-day paid trial: onboarding strategy session, 8 short-form and 5 clipped content pieces, 5 long-form blogs, plus a content audit and 30-day plan." },
-        { "@type": "Offer", name: "Growth Retainer", price: "1997", priceCurrency: "USD", description: "Monthly retainer covering social, blogs, short + long-form video, ad creatives, website optimization, and monthly strategy." },
-        { "@type": "Offer", name: "Full System", price: "4997", priceCurrency: "USD", description: "All-in monthly plan covering 30 social posts, 8 long-form blogs, full ad engine, podcast editing, course modules, automations, and quarterly custom website build." },
+      makesOffer: pricingOffers(),
+      contactPoint: {
+        "@type": "ContactPoint",
+        contactType: "sales",
+        url: BOOK_CALL_URL,
+        availableLanguage: ["en"],
+      },
+      employee: [
+        { "@id": "https://echopulse.media/#shaurya" },
+        { "@id": "https://echopulse.media/#aiman" },
       ],
     },
     {
@@ -197,6 +204,20 @@ const structuredData = {
       image: "https://echopulse.media/founder.jpg",
     },
     {
+      "@type": "Person",
+      "@id": "https://echopulse.media/#shaurya",
+      name: "Shaurya",
+      jobTitle: "Design",
+      worksFor: { "@id": "https://echopulse.media/#organization" },
+    },
+    {
+      "@type": "Person",
+      "@id": "https://echopulse.media/#aiman",
+      name: "Aiman",
+      jobTitle: "Delivery",
+      worksFor: { "@id": "https://echopulse.media/#organization" },
+    },
+    {
       "@type": "WebSite",
       "@id": "https://echopulse.media/#website",
       url: "https://echopulse.media",
@@ -210,13 +231,17 @@ const structuredData = {
   ],
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  // Server-side geo read from middleware-set headers. In production this is
-  // free (Vercel/Cloudflare inject them); in local dev these come back as
-  // null and the client-side fallback in useGeoPrice takes over.
-  const { country, city } = await getServerGeo();
+  // Geo is NOT read on the server any more. `headers()`/`cookies()` in the
+  // root layout made every route dynamic (`Cache-Control: private, no-store`),
+  // so the 150-URL site had no CDN cache and the blog's `revalidate = 60` did
+  // nothing. Tier prices are flat USD worldwide (lib/pricing.ts) and only the
+  // /order flow localizes, which useGeoPrice already does on the client from
+  // the ep_geo cookie or a timezone fallback. Pages are static/ISR again.
+  const country: string | null = null;
+  const city: string | null = null;
 
   return (
     <html lang="en" className={inter.variable}>

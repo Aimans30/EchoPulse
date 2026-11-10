@@ -180,7 +180,7 @@ export default function ContentShowcase() {
           >
             <div style={{ width:'7px', height:'7px', borderRadius:'50%', background:'#10b981', animation:'bdot 2s ease-in-out infinite', flexShrink:0 }} />
             <span style={{ fontSize:'12px', color:'#A8A49B', fontWeight:500 }}>
-              <strong style={{ color:'#0C0C0B' }}>Now booking</strong> strategy calls. 45 minutes, free, zero pitch.
+              <strong style={{ color:'#0C0C0B' }}>Now booking</strong> strategy calls. 15 minutes, free, zero pitch.
             </span>
           </motion.div>
         </div>
@@ -255,7 +255,7 @@ export default function ContentShowcase() {
               Ready to stop guessing?
             </div>
             <div style={{ fontSize:'13px', color:'#6E6B63', lineHeight:1.65, marginBottom:'22px' }}>
-              45-minute call. We audit your content, show you exactly what&apos;s missing, and give you a growth plan. Free.
+              15-minute call. We audit your content, show you exactly what&apos;s missing, and give you a growth plan. Free.
             </div>
             <a
               href="https://echopulse.media"

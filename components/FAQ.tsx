@@ -28,10 +28,10 @@ import { useGeoPrice } from '@/lib/useGeoPrice';
  *   2. Concrete numbers we can honestly stand behind (our prices, our turnaround).
  *   3. No invented industry statistics — unsourced stats are a trust liability.
  */
-const buildFaqs = (pilotPrice: string, growthPrice: string) => [
+const buildFaqs = (pilotPrice: string, presencePrice: string, growthPrice: string) => [
       {
         q: 'How much does a content agency cost per month?',
-        a: `Ours runs ${growthPrice} per month for the Growth retainer, with no contract. Most content agencies price one of three ways: per deliverable (cheapest headline, most expensive in practice once revisions stack up), per hour (you pay for their inefficiency), or a flat monthly retainer covering a defined output (what we do). Before that, you can run a ${pilotPrice} 14-day Pilot: real work on your brand, 21 deliverables, and you keep everything whether you continue or not. That way you're comparing actual output, not sales decks.`,
+        a: `Ours runs ${presencePrice} a month for the Presence Engine (8 to 9 edited videos, 8 posts, a weekly call and your website looked after) or ${growthPrice} a month for the Growth retainer, both month-to-month with no contract. Most content agencies price one of three ways: per deliverable (cheapest headline, most expensive in practice once revisions stack up), per hour (you pay for their inefficiency), or a flat monthly retainer covering a defined output (what we do). Before that, you can run a ${pilotPrice} 14-day Pilot: real work on your brand, 21 deliverables, and you keep everything whether you continue or not. That way you're comparing actual output, not sales decks.`,
       },
       {
         q: 'Is it cheaper to hire a freelance video editor or an agency?',
@@ -39,7 +39,7 @@ const buildFaqs = (pilotPrice: string, growthPrice: string) => [
       },
       {
         q: 'What is included in a monthly content retainer?',
-        a: `The Growth retainer at ${growthPrice} a month covers a defined output across video, social, and written content, plus strategy and monthly reporting. The exact mix is set during onboarding, because a real estate agent needs listing videos and a SaaS founder needs LinkedIn essays, and pretending those are the same package would be dishonest. What is fixed regardless of mix: senior review on every deliverable, a 3-hour reply window during business hours, and unlimited revisions within scope. Book a call and we'll spec the exact deliverable count for your channels.`,
+        a: `Two options. The Presence Engine at ${presencePrice} a month: a 20 to 30 minute call every week, 8 to 9 short videos, 8 posts, up to 5 free clips from footage you already have, a posting plan, and your website tuned up and kept current. The Growth retainer at ${growthPrice} a month covers a bigger defined output across video, social, written content and ads, plus strategy and monthly reporting. The exact mix is set during onboarding, because a real estate agent needs listing videos and a SaaS founder needs LinkedIn essays, and pretending those are the same package would be dishonest. What is fixed regardless of mix: senior review on every deliverable, a 3-hour reply window during business hours, and unlimited revisions within scope. Book a call and we'll spec the exact deliverable count for your channels.`,
       },
       {
         q: 'Do content agencies use AI to write the content?',
@@ -51,7 +51,7 @@ const buildFaqs = (pilotPrice: string, growthPrice: string) => [
       },
       {
         q: 'How fast is the turnaround on video edits?',
-        a: "48 hours per deliverable as standard, and the Pilot delivers 21 assets inside 14 days. Turnaround is the metric we hold ourselves to hardest, because content that arrives late is content that missed its moment. If a deadline is genuinely at risk we tell you before it slips, not after.",
+        a: "48 hours per deliverable as standard. The free sample (2 edited videos) is back within 48 hours of receiving your footage, and the Pilot delivers its 9 pieces inside 14 days. Turnaround is the metric we hold ourselves to hardest, because content that arrives late is content that missed its moment. If a deadline is genuinely at risk we tell you before it slips, not after.",
       },
       {
         q: 'How long does it take to see results from content marketing?',
@@ -60,6 +60,10 @@ const buildFaqs = (pilotPrice: string, growthPrice: string) => [
       {
         q: 'Can a content agency guarantee leads or sales?',
         a: "No, and any agency that guarantees leads is either lying or about to redefine the word 'lead'. Too much of the outcome sits outside our control: your offer, your pricing, your sales calls, your market. What we do guarantee is what we control, which is output quality, turnaround speed, and revision responsiveness. What we measure and report monthly: profile views, engagement rate, reach, content-driven website traffic, and blog time-on-page. When something isn't performing we flag it and change direction, rather than quietly producing more of it.",
+      },
+      {
+        q: 'Is the free sample really free?',
+        a: "Yes. Send 1 or 2 pieces of footage you already have (a talk, a podcast episode, a listing tour, a job-site clip) and you get 2 edited short videos back within 48 hours. No card, no call required, and you keep the files whether or not you hire us. It is the fastest way to judge the quality, so we would rather start there than with a pitch.",
       },
       // Added after a buyer-panel review. The site promises "48-hour
       // turnaround" and "3-hour replies during work hours" to a US, UK,
@@ -180,7 +184,7 @@ export default function FAQ() {
   // One flat list — no section grouping. The section labels ("Pricing &
   // comparison" / "Results & delivery") split 8 questions into two visually
   // disconnected blocks, which read as two separate FAQs rather than one.
-  const flatFaqs = buildFaqs(`${currency}${prices.pilot}`, `${currency}${prices.growth}`);
+  const flatFaqs = buildFaqs(`${currency}${prices.pilot}`, `${currency}${prices.presence}`, `${currency}${prices.growth}`);
 
   // Split down the middle so the two columns fill evenly.
   const half = Math.ceil(flatFaqs.length / 2);

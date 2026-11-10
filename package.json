@@ -8,7 +8,10 @@
     "dev:tunnel": "concurrently \"npm run dev:mobile\" \"npx --yes localtunnel --port 3000 --subdomain echopulse-dev\"",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "blog:publish": "node scripts/publish-blog.mjs",
+    "blog:thumbnail": "node scripts/render-thumbnail.mjs",
+    "blog:validate": "node scripts/publish-blog.mjs --validate"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
@@ -26,6 +29,7 @@
     "react-dom": "19.2.4"
   },
   "devDependencies": {
+    "@sanity/client": "^7.22.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
@@ -33,6 +37,9 @@
     "concurrently": "^9.0.0",
     "eslint": "^9",
     "eslint-config-next": "16.2.4",
+    "js-yaml": "^4.1.0",
+    "marked": "^15.0.12",
+    "sharp": "^0.34.5",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

@@ -211,6 +211,7 @@ export default function Footer() {
             { label: 'FAQ', href: '/#faq' },
             { label: 'Blog', href: '/blog' },
             { label: 'Terms of Service', href: '/terms' },
+            { label: 'Privacy Policy', href: '/privacy' },
           ].map((c) => (
             <li key={c.label}>
               <a
@@ -247,7 +248,7 @@ export default function Footer() {
             // nowhere else, so anyone who wanted to write rather than book a
             // call had to go hunting for it from a column headed "Contact".
             { label: 'lakshya@echopulse.media', href: 'mailto:lakshya@echopulse.media' },
-            { label: 'LinkedIn', href: 'https://www.linkedin.com/in/lakshyasoni/' },
+            { label: 'Lakshya on LinkedIn', href: 'https://www.linkedin.com/in/lakshyasoni/' },
           ].map((c) => (
             <li key={c.label}>
               <a

@@ -77,6 +77,7 @@ export const blog = defineType({
         { type: 'image', options: { hotspot: true } }, // inline images
         { type: 'imageUrl' },            // image from URL
         { type: 'video' },               // ✅ embedded video block
+        { type: 'table' },               // pipe tables from the markdown publisher
       ],
     }),
   ],

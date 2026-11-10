@@ -268,6 +268,41 @@ function buildComponents(): PortableTextComponents {
       if (!value?.url) return null;
       return <VideoEmbed url={value.url} caption={value.caption} />;
     },
+    table: ({ value }) => {
+      const rows: TableRow[] = Array.isArray(value?.rows) ? value.rows : [];
+      if (!rows.length) return null;
+      const hasHeader = value?.hasHeader !== false;
+      const head: TableRow | null = hasHeader ? rows[0] : null;
+      const body: TableRow[] = hasHeader ? rows.slice(1) : rows;
+      const cellsOf = (r: TableRow | null): string[] => (Array.isArray(r?.cells) ? r.cells : []);
+      return (
+        // The wrapper is what scrolls: on a 360px phone a 4-column table is
+        // wider than the article column, and the table must pan inside its
+        // own box instead of making the whole page pannable.
+        <div style={blogTableWrapStyle}>
+          <table style={blogTableStyle}>
+            {head && (
+              <thead>
+                <tr>
+                  {cellsOf(head).map((c, i) => (
+                    <th key={i} scope="col" style={blogThStyle}>{c}</th>
+                  ))}
+                </tr>
+              </thead>
+            )}
+            <tbody>
+              {body.map((r, ri) => (
+                <tr key={r?._key ?? ri}>
+                  {cellsOf(r).map((c, ci) => (
+                    <td key={ci} style={ri % 2 ? { ...blogTdStyle, background: 'rgba(12,12,11,0.025)' } : blogTdStyle}>{c}</td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      );
+    },
   },
   block: {
     // Rendered as an <h2>, not an <h1>, on purpose.
@@ -469,4 +504,49 @@ const blogListStyle: React.CSSProperties = {
 };
 const blogListItemStyle: React.CSSProperties = {
   marginBottom: '8px',
+};
+
+// ── table block (the custom `table` type written by scripts/publish-blog.mjs) ──
+type TableRow = { _key?: string; cells?: string[] };
+
+const blogTableWrapStyle: React.CSSProperties = {
+  margin: '28px 0 32px',
+  overflowX: 'auto',
+  WebkitOverflowScrolling: 'touch',
+  maxWidth: '100%',
+  border: '1px solid rgba(12,12,11,0.12)',
+  borderRadius: '12px',
+  background: '#FFFFFF',
+};
+const blogTableStyle: React.CSSProperties = {
+  // The containment rule below sets `.blog-prose table { display: block }`
+  // for tables pasted raw into Sanity; this block already scrolls inside its
+  // wrapper, so restore real table layout so the header spans the width.
+  display: 'table',
+  width: '100%',
+  minWidth: '480px',
+  borderCollapse: 'collapse',
+  fontFamily: 'Inter, sans-serif',
+  fontSize: '15.5px',
+  lineHeight: 1.5,
+  color: '#3E3D3A',
+};
+const blogThStyle: React.CSSProperties = {
+  textAlign: 'left',
+  verticalAlign: 'bottom',
+  padding: '12px 16px',
+  fontWeight: 700,
+  fontSize: '13.5px',
+  letterSpacing: '0.2px',
+  textTransform: 'uppercase',
+  color: '#0C0C0B',
+  background: '#F2EEE7',
+  borderBottom: '2px solid #E8541A',
+  whiteSpace: 'nowrap',
+};
+const blogTdStyle: React.CSSProperties = {
+  textAlign: 'left',
+  verticalAlign: 'top',
+  padding: '12px 16px',
+  borderBottom: '1px solid rgba(12,12,11,0.08)',
 };

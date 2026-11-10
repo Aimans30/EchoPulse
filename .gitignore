@@ -36,6 +36,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# blog thumbnails rendered locally by scripts/publish-blog.mjs
+/.thumbs/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

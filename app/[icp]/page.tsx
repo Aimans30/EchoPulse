@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { getIcp, icps } from '@/lib/icpData';
 import { videosForIcp } from '@/lib/videos';
 import ICPPage from '@/components/icp/ICPPage';
+import { getGuidesFor } from '@/lib/blogLinks';
 import { AREA_SERVED } from '@/lib/schema';
 
 const SITE_URL = 'https://echopulse.media';
@@ -53,6 +54,8 @@ export default async function IcpLandingPage({ params }: { params: Promise<{ icp
   if (!data) notFound();
 
   const pageVideos = videosForIcp(data.key);
+  // Internal links into the blog (the audit found these pages linked to 0 posts).
+  const guides = await getGuidesFor({ icp: data.key }, 6);
   const url = `${SITE_URL}/${data.key}`;
 
   // Service + FAQ structured data so these outbound pages are citable by
@@ -95,7 +98,7 @@ export default async function IcpLandingPage({ params }: { params: Promise<{ icp
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
-      <ICPPage data={data} videos={pageVideos} />
+      <ICPPage data={data} videos={pageVideos} guides={guides} />
     </>
   );
 }

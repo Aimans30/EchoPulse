@@ -3,9 +3,9 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useGeoPrice } from '@/lib/useGeoPrice';
-import { BOOK_CALL_URL, BOOK_CALL_LABEL, PILOT_CTA_LABEL } from '@/lib/links';
+import { BOOK_CALL_URL } from '@/lib/links';
 import { trackPilotClick, trackCallClick } from '@/lib/analytics';
-import { DUR, EASE } from '@/lib/motion';
+import { PRICING_CARDS, PROMISES, type Plan } from '@/lib/pricing';
 
 /**
  * Drive the mobile swipe-carousel dots indicator. When the user swipes the
@@ -52,55 +52,15 @@ function useMobilePricingDots() {
 // audience. Prices, counts, badges, taglines, and CTAs never change — only
 // these feature strings swap. A segment that supplies no override falls back to
 // these defaults (see `plans` below).
-export type PricingCopy = {
-  pilot: string[];
-  growth: string[];
-  full: string[];
-};
-
-const DEFAULT_PILOT_FEATURES: string[] = [
-  '90-min onboarding strategy session + brand brief',
-  '8 short-form + 2 static + 1 carousel + 5 clipped content pieces',
-  '5 long-form SEO blog drafts (1,500 words each, optimized for search and AI answer engines)',
-  'Content audit + 30-day plan',
-  'Curated to the channels your business actually needs',
-  '48-hour turnaround per deliverable',
-  'Revisions until you are satisfied',
-  'Live Loom walkthrough on delivery',
-  'No retainer commitment. See the work first.',
-];
-
-const DEFAULT_GROWTH_FEATURES: string[] = [
-  'Onboarding strategy session + quarterly brand-brief refresh',
-  '20 social posts per month across all platforms (LinkedIn, Instagram, wherever your buyers are)',
-  '4 long-form SEO blogs per month (1,500 to 2,500 words, optimized for search and AI answer engines)',
-  '12 short-form video edits + 12 clipped content pieces + 2 long-form (YouTube, podcast, listing tours)',
-  '6 ad creatives per month (4 static + 2 video)',
-  'Conversion-built website, rebuilt in month one and tuned every month after',
-  'Funnel optimization with conversion tracking and A/B testing built in',
-  'Monthly strategy call with a 30-day content calendar mapped ahead',
-  '48-hour turnaround on every deliverable, as standard',
-  'Monthly performance review so you see what is working',
-  '20% off any custom app or software build (MVPs, dashboards, course platforms, client portals)',
-];
-
-const DEFAULT_FULL_FEATURES: string[] = [
-  'Everything in Growth, scaled',
-  'Long-form YouTube editing (vlogs, sponsored content, educational, listing tours)',
-  'Podcast editing: full episodes + 8 to 12 highlight cuts each',
-  'Course module editing (Kajabi, Teachable, Thinkific, Skool)',
-  'Company process optimization (SOPs, workflows, internal automations)',
-  '30 social posts + 8 long-form blogs per month',
-  'Full ad creative engine across Meta, TikTok, YouTube, Google',
-  'Custom website or funnel build each quarter (4 builds/year)',
-  'One small custom app build per quarter included (up to $9,997 scope) + 30% off larger app builds',
-  'Automation stack setup (Make.com, ManyChat, CRM)',
-  'Dedicated account lead + bi-weekly strategy session',
-  'Live performance dashboard + monthly reporting',
-];
+/**
+ * Per-segment wording overrides for the scope lines. Keys match lib/pricing.ts
+ * plan keys. Prices, order and which plans show are NOT overridable here:
+ * they come from lib/pricing.ts so every page tells the same price story.
+ */
+export type PricingCopy = Partial<Record<Plan['key'], string[]>>;
 
 export default function Pricing({ pricingCopy }: { pricingCopy?: PricingCopy } = {}) {
-  const { currency, prices, countryLabel, ready } = useGeoPrice();
+  const { countryLabel, ready } = useGeoPrice();
   // (Old `mobileSelectedTier` picker state was removed when the mobile UX
   // changed from a tier-picker row to a horizontal swipe carousel. Cards
   // are equal-weight peers in the carousel — none is "selected" globally.)
@@ -112,68 +72,19 @@ export default function Pricing({ pricingCopy }: { pricingCopy?: PricingCopy } =
   // Mobile swipe carousel — update dots indicator from scroll position.
   useMobilePricingDots();
 
-  const plans = [
-    {
-      tier: 'Pilot',
-      price: `${currency}${prices.pilot}`,
-      // `originalPrice` REMOVED deliberately. It rendered a struck-through
-      // $599 next to $299, a "Save 50%" pill, and "For a limited time only"
-      // with a pulsing dot. None of that was true: pilotOriginal is a static
-      // value in lib/useGeoPrice.ts shown to every visitor on every visit
-      // forever, so the "limited time" was permanent and the "discount" was
-      // an anchor, not a former price.
-      //
-      // That matters more here than on a normal site. This studio's entire
-      // trust position is that it refuses to fabricate: it has no client
-      // testimonials and says so in writing rather than inventing them, and
-      // a fabricated "+428% reply rate" stat was already stripped out of the
-      // LinkedIn service hero for the same reason. A permanent fake sale sat
-      // directly above that honesty and undercut all of it. The audience here
-      // is founders and agency owners who recognise the device instantly.
-      //
-      // $299 is a strong entry price on its own and does not need propping up.
-      // Removing the field makes the price block fall through to the plain
-      // branch below, which drops all three elements at once.
-      per: 'one-off / 2 weeks',
-      badge: `Try us out · ${currency}${prices.pilot}`,
-      tagline: 'See real work in 14 days before you sign anything.',
-      // Per-segment override wins; otherwise the default homepage copy.
-      features: pricingCopy?.pilot ?? DEFAULT_PILOT_FEATURES,
-      cta: PILOT_CTA_LABEL,
-      featured: true,
-    },
-    {
-      tier: 'Growth',
-      price: `${currency}${prices.growth}`,
-      per: '/month',
-      // Was "Most Popular" / "The retainer most clients pick". Both assert
-      // purchase-popularity data a studio with no published client roster
-      // cannot evidence, and both sat on the same site that says in writing it
-      // will not fabricate testimonials. Replaced with a claim about scope,
-      // which is verifiable from the feature list directly underneath it.
-      badge: 'Monthly · Full coverage',
-      tagline: 'Every channel handled by one team, every month.',
-      features: pricingCopy?.growth ?? DEFAULT_GROWTH_FEATURES,
-      cta: BOOK_CALL_LABEL,
-      featured: false,
-    },
-    {
-      tier: 'Full System',
-      price: `${currency}${prices.full}`,
-      per: '/month',
-      badge: 'All-in. Fixed scope.',
-      // "no upsells" softened to "no surprise pricing". The Growth tier one
-      // card to the left offers "20% off any custom app or software build",
-      // so claiming no upsells while discounting a separate product on the
-      // same screen read as the two tiers arguing with each other. An agency
-      // owner in a buyer panel spotted it in about five seconds. The build
-      // discount is a genuine perk and stays; the absolute claim goes.
-      tagline: 'For operators going all-in on content. Locked package, fixed scope, no surprise pricing.',
-      features: pricingCopy?.full ?? DEFAULT_FULL_FEATURES,
-      cta: BOOK_CALL_LABEL,
-      featured: false,
-    },
-  ];
+  // Cards come from lib/pricing.ts (the one price ladder). Hidden plans never
+  // render. `pricingCopy` may reword a plan's scope lines for a segment page.
+  const plans = PRICING_CARDS.map((p) => ({
+    key: p.key,
+    tier: p.name,
+    price: p.priceLabel,
+    per: p.per,
+    badge: p.badge,
+    tagline: p.tagline,
+    features: pricingCopy?.[p.key] ?? p.scope,
+    cta: p.cta,
+    featured: !!p.featured,
+  }));
 
   return (
     <section
@@ -232,7 +143,7 @@ export default function Pricing({ pricingCopy }: { pricingCopy?: PricingCopy } =
                 What replaces it is the same three commitments, stated as terms
                 the reader can hold us to rather than as a boast. */}
             Owner-operated, with senior eyes on every deliverable.{' '}
-            <strong style={{ color: '#0C0C0B', fontWeight: 700 }}>3-hour replies during work hours, re-dos until it&apos;s right, and no surprise invoices</strong>
+            <strong style={{ color: '#0C0C0B', fontWeight: 700 }}>{PROMISES.replies.toLowerCase()}, {PROMISES.turnaround.toLowerCase()}, re-done until it&apos;s right, and no surprise invoices</strong>
             {' '}are the terms, not the sales pitch. You are buying output,
             not a seat in someone&apos;s account-management queue.
           </motion.p>
@@ -246,7 +157,7 @@ export default function Pricing({ pricingCopy }: { pricingCopy?: PricingCopy } =
             style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '5px 12px', background: 'rgba(255,255,255,0.55)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.85)', borderRadius: '100px', fontSize: '10.5px', fontWeight: 600, letterSpacing: '0.3px', color: '#6E6B63', marginBottom: '28px' }}
           >
             <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10b981', display: 'inline-block', flexShrink: 0 }} />
-            Showing {countryLabel}. Same scope worldwide.
+            Showing {countryLabel}. Same price and scope worldwide. Start with 2 free edits, no card.
           </motion.div>
 
           {/* ── Mobile-only swipeable pricing carousel ─────────────────
@@ -356,7 +267,7 @@ export default function Pricing({ pricingCopy }: { pricingCopy?: PricingCopy } =
             </div>
           </div>
 
-          <div className="pricing-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', alignItems: 'stretch' }}>
+          <div className="pricing-grid" style={{ display: 'grid', gridTemplateColumns: `repeat(${plans.length}, 1fr)`, gap: '12px', alignItems: 'stretch' }}>
           {plans.map((plan, i) => (
             <motion.div
               key={plan.tier}

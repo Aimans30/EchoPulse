@@ -6,6 +6,8 @@ import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
 import BlogContent from '@/components/BlogContent';
 import BlogFooterCTA from '@/components/BlogFooterCTA';
+import BlogInlineCTA from '@/components/BlogInlineCTA';
+import { audienceForPost } from '@/lib/blogLinks';
 import TableOfContents from '@/components/TableOfContents';
 import { getPostBySlug, getAllPostSlugs, getRelatedPosts, resolveCategory, resolveAuthor, type BlogPostSummary } from '@/lib/blog';
 import { urlFor } from '@/lib/sanity';
@@ -102,6 +104,8 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
   // Related posts for the bottom strip — prefer same category, fill with recent.
   const related = await getRelatedPosts(slug, post.category, 3);
+  // Which ICP + service page this article should send readers to.
+  const audience = audienceForPost(post);
 
   const headerImageSrc = post.mainImage?.asset
     ? urlFor(post.mainImage).width(1600).height(900).fit('crop').auto('format').url()
@@ -317,7 +321,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               // saves shipping a 789KB 1487x1594 portrait to every reader.
               // /about keeps the full-resolution founder.jpg for its 420x520
               // portrait, which this crop is far too small to serve.
-              const avatarSrc = isFounder ? '/founder-avatar.jpg' : '/logo.png';
+              const avatarSrc = isFounder ? '/founder-avatar.jpg' : '/logo-128.png';
               return (
                 <div
                   style={{
@@ -437,9 +441,33 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                 around a long post other than scrolling it end to end. */}
             <TableOfContents headings={headings} variant="mobile" />
 
-            {/* Body content */}
+            {/* Body content, with the in-article CTA after the intro (before
+                the second H2) and a compact one about two thirds of the way
+                down. Both are plain links; see components/BlogInlineCTA. */}
             {post.content && post.content.length > 0 ? (
-              <BlogContent value={post.content} />
+              (() => {
+                const blocks = post.content;
+                const h2s = blocks
+                  .map((b, i) => (b._type === 'block' && (b as { style?: string }).style === 'h2' ? i : -1))
+                  .filter((i) => i > 0);
+                const introEnd = h2s.length >= 2 ? h2s[1] : h2s.length === 1 ? h2s[0] : Math.min(4, blocks.length);
+                const midIdx = h2s.length >= 4 ? h2s[Math.floor(h2s.length * 0.66)] : -1;
+                const parts: Array<{ key: string; value: typeof blocks; after?: 'intro' | 'mid' }> = [];
+                if (midIdx > introEnd) {
+                  parts.push({ key: 'a', value: blocks.slice(0, introEnd), after: 'intro' });
+                  parts.push({ key: 'b', value: blocks.slice(introEnd, midIdx), after: 'mid' });
+                  parts.push({ key: 'c', value: blocks.slice(midIdx) });
+                } else {
+                  parts.push({ key: 'a', value: blocks.slice(0, introEnd), after: 'intro' });
+                  parts.push({ key: 'b', value: blocks.slice(introEnd) });
+                }
+                return parts.map((part) => (
+                  <div key={part.key}>
+                    {part.value.length > 0 ? <BlogContent value={part.value} /> : null}
+                    {part.after ? <BlogInlineCTA icp={audience.icp} service={audience.service} variant={part.after} slug={slug} /> : null}
+                  </div>
+                ));
+              })()
             ) : (
               <p style={{ color: '#6E6B63', fontStyle: 'italic' }}>
                 This post is being written. Check back soon.

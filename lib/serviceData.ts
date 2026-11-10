@@ -95,7 +95,7 @@ export const services: ServiceData[] = [
       { q: 'How fast is the turnaround?', a: 'Standard is 48 hours per video deliverable. If something is genuinely time-sensitive, a launch date or a listing going live, ask on the call or in the shared folder and we will tell you honestly whether we can hit 24 hours that week. Rush carries a 30 percent surcharge and is arranged directly with us rather than through the self-serve order page.' },
       { q: 'How do I send footage?', a: 'We set up a shared Google Drive or Dropbox folder for each client. Upload your raw footage with a brief. We handle the rest.' },
       { q: 'Do you edit for all platforms?', a: 'Yes. Reels, TikTok, YouTube Shorts, YouTube long-form, LinkedIn video, podcast video, and listing-site MP4 exports are all standard.' },
-      { q: 'What actually happens on the strategy call?', a: '45 minutes. We look at what you are publishing now, map a 30-day plan against it, and put the numbers in writing. No pitch, and you keep the plan whether or not you hire us.' },
+      { q: 'What actually happens on the strategy call?', a: '15 minutes. We look at what you are publishing now, map a 30-day plan against it, and put the numbers in writing. No pitch, and you keep the plan whether or not you hire us.' },
     ],
   },
   {
@@ -146,7 +146,7 @@ export const services: ServiceData[] = [
       { q: 'Will my audience know it is written by someone else?', a: 'That is the bar we write to. The brand brief is built from a 90-minute recorded interview, so every post is anchored to phrases and stories you have actually used, not to a template. You approve each draft before it goes out, so nothing publishes in a voice you would not use yourself.' },
       { q: 'How many posts per month?', a: 'Standard tier is 16 to 20 posts per month (4 to 5 per week) plus 1 to 2 carousels. Premium tier adds the daily engagement amplifier (5 comment drafts per day on prospect and influencer posts).' },
       { q: 'Do I have to approve every post?', a: 'Yes. You see every draft before it publishes. Revisions are unlimited until you are satisfied with the post. Most clients only revise the first 5 to 10 posts before they trust the system.' },
-      { q: 'What actually happens on the strategy call?', a: '45 minutes. We look at what you are publishing now, map a 30-day plan against it, and put the numbers in writing. No pitch, and you keep the plan whether or not you hire us.' },
+      { q: 'What actually happens on the strategy call?', a: '15 minutes. We look at what you are publishing now, map a 30-day plan against it, and put the numbers in writing. No pitch, and you keep the plan whether or not you hire us.' },
     ],
   },
   {
@@ -197,7 +197,7 @@ export const services: ServiceData[] = [
       { q: 'Do you write generic listicles?', a: 'No. Every piece has a thesis. If we cannot find a specific angle or point of view your audience cares about, we propose a different topic.' },
       { q: 'How do you avoid blogs that sound like AI wrote them?', a: 'A human editor reads every draft and flags anything generic. We keep a running list of banned phrases (delve, navigate, in today\'s fast-paced world, and so on). If a draft does not fit your business, we rewrite until it does.' },
       { q: 'Do you provide SEO?', a: 'Yes. Every blog ships with full SEO package: title, meta description, slug, internal link suggestions, external authority links, schema markup recommendation.' },
-      { q: 'What actually happens on the strategy call?', a: '45 minutes. We look at what you are publishing now, map a 30-day plan against it, and put the numbers in writing. No pitch, and you keep the plan whether or not you hire us.' },
+      { q: 'What actually happens on the strategy call?', a: '15 minutes. We look at what you are publishing now, map a 30-day plan against it, and put the numbers in writing. No pitch, and you keep the plan whether or not you hire us.' },
     ],
   },
   {
@@ -252,7 +252,7 @@ export const services: ServiceData[] = [
       // same two facts twice within one scroll. This one answers the question
       // the page's whole argument rests on and is not answered anywhere else.
       { q: 'How do you actually stop creative fatigue?', a: 'Volume and rotation, not one hero ad. You get 8 to 12 fresh creatives a month, we pull 3 to 5 hook variations off whatever is performing, and we refresh weekly rather than every 4 to 6 weeks. Fatigue is a maths problem: the fix is having the next creative ready before the current one dies.' },
-      { q: 'What actually happens on the strategy call?', a: '45 minutes. We look at the creative you are running now, map a 30-day plan against it, and put the numbers in writing. No pitch, and you keep the plan whether or not you hire us.' },
+      { q: 'What actually happens on the strategy call?', a: '15 minutes. We look at the creative you are running now, map a 30-day plan against it, and put the numbers in writing. No pitch, and you keep the plan whether or not you hire us.' },
     ],
   },
   {
@@ -265,7 +265,7 @@ export const services: ServiceData[] = [
     // once it's created. While unset, this falls back to the global modal.
     // Suggested event: "Website Strategy Call" (30 min) — different intent
     // and prep than the general content/marketing call.
-    bookCallUrl: 'https://cal.com/lakshya-soni-jvwfee/echopulse-website-strategy-call',
+    bookCallUrl: 'https://cal.com/lakshya-soni-jvwfee/meeting-with-echopulse-team',
     accentColor: '#10b981',
     problemHeadline: 'A pretty website that does not get you customers.',
     problemBody: 'Traffic lands on your site, scrolls for 8 seconds, and leaves. No inquiry. No booking. No sale. Your designer made it look beautiful, but the layout is wrong, the copy is fluff, and the call-to-action is buried. A beautiful site that does not convert is an expensive business card.',
@@ -309,7 +309,7 @@ export const services: ServiceData[] = [
       { q: 'Do you write the copy?', a: 'Yes. Every project includes conversion copywriting. We do not design around placeholder text and we do not let clients ship a beautiful site with weak copy.' },
       { q: 'How long does a website take?', a: 'Brand websites: 3 to 4 weeks. Sales funnels and landing pages: 1 to 2 weeks. Custom Next.js builds: 4 to 6 weeks depending on complexity.' },
       { q: 'Can you redesign my existing site?', a: 'Yes. Redesigns are common. We audit what is and is not converting before starting, so we keep what works and replace what does not.' },
-      { q: 'What actually happens on the strategy call?', a: '45 minutes. We walk your current site together, name what is costing you conversions, and put a scope and a fixed price in writing. No pitch, and you keep the plan whether or not you hire us.' },
+      { q: 'What actually happens on the strategy call?', a: '15 minutes. We walk your current site together, name what is costing you conversions, and put a scope and a fixed price in writing. No pitch, and you keep the plan whether or not you hire us.' },
     ],
   },
   {
@@ -360,7 +360,7 @@ export const services: ServiceData[] = [
       { q: 'How long does setup take?', a: 'Most full automation stacks are live in 10 to 14 business days. Complex multi-platform builds with custom integrations may extend to 21 days.' },
       { q: 'Do I need a large audience?', a: 'No. Automation works at any audience size, and a small engaged list converts better than a large cold one. What matters is that every inbound message gets answered and every interested person gets followed up, which is exactly what the system handles. The size of the audience is what you grow next, not a prerequisite for the system to pay for itself.' },
       { q: 'Will the messages sound robotic?', a: 'Not if they are written properly. Every message is written against your brand brief, not pulled from a default template, and we run test conversations end to end before anything goes live so you can read exactly what your audience will receive.' },
-      { q: 'What actually happens on the strategy call?', a: '45 minutes. We map your lead flow end to end, name where leads are going cold today, and put a written plan and price behind fixing it. No pitch, and you keep the map whether or not you hire us.' },
+      { q: 'What actually happens on the strategy call?', a: '15 minutes. We map your lead flow end to end, name where leads are going cold today, and put a written plan and price behind fixing it. No pitch, and you keep the map whether or not you hire us.' },
     ],
   },
   {
@@ -421,7 +421,7 @@ export const services: ServiceData[] = [
       { q: 'How does this work if I am already on a content retainer?', a: 'Growth retainer clients get 20% off any custom build. Full System clients get one small build (up to $9,997 scope) included every quarter at no extra cost, plus 30% off larger builds. Over a year, Full System clients can pull $30K+ of build value out of the retainer they are already paying for. Standalone clients are welcome too, no retainer required.' },
       { q: 'Why is this cheaper than what dev agencies quote?', a: 'Because we are three operators, not a 20-person agency layering project managers, account directors, two designers, three developers, a QA, and a head of strategy on top of every billable hour. Lakshya leads the build. Shaurya and Aiman lead design and delivery. No middle layers, no kickbacks, no quarterly steering committees. The same scope at half the timeline, a quarter of the cost, and zero contract lock-in.' },
       { q: 'Do you take equity instead of cash?', a: 'No. Fixed pricing keeps the relationship clean. Your equity should stay yours. Our incentive is shipping you working software, not negotiating a cap table.' },
-      { q: 'What actually happens on the strategy call?', a: '45 minutes. We map what you want customers and your team to experience, and you leave with a written scope, a fixed price and a delivery date. If a custom build is not right for your stage we will say so. No pitch, and you keep the spec either way.' },
+      { q: 'What actually happens on the strategy call?', a: '15 minutes. We map what you want customers and your team to experience, and you leave with a written scope, a fixed price and a delivery date. If a custom build is not right for your stage we will say so. No pitch, and you keep the spec either way.' },
     ],
   },
 ];

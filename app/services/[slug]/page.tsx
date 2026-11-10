@@ -1,9 +1,16 @@
 import { getService, services } from '@/lib/serviceData';
 import { notFound } from 'next/navigation';
 import ServicePageClient from '@/components/ServicePageClient';
+import { getGuidesFor, type ServiceSlug } from '@/lib/blogLinks';
 import { AREA_SERVED } from '@/lib/schema';
 
 const SITE_URL = 'https://echopulse.media';
+
+// Only the 7 service slugs are valid here. Without this, an unknown slug such
+// as /services/anything rendered at request time with a 200 and an empty
+// shell (confirmed live on 10 Nov 2026). The [icp] and case-study routes
+// already do this; service pages were missed.
+export const dynamicParams = false;
 
 export function generateStaticParams() {
   return services.map(s => ({ slug: s.slug }));
@@ -47,6 +54,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
   const { slug } = await params;
   const service = getService(slug);
   if (!service) notFound();
+  const guides = await getGuidesFor({ service: service.slug as ServiceSlug }, 6);
 
   // Service-specific JSON-LD — gives AI agents a structured record of the
   // offering, the provider (EchoPulse), and the parent organization so this
@@ -123,7 +131,7 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
           way to jump past the nav. Wrapping here rather than inside
           ServicePageClient keeps the client component focused on presentation. */}
       <main id="main">
-        <ServicePageClient service={service} />
+        <ServicePageClient service={service} guides={guides} />
       </main>
     </>
   );

@@ -1,9 +1,8 @@
 import type { MetadataRoute } from 'next';
 import { services } from '@/lib/serviceData';
 import { icps } from '@/lib/icpData';
-import { getAllPosts } from '@/lib/blog';
-import { urlFor } from '@/lib/sanity';
-import { BLOG_REDIRECTS } from '@/lib/redirects';
+import { urlFor, sanityClient } from '@/lib/sanity';
+import { BLOG_REDIRECTS, DEAD_SLUGS } from '@/lib/redirects';
 import { caseStudies, heroImageFor } from '@/lib/caseStudyData';
 
 /**
@@ -22,6 +21,40 @@ const SITE_URL = 'https://echopulse.media';
  */
 export const revalidate = 600;
 
+/** Fixed dates for pages that change by hand. Bump when the page changes. */
+const TERMS_UPDATED = new Date('2026-05-28');
+const PRIVACY_UPDATED = new Date('2026-11-10');
+const PRICING_UPDATED = new Date('2026-11-10');
+/**
+ * The rest of the static pages. Only the homepage keeps `new Date()`: it is
+ * the one page whose sections genuinely move with every deploy. Everything
+ * else gets this date, bumped when a release touches those pages, so the
+ * sitemap stops claiming a change on every fetch.
+ */
+const STATIC_PAGES_UPDATED = new Date('2026-11-10');
+const BRAND_PAGE_UPDATED = new Date('2026-11-10');
+
+type SitemapPost = {
+  slug: string;
+  publishedAt?: string;
+  _updatedAt?: string;
+  mainImage?: { asset?: { _ref?: string } };
+  mainImageUrl?: string;
+};
+
+/**
+ * Slug, dates and cover only. Dead slugs are excluded in the query itself so
+ * a re-published duplicate never reaches the map; the in-code filter below
+ * stays as a second guard.
+ */
+const SITEMAP_POSTS_QUERY = `*[_type == "blog" && defined(slug.current) && !(slug.current in $dead)]{
+  "slug": slug.current,
+  publishedAt,
+  _updatedAt,
+  mainImage,
+  mainImageUrl
+}`;
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
 
@@ -32,9 +65,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 1.0,
   };
 
+  // Set to the newest post's date once the posts have loaded, below.
   const blogIndex: MetadataRoute.Sitemap[number] = {
     url: `${SITE_URL}/blog`,
-    lastModified: now,
+    lastModified: STATIC_PAGES_UPDATED,
     changeFrequency: 'weekly',
     priority: 0.85,
   };
@@ -44,7 +78,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // that both Google's raters and AI assistants use to decide we're a real firm.
   const about: MetadataRoute.Sitemap[number] = {
     url: `${SITE_URL}/about`,
-    lastModified: now,
+    lastModified: STATIC_PAGES_UPDATED,
     changeFrequency: 'monthly',
     priority: 0.9,
   };
@@ -53,14 +87,41 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // it except the nav. It's a conversion page; it belongs here.
   const order: MetadataRoute.Sitemap[number] = {
     url: `${SITE_URL}/order`,
-    lastModified: now,
+    lastModified: STATIC_PAGES_UPDATED,
     changeFrequency: 'monthly',
     priority: 0.7,
   };
 
+  // /pricing is the full price page built from lib/pricing.ts. It answers the
+  // query the homepage pricing section cannot rank for on its own.
+  const pricing: MetadataRoute.Sitemap[number] = {
+    url: `${SITE_URL}/pricing`,
+    lastModified: PRICING_UPDATED,
+    changeFrequency: 'monthly',
+    priority: 0.9,
+  };
+
+  // /what-is-echopulse-media is the brand entity page. It replaces a dead blog
+  // slug that still earns impressions for the brand query.
+  const whatIs: MetadataRoute.Sitemap[number] = {
+    url: `${SITE_URL}/what-is-echopulse-media`,
+    lastModified: BRAND_PAGE_UPDATED,
+    changeFrequency: 'monthly',
+    priority: 0.8,
+  };
+
+  // Legal pages carry a fixed date. `now` on a page that has not changed tells
+  // the crawler it changed on every fetch, which is a lie it learns to ignore.
   const terms: MetadataRoute.Sitemap[number] = {
     url: `${SITE_URL}/terms`,
-    lastModified: now,
+    lastModified: TERMS_UPDATED,
+    changeFrequency: 'yearly',
+    priority: 0.2,
+  };
+
+  const privacy: MetadataRoute.Sitemap[number] = {
+    url: `${SITE_URL}/privacy`,
+    lastModified: PRIVACY_UPDATED,
     changeFrequency: 'yearly',
     priority: 0.2,
   };
@@ -73,7 +134,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // through the nav.
   const caseStudyIndex: MetadataRoute.Sitemap[number] = {
     url: `${SITE_URL}/case-studies`,
-    lastModified: now,
+    lastModified: STATIC_PAGES_UPDATED,
     changeFrequency: 'monthly',
     priority: 0.9,
   };
@@ -91,7 +152,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const serviceRoutes: MetadataRoute.Sitemap = services.map((service) => ({
     url: `${SITE_URL}/services/${service.slug}`,
-    lastModified: now,
+    lastModified: STATIC_PAGES_UPDATED,
     changeFrequency: 'monthly',
     priority: 0.8,
   }));
@@ -100,7 +161,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // priority since they're the primary outbound conversion destinations.
   const icpRoutes: MetadataRoute.Sitemap = icps.map((icp) => ({
     url: `${SITE_URL}/${icp.key}`,
-    lastModified: now,
+    lastModified: STATIC_PAGES_UPDATED,
     changeFrequency: 'monthly',
     priority: 0.9,
   }));
@@ -126,18 +187,29 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // the redirect shadows the page and the sitemap starts advertising a 301.
   // Cheap guard against a failure mode that is invisible until Search Console
   // reports it months later.
+  //
+  // lastModified uses Sanity's `_updatedAt`, which moves whenever the document
+  // is edited, with `publishedAt` as the fallback. publishedAt alone never
+  // changes after the first publish, so an edited post looked untouched to the
+  // crawler. The query is local to this file rather than lib/blog.ts because
+  // the index does not need `_updatedAt` and this file needs nothing else.
   let blogPosts: MetadataRoute.Sitemap = [];
   try {
-    const posts = await getAllPosts();
+    const posts = await sanityClient.fetch<SitemapPost[]>(
+      SITEMAP_POSTS_QUERY,
+      { dead: DEAD_SLUGS },
+      { next: { revalidate: 600 } },
+    );
     blogPosts = posts
       .filter((post) => !(post.slug in BLOG_REDIRECTS))
       .map((post) => {
         const image = post.mainImage?.asset
           ? urlFor(post.mainImage).width(1200).height(630).fit('crop').auto('format').url()
           : post.mainImageUrl || undefined;
+        const modified = post._updatedAt || post.publishedAt;
         return {
           url: `${SITE_URL}/blog/${post.slug}`,
-          lastModified: post.publishedAt ? new Date(post.publishedAt) : now,
+          lastModified: modified ? new Date(modified) : now,
           changeFrequency: 'monthly' as const,
           priority: 0.75,
           ...(image ? { images: [image] } : {}),
@@ -146,6 +218,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   } catch {
     // Sanity unreachable — sitemap continues without blog posts.
   }
+
+  // The index changes exactly when a post is published or edited.
+  const newest = blogPosts
+    .map((p) => (p.lastModified instanceof Date ? p.lastModified.getTime() : 0))
+    .reduce((a, b) => Math.max(a, b), 0);
+  if (newest > 0) blogIndex.lastModified = new Date(newest);
 
   return [
     home,
@@ -156,7 +234,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...icpRoutes,
     ...serviceRoutes,
     ...blogPosts,
+    pricing,
+    whatIs,
     order,
     terms,
+    privacy,
   ];
 }

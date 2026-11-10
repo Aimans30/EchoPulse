@@ -3,6 +3,8 @@ import { Home, Rocket, GraduationCap, ShoppingBag, Briefcase, type LucideIcon } 
 import Nav, { type NavLink } from '@/components/Nav';
 import Footer from '@/components/Footer';
 import Pricing from '@/components/Pricing';
+import GuidesSection from '@/components/GuidesSection';
+import type { Guide } from '@/lib/blogLinks';
 import { type IcpData, AGENCY_COMPARISON } from '@/lib/icpData';
 import { type VideoEntry } from '@/lib/videos';
 import { BOOK_CALL_LABEL_LONG } from '@/lib/links';
@@ -51,7 +53,7 @@ function Eyebrow({ label, accent, Icon, onDark = false }: { label: string; accen
   );
 }
 
-export default function ICPPage({ data, videos }: { data: IcpData; videos: VideoEntry[] }) {
+export default function ICPPage({ data, videos, guides = [] }: { data: IcpData; videos: VideoEntry[]; guides?: Guide[] }) {
   const accent = data.accentColor;
   const Icon = ICON_MAP[data.icon];
   const stats = data.stats.slice(0, 4);
@@ -322,7 +324,8 @@ export default function ICPPage({ data, videos }: { data: IcpData; videos: Video
             </Reveal>
             <div className="icp-risk-grid">
               {[
-                { t: '$299 Pilot, 14 days', d: 'Real deliverables on your brand before any retainer. You keep everything we make, whether you continue or not.' },
+                { t: '2 free edits first', d: 'Send footage you already have and get 2 edited videos back within 48 hours. No card, no call. You keep them either way.' },
+                { t: '$299 Pilot, 14 days', d: 'Real deliverables on your brand before any monthly plan. You keep everything we make, whether you continue or not.' },
                 { t: 'No contracts', d: 'Month to month after the Pilot, cancel with 14 days written notice. We have to earn the next month, every month.' },
                 { t: 'Redone until right', d: 'If a deliverable does not sound like you, we redo it at no charge until you would post it under your own name.' },
                 { t: '48-hour turnaround', d: 'Standard on every deliverable, with senior review before anything reaches you. Owner-operated, 3-hour replies in every workday.' },
@@ -352,6 +355,14 @@ export default function ICPPage({ data, videos }: { data: IcpData; videos: Video
         <section id="pricing" className="icp-pricing-wrap">
           <Pricing pricingCopy={data.pricingCopy} />
         </section>
+
+        {/* ── 8b. GUIDES (dark) — links into the blog for this audience ── */}
+        <GuidesSection
+          dark
+          heading={`Guides for ${data.name.toLowerCase()}`}
+          intro="Pricing guides, comparisons and how-tos we wrote for this audience. Read them first; the call is shorter when you have."
+          guides={guides}
+        />
 
         {/* ── 9. FAQ (light) ── */}
         <section id="faq" className="icp-section icp-section-light">
@@ -390,12 +401,12 @@ export default function ICPPage({ data, videos }: { data: IcpData; videos: Video
                 <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
                   <h2 className="icp-final-h">Ready to stop doing it all yourself?</h2>
                   <p className="icp-final-p">
-                    Book a free 45-minute call. We will review what you are publishing today, map a 30-day plan, and put the numbers in writing.
+                    Book a free 15-minute call. We will review what you are publishing today, map a 30-day plan, and put the numbers in writing.
                   </p>
                   <div style={{ marginTop: 12 }}>
                     <ICPBookButton label={BOOK_CALL_LABEL_LONG} location="icp_final" accent={accent} size="lg" />
                   </div>
-                  <span className="icp-final-note">Starts with a $299 14-day Pilot. See the work before you commit.</span>
+                  <span className="icp-final-note">Start with 2 free edited videos, then a $299 14-day Pilot. See the work before you commit.</span>
                 </div>
               </div>
             </Reveal>
