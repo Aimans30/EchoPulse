@@ -169,15 +169,20 @@ export default function PrivacyPage() {
               We use two analytics tools: Google Analytics 4 and Microsoft Clarity. Clarity records
               how you move through a page (scrolling, clicks, where you hesitate) and replays it to
               us. <strong>If you are visiting from the United Kingdom or the European Economic
-              Area, neither tool loads at all</strong>: we do not track those visits, so there is
-              nothing to consent to and no banner. For visitors elsewhere both tools load on page
-              view.
+              Area, neither tool loads until you click Allow</strong> on the banner at the bottom
+              of the page, which is shown in your browser&apos;s language. If you click Decline,
+              or never choose, nothing from either tool is loaded on any page. For visitors
+              elsewhere there is no banner and both tools load on page view.
             </p>
             <p>
-              To opt out from anywhere: turn on Global Privacy Control in your browser (we honour
-              it and load nothing), block the domains googletagmanager.com and clarity.ms, or email
-              us and we will delete any session recordings tied to your visit. Your region is read
-              from the <code>ep_geo</code> cookie described below, never from your identity.
+              Your choice is stored in your browser&apos;s local storage under the key{' '}
+              <code>ep-analytics-consent</code>, not in a cookie, so it is never sent to our
+              server. To change it, clear site data for echopulse.media and the banner will ask
+              again. To opt out from anywhere: turn on Global Privacy Control in your browser (we
+              honour it and load nothing), block the domains googletagmanager.com and clarity.ms,
+              or email us and we will delete any session recordings tied to your visit. Your
+              region is read from the <code>ep_geo</code> cookie described below, never from your
+              identity.
             </p>
             <p>
               Google and Microsoft process this data on their own terms, with IP anonymisation
@@ -246,9 +251,9 @@ export default function PrivacyPage() {
                 sending an order confirmation, keeping accounts.
               </li>
               <li>
-                <strong>Analytics and session recording</strong> (legitimate interests, outside
-                the UK and EEA only). Not used for UK or EEA visitors. You can opt out at any time
-                as described above.
+                <strong>Analytics and session recording</strong> (consent in the UK and EEA;
+                legitimate interests elsewhere). You can withdraw or opt out at any time as
+                described above.
               </li>
               <li>
                 <strong>Marketing email</strong> (consent, or an existing client relationship where
