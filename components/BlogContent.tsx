@@ -399,10 +399,73 @@ function buildComponents(): PortableTextComponents {
   return components;
 }
 
+/**
+ * Older posts were written with markdown pipe tables before the schema had a
+ * table block, so Sanity holds them as a run of plain paragraphs:
+ *
+ *   "Route | First year cost | What you give up"
+ *   "Systeme.io Webinar plan | About $564 | Your own time"
+ *
+ * and the site printed them as literal text with pipes. This folds any run of
+ * two or more consecutive plain paragraphs that share the same number of
+ * " | " separators into one synthetic `table` block (first row = header), so
+ * every existing post is fixed at render time with no content migration.
+ * Markdown separator rows ("--- | ---") are dropped.
+ */
+function foldPipeTables(blocks: PortableTextBlock[]): PortableTextBlock[] {
+  const textOf = (b: PortableTextBlock): string | null => {
+    const blk = b as { _type?: string; style?: string; listItem?: string; children?: Array<{ text?: string }> };
+    if (blk._type !== 'block' || blk.listItem || (blk.style && blk.style !== 'normal')) return null;
+    return (blk.children ?? []).map((c) => c.text ?? '').join('').trim();
+  };
+  const cellsOf = (t: string): string[] =>
+    t.replace(/^\|/, '').replace(/\|$/, '').split('|').map((c) => c.trim());
+  const isSeparator = (cells: string[]) => cells.every((c) => /^:?-{2,}:?$/.test(c));
+
+  const out: PortableTextBlock[] = [];
+  let run: string[][] = [];
+  let runKey = '';
+  const flush = () => {
+    if (run.length >= 2) {
+      out.push({
+        _type: 'table',
+        _key: `pipe-${runKey}`,
+        hasHeader: true,
+        rows: run.map((cells, i) => ({ _type: 'tableRow', _key: `${runKey}-${i}`, cells })),
+      } as unknown as PortableTextBlock);
+    } else if (run.length === 1) {
+      out.push(held[0]);
+    }
+    run = [];
+    held = [];
+  };
+  let held: PortableTextBlock[] = [];
+  for (const b of blocks) {
+    const t = textOf(b);
+    const cells = t && t.includes('|') ? cellsOf(t) : null;
+    if (cells && cells.length >= 2 && (run.length === 0 || cells.length === run[0].length)) {
+      if (run.length === 0) runKey = (b as { _key?: string })._key ?? String(out.length);
+      if (!isSeparator(cells)) run.push(cells);
+      held.push(b);
+      continue;
+    }
+    flush();
+    if (cells && cells.length >= 2) {
+      runKey = (b as { _key?: string })._key ?? String(out.length);
+      if (!isSeparator(cells)) run.push(cells);
+      held.push(b);
+    } else {
+      out.push(b);
+    }
+  }
+  flush();
+  return out;
+}
+
 export default function BlogContent({ value }: { value: PortableTextBlock[] }) {
   return (
     <div className="blog-prose">
-      <PortableText value={value} components={buildComponents()} />
+      <PortableText value={foldPipeTables(value)} components={buildComponents()} />
       <style>{`
         /* Anything wide that an author can put in a post has to scroll inside
            its own box rather than widen the article. On a phone a single

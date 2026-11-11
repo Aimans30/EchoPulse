@@ -7,6 +7,7 @@ import Footer from '@/components/Footer';
 import BlogContent from '@/components/BlogContent';
 import BlogFooterCTA from '@/components/BlogFooterCTA';
 import BlogInlineCTA from '@/components/BlogInlineCTA';
+import BlogSideCTA from '@/components/BlogSideCTA';
 import { audienceForPost } from '@/lib/blogLinks';
 import TableOfContents from '@/components/TableOfContents';
 import { getPostBySlug, getAllPostSlugs, getRelatedPosts, resolveCategory, resolveAuthor, type BlogPostSummary } from '@/lib/blog';
@@ -475,6 +476,12 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             )}
 
           </article>
+
+          {/* Right rail: sticky offer cards, desktop only (hidden under 1280px,
+              where the inline CTAs in the article do the same job). */}
+          <aside className="blog-post-rail">
+            <BlogSideCTA icp={audience.icp} slug={slug} />
+          </aside>
         </div>
 
         {/* Order below the article is deliberate: Related Articles first, then
@@ -541,6 +548,21 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             grid-template-columns: 260px minmax(0, 1fr);
             gap: 56px;
             align-items: start;
+          }
+          .blog-post-rail { display: none; }
+          @media (min-width: 1280px) {
+            .blog-post-layout {
+              max-width: 1400px;
+              grid-template-columns: 240px minmax(0, 760px) 280px;
+              gap: 44px;
+              justify-content: center;
+            }
+            .blog-post-rail {
+              display: block;
+              position: sticky;
+              top: 120px;
+              align-self: start;
+            }
           }
           .blog-post-article { max-width: 760px; min-width: 0; }
 

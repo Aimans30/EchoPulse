@@ -462,10 +462,17 @@ export default function BlogIndexClient({ posts }: { posts: IndexPost[] }) {
            composition intact. The tinted background fills any leftover space
            so it still reads as a solid block rather than a floating image.
            "!important" because next/image emits its own inline sizing. */
+        /* Inset, not flush. The cover keeps its 1200x630 ratio, so it is
+           almost never the same height as the text column; flush left it sat
+           with uneven bands of card above and below and read as misaligned.
+           An even 22px inset with its own radius makes the gap deliberate and
+           identical on every side, whatever the text column's height. */
         .blogx-featured-img {
-          width: 100% !important;
+          width: calc(100% - 44px) !important;
           height: auto !important;
-          max-width: 100%;
+          max-width: calc(100% - 44px);
+          margin: 22px;
+          border-radius: 14px;
           aspect-ratio: 1200 / 630;
           object-fit: contain !important;
           display: block;
@@ -634,7 +641,7 @@ export default function BlogIndexClient({ posts }: { posts: IndexPost[] }) {
           .blogx-featured { grid-template-columns: 1fr; }
           /* Stacked layout, so the cover gets the full card width at its own
              ratio. The old 16/9 + min-height combination re-cropped it. */
-          .blogx-featured-img { aspect-ratio: 1200 / 630; min-height: 0; }
+          .blogx-featured-img { aspect-ratio: 1200 / 630; min-height: 0; margin: 14px; width: calc(100% - 28px) !important; max-width: calc(100% - 28px); }
           .blogx-featured-body { padding: 28px 26px; }
         }
         @media (max-width: 620px) {

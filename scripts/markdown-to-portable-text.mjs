@@ -230,6 +230,17 @@ function convertTokens(tokens, out, warnings, ctx) {
         for (const r of t.rows) {
           rows.push({ _type: 'tableRow', _key: makeKey(), cells: r.map((c) => cellText(c)) });
         }
+        // BLOG_TABLES=pipes: emit each row as a plain "a | b | c" paragraph
+        // instead of a `table` block. Use it while the deployed site predates
+        // the table renderer: an unknown block type renders as nothing there,
+        // whereas pipe paragraphs stay readable today and are folded into a
+        // real table by BlogContent's foldPipeTables once that ships.
+        if (process.env.BLOG_TABLES === 'pipes') {
+          for (const r of rows) {
+            out.push({ _type: 'block', _key: makeKey(), style: 'normal', markDefs: [], children: [span(r.cells.join(' | '), [])] });
+          }
+          break;
+        }
         out.push({ _type: 'table', _key: makeKey(), hasHeader: true, rows });
         break;
       }
