@@ -80,13 +80,15 @@ export default function TableOfContents({
   useEffect(() => {
     if (variant === 'mobile' || !activeId) return;
     const link = document.querySelector<HTMLElement>(`.blog-toc-link[href="#${CSS.escape(activeId)}"]`);
-    const box = link?.closest<HTMLElement>('.blog-post-sidebar');
+    const box = link?.closest<HTMLElement>('.blog-toc-list');
     if (!link || !box) return;
     if (box.scrollHeight <= box.clientHeight) return; // not scrolling, nothing to do
     const l = link.getBoundingClientRect();
     const b = box.getBoundingClientRect();
     if (l.top < b.top || l.bottom > b.bottom) {
-      link.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      // Scroll the list itself, never the page: scrollIntoView can also move
+      // outer scrollers. Centre the active item so there is context above it.
+      box.scrollTo({ top: link.offsetTop - box.clientHeight / 2 + link.offsetHeight / 2, behavior: 'smooth' });
     }
   }, [activeId, variant]);
 
@@ -275,7 +277,18 @@ export default function TableOfContents({
           display: flex;
           flex-direction: column;
           gap: 2px;
+          /* Only the list scrolls, and only when the index is taller than the
+             viewport. The card and its label stay put. 230px = the sticky
+             offset (120) + card padding and label + breathing room below. */
+          position: relative;
+          max-height: calc(100vh - 230px);
+          overflow-y: auto;
+          overscroll-behavior: contain;
+          scrollbar-width: thin;
+          scrollbar-color: rgba(12,12,11,0.18) transparent;
         }
+        .blog-toc-list::-webkit-scrollbar { width: 4px; }
+        .blog-toc-list::-webkit-scrollbar-thumb { background: rgba(12,12,11,0.18); border-radius: 4px; }
         .blog-toc-item-sub { margin-left: 16px; }
         .blog-toc-link {
           display: flex;

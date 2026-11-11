@@ -597,12 +597,13 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                the scrollbar is hidden when it does, which is the part that was
                objectionable last time. Identical to MagicBnB whenever MagicBnB's
                own sidebar would also have fitted. */
-            max-height: calc(100vh - 140px);
-            overflow-y: auto;
-            overscroll-behavior: contain;
-            scrollbar-width: none;
+            /* The scroll moved off this element and onto .blog-toc-list (see
+               TableOfContents). When the whole aside scrolled, following the
+               active heading pushed the card's rounded top and its "Quick
+               navigation" label out of view, so the index looked sliced off
+               under the nav with no way to tell it was scrollable. The card
+               now stays whole and only the list inside it scrolls. */
           }
-          .blog-post-sidebar::-webkit-scrollbar { width: 0; height: 0; }
 
           .blog-post-meta {
             display: flex;
