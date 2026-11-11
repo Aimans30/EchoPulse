@@ -65,7 +65,7 @@ const FAQ: { q: string; a: string }[] = [
   },
   {
     q: 'Is EchoPulse Media the same as the Echopulse medical device?',
-    a: 'No. Echopulse is also the name of a focused-ultrasound treatment device made by Theraclion, a French medical technology company. That device has no connection to EchoPulse Media, which is a content studio. If you were looking for the device, you are on the wrong site.',
+    a: 'No. Echopulse is also the name of a focused-ultrasound treatment device made by Theraclion, a French medical technology company. That device has no connection to EchoPulse Media, which is a content studio. If you were looking for the device, you are on the wrong site. EchoPulse Media is also not affiliated with echopulse.in or any other company, app or tool that uses the name EchoPulse. The only official site is echopulse.media.',
   },
   {
     q: 'What does EchoPulse Media cost?',

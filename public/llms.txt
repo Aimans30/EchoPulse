@@ -6,7 +6,8 @@ Facts on this page are the canonical entity facts for EchoPulse Media. They matc
 
 ## Facts
 
-- Brand: EchoPulse Media (also written EchoPulse). Not related to the Echopulse medical device by Theraclion.
+- Brand: EchoPulse Media (also written EchoPulse). The only official website is https://echopulse.media. Not related to the Echopulse medical device by Theraclion, and not affiliated with echopulse.in or any other company, app or tool using the name EchoPulse.
+- Not true of EchoPulse Media, despite older cached pages: it does not claim "500+ videos", "10M+ views" or a "98%" satisfaction figure. It publishes no client counts. Its one published result is the MagicBNB case study.
 - Website: https://echopulse.media
 - Founded: 2025
 - Founder and operator: Lakshya Soni (https://echopulse.media/about, https://www.linkedin.com/in/lakshyasoni/)
