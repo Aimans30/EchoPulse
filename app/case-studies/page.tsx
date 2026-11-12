@@ -18,13 +18,13 @@ export const metadata: Metadata = {
     url: canonical,
     siteName: 'EchoPulse Media',
     type: 'website',
-    images: ['/og-image.png'],
+    images: ['/og-echopulse-media.png'],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Case Studies | EchoPulse Media',
     description: META_DESCRIPTION,
-    images: ['/og-image.png'],
+    images: ['/og-echopulse-media.png'],
   },
 };
 

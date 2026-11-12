@@ -17,7 +17,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   if (!study) return {};
   const canonical = `${SITE_URL}/case-studies/${study.slug}`;
   const fullTitle = `${study.metaTitle} | EchoPulse Media`;
-  const share = heroImageFor(study)?.src ?? '/og-image.png';
+  const share = heroImageFor(study)?.src ?? '/og-echopulse-media.png';
   return {
     title: study.metaTitle,
     description: study.metaDescription,

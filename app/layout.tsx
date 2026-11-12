@@ -87,10 +87,10 @@ export const metadata: Metadata = {
     locale: "en_US",
     images: [
       {
-        url: "/og-image.png",
-        width: 1902,
-        height: 653,
-        alt: "EchoPulse Media. You hit record. We do the rest.",
+        url: "/og-echopulse-media.png",
+        width: 1200,
+        height: 630,
+        alt: "EchoPulse Media: you run the business, we run the content. Done-for-you video, posts, blogs and websites.",
       },
     ],
   },
@@ -101,7 +101,7 @@ export const metadata: Metadata = {
       "Done-for-you content and website studio. Video, LinkedIn, blogs, ads and websites by one owner-operated team. 2 free edits, then a $299 Pilot.",
     creator: "@Lakshya_Creates",
     site: "@Lakshya_Creates",
-    images: ["/og-image.png"],
+    images: ["/og-echopulse-media.png"],
   },
   robots: {
     index: true,
