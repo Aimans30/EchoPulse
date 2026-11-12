@@ -16,6 +16,7 @@ const HOMEPAGE_LINKS: NavLink[] = [
   // valuable internal link on the site, and it was spending it on a carousel
   // with no numbers on it. /case-studies carries the only measured proof we
   // have. The #work showcase is still on the homepage and still scrolled to.
+  { label: 'Work', href: '/work' },
   { label: 'Case studies', href: '/case-studies' },
   { label: 'Pricing', href: '/pricing' },
   { label: 'Blog', href: '/blog' },

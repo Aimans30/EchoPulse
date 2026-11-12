@@ -139,6 +139,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.9,
   };
 
+  // The video wall. Carries a VideoObject ItemList for every clip.
+  const workPage: MetadataRoute.Sitemap[number] = {
+    url: `${SITE_URL}/work`,
+    lastModified: STATIC_PAGES_UPDATED,
+    changeFrequency: 'weekly',
+    priority: 0.9,
+  };
+
   const caseStudyRoutes: MetadataRoute.Sitemap = caseStudies.map((study) => {
     const hero = heroImageFor(study);
     return {
@@ -228,6 +236,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return [
     home,
     about,
+    workPage,
     caseStudyIndex,
     ...caseStudyRoutes,
     blogIndex,

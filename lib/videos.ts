@@ -88,3 +88,73 @@ export function previewMp4Src(src: string, orientation?: Orientation): string | 
   if (src.includes('.mp4')) return src;
   return null;
 }
+
+// ─── /work wall helpers ─────────────────────────────────────────────────────
+// The wall shows every clip once (several clips are listed twice above, once
+// per portfolio tab), with three renditions of each from Cloudinary:
+//   poster   a still frame, the only thing loaded until the cursor comes near
+//   preview  a small muted loop for the tile (480px wide, low bitrate)
+//   full     the proper file, loaded only when a tile is opened
+
+/** Resolve an embed-player or delivery URL to { cloud, rest } on res.cloudinary.com. */
+function cloudinaryParts(src: string): { cloud: string; path: string } | null {
+  if (src.includes('player.cloudinary.com/embed')) {
+    try {
+      const u = new URL(src);
+      const id = u.searchParams.get('public_id');
+      const cloud = u.searchParams.get('cloud_name') || 'du6yx2h01';
+      return id ? { cloud, path: `${id}.mp4` } : null;
+    } catch {
+      return null;
+    }
+  }
+  const m = src.match(/res\.cloudinary\.com\/([^/]+)\/video\/upload\/(.+)$/);
+  if (!m) return null;
+  // Drop any existing transformation segment (contains a comma or "x_y" pairs
+  // before the version/public id) so ours is the only one applied.
+  const segs = m[2].split('/');
+  while (segs.length > 1 && /^[a-z]{1,3}_[^/]+(,[a-z]{1,3}_[^/]+)*$/.test(segs[0]) && !/^v\d+$/.test(segs[0])) segs.shift();
+  return { cloud: m[1], path: segs.join('/') };
+}
+
+export type WallClip = {
+  id: string;
+  brand: string;
+  label: string;
+  types: string[];
+  icps: IcpKey[];
+  /** Declared orientation; when absent the wall reads it off the poster. */
+  orientation?: Orientation;
+  poster: string;
+  preview: string;
+  full: string;
+};
+
+export function wallClips(): WallClip[] {
+  const byId = new Map<string, WallClip>();
+  for (const v of videos) {
+    const p = cloudinaryParts(v.url);
+    if (!p) continue;
+    const id = `${p.cloud}/${p.path}`;
+    const base = `https://res.cloudinary.com/${p.cloud}/video/upload`;
+    const existing = byId.get(id);
+    if (existing) {
+      if (!existing.types.includes(v.type)) existing.types.push(v.type);
+      for (const k of v.icp ?? []) if (!existing.icps.includes(k)) existing.icps.push(k);
+      existing.orientation ??= v.orientation;
+      continue;
+    }
+    byId.set(id, {
+      id,
+      brand: v.brand,
+      label: v.label,
+      types: [v.type],
+      icps: [...(v.icp ?? [])],
+      orientation: v.orientation,
+      poster: `${base}/so_3,c_scale,w_520,q_auto,f_jpg/${p.path.replace(/\.mp4$/, '.jpg')}`,
+      preview: `${base}/c_scale,w_480,q_auto:low,f_mp4,ac_none,du_12/${p.path}`,
+      full: `${base}/q_auto:good,f_mp4/${p.path}`,
+    });
+  }
+  return [...byId.values()];
+}
