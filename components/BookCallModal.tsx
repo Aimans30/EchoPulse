@@ -3,9 +3,15 @@
 import { useEffect, useState } from 'react';
 import { BOOK_CALL_URL } from '@/lib/links';
 
+/**
+ * Cal.com URL for the modal. Carries UTM parameters so each booking in
+ * Cal.com shows which page it came from (utm_content = the page path).
+ */
 function calUrl(base: string): string {
   const sep = base.includes('?') ? '&' : '?';
-  return `${base}${sep}theme=light&layout=month_view`;
+  const path = typeof window !== 'undefined' ? window.location.pathname : '/';
+  const utm = `utm_source=echopulse.media&utm_medium=booking_modal&utm_content=${encodeURIComponent(path)}`;
+  return `${base}${sep}theme=light&layout=month_view&${utm}`;
 }
 
 export default function BookCallModal() {

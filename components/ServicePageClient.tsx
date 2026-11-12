@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { trackCallClick } from '@/lib/analytics';
 import GuidesSection from '@/components/GuidesSection';
 import type { Guide } from '@/lib/blogLinks';
 import dynamic from 'next/dynamic';
@@ -617,6 +618,8 @@ export default function ServicePageClient({ service, guides = [] }: { service: S
   // tab so it pre-fills the right event type. Otherwise fall back to the
   // global modal which uses the default call URL from lib/links.ts.
   const bookCall = () => {
+    // These three buttons were the only untracked booking CTAs on the site.
+    trackCallClick(`service_${service.slug}`);
     if (service.bookCallUrl) {
       window.open(service.bookCallUrl, '_blank', 'noopener,noreferrer');
       return;
@@ -1192,7 +1195,7 @@ export default function ServicePageClient({ service, guides = [] }: { service: S
         <div style={{ position: 'absolute', top: '20%', right: '-15%', width: '700px', height: '700px', borderRadius: '50%', background: `radial-gradient(circle, ${service.accentColor}10 0%, transparent 60%)`, filter: 'blur(80px)', pointerEvents: 'none' }} />
 
         <div style={{ maxWidth: '1280px', margin: '0 auto', position: 'relative', zIndex: 1 }}>
-          <SectionLabel left="04 / Our Promise" right="SATISFACTION GUARANTEED" />
+          <SectionLabel left="04 / Our Promise" right="RE-DONE UNTIL RIGHT" />
 
           <motion.h2
             initial={{ opacity: 0, y: 24 }}

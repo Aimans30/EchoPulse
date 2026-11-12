@@ -114,7 +114,7 @@ export const GROWTH: Plan = {
     'Onboarding strategy session + quarterly brand-brief refresh',
     '20 social posts a month across the platforms your buyers use',
     '4 long-form SEO blogs a month (1,500 to 2,500 words, sourced)',
-    '12 short-form video edits + 12 clips + 2 long-form edits (YouTube, podcast, listing tours)',
+    '12 short-form video edits + 12 clips + 2 long-form edits (YouTube or podcast)',
     '6 ad creatives a month (4 static, 2 video)',
     'Website rebuilt in month one, tuned every month after',
     'Funnel optimization with conversion tracking',

@@ -8,7 +8,7 @@
  *   cta_pilot_click       → Pilot CTAs (hero, pricing, sticky bar, ribbon)
  *   cta_call_click        → Strategy-call CTAs (BOOK_CALL_URL anywhere)
  *   lead_magnet_submit    → Lead magnet email form
- *   call_booked           → Calendly post-message confirmation
+ *   call_booked           → the /booked confirmation page (Cal.com redirect)
  *   scroll_depth          → 25 / 50 / 75 / 100% scroll milestones
  *   demo_open             → Hero "Watch a 2-min demo" modal opens
  */
@@ -58,7 +58,8 @@ export const trackCallClick = (location: string) =>
 export const trackLeadMagnetSubmit = (source: string) =>
   track('lead_magnet_submit', { source });
 
-export const trackCallBooked = () => track('call_booked');
+export const trackCallBooked = (path?: string) =>
+  track('call_booked', path ? { path } : undefined);
 
 export const trackDemoOpen = (location: string) =>
   track('demo_open', { location });

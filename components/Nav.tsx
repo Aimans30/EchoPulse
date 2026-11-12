@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { trackCallClick } from '@/lib/analytics';
 import Link from 'next/link';
 import { gsap } from 'gsap';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -443,6 +444,7 @@ export default function Nav({
               className="mobile-nav-cta"
               onClick={() => {
                 closeMobile();
+                trackCallClick('nav_mobile');
                 (window as unknown as { openBookCallModal?: () => void }).openBookCallModal?.();
               }}
               aria-label={BOOK_CALL_LABEL_LONG}
@@ -553,7 +555,10 @@ export default function Nav({
            users stay on the site instead of leaving for a new tab. */}
         <button
           type="button"
-          onClick={() => (window as unknown as { openBookCallModal?: () => void }).openBookCallModal?.()}
+          onClick={() => {
+            trackCallClick('nav');
+            (window as unknown as { openBookCallModal?: () => void }).openBookCallModal?.();
+          }}
           className="nav-cta-btn nav-desktop-cta"
           // aria-label removed: it used the _LONG variant while the visible
           // span uses the short one, so the accessible name was not a superset

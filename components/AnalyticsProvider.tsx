@@ -14,7 +14,7 @@
 
 import { useEffect, useRef } from 'react';
 import Script from 'next/script';
-import { track, trackCallBooked, trackScrollDepth } from '@/lib/analytics';
+import { trackCallBooked, trackScrollDepth } from '@/lib/analytics';
 
 
 export default function AnalyticsProvider() {
@@ -63,25 +63,29 @@ export default function AnalyticsProvider() {
     };
   }, []);
 
-  // Calendly post-message listener — fires call_booked when a visitor
-  // confirms a booking inside an embedded Calendly widget
+  // Booking confirmation.
+  //
+  // This used to listen for `calendly.event_scheduled`, but the site embeds
+  // Cal.com, which never sends that message, so `call_booked` could not fire
+  // and no booking was ever attributed to a page. Cal.com is now set to
+  // redirect to /booked after a booking. When that page loads inside the
+  // booking modal's iframe it posts `ep:call_booked` to this window, and the
+  // event is recorded here with the page the visitor booked from. (Opened
+  // directly in a tab, /booked records the event itself.)
   useEffect(() => {
     const onMessage = (e: MessageEvent) => {
-      const data = e.data as { event?: string } | undefined;
-      if (!data || typeof data !== 'object') return;
-      if (data.event === 'calendly.event_scheduled') {
-        trackCallBooked();
+      if (e.origin !== window.location.origin) return;
+      const data = e.data as { type?: string } | undefined;
+      if (data && typeof data === 'object' && data.type === 'ep:call_booked') {
+        trackCallBooked(window.location.pathname);
       }
     };
     window.addEventListener('message', onMessage);
     return () => window.removeEventListener('message', onMessage);
   }, []);
 
-  // Track the initial pageview as a custom event so it lines up with the
-  // rest of the funnel even if GA's automatic pageview is blocked
-  useEffect(() => {
-    track('page_view', { path: window.location.pathname });
-  }, []);
+  // No custom page_view: GA4 sends its own on every page, so the extra event
+  // counted each view twice.
 
   return (
     <>

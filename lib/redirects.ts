@@ -49,6 +49,10 @@ export const SURVIVORS = {
  * Destination is a full path so off-topic posts can point at "/" rather than a post.
  */
 export const BLOG_REDIRECTS: Record<string, string> = {
+  // Dead slug that outside pages still link to (Nov 2026 audit). Same title
+  // as the live post, which sits at the longer slug.
+  "linkedin-ghostwriting-pricing": "/blog/how-much-does-linkedin-ghostwriting-cost-2026",
+
   // ── Cluster 1: AI marketing stack / ROI (18 variants) ──────────────────────
   "why-ai-marketing-agents-fail-2026-governance-gap": `/blog/${SURVIVORS.aiPipeline}`,
   "why-most-ai-marketing-pilots-burn-budget-2026": `/blog/${SURVIVORS.aiPipeline}`,
