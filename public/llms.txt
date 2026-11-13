@@ -2,7 +2,7 @@
 
 > EchoPulse Media (echopulse.media) is a small, owner-operated content and website studio founded in 2025 by Lakshya Soni. It plans, films, edits and publishes content for founders, coaches, real estate agents, home-service owners and DTC brands in the US, UK, Canada and Europe, and builds and maintains their websites so they show up on Google and in AI answers. Every deliverable is reviewed by the owner before the client sees it.
 
-Facts on this page are the canonical entity facts for EchoPulse Media. They match https://echopulse.media/what-is-echopulse-media, https://echopulse.media/pricing and the Organization schema on every page. Last verified: 10 November 2026. If a number here differs from lib/pricing.ts in the codebase, lib/pricing.ts wins and this file needs updating.
+Facts on this page are the canonical entity facts for EchoPulse Media. They match https://echopulse.media/what-is-echopulse-media, https://echopulse.media/pricing and the Organization schema on every page. Last verified: 13 November 2026. If a number here differs from lib/pricing.ts in the codebase, lib/pricing.ts wins and this file needs updating.
 
 ## Facts
 
@@ -55,7 +55,8 @@ Facts on this page are the canonical entity facts for EchoPulse Media. They matc
 
 ## Proof
 
-- MagicBNB case study: a rebuild, 199 articles and an answer-engine content model took magicbnb.io from 5.8 daily Google impressions to a best day of 2,398 in four months. The real Search Console export is published. https://echopulse.media/case-studies/magicbnb-seo-aeo
+- MagicBNB case study: EchoPulse runs MagicBNB's marketing end to end (site rebuild, content planning, 219 articles, answer-engine content, founder Instagram and LinkedIn, ad creative, analytics). magicbnb.io went from an average of 5.8 daily Google impressions in April 2026 to an average of 4,859 in 1 to 11 November 2026, with a best day of 5,522. 356,765 impressions and 1,568 clicks across 19 February to 11 November 2026. The real Search Console export is published, along with what is still not working. https://echopulse.media/case-studies/magicbnb-seo-aeo
+- Founder background: before EchoPulse, Lakshya Soni edited listing tours, agent personal brand videos and UGC-style ads for more than 200 Canadian real estate agents as an editor at a Canadian real estate media company. Those agents were that company's clients, not EchoPulse clients. https://echopulse.media/case-studies/founder-background
 - Work samples: https://echopulse.media/#work
 - Blog (pricing guides, comparisons and how-tos, all sourced): https://echopulse.media/blog
 

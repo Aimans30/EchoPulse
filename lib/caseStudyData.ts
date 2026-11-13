@@ -146,6 +146,8 @@ export type CaseStudy = {
   windowStartISO: string;
   windowEndISO: string;
   publishedISO: string;
+  /** Set when the figures are refreshed. Drives Article.dateModified. */
+  updatedISO?: string;
 
   services: string[];
   heroMetrics: CaseStudyMetric[];
@@ -180,6 +182,11 @@ export type CaseStudy = {
   months?: CaseStudyMonth[];
   funnel?: {
     intro: string;
+    /** Column headings. Default to the original 31 and 30 day comparison. */
+    beforeLabel?: string;
+    afterLabel?: string;
+    /** Bold lead-in for the reading paragraph. */
+    readingLabel?: string;
     rows: CaseStudyFunnelRow[];
     reading: string;
   };
@@ -229,46 +236,49 @@ const magicbnb: CaseStudy = {
   // Title stays short because the root layout appends the brand suffix for the
   // document title. Description is held to the 140 to 160 band the rest of the
   // site uses, since it is the second half of the click decision.
-  metaTitle: 'MagicBNB Case Study: 5.8 to 2,398 Impressions',
+  metaTitle: 'MagicBNB Case Study: 5.8 to 4,859 Impressions a Day',
   metaDescription:
-    'A rebuild, 199 articles and an answer-engine content model took MagicBNB from 5.8 daily Google impressions to 2,398 in four months. Real export included.',
+    'How EchoPulse runs MagicBNB marketing end to end: site, 219 articles, AI search, Instagram, ads. 5.8 to 4,859 daily Google impressions. Real export.',
 
   eyebrow: 'Case study',
-  headline: '5.8 impressions a day to 2,398',
-  headlineAccent: 'in four months.',
+  headline: '5.8 impressions a day to 4,859',
+  headlineAccent: 'in seven months.',
   summary:
-    'In April 2026 magicbnb.io was shown in Google search results an average of 5.8 times a day. Four months later the best single day hit 2,398. Same company, same product, same market. What changed was the site, the content architecture, and what the content was written to be retrieved by. Here is the whole system, the real Search Console export, and the parts that are still broken.',
+    'In April 2026 magicbnb.io was shown in Google search results an average of 5.8 times a day. In the first 11 days of November 2026 the average was 4,859, and the best single day hit 5,522. Same company, same product, same market. EchoPulse runs the whole marketing function: the site, the content plan, 219 articles, answer-engine work, the founder brand on Instagram and LinkedIn, the ad creative and the measurement. Here is every part of that system, the real Search Console export, and the parts that are still broken.',
 
-  windowLabel: '19 February to 17 August 2026',
+  windowLabel: '19 February to 11 November 2026',
   windowStartISO: '2026-02-19',
-  windowEndISO: '2026-08-17',
+  windowEndISO: '2026-11-11',
   publishedISO: '2026-08-20',
+  updatedISO: '2026-11-13',
 
   services: [
     'Site rebuild and development',
+    'Content planning',
     'SEO and answer-engine content',
     'Blog production',
-    'Founder brand and social',
+    'Founder brand: Instagram and LinkedIn',
     'Paid social and ad creative',
-    'Strategy and planning',
+    'Analytics and conversion tracking',
   ],
 
   heroMetrics: [
-    { value: '5.8 to 1,574', label: 'daily impressions, April against August', note: 'Daily averages, same property' },
-    { value: '119,387', label: 'total impressions across the window', note: '99.1 percent earned after the relaunch' },
-    { value: '199', label: 'articles published into the new architecture', note: 'Three layers, one job each' },
-    { value: '+203%', label: 'sessions, last 30 days against the prior 31', note: '1,432 against 472' },
+    { value: '5.8 to 4,859', label: 'daily impressions, April against November', note: 'Daily averages, November is 1 to 11' },
+    { value: '356,765', label: 'total impressions across the window', note: '266 days, 1,568 clicks' },
+    { value: '219', label: 'articles live in the architecture', note: '199 by August, counted from the sitemap on 13 November' },
+    { value: '+248%', label: 'sessions, last 90 days against the prior 90', note: '6,435 against 1,848' },
   ],
 
   atAGlance: [
     { label: 'Client', value: 'MagicBNB (magicbnb.io)' },
     { label: 'Industry', value: 'B2B SaaS, short-term rental portfolio analytics' },
     { label: 'Starting point', value: '5.8 Google impressions a day, declining' },
-    { label: 'Engagement', value: 'Full marketing: site rebuild, SEO and AEO content, ad creative, founder brand, planning' },
-    { label: 'Date window', value: '19 February to 17 August 2026' },
+    { label: 'Engagement', value: 'Full marketing: site, content planning, SEO and AEO content, Instagram and LinkedIn founder brand, ad creative, analytics' },
+    { label: 'Date window', value: '19 February to 11 November 2026' },
     { label: 'Change shipped', value: '5 May 2026, rebuilt site live' },
-    { label: 'Measured result', value: '119,387 impressions, 99.1 percent of them after 5 May' },
-    { label: 'How measured', value: 'Google Search Console property for magicbnb.io, plus GA4, exported 18 August 2026' },
+    { label: 'Measured result', value: '356,765 impressions and 1,568 clicks; November averaging 4,859 impressions a day' },
+    { label: 'How measured', value: 'Google Search Console and GA4 for magicbnb.io, plus Instagram and Meta Ads data. First export 18 August 2026, refreshed 13 November 2026' },
+    { label: 'Last updated', value: '13 November 2026' },
   ],
 
   chart: {
@@ -282,6 +292,11 @@ const magicbnb: CaseStudy = {
       1621, 1303, 1283, 1415, 1122, 1043, 1126, 1190, 1308, 1354, 1421, 1452, 1433, 1384, 1486, 1818, 2087, 2209, 2074, 2018,
       2015, 1469, 1617, 1724, 1307, 1301, 1133, 959, 978, 811, 1131, 878, 903, 876, 919, 960, 806, 828, 1065, 980,
       1026, 1131, 851, 1063, 1479, 1380, 1651, 1619, 1479, 1080, 1280, 1594, 1704, 1451, 1349, 1402, 1808, 1827, 2200, 2398,
+      2784, 2139, 1705, 1689, 1635, 1555, 1509, 1675, 1606, 1501, 1510, 1380, 1597, 1823, 2085, 2599, 2485, 2311, 2414, 2621,
+      2852, 2792, 3080, 3491, 2610, 2737, 2662, 3007, 3160, 3275, 2740, 2219, 2127, 2000, 2189, 2466, 2321, 2470, 2205, 2028,
+      1906, 2233, 2025, 2018, 2037, 1895, 1693, 1937, 2224, 2683, 2391, 2412, 2174, 2139, 2356, 2518, 2157, 2119, 2380, 2075,
+      1814, 2092, 2298, 2311, 2498, 3252, 2957, 2595, 2939, 3755, 3363, 5126, 5286, 5140, 4079, 4370, 4973, 5259, 5522, 4366,
+      4954, 4080, 4596, 5086, 4932, 5309,
     ],
     launchIndex: 75,
     launchLabel: '5 May: rebuilt site ships',
@@ -294,18 +309,21 @@ const magicbnb: CaseStudy = {
       { index: 102, label: 'Jun' },
       { index: 132, label: 'Jul' },
       { index: 163, label: 'Aug' },
+      { index: 194, label: 'Sep' },
+      { index: 224, label: 'Oct' },
+      { index: 255, label: 'Nov' },
     ],
     yTicks: [
       { frac: 0, label: '0' },
-      { frac: 0.25, label: '600' },
-      { frac: 0.5, label: '1.2K' },
-      { frac: 0.75, label: '1.8K' },
-      { frac: 1, label: '2.4K' },
+      { frac: 0.25, label: '1.4K' },
+      { frac: 0.5, label: '2.8K' },
+      { frac: 0.75, label: '4.1K' },
+      { frac: 1, label: '5.5K' },
     ],
     ariaLabel:
-      'MagicBNB daily Google search impressions, February to August 2026. Flat near zero until the 5 May relaunch, then climbing to 2,398 a day.',
+      'MagicBNB daily Google search impressions, February to November 2026. Flat near zero until the 5 May relaunch, climbing to about 2,400 a day by August and above 5,000 a day by November.',
     caption:
-      'Daily impressions, Google Search Console property for magicbnb.io, 19 February to 17 August 2026. The dashed line is 5 May, the day the rebuilt site went live. On 4 May the site earned 13 impressions. On 5 May it earned 209.',
+      'Daily impressions, Google Search Console property for magicbnb.io, 19 February to 11 November 2026, 266 days. The dashed line is 5 May, the day the rebuilt site went live. On 4 May the site earned 13 impressions. On 5 May it earned 209. The best day so far is 4 November at 5,522.',
   },
 
   situation: {
@@ -349,15 +367,29 @@ const magicbnb: CaseStudy = {
       ],
     },
     {
+      name: 'Content planning: what gets written, and why',
+      serviceSlug: 'blog-production',
+      summary:
+        'Nothing is written because it is Tuesday. Every article comes out of one of four inputs, and the plan is rebuilt from the data every week.',
+      points: [
+        'Input one, the Search Console export. Queries sitting between positions 8 and 20 are the cheapest wins on the site, so they are read every week and the pages behind them get the next round of edits. Site-wide average position moved from 11.7 to 9.5 across the last 90 days.',
+        'Input two, platform news. When Airbnb changes a policy, hosts search for it the same day. The plan keeps room for that: the November 2026 house rules change, the holiday pricing window and the 1099 threshold for cleaners each had an article live while the question was still being asked.',
+        'Input three, the buyer next to the buyer. Hosts are not the only people who open the product. Articles for real estate agents sizing up short-term rental potential and for accountants handling rental clients at year end bring in the people who recommend software to hosts.',
+        'Input four, what the data says that nobody planned. Singapore surfaced as the second largest source of sessions, ahead of Canada. We read it in the analytics, shipped a dedicated market report, and it has stayed second: 1,613 sessions in the last 90 days against 2,676 from the United States.',
+        'Each planned piece is assigned a layer, a target query, the pages it must link to and the pages that must link back, before a word is written. That is what stops article 219 from competing with article 40.',
+      ],
+    },
+    {
       name: 'Content architecture, shipped before the content',
       serviceSlug: 'blog-production',
       summary:
         'The sequencing is the part most teams get wrong. Publishing 199 articles onto a site that cannot cluster, link or surface them produces 199 orphan pages.',
       points: [
         'Blog architecture built to carry hundreds of posts, with category routing, cross-linking slots and related-post surfaces, built and shipped before the first article landed.',
-        'All 199 articles sit in one of three layers. Competitive displacement: head-to-head comparisons where the buyer is already shopping. Operator economics: the maths hosts search at 11pm, which builds the topical authority that makes layer one rankable. Market and regulation reports: city-level and regulatory coverage, which is what earns links.',
+        'Every article sits in one of three layers. Competitive displacement: head-to-head comparisons where the buyer is already shopping. Operator economics: the maths hosts search at 11pm, which builds the topical authority that makes layer one rankable. Market and regulation reports: city-level and regulatory coverage, which is what earns links.',
         'The reason the impression curve goes near vertical from the day of the relaunch, rather than creeping up over a year, is that the first wave of writing landed into a structure already built to hold it.',
-        'Nine of the top ten pages by impressions are now editorial. The homepage sits tenth. The brand page stopped being the only door into the business.',
+        '199 articles were live by 17 August. The sitemap listed 219 on 13 November. The pace dropped on purpose after August: the work moved from adding pages to improving the ones already ranking.',
+        'Nine of the top ten pages by impressions are editorial. The brand page stopped being the only door into the business.',
       ],
     },
     {
@@ -367,34 +399,35 @@ const magicbnb: CaseStudy = {
         'The single highest-leverage decision was refusing to fight for head terms. Phrases like short term rental software are owned by companies with a decade of domain authority and budgets a young SaaS does not have.',
       points: [
         'We mapped the category frustration instead. The best known name in short-term rental data is expensive and estimates market averages rather than reporting your actual numbers. That combination produces a very specific, very high-intent search behaviour: people looking for a way out.',
-        'The resulting displacement cluster sits between positions 9 and 19, the band where a title rewrite or a single link moves a page onto the first screen.',
-        'The flagship article on alternatives to the category leader has earned 52,793 impressions on its own since May, which is more than the entire pre-relaunch site earned in six months.',
-        'Singapore surfaced as the second largest source of sessions, ahead of Canada. That was not planned. We read it in the data, shipped a dedicated market report, and it is now a top twenty page.',
+        'The flagship article on alternatives to the category leader earned 52,793 impressions on its own between May and mid August, against 1,121 for the entire site in the 75 days before the relaunch.',
+        'The same pattern was then repeated across the category. Pricing and alternatives pages for the property management systems hosts already pay for are now among the most shown pages on the site, next to the original displacement article.',
+        'Pricing queries turned out to be the sharpest version of the idea. A host searching what a tool costs is one step from choosing one, and the site now holds first-page positions on several of those queries.',
       ],
     },
     {
-      name: 'Writing for answer engines, not blue links',
+      name: 'Answer engines and AI presence',
       serviceSlug: 'blog-production',
       summary:
-        'Zero-click share sat between 99.0 and 99.8 percent every single day. Most agencies would bury that. It is the centre of the strategy.',
+        'Most of these searches end without a click, because Google answers in place. Most agencies would bury that. It is the centre of the strategy.',
       points: [
         'When someone searches what a good occupancy rate is, Google increasingly answers in place using text lifted from pages it trusts. The user never clicks. The impression still registers. If the answer being read out is yours, carrying your framing and your brand name, you have been cited to a buyer who never visited the site.',
         'Question-shaped H2 headings phrased the way people actually type them, because that is the retrieval unit an answer engine matches against.',
         'A clean definition sentence near the top of every page, at least one comparison table per piece, FAQ answers sized between 40 and 60 words, and key takeaway bullets at the end. These are the four most frequently extracted blocks.',
-        'Entity consistency: the same description of what the company is and who it serves, repeated in consistent language across 199 pages, the metadata and off-site profiles. Models learn entities by repetition across sources.',
-        'The honest read on whether it is working: GA4 attributes about 2 percent of traffic to AI assistant referrers, which is small, and any agency claiming large AI citation numbers in 2026 is measuring badly or making it up. The stronger evidence is in the query export, where the site now surfaces for long conversational queries nobody types into a search box.',
+        'Entity consistency: the same description of what the company is and who it serves, repeated in consistent language across every article, the metadata and the off-site profiles, including a claimed Trustpilot page. Models learn entities by repetition across sources.',
+        'The honest read on whether it is working. In the last 90 days GA4 recorded 86 sessions from AI assistants, about 1 percent of traffic: 54 from ChatGPT and 11 from Gemini among them. That is small, and any agency claiming large AI citation numbers in 2026 is measuring badly or making it up. It is also not zero: people are now arriving from a chat window where the product was named in the answer.',
       ],
     },
     {
-      name: 'Founder brand and social',
-      serviceSlug: 'linkedin-ghostwriting',
+      name: 'Founder brand: Instagram and LinkedIn',
+      serviceSlug: 'video-editing',
       summary:
-        'Software in this category is bought on trust, and trust attaches to a person before it attaches to a logo.',
+        'Software in this category is bought on trust, and trust attaches to a person before it attaches to a logo. The founder is a working host, so the content is a host talking to hosts.',
       points: [
-        'We run the founder LinkedIn presence as a distribution channel in its own right, with positioning, a repeatable post architecture and a weekly cadence built by repurposing research the blog is already producing.',
-        'A market report becomes a post about what operators in that city are actually earning. The research cost is already paid.',
-        'In the last 30 days Organic Social delivered 285 sessions, third behind Direct at 595 and Organic Search at 339, and ahead of Paid Social at 165.',
-        'The Direct number is itself largely brand recall: people who met the company on LinkedIn and typed the domain in later.',
+        'Instagram is run as short video first. In the last 90 days the account published 69 Reels and 6 feed posts. Reels reached 8,009 accounts between them; the feed posts reached 270. That split decides where the editing hours go.',
+        'Three kinds of Reel carry the plan. Fast reactions to Airbnb changes hosts are worried about. The founder building in public, including a numbered series on building the product. And operator stories from a real portfolio, such as opening a 25th property.',
+        'The audience is the buyer. Of the followers Instagram reports a country for, 83 percent are in the United States and 12 percent in Canada, and two thirds are aged 25 to 54.',
+        'The account is small and we print that: 573 followers on 9 November 2026. Reach is uneven. One Reel on 23 October reached 766 accounts; most reach under 200. The job at this size is finding the formats that travel, then repeating them.',
+        'LinkedIn runs on the same research. A market report becomes a post about what operators in that city are actually earning, so the research cost is paid once and used three times: article, Reel, post.',
       ],
     },
     {
@@ -403,9 +436,23 @@ const magicbnb: CaseStudy = {
       summary:
         'Creative produced in house across static, video and carousel, iterated against delivery data rather than opinion.',
       points: [
-        'Spend in the last 30 days was $596.65, up 107 percent on the prior period, which is the right shape for a programme still in its learning phase.',
+        'Spend in the last 90 days was $2,211.87, against $870.83 in the 90 days before. That is still a learning budget, and it is treated as one.',
         'The job of paid here is not volume. It is to buy fast feedback on which messages land, then feed the winners back into the organic content and the site copy.',
-        'Ad creative and organic content are produced by the same team from the same research, so a message that wins in paid is in the blog and on LinkedIn the same week.',
+        'Paid clicks go to dedicated landing pages, each built around one message, and the pages are tested against each other rather than sending everything to the homepage.',
+        'Ad creative and organic content are produced by the same team from the same research, so a message that wins in paid is in the blog and on Instagram the same week.',
+      ],
+    },
+    {
+      name: 'Site visitors, tracking and reporting',
+      serviceSlug: 'automations',
+      summary:
+        'Traffic nobody can read is decoration. Search, analytics, Instagram, ads and session recordings are pulled into one dashboard every day, and that dashboard is what the weekly plan is built from.',
+      points: [
+        'Where visitors came from in the last 90 days: 3,441 sessions direct, 1,546 from organic search, 524 from paid social. Direct is largely brand recall, people who met the company on social or in a search result and typed the domain in later.',
+        'Conversions are now measured. The August version of this page reported that sign-ups were not instrumented. They are: GA4 recorded 18 conversions in the last 90 days, against none recorded before.',
+        'Bots are separated from people before anything is reported. The filter classed 5,309 sessions as bot and 4,244 as real in the same window, which is why raw session counts are never quoted on their own.',
+        'Session recordings show where people stall on a page, which feeds the next round of landing page and homepage edits.',
+        'Every page on the blog carries a tracked call to action, so a sign-up can be traced back to the article that earned it.',
       ],
     },
   ],
@@ -417,21 +464,28 @@ const magicbnb: CaseStudy = {
     { month: 'May 2026', impressions: '15,394', perDay: '496.6', note: 'Rebuild ships on the 5th' },
     { month: 'June 2026', impressions: '35,983', perDay: '1,199.4', note: 'The comparison cluster starts ranking' },
     { month: 'July 2026', impressions: '40,177', perDay: '1,296.0', note: 'Steady compounding' },
-    { month: 'August 2026, to the 17th', impressions: '26,764', perDay: '1,574.4', note: 'Highest daily average so far, still climbing' },
+    { month: 'August 2026', impressions: '50,872', perDay: '1,641.0', note: 'First version of this page published on the 20th' },
+    { month: 'September 2026', impressions: '75,128', perDay: '2,504.3', note: 'Pricing and alternatives pages take over' },
+    { month: 'October 2026', impressions: '84,695', perDay: '2,732.1', note: 'A step up in the last week, past 5,000 a day' },
+    { month: 'November 2026, to the 11th', impressions: '53,447', perDay: '4,858.8', note: 'Highest daily average so far' },
   ],
 
   funnel: {
     intro:
-      'Impressions on their own are a vanity number. Here is the last 30 days against the preceding 31, from the same Search Console and GA4 properties. Two rows moved the wrong way and they are printed here rather than left out.',
+      'Impressions on their own are a vanity number. Here is the last 90 days against the 90 before, 12 August to 9 November 2026, from the same Search Console and GA4 properties.',
+    beforeLabel: 'Prior 90 days',
+    afterLabel: 'Last 90 days',
     rows: [
-      { label: 'Sessions', before: '472', after: '1,432', change: '+203%', direction: 'up' },
-      { label: 'Users', before: '422', after: '1,331', change: '+215%', direction: 'up' },
-      { label: 'Organic search clicks', before: '158', after: '190', change: '+20%', direction: 'up' },
-      { label: 'Impressions', before: '44,592', after: '40,771', change: '-9%', direction: 'down' },
-      { label: 'Average position', before: '10.6', after: '12.1', change: '1.5 worse', direction: 'down' },
+      { label: 'Sessions', before: '1,848', after: '6,435', change: '+248%', direction: 'up' },
+      { label: 'Users', before: '1,699', after: '5,987', change: '+252%', direction: 'up' },
+      { label: 'Organic search clicks', before: '380', after: '1,077', change: '+183%', direction: 'up' },
+      { label: 'Impressions', before: '104,049', after: '228,602', change: '+120%', direction: 'up' },
+      { label: 'Average position', before: '11.7', after: '9.5', change: '2.2 better', direction: 'up' },
+      { label: 'Conversions recorded', before: '0', after: '18', change: 'now tracked', direction: 'up' },
     ],
+    readingLabel: 'Reading it honestly.',
     reading:
-      'When a large batch of new pages indexes at once, they enter at weak positions and drag the site-wide average down before they mature. Sessions tripling in the same window is the signal that matters. A site that triples real human sessions while its average position slips has stopped depending on any single page.',
+      'Every row moved the right way this time, which was not true in August, when impressions and average position both slipped while the new pages matured. Two cautions still apply. Clicks grew more slowly than impressions, so the click-through problem below is still the biggest one on the site. And 18 conversions is a start, not a result: it proves the tracking works, not that the funnel does.',
   },
 
   midCtaText:
@@ -445,44 +499,51 @@ const magicbnb: CaseStudy = {
       width: 1893,
       height: 895,
       caption:
-        'Google Search Console, property magicbnb.io, performance report for 19 February to 17 August 2026. Exported 18 August 2026. Published with the client written consent.',
+        'Google Search Console, property magicbnb.io, performance report for 19 February to 17 August 2026. Exported 18 August 2026, the first export behind this page. Published with the client written consent.',
     },
   ],
 
   openProblems: [
     {
-      title: 'Click-through rate is 0.4 percent',
+      title: 'Click-through rate is still under half a percent',
       detail:
-        '119,387 impressions produced 477 clicks, which means titles and descriptions are not earning the click the ranking already won. At current volume, moving site-wide CTR from 0.4 to a still-modest 2 percent is roughly 2,000 extra clicks a month without publishing a single new page. This is the highest value work available.',
-      status: 'Next phase',
+        'From 18 August to 11 November, 237,378 impressions produced 1,091 clicks, a rate of 0.46 percent, barely up from 0.4. Titles and descriptions are not earning the click the ranking already won. At current volume, moving the rate to a still-modest 2 percent is roughly 2,000 extra clicks a month without publishing a single new page. This was the highest value work available in August and it still is.',
+      status: 'In progress',
     },
     {
-      title: 'Conversions read zero because they are not instrumented',
+      title: 'Conversions are tracked, and the number is small',
       detail:
-        'GA4 has no key event and the signup webhook is not wired, so we can prove traffic and cannot yet prove trials. This should have been wired at launch and was not.',
-      status: 'Being fixed now',
+        '18 recorded conversions in 90 days from 6,435 sessions. The tracking gap from August is closed. The gap between traffic and trials is not, and that is now the main job of the landing page tests.',
+      status: 'In progress',
+    },
+    {
+      title: 'A broken inbound link is still sending visitors to a 404',
+      detail:
+        'This was on the August list as being fixed. It was not finished: the error page took 54 visits in the last 90 days. It is printed here again rather than quietly dropped.',
+      status: 'Overdue',
+    },
+    {
+      title: 'One article is not indexed',
+      detail: 'Down from three in August. Resubmitted and being monitored.',
+      status: 'Monitoring',
     },
     {
       title: 'Keyword cannibalisation',
       detail:
-        'The brand query is split across 23 pages and the flagship comparison query across 14. That is the cost of shipping 199 articles quickly. Consolidation and canonical work is scheduled.',
-      status: 'Scheduled',
+        'In August the brand query was split across 23 pages and the flagship comparison query across 14. That is the cost of shipping 199 articles quickly. Consolidation and canonical work is under way and has not been re-measured for this update.',
+      status: 'Not re-measured',
     },
     {
-      title: 'Three articles are not indexed at all',
-      detail: 'Submitted and being monitored.',
-      status: 'Monitoring',
-    },
-    {
-      title: 'A broken inbound link is sending real visitors to a 404',
-      detail: 'Found in the same export. Being redirected.',
-      status: 'Being fixed now',
-    },
-    {
-      title: 'Bot traffic is 44 percent of sessions',
+      title: 'More than half of sessions are bots',
       detail:
-        '1,001 bot against 1,262 real. Normal for a site with a large new content surface, but it means raw session counts need filtering before anyone celebrates them. The session figures quoted above are the filtered ones.',
+        '5,309 bot against 4,244 real in the last 90 days. Normal for a site with a large content surface, but it means raw session counts need filtering before anyone celebrates them.',
       status: 'Filtered in reporting',
+    },
+    {
+      title: 'The Instagram account is small',
+      detail:
+        '573 followers, and organic Instagram sent 56 sessions to the site in 90 days. The audience is the right one. The reach is not there yet.',
+      status: 'In progress',
     },
   ],
 
@@ -490,7 +551,7 @@ const magicbnb: CaseStudy = {
     {
       title: 'You need leads this month',
       detail:
-        'The curve above took four months to bend and the first two produced nothing visible. If the business needs pipeline inside 30 days, paid and outbound are the honest answer, and this programme runs behind them rather than instead of them.',
+        'The curve above took months to bend and the first two produced nothing visible. If the business needs pipeline inside 30 days, paid and outbound are the honest answer, and this programme runs behind them rather than instead of them.',
     },
     {
       title: 'Your category has no comparison behaviour',
@@ -500,7 +561,7 @@ const magicbnb: CaseStudy = {
     {
       title: 'You cannot publish at volume',
       detail:
-        '199 articles in four months is the input. At a tenth of that volume the architecture still helps, but you should expect a tenth of the surface and a much longer curve, and you should plan for that rather than be surprised by it.',
+        '199 articles in the first four months was the input. At a tenth of that volume the architecture still helps, but you should expect a tenth of the surface and a much longer curve, and you should plan for that rather than be surprised by it.',
     },
     {
       title: 'Your product cannot be described honestly',
@@ -510,9 +571,9 @@ const magicbnb: CaseStudy = {
   ],
 
   dataset: {
-    name: 'MagicBNB Google Search Console daily impressions, February to August 2026',
+    name: 'MagicBNB Google Search Console daily impressions, February to November 2026',
     description:
-      'Daily Google Search impression counts for the magicbnb.io Search Console property, 19 February to 17 August 2026 inclusive, 180 daily observations totalling 119,387 impressions. Exported 18 August 2026 and published with the site owner consent.',
+      'Daily Google Search impression counts for the magicbnb.io Search Console property, 19 February to 11 November 2026 inclusive, 266 daily observations totalling 356,765 impressions. First exported 18 August 2026, refreshed 13 November 2026, and published with the site owner consent.',
     measurementTechnique: 'Google Search Console performance report export',
     variableMeasured: ['Search impressions', 'Search clicks', 'Average position', 'Click-through rate'],
   },

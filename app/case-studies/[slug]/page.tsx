@@ -29,6 +29,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       siteName: 'EchoPulse Media',
       type: 'article',
       publishedTime: study.publishedISO,
+      modifiedTime: study.updatedISO ?? study.publishedISO,
       images: [share],
     },
     twitter: {
@@ -109,7 +110,7 @@ export default async function CaseStudyRoute({ params }: { params: Promise<{ slu
     headline: `${study.headline} ${study.headlineAccent}`.trim(),
     description: study.metaDescription,
     datePublished: study.publishedISO,
-    dateModified: study.publishedISO,
+    dateModified: study.updatedISO ?? study.publishedISO,
     author: { '@id': `${SITE_URL}/#organization` },
     publisher: { '@id': `${SITE_URL}/#organization` },
     mainEntityOfPage: { '@type': 'WebPage', '@id': url },

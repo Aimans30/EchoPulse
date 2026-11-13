@@ -263,8 +263,8 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
                 <thead>
                   <tr>
                     <th scope="col">Metric</th>
-                    <th scope="col">Prior 31 days</th>
-                    <th scope="col">Last 30 days</th>
+                    <th scope="col">{study.funnel.beforeLabel ?? 'Prior 31 days'}</th>
+                    <th scope="col">{study.funnel.afterLabel ?? 'Last 30 days'}</th>
                     <th scope="col">Change</th>
                   </tr>
                 </thead>
@@ -281,7 +281,7 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
               </table>
             </div>
             <p className="cs-body cs-reading">
-              <strong>Reading the two that moved the wrong way.</strong> {study.funnel.reading}
+              <strong>{study.funnel.readingLabel ?? 'Reading the two that moved the wrong way.'}</strong> {study.funnel.reading}
             </p>
           </Reveal>
           )}

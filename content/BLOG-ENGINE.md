@@ -122,8 +122,8 @@ Voice:
   "it's not X, it's Y", "the result?", lists of three adjectives, tidy
   symmetrical paragraphs, praise then "but".
 - Never claim client results, client counts, testimonials or revenue. The
-  one proof we publish is the MagicBNB case study (5.8 to 1,574 average daily
-  Google impressions, April to August 2026, best day 2,398). Link it, never
+  one proof we publish is the MagicBNB case study (5.8 to 4,859 average daily
+  Google impressions, April to November 2026, best day 5,522). Link it, never
   restate it with different numbers.
 - EchoPulse's own price appears in every pricing guide, plainly, once: the
   ladder is in lib/pricing.ts (free sample, $299 Pilot, $399/month Presence

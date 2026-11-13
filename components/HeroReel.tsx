@@ -87,10 +87,10 @@ export default function HeroReel() {
           Case study: MagicBNB
         </span>
         <span style={{ display: 'block', fontFamily: 'Inter, sans-serif', fontSize: 20, fontWeight: 900, letterSpacing: '-0.6px', lineHeight: 1.1 }}>
-          5.8 <span aria-hidden="true">&rarr;</span> 1,574 <span style={{ fontSize: 13, fontWeight: 600, color: '#6E6B63' }}>daily Google impressions</span>
+          5.8 <span aria-hidden="true">&rarr;</span> 4,859 <span style={{ fontSize: 13, fontWeight: 600, color: '#6E6B63' }}>daily Google impressions</span>
         </span>
         <span style={{ display: 'block', fontSize: 12, color: '#6E6B63', marginTop: 3 }}>
-          April to August average, best day 2,398. Real export inside <span style={{ color: '#E8541A', fontWeight: 700 }}>&rarr;</span>
+          April to November 2026 average, best day 5,522. Real export inside <span style={{ color: '#E8541A', fontWeight: 700 }}>&rarr;</span>
         </span>
       </Link>
     </div>

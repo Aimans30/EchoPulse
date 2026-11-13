@@ -61,7 +61,7 @@ export default function BlogSideCTA({ icp, slug }: { icp: IcpKey; slug: string }
           href="/case-studies/magicbnb-seo-aeo"
           style={{ display: 'block', marginTop: 12, fontSize: 12, lineHeight: 1.45, color: '#6E6B63', textDecoration: 'none' }}
         >
-          <strong style={{ color: '#0C0C0B' }}>5.8 &rarr; 1,574</strong> daily Google impressions in four months. <span style={{ color: '#E8541A', fontWeight: 700 }}>See the export &rarr;</span>
+          <strong style={{ color: '#0C0C0B' }}>5.8 &rarr; 4,859</strong> daily Google impressions in seven months. <span style={{ color: '#E8541A', fontWeight: 700 }}>See the export &rarr;</span>
         </Link>
       </div>
     </div>

@@ -138,6 +138,30 @@ export default function CaseStudyIndex({ studies }: { studies: CaseStudy[] }) {
                 </Link>
               </Reveal>
             ))}
+            <Reveal>
+              <Link href="/case-studies/founder-background" className="csi-feature">
+                <div className="csi-feature-head">
+                  <div>
+                    <p className="csi-feature-client">Lakshya Soni, founder</p>
+                    <p className="csi-feature-industry">Founder background, not a client case study</p>
+                  </div>
+                  <span className="csi-feature-window">Before EchoPulse</span>
+                </div>
+                <h2 className="csi-feature-title">
+                  Editing for more than 200 Canadian real estate agents,{' '}
+                  <span className="csi-accent">and why EchoPulse is built the opposite way.</span>
+                </h2>
+                <ul className="csi-feature-services">
+                  <li>Listing tours in 4K</li>
+                  <li>Agent personal brand content</li>
+                  <li>UGC-style ads</li>
+                </ul>
+                <span className="csi-feature-cta">
+                  Read the founder background
+                  <span aria-hidden="true"> &rarr;</span>
+                </span>
+              </Link>
+            </Reveal>
           </div>
         </div>
       </section>

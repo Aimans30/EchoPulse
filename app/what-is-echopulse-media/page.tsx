@@ -77,7 +77,7 @@ const FAQ: { q: string; a: string }[] = [
   },
   {
     q: 'What proof is there that the work gets results?',
-    a: 'The MagicBNB case study is the one with a real export behind it. Between 19 February and 17 August 2026 the client went from an average of 5.8 Google impressions a day in April to a best single day of 2,398, with 119,387 impressions across the window, after a site rebuild and 199 articles. The Search Console export is on the case study page, along with what is still not working.',
+    a: 'The MagicBNB case study is the one with a real export behind it. EchoPulse runs that client\'s marketing end to end. Between 19 February and 11 November 2026 the site went from an average of 5.8 Google impressions a day in April to an average of 4,859 a day in the first 11 days of November, with 356,765 impressions and 1,568 clicks across the window, after a site rebuild and more than 200 articles. The Search Console export is on the case study page, along with what is still not working.',
   },
 ];
 
@@ -249,7 +249,7 @@ export default function WhatIsEchoPulseMediaPage() {
               <span className="wi-step-num">2</span>
               <div>
                 <h3>{PILOT.name}, {PILOT.priceLabel}, {PILOT.per}</h3>
-                <p>{PILOT.tagline} A recorded strategy session, 5 video edits, 3 posts, 1 sourced blog, a content audit and a 30-day plan. You keep all of it.</p>
+                <p>{PILOT.tagline} A recorded strategy session, 6 video edits, 2 posts, 1 sourced blog, a content audit and a 30-day plan. You keep all of it.</p>
               </div>
             </li>
             <li>
