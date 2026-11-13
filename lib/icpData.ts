@@ -124,6 +124,8 @@ export interface IcpData {
   pipeline: PipelineConfig;
   /** The "why this matters / why us" education block. Renders as its own section. */
   authority: AuthorityCase;
+  /** Optional compact founder-background block rendered just under the authority section. */
+  founderStory?: { heading: string; body: string; linkLabel: string; href: string };
   /** Concrete deliverables list — what they actually receive. */
   deliverables: IcpDeliverable[];
   /** The before → after transformation, two short strings. */
@@ -249,6 +251,12 @@ export const icps: IcpData[] = [
       { slug: 'automations',        name: 'Lead Automations',              why: 'Inquiry-to-booked-viewing flows so leads never sit in a DM overnight.',                            weight: 'Medium' },
     ],
     starterStack: 'Start with Listing Video + Ad Creatives. Add personal-brand social once the listing flow is humming.',
+    founderStory: {
+      heading: 'Edited for 200+ Canadian real estate agents before EchoPulse',
+      body: "Before starting EchoPulse, founder Lakshya Soni edited listing tours, agent brand videos and ads for more than 200 Canadian agents as an editor at a real estate media company. Those were that company's clients, not EchoPulse clients.",
+      linkLabel: 'Read the founder story',
+      href: '/case-studies/founder-200-real-estate-agents',
+    },
     faq: [
       { q: 'Do I have to shoot the footage myself?', a: 'Either works. If you have a phone or a drone and a steady hand, shoot it and send us the raw clips, and we will guide you on what to capture. If you would rather not, we direct the shot list so a local videographer (or you) captures exactly what the edit needs. Then we handle the cinematic edit, captions, music, and exports.' },
       // These were two FAQs asking the same question. One covered turnaround,

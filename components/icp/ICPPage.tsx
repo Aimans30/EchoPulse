@@ -14,6 +14,7 @@ import ICPFaq from './ICPFaq';
 import ICPWork from './ICPWork';
 import ICPHeroDevice from './ICPHeroDevice';
 import ICPAuthority from './ICPAuthority';
+import { PAGES_UPDATED_LABEL, PAGES_UPDATED_ISO } from '@/lib/siteMeta';
 
 const ICON_MAP: Record<IcpData['icon'], LucideIcon> = {
   home: Home,
@@ -107,6 +108,12 @@ export default function ICPPage({ data, videos, guides = [] }: { data: IcpData; 
               <ICPHeroDevice accent={accent} alt={deviceAlt} pipeline={data.pipeline} />
             </div>
           </div>
+          <div className="icp-container icp-byline-wrap">
+            <p className="icp-byline">
+              Written and reviewed by <Link href="/about">Lakshya Soni</Link>, founder. Last updated{' '}
+              <time dateTime={PAGES_UPDATED_ISO}>{PAGES_UPDATED_LABEL}</time>.
+            </p>
+          </div>
         </section>
 
         {/* ── 2. WHY NOW (light) ── */}
@@ -162,6 +169,21 @@ export default function ICPPage({ data, videos, guides = [] }: { data: IcpData; 
              completeness → handed conclusion. Sits before the services so the
              reader wants the thing before we show them the thing. ── */}
         <ICPAuthority data={data.authority} accent={accent} />
+
+        {/* Optional founder-background block (real estate only, data-driven). */}
+        {data.founderStory && (
+          <section className="icp-founder-story icp-section-light" aria-labelledby="icp-founder-story-h">
+            <div className="icp-container icp-narrow">
+              <div className="icp-founder-card" style={{ borderLeft: `3px solid ${accent}` }}>
+                <h2 id="icp-founder-story-h" className="icp-founder-h">{data.founderStory.heading}</h2>
+                <p className="icp-founder-p">{data.founderStory.body}</p>
+                <Link href={data.founderStory.href} className="icp-founder-link" style={{ color: accent }}>
+                  {data.founderStory.linkLabel}
+                </Link>
+              </div>
+            </div>
+          </section>
+        )}
 
         {/* ── 4. THE SOLUTION (light) — services in priority order ── */}
         <section id="services" className="icp-section icp-section-light" style={{ paddingTop: 0 }}>
@@ -429,6 +451,16 @@ export default function ICPPage({ data, videos, guides = [] }: { data: IcpData; 
         .icp-lead { font-size: 15px; line-height: 1.65; color: #6E6B63; max-width: 640px; margin: 18px 0 0; }
         .icp-eyebrow-line { display: inline-flex; align-items: center; gap: 14px; font-size: 10px; font-weight: 600; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 18px; }
 
+        /* Byline + founder story */
+        .icp-byline-wrap { position: relative; z-index: 1; margin-top: 40px; }
+        .icp-byline { font-family: Inter, sans-serif; font-size: 12.5px; line-height: 1.5; color: rgba(242,238,231,0.55); margin: 0; overflow-wrap: anywhere; }
+        .icp-byline a { color: rgba(242,238,231,0.8); text-decoration: underline; text-underline-offset: 3px; }
+        .icp-founder-story { padding: 0 0 56px; }
+        .icp-founder-card { padding: 4px 0 4px 22px; }
+        .icp-founder-h { font-family: Inter, sans-serif; font-weight: 800; font-size: clamp(19px, 2.4vw, 24px); letter-spacing: -0.5px; line-height: 1.2; margin: 0 0 10px; }
+        .icp-founder-p { font-size: 15px; line-height: 1.65; color: #6E6B63; margin: 0 0 12px; }
+        .icp-founder-link { font-family: Inter, sans-serif; font-size: 14px; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+
         /* Hero */
         .icp-hero { position: relative; overflow: hidden; background: #0C0C0B; color: #F2EEE7; padding: 132px 0 96px; scroll-margin-top: 96px; }
         .icp-hero-glow { position: absolute; inset: 0; pointer-events: none; }
@@ -542,6 +574,9 @@ export default function ICPPage({ data, videos, guides = [] }: { data: IcpData; 
           .icp-container { padding: 0 20px; }
           .icp-section { padding: 64px 0; }
           .icp-hero { padding: 104px 0 64px; }
+          .icp-byline-wrap { margin-top: 28px; }
+          .icp-founder-story { padding-bottom: 40px; }
+          .icp-founder-card { padding-left: 16px; }
           .icp-hero-eyebrow { font-size: 10.5px; letter-spacing: 1.8px; margin-bottom: 12px; }
           .icp-h1 { font-size: 34px; letter-spacing: -1.6px; }
           /* The animation used to be display:none on phones — indefensible for

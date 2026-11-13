@@ -14,6 +14,7 @@ import { useGeoPrice } from '@/lib/useGeoPrice';
 import { DUR, EASE } from '@/lib/motion';
 import Nav from './Nav';
 import { BOOK_CALL_LABEL } from '@/lib/links';
+import { PAGES_UPDATED_LABEL, PAGES_UPDATED_ISO } from '@/lib/siteMeta';
 
 // ServiceHeroVisual is 2.4K lines of SVG / animation code per service.
 // Lazy-loading it strips ~80KB of JS off the initial chunk so the route
@@ -804,6 +805,11 @@ export default function ServicePageClient({ service, guides = [] }: { service: S
               <ServiceHeroVisual slug={service.slug} accent={service.accentColor} />
             </div>
           </div>
+
+          <p style={{ fontFamily: 'Inter, sans-serif', fontSize: '12.5px', lineHeight: 1.5, color: 'rgba(242,238,231,0.55)', margin: '32px 0 0', overflowWrap: 'anywhere' }}>
+            Written and reviewed by <Link href="/about" style={{ color: 'rgba(242,238,231,0.8)', textDecoration: 'underline', textUnderlineOffset: '3px' }}>Lakshya Soni</Link>, founder. Last updated{' '}
+            <time dateTime={PAGES_UPDATED_ISO}>{PAGES_UPDATED_LABEL}</time>.
+          </p>
 
           <style>{`
             @media (max-width: 900px) {
