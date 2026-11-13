@@ -114,7 +114,10 @@ export default async function CaseStudyRoute({ params }: { params: Promise<{ slu
     author: { '@id': `${SITE_URL}/#organization` },
     publisher: { '@id': `${SITE_URL}/#organization` },
     mainEntityOfPage: { '@type': 'WebPage', '@id': url },
-    about: clientLd,
+    // A founder story is about a person, and that Person node already exists
+    // in the root layout. Pointing at it avoids declaring the founder as an
+    // Organization.
+    about: study.kind === 'founder' ? { '@id': `${SITE_URL}/#founder` } : clientLd,
     ...(datasetLd ? { citation: { '@id': datasetId } } : {}),
     url,
     ...(heroImage
@@ -134,7 +137,7 @@ export default async function CaseStudyRoute({ params }: { params: Promise<{ slu
     itemListElement: [
       { '@type': 'ListItem', position: 1, name: 'EchoPulse Media', item: SITE_URL },
       { '@type': 'ListItem', position: 2, name: 'Case studies', item: `${SITE_URL}/case-studies` },
-      { '@type': 'ListItem', position: 3, name: `${study.client} case study`, item: url },
+      { '@type': 'ListItem', position: 3, name: study.kind === 'founder' ? 'Founder story' : `${study.client} case study`, item: url },
     ],
   };
 

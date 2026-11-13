@@ -139,13 +139,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.9,
   };
 
-  const founderBackground: MetadataRoute.Sitemap[number] = {
-    url: `${SITE_URL}/case-studies/founder-background`,
-    lastModified: new Date('2026-11-13'),
-    changeFrequency: 'monthly',
-    priority: 0.8,
-  };
-
   // The video wall. Carries a VideoObject ItemList for every clip.
   const workPage: MetadataRoute.Sitemap[number] = {
     url: `${SITE_URL}/work`,
@@ -246,7 +239,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     workPage,
     caseStudyIndex,
     ...caseStudyRoutes,
-    founderBackground,
     blogIndex,
     ...icpRoutes,
     ...serviceRoutes,

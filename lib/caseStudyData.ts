@@ -37,8 +37,31 @@ export type CaseStudyMetric = {
   note?: string;
 };
 
+/** One labelled bar in a small horizontal bar chart. */
+export type CaseStudyBarItem = { label: string; value: number; display: string };
+
+/** A small horizontal bar chart. Values are real, sourced in `caption`. */
+export type CaseStudyBars = {
+  title: string;
+  caption: string;
+  items: CaseStudyBarItem[];
+};
+
+/** A still image shown next to a workstream or in the hero. */
+export type CaseStudyMedia = {
+  src: string;
+  alt: string;
+  width: number;
+  height: number;
+  caption?: string;
+};
+
 export type CaseStudyWorkstream = {
   name: string;
+  /** One number that sums the workstream up, shown as a chip on the card. */
+  stat?: { value: string; label: string };
+  /** Optional stills shown with the workstream (max 3). */
+  media?: CaseStudyMedia[];
   /** Slug in lib/serviceData.ts, so the page can link the service. */
   serviceSlug?: string;
   summary: string;
@@ -123,6 +146,31 @@ export type CaseStudyComparison = {
 
 export type CaseStudy = {
   slug: string;
+  /**
+   * 'client' (default) is work done for a named client. 'founder' is the
+   * founder's own background: it renders through the same template but the
+   * labels change (no "open the client site and check", no "still broken"),
+   * and the schema `about` node is the founder Person, not an Organization.
+   */
+  kind?: 'client' | 'founder';
+  /** Three short lines for the summary box under the hero: result, how, catch. */
+  tldr?: string[];
+  /** Picture for the hero when there is no chart or before/after to show. */
+  heroMedia?: CaseStudyMedia;
+  /** Small bar charts shown in the numbers section. */
+  bars?: CaseStudyBars[];
+  /** Overrides for section headings. Every key is optional. */
+  labels?: {
+    eyebrowIndex?: string;
+    situationKicker?: string;
+    workKicker?: string;
+    workHeading?: string;
+    openProblemsKicker?: string;
+    openProblemsHeading?: string;
+    limitsKicker?: string;
+    limitsHeading?: string;
+    clientLinkLabel?: string;
+  };
   /** Client name as they write it themselves. */
   client: string;
   /** Live, checkable URL. Emitted as Organization.sameAs. */
@@ -246,6 +294,48 @@ const magicbnb: CaseStudy = {
   summary:
     'In April 2026 magicbnb.io was shown in Google search results an average of 5.8 times a day. In the first 11 days of November 2026 the average was 4,859, and the best single day hit 5,522. Same company, same product, same market. EchoPulse runs the whole marketing function: the site, the content plan, 219 articles, answer-engine work, the founder brand on Instagram and LinkedIn, the ad creative and the measurement. Here is every part of that system, the real Search Console export, and the parts that are still broken.',
 
+  tldr: [
+    'Result: Google impressions went from 5.8 a day in April 2026 to 4,859 a day in early November. Sessions are up 248 percent in the last 90 days.',
+    'How: one team runs the site, the content plan, 219 articles, answer-engine content, Instagram, LinkedIn, ads and tracking from the same research.',
+    'The catch: click-through rate is still under half a percent, and only 18 conversions were recorded in 90 days.',
+  ],
+
+  bars: [
+    {
+      title: 'Where visitors came from, last 90 days',
+      caption: 'GA4 sessions by channel, 12 August to 9 November 2026.',
+      items: [
+        { label: 'Direct', value: 3441, display: '3,441' },
+        { label: 'Organic search', value: 1546, display: '1,546' },
+        { label: 'Paid social', value: 524, display: '524' },
+        { label: 'AI assistants', value: 86, display: '86' },
+        { label: 'Organic Instagram', value: 56, display: '56' },
+      ],
+    },
+    {
+      title: 'Instagram reach by format, last 90 days',
+      caption: 'Accounts reached, Instagram insights, 12 August to 9 November 2026. 69 Reels against 6 feed posts.',
+      items: [
+        { label: 'Reels', value: 8009, display: '8,009' },
+        { label: 'Feed posts', value: 270, display: '270' },
+      ],
+    },
+    {
+      title: 'Average daily impressions by month',
+      caption: 'Google Search Console, magicbnb.io. November is the 1st to the 11th.',
+      items: [
+        { label: 'Apr', value: 5.8, display: '5.8' },
+        { label: 'May', value: 496.6, display: '497' },
+        { label: 'Jun', value: 1199.4, display: '1,199' },
+        { label: 'Jul', value: 1296, display: '1,296' },
+        { label: 'Aug', value: 1641, display: '1,641' },
+        { label: 'Sep', value: 2504.3, display: '2,504' },
+        { label: 'Oct', value: 2732.1, display: '2,732' },
+        { label: 'Nov', value: 4858.8, display: '4,859' },
+      ],
+    },
+  ],
+
   windowLabel: '19 February to 11 November 2026',
   windowStartISO: '2026-02-19',
   windowEndISO: '2026-11-11',
@@ -355,6 +445,7 @@ const magicbnb: CaseStudy = {
   workstreams: [
     {
       name: 'Site rebuild and development',
+      stat: { value: '13 to 209', label: 'impressions, the day before launch against launch day' },
       serviceSlug: 'websites-funnels',
       summary:
         'A full rebuild on Next.js, designed around three jobs: explain the product to a human in ten seconds, prove it to a sceptic in ninety, and give a machine something unambiguous to quote.',
@@ -368,6 +459,7 @@ const magicbnb: CaseStudy = {
     },
     {
       name: 'Content planning: what gets written, and why',
+      stat: { value: '11.7 to 9.5', label: 'average position, last 90 days' },
       serviceSlug: 'blog-production',
       summary:
         'Nothing is written because it is Tuesday. Every article comes out of one of four inputs, and the plan is rebuilt from the data every week.',
@@ -381,6 +473,7 @@ const magicbnb: CaseStudy = {
     },
     {
       name: 'Content architecture, shipped before the content',
+      stat: { value: '219', label: 'articles live' },
       serviceSlug: 'blog-production',
       summary:
         'The sequencing is the part most teams get wrong. Publishing 199 articles onto a site that cannot cluster, link or surface them produces 199 orphan pages.',
@@ -394,6 +487,7 @@ const magicbnb: CaseStudy = {
     },
     {
       name: 'Choosing what to rank for',
+      stat: { value: '52,793', label: 'impressions from one article, May to mid August' },
       serviceSlug: 'blog-production',
       summary:
         'The single highest-leverage decision was refusing to fight for head terms. Phrases like short term rental software are owned by companies with a decade of domain authority and budgets a young SaaS does not have.',
@@ -406,6 +500,7 @@ const magicbnb: CaseStudy = {
     },
     {
       name: 'Answer engines and AI presence',
+      stat: { value: '86', label: 'visits from AI assistants in 90 days' },
       serviceSlug: 'blog-production',
       summary:
         'Most of these searches end without a click, because Google answers in place. Most agencies would bury that. It is the centre of the strategy.',
@@ -419,6 +514,7 @@ const magicbnb: CaseStudy = {
     },
     {
       name: 'Founder brand: Instagram and LinkedIn',
+      stat: { value: '8,009', label: 'accounts reached by Reels in 90 days' },
       serviceSlug: 'video-editing',
       summary:
         'Software in this category is bought on trust, and trust attaches to a person before it attaches to a logo. The founder is a working host, so the content is a host talking to hosts.',
@@ -432,6 +528,7 @@ const magicbnb: CaseStudy = {
     },
     {
       name: 'Paid social and ad creative',
+      stat: { value: '$2,211.87', label: 'ad spend in 90 days' },
       serviceSlug: 'ad-creatives',
       summary:
         'Creative produced in house across static, video and carousel, iterated against delivery data rather than opinion.',
@@ -444,6 +541,7 @@ const magicbnb: CaseStudy = {
     },
     {
       name: 'Site visitors, tracking and reporting',
+      stat: { value: '18', label: 'conversions recorded, from zero tracked' },
       serviceSlug: 'automations',
       summary:
         'Traffic nobody can read is decoration. Search, analytics, Instagram, ads and session recordings are pulled into one dashboard every day, and that dashboard is what the weekly plan is built from.',
@@ -577,6 +675,207 @@ const magicbnb: CaseStudy = {
     measurementTechnique: 'Google Search Console performance report export',
     variableMeasured: ['Search impressions', 'Search clicks', 'Average position', 'Click-through rate'],
   },
+};
+
+/**
+ * Founder background. NOT a client case study, and it must never read like one.
+ *
+ * The agents and brokerages mentioned here were clients of a previous employer,
+ * edited by Lakshya as one of that company's editors. They are not EchoPulse
+ * clients and none of them endorses EchoPulse. The page says so in the summary
+ * table and again in the "does not claim" section, because an AI answer that
+ * lifts one paragraph should still carry the caveat.
+ *
+ * The previous company is deliberately not named. The criticism is written as
+ * the founder's own experience and as the reason EchoPulse is built the way it
+ * is, not as an accusation against an identifiable business.
+ *
+ * Every figure is the founder's own account of his work history. Nothing here
+ * is a measured result, so there is no chart, no funnel and no Dataset node.
+ * The stills are frames from listing reels already shown on /work.
+ */
+const founderStory: CaseStudy = {
+  slug: 'founder-200-real-estate-agents',
+  kind: 'founder',
+  client: 'Lakshya Soni, founder',
+  clientUrl: 'https://echopulse.media/about',
+  clientTagline:
+    'Founder of EchoPulse Media. Editor, writer and developer. Before EchoPulse, an editor at a Canadian real estate media company.',
+  industry: 'Founder story, real estate video',
+  icpKey: 'real-estate',
+
+  metaTitle: 'Founder Story: 200+ Real Estate Agents Edited',
+  metaDescription:
+    'Before EchoPulse, founder Lakshya Soni edited listing tours, agent brand videos and ads for 200+ Canadian real estate agents. What he saw, and what he built.',
+
+  eyebrow: 'Founder story',
+  headline: 'I edited for 200+ Canadian real estate agents.',
+  headlineAccent: 'Then I built the studio I wished they had hired.',
+  summary:
+    'Before starting EchoPulse Media, I worked as a video editor for a real estate media company in Canada that shot and edited content for agents. Through that company I edited listing tours, personal brand videos and ads for more than 200 agents. This is what I worked on, what I saw go wrong from the editing desk, and why EchoPulse is built the opposite way.',
+
+  tldr: [
+    'The work: listing tours in 4K at 120 frames per second and above, agent personal brand content and UGC-style ads, for more than 200 Canadian agents.',
+    'What I saw: agents paying premium prices for average edits, and the editors doing the work treated as replaceable.',
+    'What I built: a studio where the price is on the page, the person who hears the brief cuts the footage, and nothing ships until you would post it under your own name.',
+  ],
+
+  windowLabel: 'Before EchoPulse',
+  // No dated window is claimed. These only feed the Dataset node, which this
+  // study does not emit, so they are set to the publish date.
+  windowStartISO: '2026-11-13',
+  windowEndISO: '2026-11-13',
+  publishedISO: '2026-11-13',
+
+  heroMedia: {
+    src: '/founder.jpg',
+    alt: 'Lakshya Soni, founder of EchoPulse Media.',
+    width: 1487,
+    height: 1594,
+    caption: 'Lakshya Soni, founder of EchoPulse Media.',
+  },
+
+  labels: {
+    eyebrowIndex: 'Founder story, not a client case study',
+    situationKicker: 'Where I started',
+    workKicker: 'What I edited',
+    workHeading: 'Three kinds of work, one editing desk.',
+    openProblemsKicker: 'To be clear',
+    openProblemsHeading: 'What this page does not claim.',
+    limitsKicker: 'What changed',
+    limitsHeading: 'What I saw there, and what EchoPulse does instead.',
+    clientLinkLabel: 'About Lakshya',
+  },
+
+  services: ['Listing tours in 4K', 'Agent personal brand content', 'UGC-style ads'],
+
+  heroMetrics: [
+    { value: '200+', label: 'Canadian real estate agents edited for', note: 'As an editor at a previous company' },
+    { value: '4K, 120fps+', label: 'listing and property tour footage', note: 'Smooth slow motion, a lot of footage per home' },
+    { value: '3', label: 'kinds of work', note: 'Listing tours, agent brand content, UGC-style ads' },
+  ],
+
+  atAGlance: [
+    { label: 'Who', value: 'Lakshya Soni, founder of EchoPulse Media' },
+    { label: 'Role', value: 'Video editor at a Canadian real estate media company that offered shooting and editing to agents' },
+    { label: 'Agents edited for', value: 'More than 200 real estate agents across Canada' },
+    { label: 'Brokerages', value: 'Agents at RE/MAX offices and other large Canadian brokerages' },
+    { label: 'Footage', value: 'Listing and property tours shot in 4K, at 120 frames per second and above' },
+    { label: 'Types of work', value: 'Listing tour videos, agent personal brand content, UGC-style ads' },
+    { label: 'Whose clients', value: 'The previous company\'s clients, not EchoPulse clients. No brokerage or agent mentioned here endorses EchoPulse.' },
+    { label: 'Last updated', value: '13 November 2026' },
+  ],
+
+  situation: {
+    headline: 'The company was well known and busy. From the editing desk it looked different.',
+    body: [
+      'I am not naming the company, and this is one editor\'s experience, not an investigation. I cut the footage, so I saw two things the agents never did: what the edit could have been, and what was actually sent.',
+      'Three things stayed with me, and each one became a rule at EchoPulse.',
+    ],
+    failures: [
+      {
+        title: 'The price did not match the work',
+        detail: 'Agents paid premium prices. The people doing the editing were paid a small share of it, and the client had no way to see what the money bought.',
+      },
+      {
+        title: 'Volume came before quality',
+        detail: 'Edits went out that I would not have signed, because there was always another batch behind them.',
+      },
+      {
+        title: 'Editors were treated as replaceable',
+        detail: 'The culture was poor, and it showed in the work. People who are treated as interchangeable produce interchangeable edits.',
+      },
+    ],
+  },
+
+  workstreams: [
+    {
+      name: 'Listing and property tours',
+      serviceSlug: 'video-editing',
+      stat: { value: '4K, 120fps+', label: 'source footage' },
+      summary:
+        'The core of the job. High-resolution walk-throughs with smooth slow motion and a lot of footage per property.',
+      points: [
+        'The edit decides whether a buyer watches twelve seconds or the whole home: the opening shot, the order of the rooms, the pace, the colour.',
+        'Aerial openers, address titles and room-by-room sequencing, cut for vertical feeds as well as widescreen.',
+        'High frame rate footage is heavy and slow to work with. Handling it well is most of what separates a clean tour from a choppy one.',
+      ],
+      media: [
+        { src: 'https://res.cloudinary.com/dqqd9rq8s/video/upload/so_3,c_scale,w_900,q_auto,f_jpg/v1782371049/2426_fn_e4yyrc.jpg', alt: 'Aerial opening frame from a listing reel, a detached home on a residential street with the address as a title.', width: 900, height: 1600, caption: 'Opening frame from a listing reel.' },
+        { src: 'https://res.cloudinary.com/dqqd9rq8s/video/upload/so_3,c_scale,w_900,q_auto,f_jpg/v1782371126/2458_fn_uphhrb.jpg', alt: 'Frame from a real estate listing reel.', width: 900, height: 1600, caption: 'Frame from a listing reel.' },
+        { src: 'https://res.cloudinary.com/dqqd9rq8s/video/upload/so_3,c_scale,w_900,q_auto,f_jpg/v1782372139/2438_fn_z6wry7.jpg', alt: 'Frame from a real estate listing reel.', width: 900, height: 1600, caption: 'Frame from a listing reel.' },
+      ],
+    },
+    {
+      name: 'Agent personal brand content',
+      serviceSlug: 'video-editing',
+      stat: { value: '2 seconds', label: 'to earn the watch' },
+      summary:
+        'Talking-head videos, market updates, neighbourhood guides and day-in-the-life pieces: the content that gets an agent recognised before the listing appointment.',
+      points: [
+        'Edited very differently from a tour: tighter cuts, captions on screen, a hook in the first two seconds.',
+        'The agent is the product here, so the edit has to sound like them and not like a template.',
+      ],
+    },
+    {
+      name: 'UGC-style ads',
+      serviceSlug: 'ad-creatives',
+      stat: { value: '3 seconds', label: 'decide if the rest is seen' },
+      summary: 'Short ads cut to look native in a feed, for agents and for other businesses.',
+      points: [
+        'Several versions of the same idea with different openings, because the first three seconds decide whether the rest is ever seen.',
+        'Made to be tested against each other, not to win an award.',
+      ],
+    },
+  ],
+
+  proof: [],
+
+  midCtaText:
+    'An agent? Send footage from one listing and get two edited videos back within 48 hours, free. You keep the files either way.',
+  openProblemsAccent: 'said plainly.',
+
+  openProblems: [
+    {
+      title: 'These were not EchoPulse clients',
+      detail: 'The agents and brokerages were clients of the company I worked for. EchoPulse Media has no brokerage as a client and does not claim one.',
+      status: 'Previous employer',
+    },
+    {
+      title: 'Nobody here endorses EchoPulse',
+      detail: 'No agent or brokerage mentioned on this page has reviewed or recommended EchoPulse Media. When a client is willing to speak on the record, we will introduce them.',
+      status: 'No endorsement',
+    },
+    {
+      title: 'No results are claimed',
+      detail: 'I edited the videos. I did not run those agents\' marketing and I do not have their numbers, so there are none on this page.',
+      status: 'No numbers',
+    },
+    {
+      title: 'The measured proof is elsewhere',
+      detail: 'The MagicBNB case study is the one with a real export behind it, and the work page has edits you can watch.',
+      status: 'See MagicBNB',
+    },
+  ],
+
+  notApplicable: [
+    {
+      title: 'Price',
+      detail: 'There: premium prices, with no way for the client to see what the money bought. Here: every price is published with its exact scope, and the person you pay is the person doing the work.',
+    },
+    {
+      title: 'Quality',
+      detail: 'There: volume first. Here: every piece is re-done until you would ship it under your own name, and the client list is kept small on purpose.',
+    },
+    {
+      title: 'People',
+      detail: 'There: editors treated as replaceable. Here: three named people, the same three every month.',
+    },
+    {
+      title: 'Ownership',
+      detail: 'You keep everything made, whether or not you continue. Month to month, no contract.',
+    },
+  ],
 };
 
 /**
@@ -880,7 +1179,7 @@ const workingWithGod: CaseStudy = {
   ],
 };
 
-export const caseStudies: CaseStudy[] = [magicbnb, workingWithGod];
+export const caseStudies: CaseStudy[] = [magicbnb, workingWithGod, founderStory];
 
 export function getCaseStudy(slug: string): CaseStudy | undefined {
   return caseStudies.find((c) => c.slug === slug);
@@ -898,5 +1197,6 @@ export function getCaseStudy(slug: string): CaseStudy | undefined {
 export function heroImageFor(study: CaseStudy): { src: string; caption: string } | null {
   if (study.proof[0]) return { src: study.proof[0].src, caption: study.proof[0].caption };
   if (study.comparison) return { src: study.comparison.beforeSrc, caption: study.comparison.caption };
+  if (study.heroMedia) return { src: study.heroMedia.src, caption: study.heroMedia.caption ?? study.heroMedia.alt };
   return null;
 }
