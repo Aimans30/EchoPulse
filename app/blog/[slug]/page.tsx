@@ -8,6 +8,7 @@ import BlogContent from '@/components/BlogContent';
 import BlogFooterCTA from '@/components/BlogFooterCTA';
 import BlogInlineCTA from '@/components/BlogInlineCTA';
 import BlogSideCTA from '@/components/BlogSideCTA';
+import BlogEmailCapture from '@/components/BlogEmailCapture';
 import { audienceForPost } from '@/lib/blogLinks';
 import TableOfContents from '@/components/TableOfContents';
 import { getPostBySlug, getAllPostSlugs, getRelatedPosts, resolveCategory, resolveAuthor, type BlogPostSummary } from '@/lib/blog';
@@ -475,6 +476,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               </p>
             )}
 
+            <BlogEmailCapture />
           </article>
 
           {/* Right rail: sticky offer cards, desktop only (hidden under 1280px,

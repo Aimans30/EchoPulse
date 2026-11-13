@@ -115,6 +115,20 @@ export default function WorkWall({ clips }: { clips: WallClip[] }) {
   const [open, setOpen] = useState<WallClip | null>(null);
   const [hinted, setHinted] = useState(false);
 
+  // ?niche=real-estate preselects that filter. Read from the URL on mount so
+  // /work stays statically rendered; unknown values keep the default.
+  useEffect(() => {
+    try {
+      const n = new URLSearchParams(window.location.search).get('niche');
+      if (n && ICP_CHIPS.some((c) => c.key === n && c.key !== 'all')) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setIcp(n as IcpKey);
+      }
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
   const isHorizontal = useCallback(
     (c: WallClip) => orient[c.id] ?? c.orientation === 'horizontal',
     [orient],

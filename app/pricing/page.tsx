@@ -4,6 +4,7 @@ import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
 import ICPBookButton from '@/components/icp/ICPBookButton';
 import { icps } from '@/lib/icpData';
+import { getCaseStudy } from '@/lib/caseStudyData';
 import { BOOK_CALL_LABEL, BOOK_CALL_REASSURANCE } from '@/lib/links';
 import {
   FREE_SAMPLE,
@@ -202,6 +203,7 @@ export default function PricingPage() {
   };
 
   const plans = [FREE_SAMPLE, ...PRICING_CARDS];
+  const proofMetrics = (getCaseStudy('magicbnb-seo-aeo')?.heroMetrics ?? []).slice(0, 3);
 
   return (
     <>
@@ -298,6 +300,21 @@ export default function PricingPage() {
             ))}
           </div>
         </section>
+
+        {/* ── Proof strip: figures read from the case study data ─────────── */}
+        {proofMetrics.length > 0 && (
+          <section className="pr-proof" aria-label="Proof from a client engagement">
+            <ul className="pr-proof-list">
+              {proofMetrics.map((m) => (
+                <li key={m.label} className="pr-proof-item">
+                  <span className="pr-proof-val">{m.value}</span>
+                  <span className="pr-proof-label">{m.label}</span>
+                </li>
+              ))}
+            </ul>
+            <Link href="/case-studies/magicbnb-seo-aeo" className="pr-proof-link">See the MagicBNB case study</Link>
+          </section>
+        )}
 
         {/* ── Comparison table ───────────────────────────────────────────── */}
         <section className="pr-compare" aria-labelledby="compare-heading">
@@ -498,6 +515,15 @@ export default function PricingPage() {
           .pr-faq-list dt { font-size: 18px; font-weight: 800; letter-spacing: -0.02em; margin: 0 0 8px; }
           .pr-faq-list dd { margin: 0; }
 
+          /* Proof strip */
+          .pr-proof { padding-top: 0 !important; border-top: none !important; }
+          .pr-proof-list { list-style: none; margin: 0 0 16px; padding: 20px 24px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; border: 1px solid rgba(12,12,11,0.12); border-radius: 16px; background: #F2EEE7; }
+          .pr-proof-item { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+          .pr-proof-val { font-size: clamp(20px, 2.6vw, 28px); font-weight: 800; letter-spacing: -0.03em; color: #0C0C0B; overflow-wrap: anywhere; }
+          .pr-proof-label { font-size: 13px; color: #6E6B63; line-height: 1.4; }
+          .pr-proof-link { color: ${ACCENT}; font-weight: 700; font-size: 14px; text-decoration: none; }
+          .pr-proof-link:hover { text-decoration: underline; }
+
           /* CTA */
           .pr-cta { padding-bottom: 128px !important; }
           .pr-cta p { max-width: 640px; }
@@ -505,6 +531,7 @@ export default function PricingPage() {
 
           @media (max-width: 900px) {
             .pr-cards { grid-template-columns: 1fr; }
+            .pr-proof-list { grid-template-columns: 1fr; }
           }
           @media (max-width: 760px) {
             .pr-page > section { padding: 48px 20px; }

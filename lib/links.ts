@@ -68,8 +68,10 @@ export const BOOK_CALL_ANCHOR = '#book-call';
 /**
  * The free sample. The lowest-friction ask on the site: send footage, get 2
  * edited videos back within 48 hours, no card, no call. Lives in lib/pricing.ts
- * as FREE_SAMPLE; these are the link and label every CTA uses.
+ * as FREE_SAMPLE; these are the link and label every CTA uses. The URL is the
+ * internal /free-edits page (app/free-edits), whose form posts to /api/lead.
+ * It was a mailto: link until Nov 2026. Keep it an internal path: open it in
+ * the same tab, no target="_blank".
  */
 export const FREE_EDITS_LABEL = 'Get 2 free edits';
-export const FREE_EDITS_URL =
-  'mailto:lakshya@echopulse.media?subject=2%20free%20edits&body=Hi%20Lakshya%2C%20here%20is%20a%20link%20to%20my%20footage%3A%20';
+export const FREE_EDITS_URL = '/free-edits';

@@ -110,6 +110,29 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   };
 
+  // /pilot is the one-screen $299 Pilot page sent in DMs; /free-edits is the
+  // free sample form; /about/lakshya-soni is the founder's author page.
+  const pilot: MetadataRoute.Sitemap[number] = {
+    url: `${SITE_URL}/pilot`,
+    lastModified: PRICING_UPDATED,
+    changeFrequency: 'monthly',
+    priority: 0.8,
+  };
+
+  const freeEdits: MetadataRoute.Sitemap[number] = {
+    url: `${SITE_URL}/free-edits`,
+    lastModified: STATIC_PAGES_UPDATED,
+    changeFrequency: 'monthly',
+    priority: 0.7,
+  };
+
+  const founderPage: MetadataRoute.Sitemap[number] = {
+    url: `${SITE_URL}/about/lakshya-soni`,
+    lastModified: BRAND_PAGE_UPDATED,
+    changeFrequency: 'monthly',
+    priority: 0.7,
+  };
+
   // Legal pages carry a fixed date. `now` on a page that has not changed tells
   // the crawler it changed on every fetch, which is a lie it learns to ignore.
   const terms: MetadataRoute.Sitemap[number] = {
@@ -245,6 +268,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...blogPosts,
     pricing,
     whatIs,
+    pilot,
+    freeEdits,
+    founderPage,
     order,
     terms,
     privacy,
