@@ -49,11 +49,11 @@ function sanityDims(url?: string | null): { w: number; h: number } | null {
   return w > 0 && h > 0 ? { w, h } : null;
 }
 
-// The server requests every index cover at a flat 900x560 (see app/blog/page.tsx),
+// The server requests every index cover at exactly 1200x630 (see app/blog/page.tsx),
 // so that is the ratio when the URL came from the image builder. When it came
 // from a raw mainImageUrl we read the ratio out of the filename instead.
 function cardDims(src: string): { w: number; h: number } | null {
-  if (src.includes('cdn.sanity.io') && src.includes('w=900')) return { w: 900, h: 560 };
+  if (src.includes('cdn.sanity.io') && src.includes('w=1200') && src.includes('h=630')) return { w: 1200, h: 630 };
   return sanityDims(src);
 }
 
@@ -88,8 +88,8 @@ function CoverImage({
         className={className}
         src={src}
         alt={alt}
-        width={900}
-        height={560}
+        width={1200}
+        height={630}
         loading={priority ? 'eager' : 'lazy'}
         decoding="async"
       />
@@ -168,6 +168,7 @@ export default function BlogIndexClient({ posts }: { posts: IndexPost[] }) {
   return (
     <>
       {/* Category filter cards */}
+      <div className="blogx-filters-wrap" data-fit={categories.length + 1 <= 8 ? 'grid' : 'scroll'}>
       <div className="blogx-filters" role="tablist" aria-label="Filter posts by category">
         {(() => {
           const allStyle = getCategoryStyle(ALL, -1);
@@ -191,7 +192,7 @@ export default function BlogIndexClient({ posts }: { posts: IndexPost[] }) {
               </span>
               <span className="blogx-pill-text">
                 <span className="blogx-pill-label">All</span>
-                <span className="blogx-pill-count">{posts.length} posts</span>
+                <span className="blogx-pill-count">{posts.length} {posts.length === 1 ? 'post' : 'posts'}</span>
               </span>
             </button>
           );
@@ -216,11 +217,12 @@ export default function BlogIndexClient({ posts }: { posts: IndexPost[] }) {
               </span>
               <span className="blogx-pill-text">
                 <span className="blogx-pill-label">{cat}</span>
-                <span className="blogx-pill-count">{count} posts</span>
+                <span className="blogx-pill-count">{count} {count === 1 ? 'post' : 'posts'}</span>
               </span>
             </button>
           );
         })}
+      </div>
       </div>
 
       {/* Featured hero card */}
@@ -234,7 +236,7 @@ export default function BlogIndexClient({ posts }: { posts: IndexPost[] }) {
               className="blogx-featured-img"
               src={featured.imageSrc}
               alt={featured.title}
-              sizes="(max-width: 860px) 100vw, 520px"
+              sizes="(max-width: 860px) 100vw, 600px"
               priority
             />
           )}
@@ -306,12 +308,22 @@ export default function BlogIndexClient({ posts }: { posts: IndexPost[] }) {
            backdrop-filter is a no-op and a translucent card is just a slightly
            paler rectangle. The wash behind .blogx-filters below supplies the
            depth the effect needs. */
+        /* One row, always. With 8 tiles or fewer (data-fit="grid") they share
+           the width equally on desktop; otherwise, and below 861px, the row
+           scrolls sideways with snap points, a hidden scrollbar and a fade on
+           the right edge as the hint. It never wraps to a second row. */
+        .blogx-filters-wrap { position: relative; margin-bottom: 48px; }
         .blogx-filters {
           position: relative;
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-          gap: 12px;
-          margin-bottom: 48px;
+          grid-auto-flow: column;
+          grid-auto-columns: minmax(0, 1fr);
+          gap: 10px;
+        }
+        .blogx-filters-wrap[data-fit="scroll"] .blogx-filters { grid-auto-columns: minmax(132px, 1fr); }
+        @media (min-width: 861px) {
+          .blogx-filters-wrap[data-fit="scroll"] .blogx-filters,
+          .blogx-filters-wrap[data-fit="grid"] .blogx-filters { display: grid; }
         }
         /* The thing the cards refract. Sits behind them, bleeds past the grid
            on both sides, and is purely decorative. */
@@ -333,9 +345,11 @@ export default function BlogIndexClient({ posts }: { posts: IndexPost[] }) {
           display: flex;
           flex-direction: column;
           align-items: flex-start;
-          gap: 10px;
-          padding: 16px;
-          border-radius: 18px;
+          gap: 8px;
+          padding: 12px;
+          min-height: 44px;
+          min-width: 0;
+          border-radius: 16px;
           border: 1px solid rgba(255,255,255,0.85);
           /* 0.68, not MagicBnB's 0.52. Theirs sits on a lavender gradient so a
              half-transparent white card separates cleanly. Ours sits on cream,
@@ -376,9 +390,9 @@ export default function BlogIndexClient({ posts }: { posts: IndexPost[] }) {
            a pile of !important. */
         .blogx-pill-icon {
           flex-shrink: 0;
-          width: 38px;
-          height: 38px;
-          border-radius: 12px;
+          width: 30px;
+          height: 30px;
+          border-radius: 10px;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -404,11 +418,12 @@ export default function BlogIndexClient({ posts }: { posts: IndexPost[] }) {
           min-width: 0;
         }
         .blogx-pill-label {
-          font-size: 13.5px;
+          font-size: 13px;
           font-weight: 700;
           color: #0C0C0B;
           letter-spacing: -0.1px;
           line-height: 1.2;
+          overflow-wrap: break-word;
         }
         .blogx-pill-count {
           font-size: 11.5px;
@@ -419,12 +434,44 @@ export default function BlogIndexClient({ posts }: { posts: IndexPost[] }) {
            MagicBnB row its liveliness. */
         .blogx-pill.active .blogx-pill-count { color: var(--cat, #E8541A); }
 
-        @media (max-width: 560px) {
-          .blogx-filters { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-          .blogx-filters::before { inset: -18px -20px; }
-          .blogx-pill { padding: 13px; border-radius: 16px; gap: 8px; }
-          .blogx-pill-icon { width: 32px; height: 32px; border-radius: 10px; }
-          .blogx-pill-label { font-size: 12.5px; }
+        /* Tablet and phone, or any time there are too many tiles: a single
+           swipeable row. Padding top/bottom leaves room for the hover lift and
+           shadow, which overflow-x would otherwise clip. */
+        @media (max-width: 860px) {
+          .blogx-filters-wrap { margin-bottom: 32px; }
+          .blogx-filters-wrap::after {
+            content: "";
+            position: absolute;
+            top: 0; right: 0; bottom: 0;
+            width: 36px;
+            pointer-events: none;
+            z-index: 2;
+            background: linear-gradient(to left, #F2EEE7 15%, rgba(242,238,231,0));
+          }
+          .blogx-filters {
+            display: flex !important;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scroll-snap-type: x proximity;
+            scrollbar-width: none;
+            padding: 6px 36px 12px 2px;
+            margin: -6px 0 -12px;
+          }
+          .blogx-filters::-webkit-scrollbar { display: none; }
+          .blogx-filters::before { display: none; }
+          .blogx-pill { flex: 0 0 auto; scroll-snap-align: start; box-shadow: 0 2px 8px rgba(12,12,11,0.06); }
+          .blogx-pill:hover { box-shadow: 0 2px 8px rgba(12,12,11,0.06); }
+          /* Soft shadows would be sliced into a visible box by the scroller. */
+          .blogx-pill.active { box-shadow: 0 3px 8px color-mix(in srgb, var(--cat, #E8541A) 20%, transparent); }
+        }
+        @media (max-width: 620px) {
+          /* Compact pill: icon, name and count on ONE line. */
+          .blogx-pill { flex-direction: row; align-items: center; gap: 8px; padding: 6px 14px 6px 8px; min-height: 44px; border-radius: 100px; }
+          .blogx-pill:hover, .blogx-pill.active { transform: none; }
+          .blogx-pill-icon { width: 28px; height: 28px; border-radius: 50%; }
+          .blogx-pill-text { flex-direction: row; align-items: baseline; gap: 6px; }
+          .blogx-pill-label { font-size: 14px; white-space: nowrap; }
+          .blogx-pill-count { font-size: 12px; white-space: nowrap; }
         }
         @media (prefers-reduced-motion: reduce) {
           .blogx-pill, .blogx-pill-icon { transition: none; }
@@ -434,51 +481,34 @@ export default function BlogIndexClient({ posts }: { posts: IndexPost[] }) {
         /* ── Featured hero card ── */
         .blogx-featured {
           display: grid;
-          grid-template-columns: 1.15fr 1fr;
-          /* Grid rows stretch their children by default, which forced the
-             cover image to match the text column's height and re-cropped it
-             no matter what aspect-ratio the image itself declared. Centering
-             lets each column keep its natural height. */
+          grid-template-columns: 55fr 45fr;
           align-items: center;
-          gap: 0;
-          background: rgba(255,255,255,0.6);
-          border: 1px solid rgba(12,12,11,0.07);
-          border-radius: 22px;
-          overflow: hidden;
+          gap: 40px;
           text-decoration: none;
           color: inherit;
           margin-bottom: 56px;
+        }
+        /* Covers are a designed 1200x630 composition with the headline typeset
+           inside the image, so they are NEVER cropped: the box has exactly the
+           source ratio, the image fills it, and the card has no inner inset.
+           "!important" because next/image emits its own inline sizing. */
+        .blogx-featured-img {
+          width: 100% !important;
+          height: auto !important;
+          aspect-ratio: 1200 / 630;
+          object-fit: cover !important;
+          display: block;
+          border-radius: 18px;
+          box-shadow: 0 14px 40px rgba(12,12,11,0.12);
           transition: transform 0.4s cubic-bezier(0.16,1,0.3,1), box-shadow 0.4s;
         }
-        .blogx-featured:hover {
+        .blogx-featured:hover .blogx-featured-img {
           transform: translateY(-4px);
-          box-shadow: 0 20px 48px rgba(12,12,11,0.12);
-        }
-        /* Covers are a designed 1200x630 composition: title typeset on the left
-           panel, illustration on the right. "object-fit: cover" inside a
-           full-height column cropped both ends off, so the headline lost its
-           first characters and the artwork lost its right edge. Locking the
-           slot to the source ratio and using "contain" keeps the whole
-           composition intact. The tinted background fills any leftover space
-           so it still reads as a solid block rather than a floating image.
-           "!important" because next/image emits its own inline sizing. */
-        /* Inset, not flush. The cover keeps its 1200x630 ratio, so it is
-           almost never the same height as the text column; flush left it sat
-           with uneven bands of card above and below and read as misaligned.
-           An even 22px inset with its own radius makes the gap deliberate and
-           identical on every side, whatever the text column's height. */
-        .blogx-featured-img {
-          width: calc(100% - 44px) !important;
-          height: auto !important;
-          max-width: calc(100% - 44px);
-          margin: 22px;
-          border-radius: 14px;
-          aspect-ratio: 1200 / 630;
-          object-fit: contain !important;
-          display: block;
+          box-shadow: 0 20px 48px rgba(12,12,11,0.18);
         }
         .blogx-featured-body {
-          padding: 40px 44px;
+          padding: 0;
+          min-width: 0;
           display: flex;
           flex-direction: column;
           justify-content: center;
@@ -572,7 +602,7 @@ export default function BlogIndexClient({ posts }: { posts: IndexPost[] }) {
           width: 100% !important;
           height: auto !important;
           aspect-ratio: 1200 / 630;
-          object-fit: contain !important;
+          object-fit: cover !important;
           display: block;
         }
         .blogx-card-body {
@@ -638,26 +668,14 @@ export default function BlogIndexClient({ posts }: { posts: IndexPost[] }) {
           .blogx-grid { grid-template-columns: repeat(2, 1fr); }
         }
         @media (max-width: 860px) {
-          .blogx-featured { grid-template-columns: 1fr; }
-          /* Stacked layout, so the cover gets the full card width at its own
-             ratio. The old 16/9 + min-height combination re-cropped it. */
-          .blogx-featured-img { aspect-ratio: 1200 / 630; min-height: 0; margin: 14px; width: calc(100% - 28px) !important; max-width: calc(100% - 28px); }
-          .blogx-featured-body { padding: 28px 26px; }
+          .blogx-featured { grid-template-columns: 1fr; gap: 22px; }
+          .blogx-featured-body { padding: 0; }
         }
         @media (max-width: 620px) {
           .blogx-grid { grid-template-columns: 1fr; gap: 18px; }
-          .blogx-filters {
-            grid-template-columns: repeat(2, 1fr);
-            margin-bottom: 32px;
-          }
-          /* Two pills across a 360px screen leaves ~100px for the label, and
-             the desktop \`white-space: nowrap\` made longer categories
-             ("Content Ops", "Real Estate") spill straight out past the pill
-             border. Wrapping keeps them inside the card. */
-          .blogx-pill { padding: 12px 13px; gap: 10px; }
-          .blogx-pill-label { white-space: normal; line-height: 1.25; }
-          .blogx-pill-icon { width: 32px; height: 32px; }
           .blogx-featured { margin-bottom: 40px; }
+          .blogx-featured-title { font-size: 24px; }
+          .blogx-card-body { padding: 18px 18px 20px; }
         }
       `}</style>
     </>

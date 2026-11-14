@@ -45,9 +45,14 @@ export default function BlogInlineCTA({
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginTop: 14, alignItems: 'center' }}>
         <a
           href={FREE_EDITS_URL}
+          className="blog-inline-cta-btn"
           style={{
-            display: 'inline-block',
-            padding: '10px 16px',
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            minHeight: 44,
+            boxSizing: 'border-box',
+            padding: '10px 18px',
             borderRadius: 100,
             background: '#E8541A',
             color: '#fff',
@@ -62,7 +67,8 @@ export default function BlogInlineCTA({
           href={`${BOOK_CALL_URL}${utm}`}
           target="_blank"
           rel="noopener noreferrer"
-          style={{ color: '#F2EEE7', fontWeight: 600, fontSize: 13.5, textDecoration: 'underline', textUnderlineOffset: 3 }}
+          className="blog-inline-cta-link"
+          style={{ color: '#F2EEE7', fontWeight: 600, fontSize: 13.5, textDecoration: 'underline', textUnderlineOffset: 3, display: 'inline-flex', alignItems: 'center', minHeight: 44 }}
         >
           Book a free 15-minute call
         </a>
@@ -80,6 +86,15 @@ export default function BlogInlineCTA({
           costs on our <Link href="/pricing" style={{ color: '#F2EEE7', fontWeight: 600 }}>pricing page</Link>.
         </p>
       ) : null}
+      <style>{`
+        .blog-inline-cta { max-width: 100%; box-sizing: border-box; overflow-wrap: break-word; }
+        @media (max-width: 480px) {
+          .blog-inline-cta { padding: 18px 16px !important; }
+          .blog-inline-cta-btn { width: 100%; }
+          .blog-inline-cta-link { width: 100%; justify-content: center; }
+          .blog-inline-cta p a { display: inline-block; padding: 8px 0; }
+        }
+      `}</style>
     </aside>
   );
 }

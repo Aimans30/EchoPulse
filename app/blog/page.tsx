@@ -49,7 +49,7 @@ export default async function BlogIndexPage() {
     publishedAt: post.publishedAt,
     resolvedCategory: resolveCategory(post),
     imageSrc: post.mainImage?.asset
-      ? urlFor(post.mainImage).width(900).height(560).fit('crop').auto('format').url()
+      ? urlFor(post.mainImage).width(1200).height(630).fit('crop').auto('format').url()
       : post.mainImageUrl || null,
   }));
 
@@ -87,6 +87,7 @@ export default async function BlogIndexPage() {
               Guides &amp; Insights
             </div>
             <h1
+              className="blog-h1"
               style={{
                 fontFamily: 'Inter, sans-serif',
                 fontSize: 'clamp(40px, 5.4vw, 76px)',
@@ -134,6 +135,7 @@ export default async function BlogIndexPage() {
             .blog-header { margin-bottom: 32px !important; }
           }
           @media (max-width: 480px) {
+            .blog-h1 { font-size: 30px !important; letter-spacing: -1px !important; line-height: 1.08 !important; }
             .blog-main { padding-top: 72px !important; padding-bottom: 56px !important; }
             .blog-inner { padding: 0 16px !important; }
           }

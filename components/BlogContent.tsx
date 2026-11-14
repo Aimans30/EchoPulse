@@ -271,37 +271,7 @@ function buildComponents(): PortableTextComponents {
     table: ({ value }) => {
       const rows: TableRow[] = Array.isArray(value?.rows) ? value.rows : [];
       if (!rows.length) return null;
-      const hasHeader = value?.hasHeader !== false;
-      const head: TableRow | null = hasHeader ? rows[0] : null;
-      const body: TableRow[] = hasHeader ? rows.slice(1) : rows;
-      const cellsOf = (r: TableRow | null): string[] => (Array.isArray(r?.cells) ? r.cells : []);
-      return (
-        // The wrapper is what scrolls: on a 360px phone a 4-column table is
-        // wider than the article column, and the table must pan inside its
-        // own box instead of making the whole page pannable.
-        <div style={blogTableWrapStyle}>
-          <table style={blogTableStyle}>
-            {head && (
-              <thead>
-                <tr>
-                  {cellsOf(head).map((c, i) => (
-                    <th key={i} scope="col" style={blogThStyle}>{c}</th>
-                  ))}
-                </tr>
-              </thead>
-            )}
-            <tbody>
-              {body.map((r, ri) => (
-                <tr key={r?._key ?? ri}>
-                  {cellsOf(r).map((c, ci) => (
-                    <td key={ci} style={ri % 2 ? { ...blogTdStyle, background: 'rgba(12,12,11,0.025)' } : blogTdStyle}>{c}</td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      );
+      return <BlogTable rows={rows} hasHeader={value?.hasHeader !== false} />;
     },
   },
   block: {
@@ -477,15 +447,140 @@ export default function BlogContent({ value }: { value: PortableTextBlock[] }) {
           -webkit-overflow-scrolling: touch;
           max-width: 100%;
         }
-        .blog-prose table {
+        /* Raw tables pasted into Sanity (not ours) scroll in place. */
+        .blog-prose table:not(.bt) {
           display: block;
           overflow-x: auto;
           -webkit-overflow-scrolling: touch;
           max-width: 100%;
         }
+
+        /* ── Tables ──────────────────────────────────────────────────────
+           Up to 6 columns must fit the article column with no scrollbar:
+           auto layout so columns size to content, cells wrap on word
+           boundaries (overflow-wrap: break-word does not shrink min-content,
+           so words are never chopped mid-word; only links, the usual long
+           unbroken strings, may break anywhere), and padding + type shrink as
+           the column count rises. 7+ columns scroll inside their own box with
+           a right-edge fade as the hint. */
+        .bt-wrap {
+          position: relative;
+          margin: 28px 0 32px;
+          max-width: 100%;
+          border: 1px solid rgba(12,12,11,0.12);
+          border-radius: 12px;
+          background: #FFFFFF;
+          overflow: hidden;
+        }
+        .bt-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; max-width: 100%; }
+        .bt {
+          display: table;
+          width: 100%;
+          table-layout: auto;
+          border-collapse: collapse;
+          font-family: Inter, sans-serif;
+          font-size: 15px;
+          line-height: 1.45;
+          color: #3E3D3A;
+        }
+        .bt th, .bt td {
+          text-align: left;
+          padding: 12px 14px;
+          word-break: normal;
+          overflow-wrap: break-word;
+          hyphens: manual;
+        }
+        .bt th {
+          vertical-align: bottom;
+          font-weight: 700;
+          font-size: 12.5px;
+          line-height: 1.25;
+          letter-spacing: 0.2px;
+          text-transform: uppercase;
+          color: #0C0C0B;
+          background: #F2EEE7;
+          border-bottom: 2px solid #E8541A;
+          white-space: normal;
+        }
+        .bt td { vertical-align: top; border-bottom: 1px solid rgba(12,12,11,0.08); }
+        .bt tbody tr:nth-child(even) td { background: rgba(12,12,11,0.025); }
+        .bt tbody tr:last-child td { border-bottom: 0; }
+        .bt td a, .bt th a { overflow-wrap: anywhere; }
+        .bt[data-cols="4"] th, .bt[data-cols="4"] td { padding: 11px 12px; font-size: 14.5px; }
+        .bt[data-cols="4"] th { font-size: 12px; }
+        .bt[data-cols="5"] th, .bt[data-cols="5"] td { padding: 10px 10px; font-size: 14px; }
+        .bt[data-cols="5"] th { font-size: 11.5px; }
+        .bt[data-cols="6"] th, .bt[data-cols="6"] td { padding: 9px 8px; font-size: 13px; line-height: 1.4; }
+        .bt[data-cols="6"] th { font-size: 11px; letter-spacing: 0.1px; }
+        .bt[data-cols="7+"] { min-width: 820px; }
+        .bt[data-cols="7+"] th, .bt[data-cols="7+"] td { padding: 9px 10px; font-size: 13px; line-height: 1.4; }
+        .bt[data-cols="7+"] th { font-size: 11px; }
+        .bt-wrap-wide::after {
+          content: "";
+          position: absolute;
+          top: 0; right: 0; bottom: 0;
+          width: 40px;
+          pointer-events: none;
+          background: linear-gradient(to left, #FFFFFF 10%, rgba(255,255,255,0));
+        }
+
+        /* Phone: 2 and 3 column tables stay tables, just tighter. */
+        @media (max-width: 759.98px) {
+          .bt[data-cols="2"] th, .bt[data-cols="2"] td,
+          .bt[data-cols="3"] th, .bt[data-cols="3"] td { padding: 10px 10px; font-size: 14px; }
+          .bt[data-cols="2"] th, .bt[data-cols="3"] th { font-size: 11.5px; }
+
+          /* 4+ columns: each row becomes a card. The DOM is untouched, so
+             crawlers still read a real table with a header row. */
+          .bt-wrap-cards { border: 0; background: transparent; border-radius: 0; overflow: visible; }
+          .bt-wrap-cards::after { display: none; }
+          .bt-wrap-cards .bt-scroll { overflow: visible; }
+          .bt-cards, .bt-cards tbody, .bt-cards tr, .bt-cards td { display: block; width: 100%; min-width: 0 !important; }
+          .bt-cards thead {
+            position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+            overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+          }
+          .bt-cards tr {
+            margin: 0 0 14px;
+            background: #FFFFFF;
+            border: 1px solid rgba(12,12,11,0.12);
+            border-radius: 12px;
+            overflow: hidden;
+          }
+          .bt-cards tbody tr:nth-child(even) td { background: transparent; }
+          .bt-cards td, .bt-cards[data-cols] td {
+            padding: 10px 14px;
+            font-size: 15px;
+            line-height: 1.5;
+            border-bottom: 1px solid rgba(12,12,11,0.06);
+          }
+          .bt-cards tbody tr:last-child td { border-bottom: 1px solid rgba(12,12,11,0.06); }
+          .bt-cards tr td:last-child { border-bottom: 0 !important; }
+          .bt-cards td:first-child {
+            font-weight: 800;
+            font-size: 16px;
+            color: #0C0C0B;
+            background: #F2EEE7 !important;
+            border-bottom: 2px solid #E8541A;
+          }
+          .bt-cards td[data-label]:not([data-label=""])::before {
+            content: attr(data-label);
+            display: block;
+            margin-bottom: 2px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+            color: #6E6B63;
+          }
+          .bt-cards td:first-child::before { display: none !important; }
+        }
+
         .blog-prose img,
         .blog-prose video,
-        .blog-prose iframe { max-width: 100%; }
+        .blog-prose iframe { max-width: 100%; height: auto; }
+        .blog-prose iframe { height: 100%; }
+        .blog-prose p, .blog-prose li, .blog-prose blockquote { overflow-wrap: break-word; }
         /* Long unbroken URLs pasted as link text are the other common cause. */
         .blog-prose a { overflow-wrap: anywhere; }
 
@@ -494,6 +589,7 @@ export default function BlogContent({ value }: { value: PortableTextBlock[] }) {
            fine, but blockquotes were set at 20px with a 20px rule inset that
            eats a chunk of a 328px content column. */
         @media (max-width: 640px) {
+          .blog-prose p, .blog-prose li { font-size: 17px !important; line-height: 1.7 !important; }
           .blog-prose blockquote {
             font-size: 18px !important;
             padding-left: 16px !important;
@@ -569,47 +665,48 @@ const blogListItemStyle: React.CSSProperties = {
   marginBottom: '8px',
 };
 
-// ── table block (the custom `table` type written by scripts/publish-blog.mjs) ──
+// ── table block (the custom `table` type written by scripts/publish-blog.mjs,
+// and the synthetic ones foldPipeTables builds). Both go through BlogTable. ──
 type TableRow = { _key?: string; cells?: string[] };
 
-const blogTableWrapStyle: React.CSSProperties = {
-  margin: '28px 0 32px',
-  overflowX: 'auto',
-  WebkitOverflowScrolling: 'touch',
-  maxWidth: '100%',
-  border: '1px solid rgba(12,12,11,0.12)',
-  borderRadius: '12px',
-  background: '#FFFFFF',
-};
-const blogTableStyle: React.CSSProperties = {
-  // The containment rule below sets `.blog-prose table { display: block }`
-  // for tables pasted raw into Sanity; this block already scrolls inside its
-  // wrapper, so restore real table layout so the header spans the width.
-  display: 'table',
-  width: '100%',
-  minWidth: '480px',
-  borderCollapse: 'collapse',
-  fontFamily: 'Inter, sans-serif',
-  fontSize: '15.5px',
-  lineHeight: 1.5,
-  color: '#3E3D3A',
-};
-const blogThStyle: React.CSSProperties = {
-  textAlign: 'left',
-  verticalAlign: 'bottom',
-  padding: '12px 16px',
-  fontWeight: 700,
-  fontSize: '13.5px',
-  letterSpacing: '0.2px',
-  textTransform: 'uppercase',
-  color: '#0C0C0B',
-  background: '#F2EEE7',
-  borderBottom: '2px solid #E8541A',
-  whiteSpace: 'nowrap',
-};
-const blogTdStyle: React.CSSProperties = {
-  textAlign: 'left',
-  verticalAlign: 'top',
-  padding: '12px 16px',
-  borderBottom: '1px solid rgba(12,12,11,0.08)',
-};
+/**
+ * One renderer for every table, so Sanity table blocks and folded pipe tables
+ * behave identically. Real <table>/<thead>/<tbody>/<th scope> semantics stay in
+ * the DOM at every width; on a phone, tables with 4+ columns are restyled by CSS
+ * into stacked cards (each td carries data-label, shown by td::before).
+ * Layout is driven by data-cols; see the <style> block in BlogContent.
+ */
+function BlogTable({ rows, hasHeader }: { rows: TableRow[]; hasHeader: boolean }) {
+  const cellsOf = (r: TableRow | null | undefined): string[] => (Array.isArray(r?.cells) ? (r?.cells as string[]) : []);
+  const head: TableRow | null = hasHeader ? rows[0] : null;
+  const body: TableRow[] = hasHeader ? rows.slice(1) : rows;
+  const headCells = cellsOf(head);
+  const cols = Math.max(0, ...rows.map((r) => cellsOf(r).length));
+  const colsAttr = cols >= 7 ? '7+' : String(cols);
+  return (
+    <div className={`bt-wrap${cols >= 4 ? ' bt-wrap-cards' : ''}${cols >= 7 ? ' bt-wrap-wide' : ''}`}>
+      <div className="bt-scroll">
+        <table className={`bt${cols >= 4 ? ' bt-cards' : ''}`} data-cols={colsAttr}>
+          {head && (
+            <thead>
+              <tr>
+                {headCells.map((c, i) => (
+                  <th key={i} scope="col">{c}</th>
+                ))}
+              </tr>
+            </thead>
+          )}
+          <tbody>
+            {body.map((r, ri) => (
+              <tr key={r?._key ?? ri}>
+                {cellsOf(r).map((c, ci) => (
+                  <td key={ci} data-label={headCells[ci] ?? ''}>{c}</td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}

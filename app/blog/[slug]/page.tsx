@@ -110,15 +110,15 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   const audience = audienceForPost(post);
 
   const headerImageSrc = post.mainImage?.asset
-    ? urlFor(post.mainImage).width(1600).height(900).fit('crop').auto('format').url()
+    ? urlFor(post.mainImage).width(1200).height(630).fit('crop').auto('format').url()
     : post.mainImageUrl || null;
 
   // The cover is the article's LCP element on a phone. It was requested at a
   // flat 1600px wide with no width/height attributes, so a 390px handset
   // downloaded a desktop-sized file AND reflowed the byline when it decoded.
-  // 16/9 when we cropped it ourselves; parsed from the filename otherwise.
+  // 1200x630 (the cover's own ratio) when we sized it ourselves; parsed from the filename otherwise.
   const headerImageDims = post.mainImage?.asset
-    ? { w: 1600, h: 900 }
+    ? { w: 1200, h: 630 }
     : sanityDims(post.mainImageUrl);
   const headerImageOptimizable = isOptimizableHost(headerImageSrc) && !!headerImageDims;
   // The article column tops out at 760px, so nothing wider is ever painted.
@@ -285,6 +285,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
             {/* Title */}
             <h1
+              className="blog-post-h1"
               style={{
                 fontFamily: 'Inter, sans-serif',
                 fontSize: 'clamp(34px, 5vw, 56px)',
@@ -301,6 +302,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             {/* Excerpt */}
             {post.excerpt && (
               <p
+                className="blog-post-excerpt"
                 style={{
                   fontSize: '19px',
                   lineHeight: 1.55,
@@ -403,7 +405,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                     // Full 1200x630 cover, never cropped: the headline is
                     // typeset into the left half of the image itself.
                     aspectRatio: '1200 / 630',
-                    objectFit: 'contain',
+                    objectFit: 'cover',
                     borderRadius: '18px',
                     marginBottom: '40px',
                     display: 'block',
@@ -418,8 +420,8 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                 <img
                   src={headerImageSrc}
                   alt={post.title}
-                  width={1600}
-                  height={900}
+                  width={1200}
+                  height={630}
                   loading="eager"
                   decoding="async"
                   style={{
@@ -428,7 +430,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                     // Full 1200x630 cover, never cropped: the headline is
                     // typeset into the left half of the image itself.
                     aspectRatio: '1200 / 630',
-                    objectFit: 'contain',
+                    objectFit: 'cover',
                     borderRadius: '18px',
                     marginBottom: '40px',
                     display: 'block',
@@ -520,6 +522,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             font-weight: 600;
           }
           .blog-post-crumb-link {
+            min-height: 44px;
             color: #E8541A;
             text-decoration: none;
             display: inline-flex;
@@ -676,6 +679,9 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             .blog-post-crumb-current { max-width: 60vw; }
           }
           @media (max-width: 480px) {
+            .blog-post-h1 { font-size: 30px !important; letter-spacing: -1px !important; line-height: 1.1 !important; overflow-wrap: break-word; }
+            .blog-post-excerpt { font-size: 17px !important; line-height: 1.6 !important; margin-bottom: 24px !important; }
+            .blog-post-crumb-link { min-height: 44px; }
             .blog-post-layout, .blog-post-breadcrumb, .blog-post-related, .blog-post-cta-band { padding: 0 18px !important; }
           }
 
@@ -705,13 +711,13 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 // ── Related post card — compact version of the /blog index card ──────────
 function RelatedCard({ post }: { post: BlogPostSummary }) {
   const imageSrc = post.mainImage?.asset
-    ? urlFor(post.mainImage).width(700).height(420).fit('crop').auto('format').url()
+    ? urlFor(post.mainImage).width(840).height(441).fit('crop').auto('format').url()
     : post.mainImageUrl || null;
 
   // Three cards on desktop, one full-width card on a phone. The card is never
   // wider than ~350px on the widest layout, so a 700px source was two to three
   // times more pixels than any screen resolves.
-  const dims = post.mainImage?.asset ? { w: 700, h: 420 } : sanityDims(post.mainImageUrl);
+  const dims = post.mainImage?.asset ? { w: 840, h: 441 } : sanityDims(post.mainImageUrl);
   const optimizable = isOptimizableHost(imageSrc) && !!dims;
   // Covers are a designed 1200x630 composition (title left, illustration
   // right). Cropping to 16/9 cut the start of the headline on every related
@@ -720,7 +726,7 @@ function RelatedCard({ post }: { post: BlogPostSummary }) {
     width: '100%',
     height: 'auto',
     aspectRatio: '1200 / 630',
-    objectFit: 'contain',
+    objectFit: 'cover',
     display: 'block',
   };
 
@@ -758,8 +764,8 @@ function RelatedCard({ post }: { post: BlogPostSummary }) {
             <img
               src={imageSrc}
               alt={post.title}
-              width={700}
-              height={420}
+              width={840}
+              height={441}
               loading="lazy"
               decoding="async"
               style={imgStyle}

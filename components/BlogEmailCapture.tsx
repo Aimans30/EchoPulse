@@ -82,7 +82,7 @@ export default function BlogEmailCapture() {
         </p>
       )}
       <style>{`
-        .bec { margin: 48px 0 0; padding: 28px; border-radius: 20px; background: #0C0C0B; color: #F2EEE7; font-family: Inter, sans-serif; }
+        .bec { box-sizing: border-box; max-width: 100%; margin: 48px 0 0; padding: 28px; border-radius: 20px; background: #0C0C0B; color: #F2EEE7; font-family: Inter, sans-serif; }
         .bec h2 { margin: 0 0 8px; font-size: 22px; font-weight: 800; letter-spacing: -0.4px; line-height: 1.2; color: #F2EEE7; }
         .bec-copy { margin: 0 0 18px; font-size: 15px; line-height: 1.55; color: rgba(242,238,231,0.7); }
         .bec-form { display: flex; gap: 10px; flex-wrap: wrap; }

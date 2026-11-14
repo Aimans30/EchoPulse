@@ -42,7 +42,7 @@ export default function GuidesSection({
             padding: 0,
             margin: 0,
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(min(280px, 100%), 1fr))',
             gap: 14,
           }}
         >

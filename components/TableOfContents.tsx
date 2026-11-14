@@ -117,7 +117,7 @@ export default function TableOfContents({
       <nav className="blog-toc-m" aria-label="Table of contents">
         <details>
           <summary className="blog-toc-m-summary">
-            <span className="blog-toc-m-label">Quick Navigation</span>
+            <span className="blog-toc-m-label">On this page</span>
             <span className="blog-toc-m-chev" aria-hidden="true" />
           </summary>
           <ul className="blog-toc-m-list">
@@ -169,11 +169,11 @@ export default function TableOfContents({
           }
           .blog-toc-m-summary::-webkit-details-marker { display: none; }
           .blog-toc-m-label {
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 800;
-            letter-spacing: 1.8px;
+            letter-spacing: 1.4px;
             text-transform: uppercase;
-            color: #9a958c;
+            color: #6E6B63;
           }
           .blog-toc-m-chev {
             width: 9px;
