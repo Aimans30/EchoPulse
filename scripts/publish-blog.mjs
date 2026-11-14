@@ -30,7 +30,7 @@ import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import yaml from 'js-yaml';
 import { markdownToPortableText, assertPortableText } from './markdown-to-portable-text.mjs';
-import { renderThumbnail } from './render-thumbnail.mjs';
+import { renderThumbnail, pickIcon } from './render-thumbnail.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const QUEUE_DIR = join(ROOT, 'content', 'blog-queue');
@@ -173,6 +173,8 @@ export function parsePost(filePath) {
 
   const thumbnailText = str(data.thumbnailText) || title;
   if (thumbnailText.length > 140) errors.push('thumbnailText should be 140 characters or fewer');
+  const thumbnailSub = str(data.thumbnailSub);
+  if (thumbnailSub.length > 40) errors.push(`thumbnailSub is ${thumbnailSub.length} chars; max 40`);
 
   let readTime = null;
   if (data.readTime != null && data.readTime !== '') {
@@ -182,7 +184,7 @@ export function parsePost(filePath) {
 
   if (!body.trim()) errors.push('post body is empty');
 
-  const known = new Set(['title', 'slug', 'excerpt', 'category', 'author', 'publishAt', 'icp', 'service', 'tags', 'thumbnailText', 'readTime', 'postType', 'updateBy']);
+  const known = new Set(['title', 'slug', 'excerpt', 'category', 'author', 'publishAt', 'icp', 'service', 'tags', 'thumbnailText', 'thumbnailSub', 'readTime', 'postType', 'updateBy']);
   const warnings = [];
   for (const k of Object.keys(data)) if (!known.has(k)) warnings.push(`unknown frontmatter key "${k}" ignored`);
 
@@ -212,7 +214,7 @@ export function parsePost(filePath) {
   return {
     filePath,
     title, slug, excerpt, category, author, publishAt, icp, service, tags,
-    thumbnailText, readTime, wordCount, blocks, warnings, postType, updateBy,
+    thumbnailText, thumbnailSub, readTime, wordCount, blocks, warnings, postType, updateBy,
   };
 }
 
@@ -287,7 +289,12 @@ async function publishOne(post, { client, dryRun, force, now }) {
   for (const w of post.warnings) console.log(`  warning:   ${w}`);
 
   // 1. thumbnail
-  const png = await renderThumbnail({ title: post.thumbnailText, category: post.category });
+  const png = await renderThumbnail({
+    title: post.thumbnailText,
+    category: post.category,
+    subtitle: post.thumbnailSub || undefined,
+    icon: pickIcon({ category: post.category, icp: post.icp, service: post.service, title: post.title }),
+  });
   mkdirSync(THUMBS_DIR, { recursive: true });
   const thumbPath = join(THUMBS_DIR, `${post.slug}.png`);
   writeFileSync(thumbPath, png);
