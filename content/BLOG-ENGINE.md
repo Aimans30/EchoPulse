@@ -85,6 +85,32 @@ a niche, do not write two posts about the same service in the same month.
 5. **Check it is still true.** Any number older than 12 months gets re-checked
    or labelled with its date. Anything you cannot verify is cut.
 
+6. **Go deep enough to know more than the top result.** Minimums for an asset
+   post, before you write:
+   - Open at least 8 pages in full with WebFetch, and at least 5 of them must
+     be primary sources (the vendor's own page, the platform's own help or
+     policy page, a regulator, a study with a method section). A roundup that
+     quotes a study is not the study: open the study.
+   - Read at least 2 places where the buyer talks in their own words (a forum
+     thread, a subreddit, reviews, YouTube comments). Copy down the exact
+     phrases they use for the problem. Use those words in the H2s.
+   - Find one thing the top results get wrong, leave out or repeat without a
+     source. If you cannot find one, the topic is not ready: pick another.
+   - Do one piece of original work nobody else has done for this query:
+     count something, build the full comparison table from the vendors' own
+     pages, do the arithmetic the reader would have to do themselves, or test
+     the claim. This is the reason the post deserves to exist.
+7. **Keep a research log.** Before writing, list in your notes: each source
+   URL, the date you opened it, the exact figure or quote you took, and one
+   line on why it is credible. Any sentence in the post with a number must
+   trace to a line in that log. A number with no log line is deleted.
+8. **Trace every statistic to where it was first published.** Marketing
+   statistics get copied between vendor blogs until nobody knows the origin.
+   If you cannot reach the original, either say who repeats it and that the
+   origin could not be found, or leave it out. Never present a recycled
+   vendor figure as fact. When two sources disagree (40% against 403% for the
+   same claim is a real example), show both and say which you trust and why.
+
 Use WebSearch and WebFetch only. Never open a browser. Never use a stat from
 memory.
 
@@ -131,6 +157,87 @@ Voice:
   and link each one. Never knock a competitor.
 - At most two EchoPulse mentions in the body. The site adds the CTA boxes
   automatically; do not write "book a call" copy into the post.
+
+What makes a post worth reading (all five, every asset post):
+
+1. **It takes a position.** After laying out the facts, say what you would
+   do and for whom: "If you list fewer than 3 homes a month, pay per video."
+   A post that only lists options is a brochure. Give the recommendation, the
+   reason, and the case where the opposite is right.
+2. **It contains something the reader can use today.** A table they can
+   screenshot, a script they can read out, a checklist they can tick, a
+   formula with their own numbers plugged in. Complete in the post, never
+   "download to see the rest".
+3. **It works one real example all the way through.** Real numbers, start to
+   finish: "An agent with 4 listings a month at $140 a video spends $560; the
+   $399 plan covers 8 videos." Not "costs can vary".
+4. **It says what it does not know.** A price that is not published, a claim
+   that could not be traced, a result that depends on something the post
+   cannot see. Say it once, plainly, where it matters.
+5. **It opens on the reader's situation, not the topic.** The answer capsule
+   comes first. The next paragraph is the moment the reader is in ("You got a
+   quote for $2,400 and have no idea if that is normal"), written in the
+   words they used in the forums you read.
+
+How it should read:
+
+- Write like a person who did the work and is telling a friend what they
+  found. Specific, a little blunt, never selling.
+- Vary sentence length. Three short sentences in a row, then one that carries
+  a full thought. Paragraphs of one to four sentences, never all the same
+  size.
+- Every paragraph must contain a fact, a number, an example or a decision. If
+  a paragraph could be deleted and nobody would notice, delete it.
+- Start sections with the answer, then the reason, then the exception. Never
+  start a section by restating its heading.
+- Use the reader's nouns: "listing video", "job-site clip", "cohort", not
+  "content assets" or "deliverables".
+- Headings are plain questions or plain statements. No colons with a clever
+  second half, no wordplay.
+- No summary that repeats the post. If there is a closing section, it is the
+  recommendation and the next step, in under 80 words.
+
+Slop patterns (delete on sight, in addition to the banned word list above):
+
+- Openers that announce: "In this post", "Let's dive in", "Here's what you
+  need to know", "When it comes to".
+- Sentences that set up a reveal: "The truth is", "Here's the kicker",
+  "What most people miss", any sentence ending in a colon before a one-line
+  paragraph.
+- Fake balance: "While X is true, Y is also important." Say which matters
+  more.
+- Empty intensifiers and hedges: really, very, truly, simply, just,
+  essentially, arguably, it's worth noting, it's important to remember.
+- Groups of three for rhythm ("faster, cheaper and better"). Use the number
+  of items that is true.
+- Rhetorical questions as transitions ("So what does this mean?").
+- Closing lines that sound like a quote or a moral.
+- Bold scattered through paragraphs. Bold is for table headers and the one
+  term being defined.
+- Every bullet starting with a bolded label and a colon. Use it only where
+  the items are truly parallel.
+- "Not only X but also Y", "whether you're A or B", "from A to B" ranges
+  that are not real ranges.
+
+The edit pass (do it after the draft, before validating):
+
+1. Read the first 100 words alone. Do they answer the title's question with a
+   number and a date? If not, rewrite them.
+2. Go through every number. Find its line in the research log. Delete any
+   that has none.
+3. Search the draft for each slop pattern and banned word. Rewrite, do not
+   swap synonyms.
+4. Cut 10 percent. Start with the intro, any paragraph that restates the one
+   before it, and every sentence that tells the reader what the post is about
+   to do.
+5. Read it as the buyer who is tired and sceptical. Mark every place they
+   would think "says who?" and either add the source or cut the claim. Mark
+   every place they would skim, and tighten it.
+6. Score it honestly, 1 to 5, on: answers the question in the first 100
+   words; has original work nobody else has; every number sourced; takes a
+   position; usable today; reads like a person. Anything under 4 on any line
+   gets fixed. If it cannot be fixed today, publish nothing and say why in
+   the report.
 
 ## 6. AEO (being cited by AI tools)
 
@@ -184,6 +291,18 @@ before publishing. Publish with:
     SANITY_WRITE_TOKEN=proxy-injected npm run blog:publish -- --file content/blog-queue/<file>.md
 
 (the cloud environment injects the real token; the placeholder is correct).
+
+The cover is generated from the frontmatter, in the house theme (dark title
+panel on the left, orange icon panel on the right). Set:
+
+- `thumbnailText`: the title as it should appear on the cover. Use the real
+  post title or a shorter version of it, 30 to 60 characters. Never a
+  different headline.
+- `thumbnailSub`: one short line under the title, at most 40 characters, that
+  says the angle: "Record once, run all year", "Per video vs monthly plans".
+  Not a slogan, no full stop.
+
+The icon is picked automatically from the service, niche and title.
 Add `--force` only for a refresh of an existing slug. One command per post.
 After publishing, confirm the URL returns 200 and the title matches.
 
@@ -227,6 +346,43 @@ DTC: Superside alternatives and pricing comparison; UGC creator rates vs
 agency cost (exists, position 41: rewrite); Klaviyo flow setup cost; Shopify
 landing page for ads: cost and what converts; ad creative testing: how many
 variants and how long; static vs video ads (exists: add decision table).
+
+### Gap topics added 14 November 2026
+
+A count of the 131 live posts on this date showed coaches and founders well
+covered, and these areas almost empty. Take from here first until each group
+has at least 8 posts. Titles are working titles; keep them under 60
+characters.
+
+Showing up in AI answers (cross-niche, Saturday; or the niche day it fits):
+- How to get ChatGPT to recommend your local business: a checklist
+- Does ChatGPT recommend your business? A 10-minute test
+- Google Business Profile checklist for 2026: what AI tools read
+- How real estate agents show up in ChatGPT and Google AI answers
+
+Home services (Wednesday). Name the trade in the title:
+- Video marketing for plumbers: what to film on a job site
+- HVAC marketing: before-and-after videos that get calls
+- Roofing company social media: what to post each week
+- Home service marketing cost in 2026
+- How to get more Google reviews as a contractor (with the text to send)
+
+Real estate (Monday):
+- Real estate listing video: a shot list for phone filming
+- Real estate listing video cost in 2026
+- Instagram Reels for real estate agents: what works, what doesn't
+- Real estate agent personal brand: what to post in 30 days
+
+YouTube and Shorts (cross-niche):
+- YouTube Shorts for small business: starting from zero subscribers
+- How to turn one long video into 12 Shorts
+
+DTC (Friday):
+- UGC ad cost in 2026: creator vs agency vs in-house
+- How many ad creatives does a DTC brand need per month?
+
+Known trap for these topics: most statistics in this space are vendors
+quoting each other. Section 4 rule 8 applies with full force.
 
 ## 11. The run report (end every run with this)
 

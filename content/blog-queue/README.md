@@ -46,7 +46,8 @@ publishAt: 2026-12-01T06:30:00Z     # optional ISO date; the post waits until it
 icp: real-estate                    # optional: real-estate | founders | coaches | dtc | business-owners | saas | home-services
 service: video-editing              # optional: video-editing | linkedin-ghostwriting | blog-production | ad-creatives | websites-funnels | automations | apps-software
 tags: [video, real estate]          # optional, free text
-thumbnailText: "Short punchy title" # optional, used on the generated image instead of the title
+thumbnailText: "The post title, or a shorter version of it" # optional, 30 to 60 chars, shown on the cover
+thumbnailSub: "Per video vs monthly plans" # optional, max 40 chars, the angle in one line under the title
 readTime: 6                         # optional minutes; computed from the word count if omitted
 postType: asset                     # asset (default, evergreen) | trending (news-driven, must set updateBy)
 updateBy: 2026-12-15                # trending only: date by which the engine rewrites it into an asset

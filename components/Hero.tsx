@@ -604,9 +604,6 @@ export default function Hero() {
                 See work
               </a>
             </div>
-            <p className="hero-hours" style={{ margin: '14px 0 0', fontSize: 12.5, color: '#6E6B63', lineHeight: 1.5 }}>
-              Owner-operated from Bhopal, India. Replies within 3 hours across UK days and US mornings.
-            </p>
 
           </div>
 
