@@ -21,6 +21,16 @@ const SITE_URL = 'https://echopulse.media';
  */
 export const revalidate = 600;
 
+/**
+ * Rendered per request, not as a cached static file. In November 2026 the
+ * live sitemap was found 58 hours old (x-vercel-cache: HIT, age 211154) and
+ * missing the two newest posts, so the 10-minute ISR window was not being
+ * honoured in production. The Sanity query below still caches for 10 minutes
+ * through the fetch cache, so this costs one cheap render per crawl, and a new
+ * post appears in the sitemap within 10 minutes of publishing.
+ */
+export const dynamic = 'force-dynamic';
+
 /** Fixed dates for pages that change by hand. Bump when the page changes. */
 const TERMS_UPDATED = new Date('2026-05-28');
 const PRIVACY_UPDATED = new Date('2026-11-10');
