@@ -8,7 +8,13 @@ import { BLOG_REDIRECTS } from '@/lib/redirects';
  * "From the blog": the three newest published posts, for the homepage.
  * Same fetch helper (and 60 second revalidation) as the /blog index, and the
  * same BLOG_REDIRECTS guard so no card links to a slug that redirects away.
- * Fails soft: any error or an empty result renders nothing.
+ * Fails soft, but never to nothing. The page is static with a 60 second
+ * revalidate, so if the Sanity fetch fails while the page is built or
+ * revalidated, an empty result is what gets cached and the whole section
+ * disappears at every width until the next successful revalidation. That is
+ * the likeliest cause of "From the blog" being missing on a phone check: no
+ * CSS or animation rule hides it (it renders at 360, 390 and 430). On a failed
+ * or empty fetch we now keep the heading and a link to /blog instead.
  */
 function formatDate(iso?: string): string | null {
   if (!iso) return null;
@@ -22,15 +28,15 @@ export default async function HomeLatestPosts() {
   try {
     posts = (await getAllPosts()).filter((p) => !(p.slug in BLOG_REDIRECTS)).slice(0, 3);
   } catch {
-    return null;
+    posts = [];
   }
-  if (posts.length === 0) return null;
 
   return (
     <section className="hlp" aria-labelledby="hlp-heading">
       <div className="hlp-inner">
         <p className="hlp-eyebrow">Blog</p>
         <h2 id="hlp-heading" className="hlp-h2">From the blog</h2>
+        {posts.length > 0 && (
         <ul className="hlp-grid">
           {posts.map((post) => {
             const img = post.mainImage?.asset
@@ -52,6 +58,7 @@ export default async function HomeLatestPosts() {
             );
           })}
         </ul>
+        )}
         <Link href="/blog" className="hlp-all">See all posts</Link>
       </div>
       <style>{`
@@ -67,7 +74,7 @@ export default async function HomeLatestPosts() {
         .hlp-date { font-size: 12px; color: #6E6B63; }
         .hlp-title { font-size: 18px; font-weight: 700; line-height: 1.3; letter-spacing: -0.01em; overflow-wrap: anywhere; }
         .hlp-link:hover .hlp-title { color: #E8541A; }
-        .hlp-all { color: #E8541A; font-weight: 700; font-size: 15px; text-decoration: none; }
+        .hlp-all { display: inline-flex; align-items: center; min-height: 44px; color: #E8541A; font-weight: 700; font-size: 15px; text-decoration: none; }
         .hlp-all:hover { text-decoration: underline; }
         @media (max-width: 900px) { .hlp-grid { grid-template-columns: 1fr; } }
         @media (max-width: 760px) { .hlp { padding: 56px 20px; } }

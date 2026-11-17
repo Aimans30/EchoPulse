@@ -4,6 +4,8 @@ import { icps } from '@/lib/icpData';
 import { urlFor, sanityClient } from '@/lib/sanity';
 import { BLOG_REDIRECTS, DEAD_SLUGS } from '@/lib/redirects';
 import { caseStudies, heroImageFor } from '@/lib/caseStudyData';
+import { NICHE_PAGES } from '@/lib/nicheServiceData';
+import { NICHE_PAGES_UPDATED_ISO } from '@/lib/siteMeta';
 
 /**
  * Sitemap — generated at build time. Lists the homepage + every service
@@ -136,6 +138,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   };
 
+  // Free resources (lead magnets). Each is complete on the page, with an
+  // email box for the printable version.
+  const resourcePages: MetadataRoute.Sitemap = ['/resources', '/resources/listing-video-shot-list'].map((path) => ({
+    url: `${SITE_URL}${path}`,
+    lastModified: new Date('2026-11-17'),
+    changeFrequency: 'monthly' as const,
+    priority: 0.7,
+  }));
+
   const founderPage: MetadataRoute.Sitemap[number] = {
     url: `${SITE_URL}/about/lakshya-soni`,
     lastModified: BRAND_PAGE_UPDATED,
@@ -207,6 +218,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.9,
   }));
 
+  // Niche-plus-service pages (/real-estate/video-editing and 11 more). Only the
+  // combinations listed in lib/nicheServiceData.ts exist; every other
+  // /[icp]/[service] path 404s.
+  const nicheRoutes: MetadataRoute.Sitemap = NICHE_PAGES.map((p) => ({
+    url: `${SITE_URL}/${p.icp}/${p.service}`,
+    lastModified: new Date(NICHE_PAGES_UPDATED_ISO),
+    changeFrequency: 'monthly',
+    priority: 0.8,
+  }));
+
   // Blog posts from Sanity — wrapped in try so a Sanity outage never breaks
   // the build. If Sanity is down, the sitemap drops the post URLs gracefully.
   //
@@ -274,6 +295,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...caseStudyRoutes,
     blogIndex,
     ...icpRoutes,
+    ...nicheRoutes,
     ...serviceRoutes,
     ...blogPosts,
     pricing,
@@ -281,6 +303,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     pilot,
     freeEdits,
     founderPage,
+    ...resourcePages,
     order,
     terms,
     privacy,

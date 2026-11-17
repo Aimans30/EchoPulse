@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { trackCallClick } from '@/lib/analytics';
 import GuidesSection from '@/components/GuidesSection';
+import NicheLinks from '@/components/niche/NicheLinks';
 import type { Guide } from '@/lib/blogLinks';
 import dynamic from 'next/dynamic';
 import { motion, useScroll, useSpring } from 'framer-motion';
@@ -1462,6 +1463,9 @@ export default function ServicePageClient({ service, guides = [] }: { service: S
           </div>
         </div>
       </section>
+
+      {/* For your niche: links to the /[icp]/[service] pages for this service */}
+      <NicheLinks mode="service" value={service.slug} />
 
       {/* FINAL CTA */}
       <section

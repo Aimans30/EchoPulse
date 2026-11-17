@@ -4,6 +4,7 @@ import Nav, { type NavLink } from '@/components/Nav';
 import Footer from '@/components/Footer';
 import Pricing from '@/components/Pricing';
 import GuidesSection from '@/components/GuidesSection';
+import NicheLinks from '@/components/niche/NicheLinks';
 import type { Guide } from '@/lib/blogLinks';
 import { type IcpData, AGENCY_COMPARISON } from '@/lib/icpData';
 import { type VideoEntry } from '@/lib/videos';
@@ -396,6 +397,9 @@ export default function ICPPage({ data, videos, guides = [] }: { data: IcpData; 
             <ICPFaq faq={data.faq} accent={accent} />
           </div>
         </section>
+
+        {/* ── 9b. BY SERVICE — links to the /[icp]/[service] pages for this audience ── */}
+        <NicheLinks mode="icp" value={data.key} />
 
         {/* ── 10. FINAL CTA (dark) ── */}
         <section

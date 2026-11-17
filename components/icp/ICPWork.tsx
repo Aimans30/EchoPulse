@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { AnimatePresence } from 'framer-motion';
+import { useParams } from 'next/navigation';
 import { previewMp4Src, type Orientation, type VideoEntry } from '@/lib/videos';
 
 // Card sizing (mirrors OurWork proportions, slightly smaller for the ICP rail).
@@ -10,6 +11,16 @@ const CARD_W_VERTICAL = 203; // CARD_H * 9/16
 const CARD_W_HORIZ = 640; // CARD_H * 16/9
 const GAP = 14;
 const SPEED = 0.5; // px / frame
+
+// The route segment is the ICP key (see app/[icp]/page.tsx), so the link below
+// can be built without the parent passing the key down.
+const NICHE_LABEL: Record<string, string> = {
+  'real-estate': 'real estate',
+  founders: 'founder',
+  coaches: 'coach',
+  dtc: 'DTC',
+  'business-owners': 'business owner',
+};
 
 const cardWidth = (o?: Orientation) => (o === 'horizontal' ? CARD_W_HORIZ : CARD_W_VERTICAL);
 
@@ -42,6 +53,8 @@ function VideoModal({ src, onClose }: { src: string; onClose: () => void }) {
  * window + RAF); the section heading around it stays server-rendered.
  */
 export default function ICPWork({ videos, accent }: { videos: VideoEntry[]; accent: string }) {
+  const params = useParams<{ icp?: string }>();
+  const nicheKey = typeof params?.icp === 'string' ? params.icp : '';
   const [modalSrc, setModalSrc] = useState<string | null>(null);
   const [detected, setDetected] = useState<Record<string, Orientation>>({});
 
@@ -181,6 +194,13 @@ export default function ICPWork({ videos, accent }: { videos: VideoEntry[]; acce
           })}
         </div>
       </div>
+      {nicheKey && (
+        <p className="icp-work-all">
+          <a href={`/work?niche=${encodeURIComponent(nicheKey)}`}>
+            {NICHE_LABEL[nicheKey] ? `See all ${NICHE_LABEL[nicheKey]} samples` : 'See all samples'}
+          </a>
+        </p>
+      )}
       <AnimatePresence>
         {modalSrc && <VideoModal src={modalSrc} onClose={closeModal} />}
       </AnimatePresence>
@@ -193,8 +213,11 @@ export default function ICPWork({ videos, accent }: { videos: VideoEntry[]; acce
            last card on desktop-class touch devices. Momentum scrolling still
            works, and the partially visible next card is the affordance. */
         .icp-rail-outer::-webkit-scrollbar { display: none; }
+        .icp-work-all { margin: 28px 0 0; padding: 0 56px; text-align: center; }
+        .icp-work-all a { display: inline-flex; align-items: center; min-height: 44px; color: ${accent}; font-size: 15px; font-weight: 700; text-decoration: underline; text-underline-offset: 4px; }
         @media (max-width: 640px) {
           .icp-rail { padding-left: 18px !important; padding-right: 18px !important; }
+          .icp-work-all { padding: 0 18px; }
           /* globals.css pins EVERY open dialog to \`width: min(95vw, 420px)\`
              and a 9/14 aspect-ratio on phones. That rule was written for the
              booking modal but catches this fixed inset:0 video overlay too,

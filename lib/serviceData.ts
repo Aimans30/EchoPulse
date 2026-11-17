@@ -122,8 +122,8 @@ export const services: ServiceData[] = [
       { num: '03', title: 'Write, Edit, Ship', body: 'Drafts written against the brief. Read by a human editor who flags anything that sounds like generic LinkedIn. Rewritten until it fits. You approve every post before it publishes.' },
     ],
     deliverables: [
-      { icon: '✍️', title: 'Short-Form Posts', desc: '4 to 5 posts per week. Story-driven, opinion-driven, or tactical. Never generic listicles.' },
-      { icon: '📊', title: 'Carousel Posts', desc: '1 to 2 deep-dive carousels per month. 8 to 12 slides built for saves, shares, and DMs.' },
+      { icon: '✍️', title: 'Short-Form Posts', desc: '8 photo or carousel posts a month on Presence Engine, 20 social posts a month on Growth. Story-driven, opinion-driven, or tactical. Never generic listicles.' },
+      { icon: '📊', title: 'Carousel Posts', desc: 'Carousels count toward your monthly post total. 8 to 12 slides built for saves, shares, and DMs.' },
       { icon: '🎙️', title: 'Brand Brief Document', desc: 'Your brand brief. Interview transcript, audience map, offer breakdown, story bank, banned phrases. Yours forever, even if you cancel.' },
       { icon: '💬', title: 'Engagement Drafts', desc: '5 daily comment drafts on prospect and influencer posts. Visibility in their feed without you posting more.' },
       { icon: '📝', title: 'Profile Optimization', desc: 'Headline, About, Featured section, and banner rewritten once per quarter to match your evolving positioning.' },
@@ -144,7 +144,7 @@ export const services: ServiceData[] = [
     faq: [
       { q: 'How is this different from a $200 per month content writer?', a: 'Cheap writers use templates. We use a structured brand brief built from a 90-minute recorded interview with you. The posts fit your business because we built a system around your actual offer and audience, not a template stuffed with industry buzzwords.' },
       { q: 'Will my audience know it is written by someone else?', a: 'That is the bar we write to. The brand brief is built from a 90-minute recorded interview, so every post is anchored to phrases and stories you have actually used, not to a template. You approve each draft before it goes out, so nothing publishes in a voice you would not use yourself.' },
-      { q: 'How many posts per month?', a: 'Standard tier is 16 to 20 posts per month (4 to 5 per week) plus 1 to 2 carousels. Premium tier adds the daily engagement amplifier (5 comment drafts per day on prospect and influencer posts).' },
+      { q: 'How many posts per month?', a: 'Presence Engine at $399 a month includes 8 photo or carousel posts a month. Growth at $1,997 a month includes 20 social posts a month. Carousels count toward those totals.' },
       { q: 'Do I have to approve every post?', a: 'Yes. You see every draft before it publishes. Revisions are unlimited until you are satisfied with the post. Most clients only revise the first 5 to 10 posts before they trust the system.' },
       { q: 'What actually happens on the strategy call?', a: '15 minutes. We look at what you are publishing now, map a 30-day plan against it, and put the numbers in writing. No pitch, and you keep the plan whether or not you hire us.' },
     ],
@@ -204,8 +204,8 @@ export const services: ServiceData[] = [
     slug: 'ad-creatives',
     name: 'Ad Creatives',
     tagline: 'Ad creative built for returns, not design awards.',
-    heroSub: 'Static and video creative built for one job: stopping the scroll and getting the click. Eight to twelve fresh hooks per month so your CPA stops creeping up and your ad spend keeps working. We ship the angle that converts, not the one that wins design contests.',
-    metaDescription: 'Ad creative on subscription: 8 to 12 fresh static and video ads a month, 48-hour turnaround, so creative fatigue stops eating your ad spend.',
+    heroSub: 'Static and video creative built for one job: stopping the scroll and getting the click. Six ad creatives a month on Growth, with new hooks cut from whatever is working, so your CPA stops creeping up and your ad spend keeps working. We ship the angle that converts, not the one that wins design contests.',
+    metaDescription: 'Ad creative on subscription: 6 ads a month on Growth, 4 static and 2 video, 48-hour turnaround, so creative fatigue stops eating your ad spend.',
     accentColor: '#3b82f6',
     problemHeadline: 'Your ad creative goes stale every 14 days.',
     problemBody: 'You launch new ads, they perform for two weeks, then CPMs creep up and ROAS tanks. The fix is fresh creative. But your in-house designer is overwhelmed and your freelancer is slow, so the same three variations keep running long after they stopped working, and the budget keeps going out the door behind them.',
@@ -216,7 +216,7 @@ export const services: ServiceData[] = [
       'Generic ad templates that look identical to every competitor in your category',
     ],
     solutionHeadline: 'A creative subscription that ships before fatigue hits.',
-    solutionBody: 'We deliver 8 to 12 fresh ad creatives per month on a subscription. Static images, video ads, motion graphic ads. Built around new hooks tested against your audience. 48-hour standard turnaround. Unlimited revisions per creative until you are satisfied.',
+    solutionBody: 'Growth includes 6 ad creatives a month, 4 static and 2 video. Static images, video ads, motion graphic ads. Built around new hooks tested against your audience. 48-hour standard turnaround. Unlimited revisions per creative until you are satisfied.',
     methodTimeline: '48-HOUR TURNAROUND',
     steps: [
       { num: '01', title: 'Strategy and Hook Lab', body: 'Monthly creative kickoff: review last month\'s top performers, brainstorm new hooks, identify visual angles. Your team picks the angles you want produced.' },
@@ -224,8 +224,8 @@ export const services: ServiceData[] = [
       { num: '03', title: 'Iterate Based on Data', body: 'You ship. We monitor performance via your Meta or Google reports. Top performers get variations. Underperformers inform next month\'s creative direction.' },
     ],
     deliverables: [
-      { icon: '🖼️', title: 'Static Image Ads', desc: 'Single-image and carousel ads built for Meta, Instagram, LinkedIn. 4 to 6 per month standard.' },
-      { icon: '🎥', title: 'Video Ads', desc: '15 to 60 second video ads cut from your footage or stock. Hooks tested against your audience. 4 per month standard.' },
+      { icon: '🖼️', title: 'Static Image Ads', desc: 'Single-image and carousel ads built for Meta, Instagram, LinkedIn. 4 a month on Growth.' },
+      { icon: '🎥', title: 'Video Ads', desc: '15 to 60 second video ads cut from your footage or stock. Hooks tested against your audience. 2 a month on Growth.' },
       { icon: '✨', title: 'Motion Graphic Ads', desc: 'Animated kinetic-text ads, product showcases, and explainer ads built in After Effects.' },
       { icon: '🎯', title: 'Hook Variations', desc: 'Each top-performing ad gets 3 to 5 hook variations to fight fatigue and find new audience pockets.' },
       { icon: '📊', title: 'Performance Pack', desc: 'Monthly report on which creatives won, why they won, and what to test next.' },
@@ -236,7 +236,7 @@ export const services: ServiceData[] = [
       role: 'Production rhythm',
       stat: '48 hr',
       statLabel: 'creative turnaround',
-      body: 'Our creative subscription delivers 8 to 12 fresh ad creatives per month with a 48-hour turnaround on each piece. That cadence is what lets you refresh top performers weekly instead of running the same three variations until CPMs climb. The difference between scaling and stalling.',
+      body: 'Our creative subscription delivers 6 ad creatives a month on Growth, 4 static and 2 video, with a 48-hour turnaround on each piece. That cadence lets you refresh top performers as they tire instead of running the same three variations until CPMs climb. The difference between scaling and stalling.',
     },
     testimonial: {
       quote: 'Ad creative is the highest-leverage thing most DTC brands underspend on. A subscription is the cheapest way to fix it.',
@@ -251,7 +251,7 @@ export const services: ServiceData[] = [
       // revisions, month to month with 14 days notice), so the reader met the
       // same two facts twice within one scroll. This one answers the question
       // the page's whole argument rests on and is not answered anywhere else.
-      { q: 'How do you actually stop creative fatigue?', a: 'Volume and rotation, not one hero ad. You get 8 to 12 fresh creatives a month, we pull 3 to 5 hook variations off whatever is performing, and we refresh weekly rather than every 4 to 6 weeks. Fatigue is a maths problem: the fix is having the next creative ready before the current one dies.' },
+      { q: 'How do you actually stop creative fatigue?', a: 'Volume and rotation, not one hero ad. Growth gives you 6 fresh creatives a month, 4 static and 2 video, we pull 3 to 5 hook variations off whatever is performing, and we refresh as ads tire rather than every 4 to 6 weeks. Fatigue is a maths problem: the fix is having the next creative ready before the current one dies.' },
       { q: 'What actually happens on the strategy call?', a: '15 minutes. We look at the creative you are running now, map a 30-day plan against it, and put the numbers in writing. No pitch, and you keep the plan whether or not you hire us.' },
     ],
   },

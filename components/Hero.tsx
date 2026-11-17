@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { motion } from 'framer-motion';
 import { BOOK_CALL_LABEL, FREE_EDITS_LABEL, FREE_EDITS_URL } from '@/lib/links';
+import { PRESENCE } from '@/lib/pricing';
 import HeroReel from '@/components/HeroReel';
 import { trackPilotClick, trackCallClick } from '@/lib/analytics';
 
@@ -536,28 +537,15 @@ export default function Hero() {
                 the words buyers actually search. Doubles as the sentence AI
                 assistants extract when asked "what is EchoPulse Media". */}
             <h2 ref={subRef} className="hero-sub" style={{ fontSize: '16px', color: '#6E6B63', maxWidth: '540px', lineHeight: 1.7, fontWeight: 400, margin: '0 0 36px' }}>
-              {/* Rewritten after a 10-buyer panel. Two problems with the old
-                  line, both structural rather than stylistic.
-                  1. It named three audiences ("founders, coaches, and business
-                     owners") while the site runs FIVE ICP landing pages. Real
-                     estate agents and DTC brands were missing entirely, and
-                     both said they bounced before thinking to look for a page
-                     of their own. A real estate agent put it as: he sells
-                     houses, not "under one roof" services to founders.
-                  2. It led with LinkedIn ghostwriting, which actively repels
-                     three of the five segments. An HVAC owner: "LinkedIn
-                     ghostwriting? I fix furnaces. I need the phone to ring."
-                     A DTC founder read the whole line as a personal-brand shop
-                     rather than a performance-creative one and left.
-                  "You hit record, we do the rest" also framed everything as
-                  video first, which misreads the consultancy and DTC buyers.
-                  Replaced with the owner-review point, which is the actual
-                  differentiator and the one the skeptical buyers responded to. */}
+              {/* Offer line: what the weekly plan covers and what it costs (read
+                  from lib/pricing.ts so it cannot drift), then the free start.
+                  The same h2 serves phone and desktop; there is no separate
+                  mobile subheading. */}
               <span>
-                Send raw footage. Get post-ready videos, posts and blogs back in 48 hours,
-                reviewed by me before you see them.
+                Videos, posts and your website, run every week from {PRESENCE.priceLabel} a month.
+                No contract.
               </span>{' '}
-              <strong style={{ color: '#0C0C0B', fontWeight: 600 }}>Your first 2 videos are free.</strong>
+              <strong style={{ color: '#0C0C0B', fontWeight: 600 }}>Start with 2 free edits.</strong>
             </h2>
 
             <div ref={actionsRef} className="hero-actions" style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '0', alignItems: 'center' }}>

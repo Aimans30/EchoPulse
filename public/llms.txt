@@ -60,6 +60,23 @@ Facts on this page are the canonical entity facts for EchoPulse Media. They matc
 - Work samples: https://echopulse.media/#work
 - Blog (pricing guides, comparisons and how-tos, all sourced): https://echopulse.media/blog
 
+## Niche pages
+
+One page per buyer and service, each with the price ladder, deliverables, an honest "not a fit" list and an FAQ for that buyer (last updated 17 November 2026):
+
+- Video editing for real estate agents: https://echopulse.media/real-estate/video-editing
+- Websites and lead pages for real estate agents: https://echopulse.media/real-estate/websites-funnels
+- Ad creatives for real estate agents: https://echopulse.media/real-estate/ad-creatives
+- Video editing for coaches and course creators: https://echopulse.media/coaches/video-editing
+- LinkedIn ghostwriting for coaches: https://echopulse.media/coaches/linkedin-ghostwriting
+- Websites and funnels for coaches: https://echopulse.media/coaches/websites-funnels
+- LinkedIn ghostwriting for founders: https://echopulse.media/founders/linkedin-ghostwriting
+- Video editing for founders: https://echopulse.media/founders/video-editing
+- Ad creatives for DTC brands: https://echopulse.media/dtc/ad-creatives
+- Video editing for DTC and e-commerce brands: https://echopulse.media/dtc/video-editing
+- Video editing for business owners: https://echopulse.media/business-owners/video-editing
+- Websites and funnels for business owners: https://echopulse.media/business-owners/websites-funnels
+
 ## How EchoPulse uses AI
 
 AI is used for research, transcription and first-pass outlines. The final voice of every post, script and article is written and reviewed by a person against the client's brand brief. EchoPulse does not sell AI-generated content as finished work.
@@ -72,6 +89,7 @@ AI is used for research, transcription and first-pass outlines. The final voice 
 - Pilot: https://echopulse.media/pilot
 - Founder: https://echopulse.media/about/lakshya-soni
 - Free sample form: https://echopulse.media/free-edits
+- Free resources: https://echopulse.media/resources (listing video shot list for real estate agents: https://echopulse.media/resources/listing-video-shot-list)
 - Services: https://echopulse.media/services/video-editing (and the six others listed above)
 - Case studies: https://echopulse.media/case-studies
 - Privacy: https://echopulse.media/privacy
