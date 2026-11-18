@@ -19,49 +19,42 @@ import { PRESENCE } from '@/lib/pricing';
 export default function BlogSideCTA({ icp, slug }: { icp: IcpKey; slug: string }) {
   const utm = `?utm_source=blog&utm_medium=side_rail&utm_campaign=${encodeURIComponent(slug)}`;
   const card: React.CSSProperties = {
-    borderRadius: 18,
-    padding: '20px 18px 18px',
-    marginBottom: 14,
+    borderRadius: 14,
+    padding: '14px 14px 13px',
+    marginBottom: 10,
+    background: 'rgba(255,255,255,0.55)',
+    border: '1px solid rgba(12,12,11,0.08)',
+    color: '#0C0C0B',
   };
+  const eyebrow: React.CSSProperties = { margin: 0, fontSize: 10, fontWeight: 700, letterSpacing: 1.4, textTransform: 'uppercase', color: '#8A867D' };
+  const title: React.CSSProperties = { margin: '5px 0 4px', fontSize: 14.5, fontWeight: 800, lineHeight: 1.25, letterSpacing: '-0.2px' };
+  const sub: React.CSSProperties = { margin: '0 0 10px', fontSize: 12, lineHeight: 1.45, color: '#6E6B63' };
+  const link: React.CSSProperties = { display: 'inline-block', fontSize: 12.5, fontWeight: 800, textDecoration: 'none' };
   return (
     <div className="blog-side-cta">
-      <div style={{ ...card, background: '#0C0C0B', color: '#F2EEE7', border: '1px solid rgba(255,255,255,0.08)' }}>
-        <p style={{ margin: 0, fontSize: 10.5, fontWeight: 800, letterSpacing: 1.6, textTransform: 'uppercase', color: '#E8541A' }}>Free, no card</p>
-        <p style={{ margin: '8px 0 6px', fontSize: 19, fontWeight: 900, lineHeight: 1.15, letterSpacing: '-0.4px' }}>
-          Send footage. Get 2 edited videos back in 48 hours.
-        </p>
-        <p style={{ margin: '0 0 14px', fontSize: 13, lineHeight: 1.5, color: 'rgba(242,238,231,0.66)' }}>
-          A talk, a podcast clip, a listing tour, a job-site video. You keep the edits either way.
-        </p>
-        <a
-          href={FREE_EDITS_URL}
-          style={{ display: 'block', textAlign: 'center', padding: '11px 14px', borderRadius: 100, background: '#E8541A', color: '#fff', fontWeight: 800, fontSize: 13.5, textDecoration: 'none' }}
-        >
+      <div style={{ ...card, borderLeft: '3px solid #E8541A' }}>
+        <p style={{ ...eyebrow, color: '#E8541A' }}>Free, no card</p>
+        <p style={title}>2 edited videos back in 48 hours.</p>
+        <p style={sub}>Send any footage. You keep the edits either way.</p>
+        <a href={FREE_EDITS_URL} style={{ ...link, padding: '7px 13px', borderRadius: 100, background: '#0C0C0B', color: '#fff' }}>
           Get my 2 free edits
         </a>
       </div>
 
-      <div style={{ ...card, background: 'rgba(255,255,255,0.62)', border: '1px solid rgba(12,12,11,0.08)', color: '#0C0C0B' }}>
-        <p style={{ margin: 0, fontSize: 10.5, fontWeight: 800, letterSpacing: 1.6, textTransform: 'uppercase', color: '#6E6B63' }}>15 minutes, free</p>
-        <p style={{ margin: '8px 0 6px', fontSize: 17, fontWeight: 900, lineHeight: 1.2, letterSpacing: '-0.3px' }}>
-          Show me your site. I&apos;ll tell you the first 3 things I&apos;d fix.
+      <div style={card}>
+        <p style={eyebrow}>15 minutes, free</p>
+        <p style={title}>The first 3 things I&apos;d fix on your site.</p>
+        <p style={sub}>
+          No pitch. For {ICP_LABEL[icp]}. Plans from {PRESENCE.priceLabel} a month.
         </p>
-        <p style={{ margin: '0 0 12px', fontSize: 12.5, lineHeight: 1.5, color: '#6E6B63' }}>
-          No pitch. For {ICP_LABEL[icp]}. Plans start at {PRESENCE.priceLabel} a month, month-to-month.
-        </p>
-        <a
-          href={`${BOOK_CALL_URL}${utm}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{ display: 'block', textAlign: 'center', padding: '10px 14px', borderRadius: 100, border: '1.5px solid #0C0C0B', color: '#0C0C0B', fontWeight: 800, fontSize: 13, textDecoration: 'none' }}
-        >
-          Pick a time
+        <a href={`${BOOK_CALL_URL}${utm}`} target="_blank" rel="noopener noreferrer" style={{ ...link, color: '#0C0C0B', borderBottom: '1.5px solid #E8541A', paddingBottom: 1 }}>
+          Pick a time &rarr;
         </a>
         <Link
           href="/case-studies/magicbnb-seo-aeo"
-          style={{ display: 'block', marginTop: 12, fontSize: 12, lineHeight: 1.45, color: '#6E6B63', textDecoration: 'none' }}
+          style={{ display: 'block', marginTop: 10, paddingTop: 9, borderTop: '1px solid rgba(12,12,11,0.08)', fontSize: 11.5, lineHeight: 1.4, color: '#6E6B63', textDecoration: 'none' }}
         >
-          <strong style={{ color: '#0C0C0B' }}>5.8 &rarr; 4,859</strong> daily Google impressions in seven months. <span style={{ color: '#E8541A', fontWeight: 700 }}>See the export &rarr;</span>
+          <strong style={{ color: '#0C0C0B' }}>5.8 &rarr; 4,859</strong> daily Google impressions. <span style={{ color: '#E8541A', fontWeight: 700 }}>See proof &rarr;</span>
         </Link>
       </div>
     </div>

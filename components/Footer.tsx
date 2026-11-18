@@ -249,7 +249,7 @@ export default function Footer() {
             // the reader was already on. The email existed on /about and
             // nowhere else, so anyone who wanted to write rather than book a
             // call had to go hunting for it from a column headed "Contact".
-            { label: 'lakshya@echopulse.media', href: 'mailto:lakshya@echopulse.media' },
+            { label: 'lakshyasoni2703@gmail.com', href: 'mailto:lakshyasoni2703@gmail.com' },
             { label: 'Lakshya on LinkedIn', href: 'https://www.linkedin.com/in/lakshyasoni/' },
           ].map((c) => (
             <li key={c.label}>

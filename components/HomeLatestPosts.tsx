@@ -40,14 +40,14 @@ export default async function HomeLatestPosts() {
         <ul className="hlp-grid">
           {posts.map((post) => {
             const img = post.mainImage?.asset
-              ? urlFor(post.mainImage).width(720).height(450).fit('crop').auto('format').url()
+              ? urlFor(post.mainImage).width(800).height(420).fit("crop").auto('format').url()
               : null;
             const date = formatDate(post.publishedAt);
             return (
               <li key={post._id} className="hlp-card">
                 <Link href={`/blog/${post.slug}`} className="hlp-link">
                   {img && (
-                    <Image className="hlp-img" src={img} alt="" width={720} height={450} sizes="(max-width: 760px) 100vw, 360px" loading="lazy" />
+                    <Image className="hlp-img" src={img} alt="" width={800} height={420} sizes="(max-width: 760px) 100vw, 360px" loading="lazy" />
                   )}
                   <span className="hlp-body">
                     {date && <span className="hlp-date">{date}</span>}
@@ -69,7 +69,7 @@ export default async function HomeLatestPosts() {
         .hlp-grid { list-style: none; margin: 0 0 28px; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
         .hlp-card { background: #fff; border: 1px solid rgba(12,12,11,0.1); border-radius: 16px; overflow: hidden; min-width: 0; }
         .hlp-link { display: flex; flex-direction: column; height: 100%; color: inherit; text-decoration: none; }
-        .hlp-img { width: 100%; height: auto; aspect-ratio: 16 / 10; object-fit: cover; display: block; }
+        .hlp-img { width: 100%; height: auto; aspect-ratio: 1200 / 630; object-fit: cover; display: block; }
         .hlp-body { display: flex; flex-direction: column; gap: 8px; padding: 18px 20px 22px; }
         .hlp-date { font-size: 12px; color: #6E6B63; }
         .hlp-title { font-size: 18px; font-weight: 700; line-height: 1.3; letter-spacing: -0.01em; overflow-wrap: anywhere; }
