@@ -52,6 +52,7 @@ export default function FreeEditsPage() {
         .fe-lead { font-size: 19px; line-height: 1.55; color: #3E3D3A; margin: 0 0 22px; }
         .fe-copy ul { margin: 0 0 18px; padding: 0 0 0 20px; display: grid; gap: 10px; font-size: 16px; line-height: 1.55; color: #0C0C0B; }
         .fe-small { font-size: 14px; color: #6E6B63; margin: 0; }
+        @media (min-width: 901px) { .fe-copy { position: sticky; top: 120px; } }
         @media (max-width: 900px) { .fe-page { grid-template-columns: minmax(0, 1fr); gap: 32px; padding-top: 110px; } }
         @media (max-width: 480px) { .fe-page { padding-left: 18px; padding-right: 18px; padding-bottom: 72px; } }
       `}</style>

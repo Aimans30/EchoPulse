@@ -45,6 +45,7 @@ export async function POST(req: Request) {
         fullName, email, source,
         notes: notes ?? `${serviceInterest ? `Interest: ${serviceInterest}` : ''}${company ? ` · Company: ${company}` : ''}`,
         asanaTaskUrl: asanaTask?.permalink_url,
+        title: source === 'free_edits_form' ? '🎬 Free edits request' : undefined,
       }),
     );
 

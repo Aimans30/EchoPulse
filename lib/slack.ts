@@ -162,17 +162,20 @@ export function buildLeadMessage(args: {
   source: string;
   notes?: string;
   asanaTaskUrl?: string;
+  /** Overrides the header, e.g. for the free-edits form. */
+  title?: string;
 }): SlackPostOptions {
+  const title = args.title ?? '🔥 New Lead';
   return {
-    text: `🔥 New lead: ${args.fullName} (${args.source})`,
+    text: `${title}: ${args.fullName} (${args.source})`,
     channel: 'leads',
     blocks: [
-      { type: 'header', text: { type: 'plain_text', text: '🔥 New Lead', emoji: true } },
+      { type: 'header', text: { type: 'plain_text', text: title, emoji: true } },
       {
         type: 'section',
         text: {
           type: 'mrkdwn',
-          text: `*${args.fullName}*  ·  ${args.email}\n*Source:* ${args.source}${args.notes ? `\n*Notes:* ${args.notes}` : ''}`,
+          text: `*${args.fullName}*  ·  ${args.email}\n*Source:* ${args.source}${args.notes ? `\n${args.notes.includes('\n') ? args.notes.split('\n').map((l) => l.replace(/^([^:]{1,40}):/, '*$1:*')).join('\n') : `*Notes:* ${args.notes}`}` : ''}`.slice(0, 2900),
         },
       },
       ...(args.asanaTaskUrl ? [{

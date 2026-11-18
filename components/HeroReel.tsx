@@ -5,29 +5,33 @@ import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { wallClips, type WallClip } from '@/lib/videos';
 
 /**
- * Hero visual: the studio's own edits playing one after another, plus the one
- * number the studio can prove.
+ * Hero visual: the studio's own edits, cutting fast, in the two shapes the
+ * work actually ships in.
  *
- * Buyers asked the same thing in every review: "show me the work". The right
- * column of the hero is a phone-shaped frame that plays a short preview of one
- * edit, then cross-fades to the next, like stories. The segments along the top
- * show which clip is playing and how long is left; clicking one jumps to it.
- * The label says what kind of edit it is, so a real estate agent, a coach and
- * a founder each see their own niche within a few seconds.
+ * Two frames sit together like a desk of screens: a tall phone frame for
+ * vertical edits (reels, shorts) and a wide frame for horizontal ones
+ * (podcasts, long-form). Each frame swaps to its next clip every SLOT_MS with
+ * a quick cross-fade, and the two are half a slot out of step, so something
+ * on screen changes roughly every second and a half. A visitor sees six or
+ * seven different edits in the time it takes to read the headline.
  *
- * Only the playing clip and the next one are ever in the DOM, and each is the
- * 12-second, 480px, silent preview rendition from lib/videos.ts, so the hero
- * never downloads a full-size video. Rotation pauses while the pointer is over
- * the frame or the tab is hidden, and does not run at all for visitors who ask
- * for reduced motion (they get the first clip, looping).
+ * Each frame keeps only the playing clip and the next one in the DOM (the
+ * next one is preloaded so the cut is instant), and both use the small silent
+ * preview rendition, so the hero never downloads a full-size video. Rotation
+ * stops while the pointer is over the frames, while the tab is hidden, while
+ * the hero is scrolled out of view, and for visitors who ask for reduced
+ * motion (they get the first clip of each, looping).
+ *
+ * The whole composition is one link to /work. There is no button on top of
+ * the video: the label underneath says where a click goes.
  *
  * Hidden on phones by the existing `.hero-right` rule, where the mobile hero
  * shows its own trust strip instead.
  */
 
-/** How long each clip stays up, in milliseconds. */
-const SLOT_MS = 6500;
-const MAX_CLIPS = 6;
+/** How long each clip stays up in a frame, in milliseconds. */
+const SLOT_MS = 3000;
+const FADE_MS = 380;
 
 /** Plain-language label for each clip type. */
 const TYPE_LABEL: Record<string, string> = {
@@ -37,24 +41,20 @@ const TYPE_LABEL: Record<string, string> = {
   longform: 'Brand film',
 };
 
-/**
- * Vertical clips, interleaved by type so consecutive clips come from
- * different niches: listing, founder, podcast, listing, founder, ...
- */
-function pickReel(): WallClip[] {
-  const vertical = wallClips().filter((c) => c.orientation !== 'horizontal');
+/** Interleave by type so consecutive clips come from different niches. */
+function interleave(clips: WallClip[], max: number): WallClip[] {
   const order = ['realestate', 'talking', 'podcast', 'longform'];
-  const buckets = order.map((t) => vertical.filter((c) => c.types[0] === t));
+  const buckets = order.map((t) => clips.filter((c) => c.types[0] === t));
   const out: WallClip[] = [];
-  for (let round = 0; out.length < MAX_CLIPS && round < 4; round++) {
-    for (const b of buckets) {
-      if (b[round] && out.length < MAX_CLIPS) out.push(b[round]);
-    }
+  for (let round = 0; out.length < max && round < 6; round++) {
+    for (const bkt of buckets) if (bkt[round] && out.length < max) out.push(bkt[round]);
   }
-  return out.length > 0 ? out : vertical.slice(0, 1);
+  return out;
 }
 
-const REEL = pickReel();
+const ALL = wallClips();
+const TALL = interleave(ALL.filter((c) => c.orientation !== 'horizontal'), 8);
+const WIDE = interleave(ALL.filter((c) => c.orientation === 'horizontal'), 6);
 
 function useReducedMotion(): boolean {
   return useSyncExternalStore(
@@ -84,95 +84,69 @@ function useIsWide(): boolean {
   );
 }
 
-export default function HeroReel() {
-  const wide = useIsWide();
+/**
+ * One frame that cycles through `clips`. `offset` delays its first cut so two
+ * frames never change on the same beat.
+ */
+function ReelFrame({
+  clips, offset, running, reduced, render, style, labelAt,
+}: {
+  clips: WallClip[];
+  offset: number;
+  running: boolean;
+  reduced: boolean;
+  render: boolean;
+  style: React.CSSProperties;
+  labelAt: 'top' | 'bottom';
+}) {
   const [index, setIndex] = useState(0);
-  const [paused, setPaused] = useState(false);
-  const reduced = useReducedMotion();
-  const startedAt = useRef(0);
-  const remaining = useRef(SLOT_MS);
-
-  const count = REEL.length;
+  const first = useRef(true);
+  const count = clips.length;
   const rotate = count > 1 && !reduced;
 
-  // Advance after the slot elapses. Pausing keeps the time already spent.
   useEffect(() => {
-    if (!rotate || paused) return;
-    startedAt.current = performance.now();
-    let fired = false;
+    if (!rotate || !running) return;
+    const wait = first.current ? SLOT_MS + offset : SLOT_MS;
     const t = window.setTimeout(() => {
-      fired = true;
-      remaining.current = SLOT_MS;
+      first.current = false;
       setIndex((i) => (i + 1) % count);
-    }, remaining.current);
-    return () => {
-      window.clearTimeout(t);
-      // Only a pause (the timer was cancelled) keeps the time already spent.
-      // After the timer fires the next clip gets a full slot.
-      if (!fired) {
-        remaining.current = Math.max(400, remaining.current - (performance.now() - startedAt.current));
-      }
-    };
-  }, [index, paused, rotate, count]);
+    }, wait);
+    return () => window.clearTimeout(t);
+  }, [index, running, rotate, count, offset]);
 
-  // Do not burn through clips in a background tab.
-  useEffect(() => {
-    const onVis = () => setPaused(document.hidden);
-    document.addEventListener('visibilitychange', onVis);
-    return () => document.removeEventListener('visibilitychange', onVis);
-  }, []);
-
-  const jump = (i: number) => {
-    remaining.current = SLOT_MS;
-    setIndex(i);
-  };
-
-  const current = REEL[index];
-  const next = rotate ? REEL[(index + 1) % count] : null;
+  const current = clips[index];
+  const next = rotate ? clips[(index + 1) % count] : null;
   const label = current ? TYPE_LABEL[current.types[0]] ?? current.brand : '';
 
   return (
-    <div className="hero-reel" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14 }}>
-      <div
-        className="hero-reel-frame"
-        onMouseEnter={() => setPaused(true)}
-        onMouseLeave={() => setPaused(false)}
-        style={{
-          width: 250,
-          aspectRatio: '9 / 16',
-          borderRadius: 28,
-          overflow: 'hidden',
-          background: '#0C0C0B',
-          border: '1px solid rgba(12,12,11,0.12)',
-          boxShadow: '0 30px 80px rgba(12,12,11,0.18), inset 0 1px 0 rgba(255,255,255,0.08)',
-          position: 'relative',
-        }}
-      >
-        {REEL.map((clip, i) => {
+    <div
+      style={{
+        position: 'absolute',
+        overflow: 'hidden',
+        background: '#0C0C0B',
+        boxShadow: '0 26px 70px rgba(12,12,11,0.22)',
+        ...style,
+      }}
+    >
+      {render &&
+        clips.map((clip, i) => {
           const isCurrent = i === index;
           const isNext = next !== null && clip.id === next.id && !isCurrent;
-          if (!wide || (!isCurrent && !isNext)) return null;
+          if (!isCurrent && !isNext) return null;
           return (
             <video
               key={clip.id}
-              className="hero-reel-video"
               src={clip.preview}
               poster={clip.poster}
-              autoPlay={isCurrent}
               muted
               loop
               playsInline
-              preload={isCurrent ? 'auto' : 'metadata'}
-              aria-hidden={!isCurrent}
-              aria-label={isCurrent ? `${label}: a short-form edit by EchoPulse` : undefined}
+              preload="auto"
+              aria-hidden="true"
               ref={(el) => {
                 if (!el) return;
-                if (isCurrent) {
-                  el.play().catch(() => {});
-                } else {
-                  el.pause();
-                  el.currentTime = 0;
-                }
+                if (isCurrent) el.play().catch(() => {});
+                else { el.pause(); el.currentTime = 0; }
               }}
               style={{
                 position: 'absolute',
@@ -182,108 +156,93 @@ export default function HeroReel() {
                 objectFit: 'cover',
                 display: 'block',
                 opacity: isCurrent ? 1 : 0,
-                transition: reduced ? 'none' : 'opacity 0.6s ease',
+                transform: isCurrent ? 'scale(1)' : 'scale(1.04)',
+                transition: reduced ? 'none' : `opacity ${FADE_MS}ms ease, transform ${FADE_MS + 200}ms ease`,
               }}
             />
           );
         })}
+      <span
+        style={{
+          position: 'absolute',
+          left: 10,
+          ...(labelAt === 'top' ? { top: 10 } : { bottom: 10 }),
+          padding: '4px 9px',
+          borderRadius: 100,
+          background: 'rgba(12,12,11,0.66)',
+          color: '#F2EEE7',
+          fontSize: 10,
+          fontWeight: 700,
+          letterSpacing: 1.2,
+          textTransform: 'uppercase',
+          zIndex: 2,
+        }}
+      >
+        {label || 'Cut by Lakshya'}
+      </span>
+    </div>
+  );
+}
 
-        {/* Story segments: which clip is playing, and how long is left. */}
-        {rotate && (
-          <div
-            role="tablist"
-            aria-label="Sample edits"
-            style={{ position: 'absolute', left: 12, right: 12, top: 10, display: 'flex', gap: 4, zIndex: 2 }}
-          >
-            {REEL.map((clip, i) => (
-              <button
-                key={clip.id}
-                type="button"
-                role="tab"
-                aria-selected={i === index}
-                aria-label={`Play sample ${i + 1} of ${count}`}
-                onClick={() => jump(i)}
-                className="hero-reel-seg"
-                style={{
-                  flex: 1,
-                  height: 16,
-                  padding: '6px 0',
-                  background: 'transparent',
-                  border: 'none',
-                  cursor: 'pointer',
-                }}
-              >
-                <span
-                  style={{
-                    display: 'block',
-                    height: 3,
-                    borderRadius: 3,
-                    background: 'rgba(255,255,255,0.32)',
-                    overflow: 'hidden',
-                  }}
-                >
-                  <span
-                    key={i === index ? `on-${index}` : 'off'}
-                    className={i === index ? 'hero-reel-fill' : undefined}
-                    style={{
-                      display: 'block',
-                      height: '100%',
-                      width: i < index ? '100%' : i === index ? undefined : '0%',
-                      background: '#fff',
-                      animationPlayState: paused ? 'paused' : 'running',
-                    }}
-                  />
-                </span>
-              </button>
-            ))}
-          </div>
+export default function HeroReel() {
+  const wide = useIsWide();
+  const reduced = useReducedMotion();
+  const [hover, setHover] = useState(false);
+  const [hidden, setHidden] = useState(false);
+  const [onScreen, setOnScreen] = useState(true);
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  // Do not burn through clips in a background tab or below the fold.
+  useEffect(() => {
+    const onVis = () => setHidden(document.hidden);
+    document.addEventListener('visibilitychange', onVis);
+    const el = rootRef.current;
+    const io = el ? new IntersectionObserver(([e]) => setOnScreen(e.isIntersecting), { threshold: 0.15 }) : null;
+    if (el && io) io.observe(el);
+    return () => { document.removeEventListener('visibilitychange', onVis); io?.disconnect(); };
+  }, []);
+
+  const running = !hover && !hidden && onScreen;
+  const hasWide = WIDE.length > 0;
+
+  return (
+    <div ref={rootRef} className="hero-reel" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14 }}>
+      <Link
+        href="/work"
+        data-cursor-hover
+        aria-label={`See all ${ALL.length} edits on the work wall`}
+        onMouseEnter={() => setHover(true)}
+        onMouseLeave={() => setHover(false)}
+        className="hero-reel-stage"
+        style={{ position: 'relative', display: 'block', width: 380, height: hasWide ? 452 : 430, textDecoration: 'none' }}
+      >
+        <ReelFrame
+          clips={TALL}
+          offset={0}
+          running={running}
+          reduced={reduced}
+          render={wide}
+          labelAt="top"
+          style={{ right: 0, top: 0, width: 236, aspectRatio: '9 / 16', borderRadius: 26, border: '1px solid rgba(12,12,11,0.12)' }}
+        />
+        {hasWide && (
+          <ReelFrame
+            clips={WIDE}
+            offset={SLOT_MS / 2}
+            running={running}
+            reduced={reduced}
+            render={wide}
+            labelAt="bottom"
+            style={{ left: 0, bottom: 0, width: 268, aspectRatio: '16 / 9', borderRadius: 18, border: '4px solid #F2EEE7' }}
+          />
         )}
-
-        <span
-          style={{
-            position: 'absolute',
-            left: 12,
-            top: rotate ? 32 : 12,
-            padding: '4px 9px',
-            borderRadius: 100,
-            background: 'rgba(12,12,11,0.65)',
-            color: '#F2EEE7',
-            fontSize: 10,
-            fontWeight: 700,
-            letterSpacing: 1.2,
-            textTransform: 'uppercase',
-            zIndex: 2,
-          }}
-        >
-          {label || 'Cut by Lakshya'}
-        </span>
-
-        <Link
-          href="/work"
-          data-cursor-hover
-          style={{
-            position: 'absolute',
-            right: 12,
-            bottom: 12,
-            padding: '7px 12px',
-            borderRadius: 100,
-            background: 'rgba(242,238,231,0.92)',
-            color: '#0C0C0B',
-            fontSize: 11,
-            fontWeight: 700,
-            textDecoration: 'none',
-            zIndex: 2,
-          }}
-        >
-          See all work &rarr;
+      </Link>
+      <p style={{ margin: 0, fontSize: 12.5, color: '#6E6B63', fontFamily: 'Inter, sans-serif' }}>
+        {ALL.length} edits on the wall.{' '}
+        <Link href="/work" style={{ color: '#0C0C0B', fontWeight: 700, textDecoration: 'underline', textUnderlineOffset: 3 }}>
+          Watch them all
         </Link>
-
-        <style>{`
-          .hero-reel-fill { width: 0%; animation: heroReelFill ${SLOT_MS}ms linear forwards; }
-          @keyframes heroReelFill { from { width: 0%; } to { width: 100%; } }
-          .hero-reel-seg:focus-visible { outline: 2px solid #E8541A; outline-offset: 2px; border-radius: 4px; }
-        `}</style>
-      </div>
+      </p>
 
       <Link
         href="/case-studies/magicbnb-seo-aeo"
