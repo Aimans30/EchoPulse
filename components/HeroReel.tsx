@@ -8,11 +8,11 @@ import { wallClips, type WallClip } from '@/lib/videos';
  * Hero visual: the studio's own edits, cutting fast, in the two shapes the
  * work actually ships in.
  *
- * Two frames sit together like a desk of screens: a tall phone frame for
- * vertical edits (reels, shorts) and a wide frame for horizontal ones
- * (podcasts, long-form). Each frame swaps to its next clip every SLOT_MS with
- * a quick cross-fade, and the two are half a slot out of step, so something
- * on screen changes roughly every second and a half. A visitor sees six or
+ * Three frames in one aligned block: a wide frame on top for horizontal edits
+ * (podcasts, long-form) and two tall frames underneath for vertical ones
+ * (reels, shorts). Each frame swaps to its next clip every SLOT_MS with a
+ * quick cross-fade, and the three are a third of a slot out of step, so
+ * something on screen changes about once a second. A visitor sees six or
  * seven different edits in the time it takes to read the headline.
  *
  * Each frame keeps only the playing clip and the next one in the DOM (the
@@ -22,8 +22,8 @@ import { wallClips, type WallClip } from '@/lib/videos';
  * the hero is scrolled out of view, and for visitors who ask for reduced
  * motion (they get the first clip of each, looping).
  *
- * The whole composition is one link to /work. There is no button on top of
- * the video: the label underneath says where a click goes.
+ * The whole block is one link to /work. Nothing sits on top of the video
+ * except a small label naming the kind of edit.
  *
  * Hidden on phones by the existing `.hero-right` rule, where the mobile hero
  * shows its own trust strip instead.
@@ -55,6 +55,17 @@ function interleave(clips: WallClip[], max: number): WallClip[] {
 const ALL = wallClips();
 const TALL = interleave(ALL.filter((c) => c.orientation !== 'horizontal'), 8);
 const WIDE = interleave(ALL.filter((c) => c.orientation === 'horizontal'), 6);
+// Two tall frames, each with its own half of the vertical clips.
+const TALL_A = TALL.filter((_, i) => i % 2 === 0);
+const TALL_B = TALL.filter((_, i) => i % 2 === 1);
+
+// One aligned block: a wide frame on top, two tall frames underneath.
+const W = 384;
+const GAP = 12;
+const WIDE_H = Math.round((W * 9) / 16);
+const TALL_W = (W - GAP) / 2;
+const TALL_H = Math.round(TALL_W * 1.62);
+
 
 function useReducedMotion(): boolean {
   return useSyncExternalStore(
@@ -124,7 +135,8 @@ function ReelFrame({
         position: 'absolute',
         overflow: 'hidden',
         background: '#0C0C0B',
-        boxShadow: '0 26px 70px rgba(12,12,11,0.22)',
+        border: '1px solid rgba(12,12,11,0.1)',
+        boxShadow: '0 18px 50px rgba(12,12,11,0.14)',
         ...style,
       }}
     >
@@ -190,7 +202,7 @@ export default function HeroReel() {
   const [hover, setHover] = useState(false);
   const [hidden, setHidden] = useState(false);
   const [onScreen, setOnScreen] = useState(true);
-  const rootRef = useRef<HTMLDivElement>(null);
+  const rootRef = useRef<HTMLAnchorElement>(null);
 
   // Do not burn through clips in a background tab or below the fold.
   useEffect(() => {
@@ -206,69 +218,51 @@ export default function HeroReel() {
   const hasWide = WIDE.length > 0;
 
   return (
-    <div ref={rootRef} className="hero-reel" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14 }}>
-      <Link
-        href="/work"
-        data-cursor-hover
-        aria-label={`See all ${ALL.length} edits on the work wall`}
-        onMouseEnter={() => setHover(true)}
-        onMouseLeave={() => setHover(false)}
-        className="hero-reel-stage"
-        style={{ position: 'relative', display: 'block', width: 380, height: hasWide ? 452 : 430, textDecoration: 'none' }}
-      >
+    <Link
+      ref={rootRef}
+      href="/work"
+      data-cursor-hover
+      aria-label={`See all ${ALL.length} edits on the work wall`}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      className="hero-reel"
+      style={{
+        position: 'relative',
+        display: 'block',
+        width: W,
+        height: hasWide ? WIDE_H + GAP + TALL_H : TALL_H,
+        textDecoration: 'none',
+      }}
+    >
+      {hasWide && (
         <ReelFrame
-          clips={TALL}
+          clips={WIDE}
           offset={0}
           running={running}
           reduced={reduced}
           render={wide}
           labelAt="top"
-          style={{ right: 0, top: 0, width: 236, aspectRatio: '9 / 16', borderRadius: 26, border: '1px solid rgba(12,12,11,0.12)' }}
+          style={{ left: 0, top: 0, width: W, height: WIDE_H, borderRadius: 20 }}
         />
-        {hasWide && (
-          <ReelFrame
-            clips={WIDE}
-            offset={SLOT_MS / 2}
-            running={running}
-            reduced={reduced}
-            render={wide}
-            labelAt="bottom"
-            style={{ left: 0, bottom: 0, width: 268, aspectRatio: '16 / 9', borderRadius: 18, border: '4px solid #F2EEE7' }}
-          />
-        )}
-      </Link>
-      <p style={{ margin: 0, fontSize: 12.5, color: '#6E6B63', fontFamily: 'Inter, sans-serif' }}>
-        {ALL.length} edits on the wall.{' '}
-        <Link href="/work" style={{ color: '#0C0C0B', fontWeight: 700, textDecoration: 'underline', textUnderlineOffset: 3 }}>
-          Watch them all
-        </Link>
-      </p>
-
-      <Link
-        href="/case-studies/magicbnb-seo-aeo"
-        data-cursor-hover
-        style={{
-          display: 'block',
-          width: 300,
-          padding: '12px 14px',
-          borderRadius: 16,
-          background: 'rgba(255,255,255,0.6)',
-          border: '1px solid rgba(255,255,255,0.85)',
-          boxShadow: '0 8px 30px rgba(12,12,11,0.06)',
-          textDecoration: 'none',
-          color: '#0C0C0B',
-        }}
-      >
-        <span style={{ display: 'block', fontSize: 10, fontWeight: 700, letterSpacing: 1.6, textTransform: 'uppercase', color: '#6E6B63', marginBottom: 4 }}>
-          Case study: MagicBNB
-        </span>
-        <span style={{ display: 'block', fontFamily: 'Inter, sans-serif', fontSize: 20, fontWeight: 900, letterSpacing: '-0.6px', lineHeight: 1.1 }}>
-          5.8 <span aria-hidden="true">&rarr;</span> 4,859 <span style={{ fontSize: 13, fontWeight: 600, color: '#6E6B63' }}>daily Google impressions</span>
-        </span>
-        <span style={{ display: 'block', fontSize: 12, color: '#6E6B63', marginTop: 3 }}>
-          April to November 2026 average, best day 5,522. Real export inside <span style={{ color: '#E8541A', fontWeight: 700 }}>&rarr;</span>
-        </span>
-      </Link>
-    </div>
+      )}
+      <ReelFrame
+        clips={TALL_A}
+        offset={SLOT_MS / 3}
+        running={running}
+        reduced={reduced}
+        render={wide}
+        labelAt="bottom"
+        style={{ left: 0, bottom: 0, width: TALL_W, height: TALL_H, borderRadius: 20 }}
+      />
+      <ReelFrame
+        clips={TALL_B}
+        offset={(SLOT_MS * 2) / 3}
+        running={running}
+        reduced={reduced}
+        render={wide}
+        labelAt="bottom"
+        style={{ right: 0, bottom: 0, width: TALL_W, height: TALL_H, borderRadius: 20 }}
+      />
+    </Link>
   );
 }

@@ -6,32 +6,32 @@ import type { WallClip, IcpKey } from '@/lib/videos';
 import { BOOK_CALL_URL, FREE_EDITS_LABEL, FREE_EDITS_URL } from '@/lib/links';
 
 /**
- * The /work wall: a full-screen honeycomb of every edit, navigated the way
- * the Apple Watch home screen is, but with the cursor instead of a finger.
+ * The /work wall: a full-screen bento of every edit, shot like a camera move.
  *
- * - Layout: circular tiles on a hex grid that wraps in both directions, so
- *   the screen is always full no matter how few clips a filter leaves. Clips
- *   repeat to fill the grid; adding clips to lib/videos.ts just makes the
- *   repeats rarer.
- * - Navigation (mouse): no dragging. The wall glides opposite to the cursor,
- *   so sweeping the mouse across the screen sweeps you across the wall, and
- *   it stops the moment the mouse stops. Wheel / trackpad scroll pans too.
- * - Navigation (touch): there is no cursor, so a swipe pans with inertia and
- *   the lens sits in the middle of the screen, exactly like the watch.
- * - Lens: tiles swell toward the cursor and neighbours are pushed outward by
- *   the integral of that swell, so nothing ever overlaps. Tiles also shrink
- *   toward the screen edges, which gives the domed look.
- * - Playback: the few tiles nearest the lens play a small muted preview;
- *   everything else is a still poster. Click a tile for the full video.
+ * - Layout: a pinwheel bento. Each 8x8-cell module holds two tall tiles
+ *   (3x5, vertical edits), two wide tiles (5x3, horizontal edits) and one
+ *   small square in the middle, with no holes. Modules repeat in both
+ *   directions and wrap, so the screen is always full. Clips are dealt into
+ *   the slot that matches their shape; adding clips to lib/videos.ts just
+ *   makes repeats rarer.
+ * - Navigation (mouse): no dragging. The wall glides opposite to the cursor
+ *   and stops when the mouse stops. Wheel / trackpad scroll pans too.
+ * - Navigation (touch): swipe pans with inertia; focus sits mid-screen.
+ * - Camera: the whole wall tilts a few degrees toward the cursor in real
+ *   perspective, pulls back slightly while it is moving and settles forward
+ *   when it stops, tiles brighten near the cursor and fall off into the dark
+ *   away from it, and a vignette plus fine grain sit over everything.
+ * - Cursor: a soft light and a small label follow the pointer on a spring,
+ *   naming the edit under it. The tile under the cursor lifts and plays;
+ *   its nearest neighbours play too.
  *
  * Every per-frame value is written straight to the DOM from one rAF loop.
  * React state only changes for the filter, the viewport size and the
  * lightbox, so moving the mouse never re-renders anything.
  */
 
-const LENS = 1.25;          // extra scale at the lens centre (1 + LENS = 2.25x)
-const MAX_LIVE = 7;         // centre tile + its six neighbours
-const MAX_LIVE_TOUCH = 4;
+const MAX_LIVE = 5;
+const MAX_LIVE_TOUCH = 3;
 
 const ICP_CHIPS: Array<{ key: IcpKey | 'all'; label: string }> = [
   { key: 'all', label: 'All' },
@@ -49,27 +49,71 @@ const TYPE_LABEL: Record<string, string> = {
   realestate: 'Listing',
 };
 
-type Grid = {
-  d: number; lay: number; dx: number; dy: number; cols: number; rows: number;
-  w: number; h: number; vw: number; vh: number; gain: number;
-};
+/** The pinwheel: [col, row, cols, rows, shape] inside an 8x8 module. */
+const SLOTS: Array<[number, number, number, number, 'tall' | 'wide' | 'square']> = [
+  [0, 0, 3, 5, 'tall'],
+  [3, 0, 5, 3, 'wide'],
+  [5, 3, 3, 5, 'tall'],
+  [0, 5, 5, 3, 'wide'],
+  [3, 3, 2, 2, 'square'],
+];
 
-/** Hex grid big enough to cover the screen and to show every clip once. */
-function makeGrid(vw: number, vh: number, n: number): Grid {
-  const d = Math.round(Math.max(78, Math.min(168, vw < 700 ? vw / 4.6 : vw / 9.5)));
-  const dx = Math.round(d * 1.06);
-  const dy = dx * 0.866;
-  let cols = Math.ceil(vw / dx) + 3;
-  let rows = Math.ceil(vh / dy) + 3;
-  if (rows % 2) rows++;
-  while (cols * rows < n) { cols++; if (cols * rows < n) rows += 2; }
-  // Keep the clip pattern from lining up into columns of the same video.
-  if (n > 3) while (cols % n === 0 || cols % n === 1 || cols % n === n - 1) cols++;
-  const w = cols * dx;
-  const h = rows * dy;
-  // How far one full sweep of the mouse travels: enough to cross one period.
-  const gain = Math.max(0.9, Math.min(2.4, Math.max(w / vw, h / vh) - 1));
-  return { d, lay: Math.round(d * 1.5), dx, dy, cols, rows, w, h, vw, vh, gain };
+type Tile = { key: string; x: number; y: number; w: number; h: number; clip: WallClip; first: boolean };
+type Grid = { tiles: Tile[]; w: number; h: number; vw: number; vh: number; gain: number; mod: number };
+
+function makeGrid(vw: number, vh: number, clips: WallClip[]): Grid | null {
+  if (!clips.length) return null;
+  const pitch = Math.round(Math.max(38, Math.min(78, vw / 19)));
+  const gap = Math.round(pitch * 0.16);
+  const mod = pitch * 8;
+  const tall = clips.filter((c) => c.orientation !== 'horizontal');
+  const wide = clips.filter((c) => c.orientation === 'horizontal');
+  const tallPool = tall.length ? tall : clips;
+  const widePool = wide.length ? wide : clips;
+
+  let mc = Math.ceil(vw / mod) + 2;
+  let mr = Math.ceil(vh / mod) + 2;
+  // Enough modules that every clip gets at least one slot of its own shape.
+  while (mc * mr * 2 < tallPool.length || mc * mr * 2 < widePool.length) {
+    if (mc <= mr * 1.6) mc++; else mr++;
+  }
+
+  const seen = new Set<string>();
+  const tiles: Tile[] = [];
+  let ti = 0, wi = 0, si = 0;
+  // A stride through each pool keeps the same clip from sitting next to itself.
+  const stride = (n: number) => {
+    let st = Math.max(1, Math.round(n * 0.618));
+    const gcd = (x: number, y: number): number => (y ? gcd(y, x % y) : x);
+    while (gcd(st, n) !== 1) st++;
+    return st;
+  };
+  const ts = stride(tallPool.length), ws = stride(widePool.length), ss = stride(clips.length);
+  for (let r = 0; r < mr; r++) {
+    for (let c = 0; c < mc; c++) {
+      SLOTS.forEach(([sc, sr, cw, ch, shape], k) => {
+        const clip =
+          shape === 'tall' ? tallPool[(ti++ * ts) % tallPool.length]
+          : shape === 'wide' ? widePool[(wi++ * ws) % widePool.length]
+          : clips[(si++ * ss + 3) % clips.length];
+        const first = !seen.has(clip.id);
+        seen.add(clip.id);
+        tiles.push({
+          key: `${r}-${c}-${k}`,
+          x: c * mod + sc * pitch,
+          y: r * mod + sr * pitch,
+          w: cw * pitch - gap,
+          h: ch * pitch - gap,
+          clip,
+          first,
+        });
+      });
+    }
+  }
+  const w = mc * mod;
+  const h = mr * mod;
+  const gain = Math.max(0.9, Math.min(2.2, Math.max(w / vw, h / vh) - 1));
+  return { tiles, w, h, vw, vh, gain, mod };
 }
 
 const smooth = (a: number, b: number, x: number) => {
@@ -99,10 +143,11 @@ export default function WorkWall({ clips }: { clips: WallClip[] }) {
   }, []);
 
   const stageRef = useRef<HTMLDivElement>(null);
-  const captionRef = useRef<HTMLDivElement>(null);
+  const worldRef = useRef<HTMLDivElement>(null);
+  const lightRef = useRef<HTMLDivElement>(null);
+  const chipRef = useRef<HTMLDivElement>(null);
+  const chipTextRef = useRef<HTMLSpanElement>(null);
 
-  // Viewport size drives the grid. Measured after mount (the server has no
-  // window), then on resize.
   useEffect(() => {
     const measure = () => {
       const el = stageRef.current;
@@ -114,29 +159,8 @@ export default function WorkWall({ clips }: { clips: WallClip[] }) {
   }, []);
 
   const visible = useMemo(() => (icp === 'all' ? clips : clips.filter((c) => c.icps.includes(icp))), [clips, icp]);
-
-  const grid = useMemo(() => (view ? makeGrid(view.vw, view.vh, visible.length) : null), [view, visible.length]);
-
-  // One tile per grid cell; clips are dealt out with a stride so the same
-  // video is never next to itself.
-  const tiles = useMemo(() => {
-    if (!grid || !visible.length) return [];
-    const n = visible.length;
-    let step = Math.max(1, Math.round(n * 0.618));
-    const gcd = (a: number, b: number): number => (b ? gcd(b, a % b) : a);
-    while (gcd(step, n) !== 1) step++;
-    const seen = new Set<string>();
-    const out: Array<{ key: string; col: number; row: number; clip: WallClip; first: boolean }> = [];
-    for (let r = 0; r < grid.rows; r++) {
-      for (let c = 0; c < grid.cols; c++) {
-        const clip = visible[((r * grid.cols + c) * step) % n];
-        const first = !seen.has(clip.id);
-        seen.add(clip.id);
-        out.push({ key: `${r}-${c}`, col: c, row: r, clip, first });
-      }
-    }
-    return out;
-  }, [grid, visible]);
+  const grid = useMemo(() => (view ? makeGrid(view.vw, view.vh, visible) : null), [view, visible]);
+  const tiles = grid?.tiles;
 
   const tileEls = useRef<Array<HTMLButtonElement | null>>([]);
   const videoEls = useRef<Array<HTMLVideoElement | null>>([]);
@@ -144,38 +168,40 @@ export default function WorkWall({ clips }: { clips: WallClip[] }) {
   // Mutable interaction state, kept out of React on purpose.
   const s = useRef({
     mx: 0, my: 0, hover: false,           // raw pointer, stage coords
-    fx: 0, fy: 0,                         // smoothed lens position
+    fx: 0, fy: 0,                         // smoothed focus point
+    cx: 0, cy: 0,                         // smoothed cursor label position
     ox: 0, oy: 0,                         // smoothed wall offset
     bx: 0, by: 0, vx: 0, vy: 0,           // base offset (wheel / touch) + inertia
+    tx: 0, ty: 0, dolly: 0,               // smoothed tilt and pull-back
     touching: false, moved: false, sx: 0, sy: 0, lx: 0, ly: 0, lt: 0,
-    live: new Set<number>(), born: 0, last: 0, settled: false, init: false,
-    caption: '',
+    live: new Set<number>(), focus: -1, born: 0, last: 0, settled: false, init: false,
   });
 
-  // Restart the intro and force a repaint whenever the tile set changes.
   useEffect(() => {
     const st = s.current;
     st.born = performance.now();
     st.settled = false;
     st.live = new Set();
+    st.focus = -1;
     if (grid && !st.init) {
       st.init = true;
-      st.fx = grid.vw / 2;
-      st.fy = grid.vh / 2;
+      st.fx = st.cx = grid.vw / 2;
+      st.fy = st.cy = grid.vh / 2;
     }
-  }, [tiles, grid]);
+  }, [grid]);
 
   // The frame loop.
   useEffect(() => {
-    if (!grid || !tiles.length) return;
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!grid) return;
     const g = grid;
+    const list = g.tiles;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const cx = g.vw / 2;
     const cy = g.vh / 2;
-    const sigma = g.d * 1.2;
-    const k0 = g.d / g.lay;
-    const half = g.lay / 2;
-    const hidden = new Uint8Array(tiles.length);
+    const reach = g.mod * 0.62;           // how far the lift and the light reach
+    const hidden = new Uint8Array(list.length);
+    const padX = g.vw * 0.08 + 40;        // the tilt exposes a little past the edges
+    const padY = g.vh * 0.08 + 40;
     let raf = 0;
 
     const tick = (now: number) => {
@@ -184,7 +210,6 @@ export default function WorkWall({ clips }: { clips: WallClip[] }) {
       const dt = Math.min(0.05, st.last ? (now - st.last) / 1000 : 0.016);
       st.last = now;
 
-      // Touch inertia on the base offset.
       if (!st.touching && (Math.abs(st.vx) > 4 || Math.abs(st.vy) > 4)) {
         st.bx += st.vx * dt;
         st.by += st.vy * dt;
@@ -193,68 +218,80 @@ export default function WorkWall({ clips }: { clips: WallClip[] }) {
         st.vy *= decay;
       }
 
-      // Targets: the lens follows the cursor, the wall runs opposite to it.
+      const nx = st.hover ? (st.mx - cx) / cx : 0;
+      const ny = st.hover ? (st.my - cy) / cy : 0;
       const tfx = st.hover ? st.mx : cx;
       const tfy = st.hover ? st.my : cy;
-      const tox = st.bx + (st.hover ? -(st.mx - cx) * g.gain : 0);
-      const toy = st.by + (st.hover ? -(st.my - cy) * g.gain : 0);
-      const aF = reduce ? 1 : 1 - Math.exp(-dt / 0.085);
-      const aO = reduce ? 1 : 1 - Math.exp(-dt / 0.17);
-      const pfx = st.fx, pfy = st.fy, pox = st.ox, poy = st.oy;
-      st.fx += (tfx - st.fx) * aF;
-      st.fy += (tfy - st.fy) * aF;
-      st.ox += (tox - st.ox) * aO;
-      st.oy += (toy - st.oy) * aO;
+      const tox = st.bx - nx * cx * g.gain;
+      const toy = st.by - ny * cy * g.gain;
+      const ease = (tau: number) => (reduce ? 1 : 1 - Math.exp(-dt / tau));
+      const pox = st.ox, poy = st.oy, pfx = st.fx, pfy = st.fy, pcx = st.cx, pcy = st.cy, ptx = st.tx, pty = st.ty;
+      st.fx += (tfx - st.fx) * ease(0.1);
+      st.fy += (tfy - st.fy) * ease(0.1);
+      st.cx += (tfx - st.cx) * ease(0.16);
+      st.cy += (tfy - st.cy) * ease(0.16);
+      st.ox += (tox - st.ox) * ease(0.22);
+      st.oy += (toy - st.oy) * ease(0.22);
+      st.tx += ((reduce ? 0 : nx) - st.tx) * ease(0.3);
+      st.ty += ((reduce ? 0 : ny) - st.ty) * ease(0.3);
+      // Pull the camera back a touch while the wall is travelling.
+      const speed = Math.hypot(st.ox - pox, st.oy - poy) / dt;
+      st.dolly += ((reduce ? 0 : Math.min(1, speed / 2600)) - st.dolly) * ease(0.28);
 
       const age = (now - st.born) / 1000;
-      const intro = !reduce && age < 1.6;
+      const intro = !reduce && age < 1.5;
       const moving =
-        Math.abs(st.fx - pfx) + Math.abs(st.fy - pfy) + Math.abs(st.ox - pox) + Math.abs(st.oy - poy) > 0.02;
+        Math.abs(st.fx - pfx) + Math.abs(st.fy - pfy) + Math.abs(st.ox - pox) + Math.abs(st.oy - poy) +
+        Math.abs(st.cx - pcx) + Math.abs(st.cy - pcy) + (Math.abs(st.tx - ptx) + Math.abs(st.ty - pty)) * 200 > 0.02;
       if (!moving && !intro && st.settled) return;
       st.settled = !moving && !intro;
+
+      if (worldRef.current) {
+        worldRef.current.style.transform =
+          `rotateX(${(-st.ty * 3.2).toFixed(3)}deg) rotateY(${(st.tx * 4.2).toFixed(3)}deg) scale(${(1.07 - st.dolly * 0.045).toFixed(4)})`;
+      }
+      if (lightRef.current) {
+        lightRef.current.style.transform = `translate3d(${(st.cx - 380).toFixed(1)}px,${(st.cy - 380).toFixed(1)}px,0)`;
+        lightRef.current.style.opacity = st.hover ? '1' : '0.55';
+      }
+      if (chipRef.current) {
+        chipRef.current.style.transform = `translate3d(${(st.cx + 20).toFixed(1)}px,${(st.cy + 22).toFixed(1)}px,0)`;
+      }
 
       const maxLive = st.hover ? MAX_LIVE : MAX_LIVE_TOUCH;
       const nearI: number[] = [];
       const nearD: number[] = [];
+      let focus = -1;
 
-      for (let i = 0; i < tiles.length; i++) {
-        const t = tiles[i];
+      for (let i = 0; i < list.length; i++) {
+        const t = list[i];
         const el = tileEls.current[i];
         if (!el) continue;
-        // Grid position, wrapped around the middle of the screen.
-        const x = mod(t.col * g.dx + (t.row & 1 ? g.dx / 2 : 0) + st.ox - cx + g.w / 2, g.w) - g.w / 2 + cx;
-        const y = mod(t.row * g.dy + st.oy - cy + g.h / 2, g.h) - g.h / 2 + cy;
-        // Lens: swell by a Lorentzian, push out by its integral.
-        const ddx = x - st.fx;
-        const ddy = y - st.fy;
-        const d = Math.hypot(ddx, ddy);
-        const u = d / sigma;
-        const swell = 1 + LENS / (1 + u * u);
-        const push = d > 0.01 ? (d + LENS * sigma * Math.atan(u)) / d : 1;
-        // The push spreads tiles a little more around the lens than along
-        // it; growing them by a fraction of that difference closes the gaps
-        // without ever letting two tiles touch.
-        const fill = Math.pow(push / swell, 0.25);
-        const X = st.fx + ddx * push;
-        const Y = st.fy + ddy * push;
-
-        const off = X < -g.lay || X > g.vw + g.lay || Y < -g.lay || Y > g.vh + g.lay;
+        const X = mod(t.x + t.w / 2 + st.ox - cx + g.w / 2, g.w) - g.w / 2 + cx;
+        const Y = mod(t.y + t.h / 2 + st.oy - cy + g.h / 2, g.h) - g.h / 2 + cy;
+        const hw = t.w / 2, hh = t.h / 2;
+        const off = X + hw < -padX || X - hw > g.vw + padX || Y + hh < -padY || Y - hh > g.vh + padY;
         if (off) {
           if (!hidden[i]) { hidden[i] = 1; el.style.visibility = 'hidden'; }
           continue;
         }
         if (hidden[i]) { hidden[i] = 0; el.style.visibility = ''; }
 
-        // Dome: shrink toward the screen edges.
-        const edge = 1 - 0.36 * smooth(0.7, 1.4, Math.hypot((X - cx) / cx, (Y - cy) / cy));
-        let k = swell * fill * edge;
+        // Distance from the focus point to the tile's rectangle (0 inside it).
+        const d = Math.hypot(Math.max(Math.abs(X - st.fx) - hw, 0), Math.max(Math.abs(Y - st.fy) - hh, 0));
+        const near = 1 / (1 + (d / reach) * (d / reach));
+        let k = 1 + 0.035 * near;
+        let light = 0.42 + 0.58 * near;
         if (intro) {
-          const p = smooth(0, 0.55, age - Math.hypot(x - cx, y - cy) / 1500);
-          k *= 1 - (1 - p) * (1 - p) * (1 - p);
+          const p = smooth(0, 0.6, age - Math.hypot(X - cx, Y - cy) / 1700);
+          const e = 1 - (1 - p) * (1 - p) * (1 - p);
+          k *= 0.86 + 0.14 * e;
+          light *= e;
         }
-        el.style.transform = `translate3d(${(X - half).toFixed(1)}px,${(Y - half).toFixed(1)}px,0) scale(${(k * k0).toFixed(4)})`;
+        el.style.transform = `translate3d(${(X - hw).toFixed(1)}px,${(Y - hh).toFixed(1)}px,0) scale(${k.toFixed(4)})`;
+        el.style.opacity = light.toFixed(3);
 
-        // Keep the few tiles nearest the lens, sorted.
+        if (d === 0 && st.hover) focus = i;
         if (nearI.length < maxLive || d < nearD[nearD.length - 1]) {
           let j = nearD.length;
           while (j > 0 && nearD[j - 1] > d) j--;
@@ -281,19 +318,20 @@ export default function WorkWall({ clips }: { clips: WallClip[] }) {
         st.live = want;
       }
 
-      const top = nearI.length ? tiles[nearI[0]].clip : null;
-      const text = top ? `${top.brand} · ${top.label}` : '';
-      if (text !== st.caption && captionRef.current) {
-        st.caption = text;
-        captionRef.current.textContent = text;
+      if (focus !== st.focus) {
+        tileEls.current[st.focus]?.classList.remove('is-focus');
+        tileEls.current[focus]?.classList.add('is-focus');
+        st.focus = focus;
+        const c = focus >= 0 ? list[focus].clip : null;
+        if (chipTextRef.current && c) chipTextRef.current.textContent = `${c.brand} · ${c.label}`;
+        chipRef.current?.classList.toggle('is-on', focus >= 0);
       }
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [grid, tiles]);
+  }, [grid]);
 
-  // Wheel / trackpad pans the wall. Needs a non-passive listener to stop the
-  // browser's back-swipe and page bounce.
+  // Wheel / trackpad pans the wall.
   useEffect(() => {
     const el = stageRef.current;
     if (!el) return;
@@ -370,10 +408,11 @@ export default function WorkWall({ clips }: { clips: WallClip[] }) {
   // Lightbox: Escape closes, wall previews pause while it is open.
   useEffect(() => {
     if (!open) return;
+    const st = s.current;
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(null); };
     window.addEventListener('keydown', onKey);
     videoEls.current.forEach((v) => v?.pause());
-    return () => { window.removeEventListener('keydown', onKey); s.current.live = new Set(); s.current.settled = false; };
+    return () => { window.removeEventListener('keydown', onKey); st.live = new Set(); st.settled = false; };
   }, [open]);
 
   const counts = useMemo(() => {
@@ -393,44 +432,54 @@ export default function WorkWall({ clips }: { clips: WallClip[] }) {
         onPointerCancel={endTouch}
         onPointerLeave={onLeave}
       >
-        {grid &&
-          tiles.map((t, i) => (
-            <button
-              key={t.key}
-              type="button"
-              className="ww-tile"
-              ref={(el) => { tileEls.current[i] = el; }}
-              style={{ width: grid.lay, height: grid.lay, transform: 'translate3d(-999px,-999px,0) scale(0)' }}
-              tabIndex={t.first ? 0 : -1}
-              aria-hidden={t.first ? undefined : true}
-              aria-label={`${t.clip.brand}: ${t.clip.label}. Open video.`}
-              onClick={() => { if (!s.current.moved) setOpen(t.clip); }}
-              onFocus={(e) => {
-                // Keyboard: bring the focused tile under the lens.
-                if (!e.currentTarget.matches(':focus-visible')) return;
-                const st = s.current;
-                st.hover = false;
-                st.bx = grid.vw / 2 - (t.col * grid.dx + (t.row & 1 ? grid.dx / 2 : 0));
-                st.by = grid.vh / 2 - t.row * grid.dy;
-                st.settled = false;
-              }}
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={t.clip.poster} alt="" decoding="async" draggable={false} />
-              <video
-                ref={(el) => { videoEls.current[i] = el; }}
-                data-src={t.clip.preview}
-                muted
-                loop
-                playsInline
-                preload="none"
-                tabIndex={-1}
-                aria-hidden="true"
-              />
-            </button>
-          ))}
+        <div ref={worldRef} className="ww-world">
+          {grid &&
+            tiles?.map((t, i) => (
+              <button
+                key={t.key}
+                type="button"
+                className="ww-tile"
+                ref={(el) => { tileEls.current[i] = el; }}
+                style={{ width: t.w, height: t.h, opacity: 0 }}
+                tabIndex={t.first ? 0 : -1}
+                aria-hidden={t.first ? undefined : true}
+                aria-label={`${t.clip.brand}: ${t.clip.label}. Open video.`}
+                onClick={() => { if (!s.current.moved) setOpen(t.clip); }}
+                onFocus={(e) => {
+                  // Keyboard: bring the focused tile to the middle of the screen.
+                  if (!e.currentTarget.matches(':focus-visible')) return;
+                  const st = s.current;
+                  st.hover = false;
+                  st.bx = grid.vw / 2 - (t.x + t.w / 2);
+                  st.by = grid.vh / 2 - (t.y + t.h / 2);
+                  st.settled = false;
+                }}
+              >
+                <span className="ww-in">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={t.clip.poster} alt="" decoding="async" draggable={false} />
+                  <video
+                    ref={(el) => { videoEls.current[i] = el; }}
+                    data-src={t.clip.preview}
+                    muted
+                    loop
+                    playsInline
+                    preload="none"
+                    tabIndex={-1}
+                    aria-hidden="true"
+                  />
+                </span>
+              </button>
+            ))}
+        </div>
 
+        <div ref={lightRef} className="ww-light" aria-hidden="true" />
         <div className="ww-vignette" aria-hidden="true" />
+        <div className="ww-grain" aria-hidden="true" />
+        <div ref={chipRef} className="ww-cursor" aria-hidden="true">
+          <i />
+          <span ref={chipTextRef} />
+        </div>
       </div>
 
       <div className="ww-top">
@@ -455,7 +504,16 @@ export default function WorkWall({ clips }: { clips: WallClip[] }) {
         </div>
       </div>
 
-      <div ref={captionRef} className="ww-caption" aria-hidden="true" />
+      <div className="ww-cta">
+        <p>
+          <strong>Want edits like these?</strong>
+          <span>Free 15-minute call. Your first 2 edits are free.</span>
+        </p>
+        <a href={BOOK_CALL_URL} target="_blank" rel="noopener noreferrer" className="ww-book">
+          Book a call <span aria-hidden="true">&rarr;</span>
+        </a>
+      </div>
+
       <div className={`ww-hint${hinted ? ' is-gone' : ''}`} aria-hidden="true">
         <span className="ww-hint-mouse">Move your mouse to explore · click a video to open it</span>
         <span className="ww-hint-touch">Swipe to explore · tap a video to open it</span>
@@ -481,32 +539,66 @@ export default function WorkWall({ clips }: { clips: WallClip[] }) {
       )}
 
 
+
       <style>{`
-        .ww { position: fixed; inset: 0; background: #0A0A09; overflow: hidden; }
+        .ww { position: fixed; inset: 0; background: #070706; overflow: hidden; }
         .ww-stage {
-          position: absolute; inset: 0; overflow: hidden; cursor: pointer;
+          position: absolute; inset: 0; overflow: hidden; cursor: pointer; perspective: 1500px;
           touch-action: none; user-select: none; -webkit-user-select: none;
         }
+        .ww-world { position: absolute; inset: 0; transform-origin: 50% 50%; will-change: transform; }
         .ww-tile {
-          position: absolute; left: 0; top: 0; padding: 0; border: 0; border-radius: 50%;
-          background: #1a1917; cursor: pointer; overflow: hidden;
-          clip-path: circle(50%); will-change: transform; transform-origin: 50% 50%;
-          contain: layout paint; outline: none;
+          position: absolute; left: 0; top: 0; padding: 0; border: 0; background: none;
+          cursor: pointer; will-change: transform; transform-origin: 50% 50%; outline: none;
         }
-        .ww-tile img, .ww-tile video {
+        .ww-in {
+          position: absolute; inset: 0; display: block; overflow: hidden; border-radius: 18px;
+          background: #161513; box-shadow: 0 0 0 1px rgba(255,255,255,0.07);
+          transition: transform .45s cubic-bezier(.16,1,.3,1), box-shadow .45s cubic-bezier(.16,1,.3,1), border-radius .45s;
+        }
+        .ww-in img, .ww-in video {
           position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block;
           pointer-events: none;
         }
-        .ww-tile video { opacity: 0; transition: opacity .3s ease; }
-        .ww-tile.is-live video { opacity: 1; }
-        .ww-tile::after {
-          content: ''; position: absolute; inset: 0; border-radius: 50%;
-          box-shadow: inset 0 0 0 1.5px rgba(255,255,255,0.08); pointer-events: none;
+        .ww-in video { opacity: 0; transition: opacity .35s ease; }
+        .ww-tile.is-live .ww-in video { opacity: 1; }
+        .ww-tile.is-focus { z-index: 3; }
+        .ww-tile.is-focus .ww-in {
+          transform: scale(1.055);
+          box-shadow: 0 0 0 1.5px rgba(255,255,255,0.55), 0 30px 70px rgba(0,0,0,0.7), 0 0 60px rgba(232,84,26,0.18);
         }
-        .ww-tile:focus-visible::after { box-shadow: inset 0 0 0 5px #E8541A; }
+        .ww-tile:focus-visible .ww-in { box-shadow: 0 0 0 3px #E8541A; }
+
+        .ww-light {
+          position: absolute; left: 0; top: 0; width: 760px; height: 760px; border-radius: 50%; pointer-events: none;
+          background: radial-gradient(circle, rgba(255,214,170,0.13) 0%, rgba(255,170,110,0.05) 38%, transparent 68%);
+          will-change: transform; transition: opacity .6s ease;
+        }
         .ww-vignette {
           position: absolute; inset: 0; pointer-events: none;
-          background: radial-gradient(ellipse at center, transparent 55%, rgba(10,10,9,0.55) 100%);
+          background:
+            radial-gradient(ellipse 78% 72% at 50% 50%, transparent 46%, rgba(7,7,6,0.62) 82%, rgba(7,7,6,0.94) 100%),
+            linear-gradient(to bottom, rgba(7,7,6,0.5), transparent 16%, transparent 84%, rgba(7,7,6,0.5));
+        }
+        .ww-grain {
+          position: absolute; inset: 0; pointer-events: none; opacity: 0.05;
+          background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='160' height='160' filter='url(%23n)'/></svg>");
+        }
+        .ww-cursor {
+          position: absolute; left: 0; top: 0; z-index: 4; pointer-events: none; will-change: transform;
+          display: inline-flex; align-items: center; gap: 8px; padding: 7px 12px 7px 8px; border-radius: 100px;
+          background: rgba(12,12,11,0.7); border: 1px solid rgba(255,255,255,0.16);
+          -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+          color: #F2EEE7; font: 600 12px Inter, sans-serif; white-space: nowrap;
+          opacity: 0; transition: opacity .25s ease;
+        }
+        .ww-cursor.is-on { opacity: 1; }
+        .ww-cursor i {
+          width: 20px; height: 20px; border-radius: 50%; background: #E8541A; flex: 0 0 auto; position: relative;
+        }
+        .ww-cursor i::after {
+          content: ''; position: absolute; left: 8px; top: 5.5px;
+          border-left: 7px solid #fff; border-top: 4.5px solid transparent; border-bottom: 4.5px solid transparent;
         }
 
         .ww-top {
@@ -535,15 +627,26 @@ export default function WorkWall({ clips }: { clips: WallClip[] }) {
         }
         .ww-chip:hover { color: #F2EEE7; }
         .ww-chip.is-on { background: #F2EEE7; color: #0C0C0B; }
-        .ww-chip:focus-visible, .ww-home:focus-visible { outline: 2px solid #E8541A; outline-offset: 2px; }
-
-        .ww-caption {
-          position: absolute; left: 18px; bottom: 18px; z-index: 5; pointer-events: none;
-          font: 600 12.5px Inter, sans-serif; color: rgba(242,238,231,0.78);
-          text-shadow: 0 1px 12px rgba(0,0,0,0.9);
+        .ww-cta {
+          position: absolute; left: 50%; bottom: 20px; transform: translateX(-50%); z-index: 5;
+          display: flex; align-items: center; gap: 18px; padding: 8px 8px 8px 22px; border-radius: 100px; max-width: calc(100% - 24px);
+          background: rgba(12,12,11,0.72); border: 1px solid rgba(255,255,255,0.14);
+          -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px);
+          box-shadow: 0 20px 60px rgba(0,0,0,0.55);
         }
+        .ww-cta p { margin: 0; display: flex; flex-direction: column; gap: 1px; font-family: Inter, sans-serif; min-width: 0; }
+        .ww-cta strong { font-size: 14px; font-weight: 800; color: #F2EEE7; letter-spacing: -0.01em; white-space: nowrap; }
+        .ww-cta p span { font-size: 12px; color: rgba(242,238,231,0.66); white-space: nowrap; }
+        .ww-book {
+          display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 18px; border-radius: 100px;
+          background: #E8541A; color: #fff; text-decoration: none; font: 800 14px Inter, sans-serif; white-space: nowrap; min-height: 46px; padding: 0 22px; flex: 0 0 auto;
+          box-shadow: 0 10px 30px rgba(232,84,26,0.35); transition: background .2s, transform .2s;
+        }
+        .ww-book:hover { background: #FF6A2B; transform: translateY(-1px); }
+        .ww-chip:focus-visible, .ww-home:focus-visible, .ww-book:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+
         .ww-hint {
-          position: absolute; left: 50%; bottom: 18px; transform: translateX(-50%); z-index: 5;
+          position: absolute; left: 50%; bottom: 96px; transform: translateX(-50%); z-index: 5;
           padding: 8px 14px; border-radius: 100px; background: rgba(12,12,11,0.72);
           border: 1px solid rgba(255,255,255,0.14); color: #F2EEE7;
           font: 600 12px Inter, sans-serif; white-space: nowrap; pointer-events: none;
@@ -552,7 +655,7 @@ export default function WorkWall({ clips }: { clips: WallClip[] }) {
         .ww-hint.is-gone { opacity: 0; }
         .ww-hint-touch { display: none; }
         @media (hover: none) {
-          .ww-hint-mouse { display: none; }
+          .ww-hint-mouse, .ww-cursor, .ww-light { display: none; }
           .ww-hint-touch { display: inline; }
         }
 
@@ -577,16 +680,22 @@ export default function WorkWall({ clips }: { clips: WallClip[] }) {
         .ww-btn:focus-visible { outline: 2px solid #E8541A; outline-offset: 2px; }
 
 
+
         @media (max-width: 640px) {
           .ww-top { padding: 12px; gap: 8px; }
           .ww-home span { display: none; }
           .ww-home { padding: 6px; }
-          .ww-chips { margin: 0; min-width: 0; flex: 0 1 auto; }
-          .ww-caption { display: none; }
+          .ww-chips { margin: 0; min-width: 0; flex: 1 1 auto; }
+          .ww-cta { gap: 10px; padding: 6px 6px 6px 16px; bottom: 14px; }
+          .ww-cta p span { display: none; }
+          .ww-cta strong { font-size: 13px; }
+          .ww-book { padding: 0 16px; min-height: 42px; }
+          .ww-hint { bottom: 80px; }
+          .ww-in { border-radius: 12px; }
           .ww-hint { font-size: 11px; }
         }
         @media (prefers-reduced-motion: reduce) {
-          .ww-tile video, .ww-hint { transition: none; }
+          .ww-in, .ww-in video, .ww-hint, .ww-cursor { transition: none; }
         }
       `}</style>
     </div>

@@ -212,11 +212,11 @@ export default function Cursor() {
     <>
       <style>{`
         .ep-cur-d, .ep-cur-r { position: fixed; top: 0; left: 0; pointer-events: none; z-index: 9999; border-radius: 50%; will-change: transform; contain: layout style paint; }
-        .ep-cur-d { width: 8px; height: 8px; background: rgba(12,12,11,.95); transition: background-color .18s ease; }
-        .ep-cur-d.on-dark { background: #F2EEE7; }
-        .ep-cur-r { width: 28px; height: 28px; border: 1px solid rgba(12,12,11,.7); z-index: 9998; transition: width .28s cubic-bezier(.16,1,.3,1), height .28s cubic-bezier(.16,1,.3,1), border-color .18s ease; }
-        .ep-cur-r.on-dark { border-color: rgba(242,238,231,.85); }
-        .ep-cur-r.hovered { width: 44px; height: 44px; border-color: #E8541A; }
+        .ep-cur-d { width: 8px; height: 8px; background: #fff; mix-blend-mode: difference; }
+        .ep-cur-d.on-dark { background: #fff; }
+        .ep-cur-r { width: 28px; height: 28px; border: 1.5px solid #fff; mix-blend-mode: difference; z-index: 9998; transition: width .28s cubic-bezier(.16,1,.3,1), height .28s cubic-bezier(.16,1,.3,1), border-color .18s ease; }
+        .ep-cur-r.on-dark { border-color: #fff; }
+        .ep-cur-r.hovered { width: 44px; height: 44px; border-color: #fff; }
         @media (max-width: 768px), (pointer: coarse) { .ep-cur-d, .ep-cur-r { display: none !important; } }
       `}</style>
       <div ref={d} className="ep-cur-d" aria-hidden="true" />

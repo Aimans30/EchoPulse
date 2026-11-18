@@ -76,6 +76,7 @@ export default function FreeEditsForm() {
   const [note, setNote] = useState('');
   const [errors, setErrors] = useState<Errors>({});
   const [status, setStatus] = useState<Status>('idle');
+  const [step, setStep] = useState(0);
 
   const validate = (): Errors => {
     const e: Errors = {};
@@ -88,14 +89,26 @@ export default function FreeEditsForm() {
     return e;
   };
 
+  /** Which step each required field lives on. */
+  const STEP_OF: Record<keyof Errors, number> = { name: 0, email: 0, business: 0, footage: 1 };
+
+  const goNext = () => {
+    const all = validate();
+    const here = Object.fromEntries(Object.entries(all).filter(([k]) => STEP_OF[k as keyof Errors] === step)) as Errors;
+    setErrors(here);
+    if (Object.keys(here).length === 0) setStep((n) => Math.min(2, n + 1));
+  };
+
   const onSubmit = async (ev: React.FormEvent) => {
     ev.preventDefault();
     if (status === 'submitting') return;
+    // Enter inside an earlier step moves forward instead of submitting.
+    if (step < 2) { goNext(); return; }
     const e = validate();
     setErrors(e);
-    if (Object.keys(e).length > 0) {
-      // Bring the first problem into view; the required fields are at the top.
-      document.querySelector('.fe-card [aria-invalid="true"]')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    const bad = Object.keys(e) as Array<keyof Errors>;
+    if (bad.length > 0) {
+      setStep(Math.min(...bad.map((k) => STEP_OF[k])));
       return;
     }
 
@@ -156,18 +169,28 @@ export default function FreeEditsForm() {
   });
 
   return (
-    <form className="fe-card" onSubmit={onSubmit} noValidate>
-      <p className="fe-step"><span>1</span> About you</p>
+    <form className="fe-card" onSubmit={onSubmit} noValidate aria-label="Request 2 free edited videos">
+      <ol className="fe-progress" aria-label="Progress">
+        {['About you', 'Your footage', 'Editing style'].map((label, i) => (
+          <li key={label} className={i === step ? 'is-on' : i < step ? 'is-done' : undefined} aria-current={i === step ? 'step' : undefined}>
+            <button type="button" onClick={() => { if (i < step) setStep(i); }} disabled={i > step} aria-label={`Step ${i + 1}: ${label}`}>
+              <span>{i + 1}</span> {label}
+            </button>
+          </li>
+        ))}
+      </ol>
+
+      <div className="fe-pane" hidden={step !== 0}>
 
       <div className="fe-row">
         <div className="fe-field">
           <label htmlFor={id('name')}>Name</label>
-          <input id={id('name')} type="text" autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} required {...fieldProps('name')} />
+          <input id={id('name')} name="name" type="text" autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} required {...fieldProps('name')} />
           {errors.name && <p className="fe-err" id={id('name-err')}>{errors.name}</p>}
         </div>
         <div className="fe-field">
           <label htmlFor={id('email')}>Email</label>
-          <input id={id('email')} type="email" autoComplete="email" inputMode="email" value={email} onChange={(e) => setEmail(e.target.value)} required {...fieldProps('email')} />
+          <input id={id('email')} name="email" type="email" autoComplete="email" inputMode="email" value={email} onChange={(e) => setEmail(e.target.value)} required {...fieldProps('email')} />
           {errors.email && <p className="fe-err" id={id('email-err')}>{errors.email}</p>}
         </div>
       </div>
@@ -175,11 +198,11 @@ export default function FreeEditsForm() {
       <div className="fe-row">
         <div className="fe-field">
           <label htmlFor={id('profile')}>Website or social <span className="fe-opt">(optional)</span></label>
-          <input id={id('profile')} type="text" placeholder="@handle or yoursite.com" value={profile} onChange={(e) => setProfile(e.target.value)} />
+          <input id={id('profile')} name="website_or_social" type="text" placeholder="@handle or yoursite.com" value={profile} onChange={(e) => setProfile(e.target.value)} />
         </div>
         <div className="fe-field">
           <label htmlFor={id('phone')}>Phone or WhatsApp <span className="fe-opt">(optional)</span></label>
-          <input id={id('phone')} type="tel" autoComplete="tel" inputMode="tel" value={phone} onChange={(e) => setPhone(e.target.value)} />
+          <input id={id('phone')} name="phone" type="tel" autoComplete="tel" inputMode="tel" value={phone} onChange={(e) => setPhone(e.target.value)} />
         </div>
       </div>
 
@@ -188,11 +211,13 @@ export default function FreeEditsForm() {
         {errors.business && <p className="fe-err" id={id('business-err')} style={{ marginTop: 8 }}>{errors.business}</p>}
       </div>
 
-      <p className="fe-step"><span>2</span> Your footage</p>
+      </div>
+
+      <div className="fe-pane" hidden={step !== 1}>
 
       <div className="fe-field">
         <label htmlFor={id('footage')}>Link to your footage</label>
-        <input id={id('footage')} type="url" inputMode="url" placeholder="https://drive.google.com/..." value={footage} onChange={(e) => setFootage(e.target.value)} required {...fieldProps('footage')} />
+        <input id={id('footage')} name="footage_url" type="url" inputMode="url" placeholder="https://drive.google.com/..." value={footage} onChange={(e) => setFootage(e.target.value)} required {...fieldProps('footage')} />
         <p className="fe-hint">Google Drive, Dropbox, WeTransfer or similar. Make sure the link is open to anyone with it.</p>
         {errors.footage && <p className="fe-err" id={id('footage-err')}>{errors.footage}</p>}
       </div>
@@ -200,32 +225,54 @@ export default function FreeEditsForm() {
       <Chips legend="What kind of video is it?" name={id('kinds')} options={VIDEO_KINDS} value={kinds} onChange={setKinds} multi />
       <Chips legend="Where will you post it?" name={id('platforms')} options={PLATFORMS} value={platforms} onChange={setPlatforms} multi />
 
-      <p className="fe-step"><span>3</span> How you want it edited <em>optional, skip what you like</em></p>
-
-      <Chips legend="Editing style" name={id('style')} options={STYLES} value={style} onChange={setStyle} />
-      <Chips legend="Captions" name={id('captions')} options={CAPTIONS} value={captions} onChange={setCaptions} />
-      <Chips legend="Music" name={id('music')} options={MUSIC} value={music} onChange={setMusic} />
-
-      <div className="fe-field">
-        <label htmlFor={id('reference')}>A video whose editing you like <span className="fe-opt">(optional)</span></label>
-        <input id={id('reference')} type="text" inputMode="url" placeholder="Link to a reel, short or video" value={reference} onChange={(e) => setReference(e.target.value)} />
-        <p className="fe-hint">Yours or anyone else&apos;s. It is the fastest way to show us the look you want.</p>
       </div>
 
-      <div className="fe-field">
-        <label htmlFor={id('brand')}>Brand colours, fonts or logo <span className="fe-opt">(optional)</span></label>
-        <input id={id('brand')} type="text" placeholder="Hex codes, font names, or a link to your brand kit" value={brand} onChange={(e) => setBrand(e.target.value)} />
+      <div className="fe-pane" hidden={step !== 2}>
+        <p className="fe-hint">All optional. Skip anything you do not have a view on and we will decide.</p>
+
+      <Chips legend="Editing style" name={id('style')} options={STYLES} value={style} onChange={setStyle} />
+      <div className="fe-row">
+        <Chips legend="Captions" name={id('captions')} options={CAPTIONS} value={captions} onChange={setCaptions} />
+        <Chips legend="Music" name={id('music')} options={MUSIC} value={music} onChange={setMusic} />
+      </div>
+
+      <div className="fe-row">
+        <div className="fe-field">
+          <label htmlFor={id('reference')}>A video you like the editing of</label>
+          <input id={id('reference')} name="reference_video_url" type="text" inputMode="url" placeholder="Link to a reel or video" value={reference} onChange={(e) => setReference(e.target.value)} />
+        </div>
+        <div className="fe-field">
+          <label htmlFor={id('brand')}>Brand colours, fonts or logo</label>
+          <input id={id('brand')} name="brand_details" type="text" placeholder="Hex codes or a brand kit link" value={brand} onChange={(e) => setBrand(e.target.value)} />
+        </div>
       </div>
 
       <div className="fe-field">
         <label htmlFor={id('note')}>Anything else we should know? <span className="fe-opt">(optional)</span></label>
-        <textarea id={id('note')} rows={3} placeholder="The hook you want, parts to cut, a deadline, anything." value={note} onChange={(e) => setNote(e.target.value)} />
+        <textarea id={id('note')} name="notes" rows={2} placeholder="The hook you want, parts to cut, a deadline, anything." value={note} onChange={(e) => setNote(e.target.value)} />
       </div>
 
-      <button type="submit" className="fe-btn" disabled={status === 'submitting'}>
-        {status === 'submitting' ? 'Sending...' : 'Send my footage'}
-      </button>
-      <p className="fe-hint fe-center">No card, no call. Two edited videos back within 48 hours.</p>
+      </div>
+
+      <div className="fe-nav">
+        {step > 0 && (
+          <button type="button" className="fe-back" onClick={() => setStep((n) => n - 1)}>
+            Back
+          </button>
+        )}
+        {step < 2 ? (
+          <button key="next" type="button" className="fe-btn" onClick={goNext}>
+            Continue
+          </button>
+        ) : (
+          <button key="send" type="submit" className="fe-btn" disabled={status === 'submitting'}>
+            {status === 'submitting' ? 'Sending...' : 'Send my footage'}
+          </button>
+        )}
+      </div>
+      <p className="fe-hint fe-center">
+        {step === 1 ? 'You can send from here: tap Continue, then Send. Step 3 is optional.' : 'No card, no call. Two edited videos back within 48 hours.'}
+      </p>
 
       {status === 'error' && (
         <p className="fe-err fe-fail" role="alert">
@@ -240,7 +287,7 @@ export default function FreeEditsForm() {
 }
 
 const styles = `
-  .fe-card { background: #0C0C0B; color: #F2EEE7; border-radius: 24px; padding: 32px; box-shadow: 0 30px 80px rgba(12,12,11,0.18); display: flex; flex-direction: column; gap: 18px; font-family: Inter, sans-serif; min-width: 0; }
+  .fe-card { background: #0C0C0B; color: #F2EEE7; border-radius: 24px; padding: 28px 30px; box-shadow: 0 30px 80px rgba(12,12,11,0.18); display: flex; flex-direction: column; gap: 18px; font-family: Inter, sans-serif; min-width: 0; }
   .fe-field { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
   .fe-field label { font-size: 14px; font-weight: 700; }
   .fe-opt { font-weight: 500; color: rgba(242,238,231,0.55); }
@@ -258,6 +305,24 @@ const styles = `
   .fe-field input:focus-visible, .fe-field select:focus-visible, .fe-field textarea:focus-visible, .fe-btn:focus-visible, .fe-card a:focus-visible {
     outline: 3px solid #E8541A; outline-offset: 2px;
   }
+  .fe-progress { list-style: none; margin: 0 0 4px; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .fe-progress button { width: 100%; display: flex; align-items: center; gap: 8px; padding: 0 0 10px; background: none; border: 0; border-bottom: 2px solid rgba(242,238,231,0.16); color: rgba(242,238,231,0.5); font: 700 12.5px Inter, sans-serif; text-align: left; cursor: default; white-space: nowrap; overflow: hidden; }
+  .fe-progress button span { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 auto; width: 22px; height: 22px; border-radius: 50%; background: rgba(242,238,231,0.14); font-size: 12px; }
+  .fe-progress .is-on button { color: #F2EEE7; border-bottom-color: #E8541A; }
+  .fe-progress .is-on button span { background: #E8541A; color: #fff; }
+  .fe-progress .is-done button { color: rgba(242,238,231,0.8); border-bottom-color: rgba(232,84,26,0.55); cursor: pointer; }
+  .fe-progress .is-done button span { background: rgba(232,84,26,0.3); color: #fff; }
+  .fe-progress button:focus-visible { outline: 3px solid #E8541A; outline-offset: 2px; }
+  .fe-pane { display: flex; flex-direction: column; gap: 16px; min-width: 0; animation: fePane .28s cubic-bezier(.16,1,.3,1); }
+  .fe-pane[hidden] { display: none; }
+  @keyframes fePane { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; transform: none; } }
+  .fe-nav { display: flex; gap: 10px; }
+  .fe-nav .fe-btn { flex: 1 1 auto; }
+  .fe-back { min-height: 54px; padding: 0 22px; border-radius: 100px; background: transparent; color: #F2EEE7; border: 1px solid rgba(242,238,231,0.28); font: 700 15px Inter, sans-serif; cursor: pointer; }
+  .fe-back:hover { border-color: rgba(242,238,231,0.6); }
+  .fe-back:focus-visible { outline: 3px solid #E8541A; outline-offset: 2px; }
+  @media (prefers-reduced-motion: reduce) { .fe-pane { animation: none; } }
+  @media (max-width: 420px) { .fe-progress button { font-size: 11.5px; gap: 6px; } }
   .fe-step { margin: 6px 0 -4px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px; font-size: 12px; font-weight: 800; letter-spacing: 1.6px; text-transform: uppercase; color: #F2EEE7; }
   .fe-step:not(:first-child) { padding-top: 20px; border-top: 1px solid rgba(242,238,231,0.12); }
   .fe-step span { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; background: #E8541A; color: #fff; font-size: 12px; letter-spacing: 0; }
@@ -266,7 +331,7 @@ const styles = `
   .fe-chips { border: 0; padding: 0; margin: 0; min-width: 0; }
   .fe-chips legend { font-size: 14px; font-weight: 700; padding: 0; margin-bottom: 8px; }
   .fe-chips > div { display: flex; flex-wrap: wrap; gap: 8px; }
-  .fe-chip { position: relative; display: inline-flex; align-items: center; min-height: 38px; padding: 8px 14px; border-radius: 100px; font-size: 14px; font-weight: 600; cursor: pointer; color: rgba(242,238,231,0.82); background: rgba(255,255,255,0.06); border: 1px solid rgba(242,238,231,0.22); transition: background .15s, color .15s, border-color .15s; }
+  .fe-chip { position: relative; display: inline-flex; align-items: center; min-height: 36px; padding: 6px 13px; border-radius: 100px; font-size: 14px; font-weight: 600; cursor: pointer; color: rgba(242,238,231,0.82); background: rgba(255,255,255,0.06); border: 1px solid rgba(242,238,231,0.22); transition: background .15s, color .15s, border-color .15s; }
   .fe-chip input { position: absolute; opacity: 0; width: 1px; height: 1px; min-height: 0; padding: 0; }
   .fe-chip.is-on { background: #F2EEE7; color: #0C0C0B; border-color: #F2EEE7; }
   .fe-chips[aria-invalid="true"] .fe-chip { border-color: #FF8A5C; }

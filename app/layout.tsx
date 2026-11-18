@@ -272,7 +272,7 @@ export default function RootLayout({
             never trigger. Both are now injected by the desktop-only loader at
             the bottom of <body>. */}
       </head>
-      <body className="pb-20 md:pb-0">
+      <body className="pb-20 md:pb-0" suppressHydrationWarning>
         {/* Skip-to-content — first focusable element. Invisible until the
             user Tabs to it. Lets keyboard users bypass the nav. */}
         <a href="#main" className="skip-to-content">Skip to content</a>
