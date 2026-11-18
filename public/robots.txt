@@ -1,14 +1,5 @@
 # EchoPulse — robots.txt
 #
-# ─────────────────────────────────────────────────────────────────────────────
-# ROUTE CONFLICT: app/robots.ts also exists and also generates /robots.txt.
-# Next.js serves public/ static assets before the App Router, so THIS file is
-# very likely the one crawlers receive and app/robots.ts is very likely dead.
-# Both now carry the same rules, so the served result is correct either way.
-# Confirm which one wins with: curl -s https://echopulse.media/robots.txt
-# Then delete the other. Keeping both is how they drift.
-# ─────────────────────────────────────────────────────────────────────────────
-#
 # FIXED Sept 2026 — record scoping bug. The Disallow lines used to sit at the
 # BOTTOM of the file, after the last `User-agent: Bytespider` block. In
 # robots.txt, directives bind to the most recent User-agent record, so those
