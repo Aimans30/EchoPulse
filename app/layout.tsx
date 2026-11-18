@@ -47,12 +47,12 @@ export const metadata: Metadata = {
     // very end, which is exactly the part that got cut — so the ~700 people
     // per month searching "echopulse" scanned the results, never saw the
     // brand name, and had no signal this was the right result.
-    default: "EchoPulse Media | Done-For-You Content Studio (Video, LinkedIn, Websites)",
+    default: "EchoPulse Media | Done-For-You Content and Website Studio",
     // Service/blog pages already carry their own name, so don't re-append it.
     template: "%s | EchoPulse Media",
   },
   description:
-    "Done-for-you content and website studio for founders, coaches, real estate agents and business owners. Video, LinkedIn, blogs, ads and websites by one owner-operated team. Start with 2 free edits.",
+    "Done-for-you videos, posts and websites for founders, coaches, real estate agents and business owners, from $399 a month. Start with 2 free edits.",
   applicationName: "EchoPulse Media",
   authors: [{ name: "Lakshya Soni", url: "https://www.linkedin.com/in/lakshyasoni/" }],
   creator: "Lakshya Soni",
@@ -77,7 +77,7 @@ export const metadata: Metadata = {
     // searches, but the OG and Twitter titles were left behind. They drive
     // every social share, Slack unfurl and link preview, and several AI
     // browsing tools prefer og:title over <title> when summarising a page.
-    title: "EchoPulse Media | Done-For-You Content Studio (Video, LinkedIn, Websites)",
+    title: "EchoPulse Media | Done-For-You Content and Website Studio",
     description:
       "Done-for-you content and website studio for founders, coaches, real estate agents and business owners. Video, LinkedIn, blogs, ads and websites by one owner-operated team. 2 free edits, then a $299 Pilot.",
     url: "https://echopulse.media",
@@ -95,7 +95,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "EchoPulse Media | Done-For-You Content Studio (Video, LinkedIn, Websites)",
+    title: "EchoPulse Media | Done-For-You Content and Website Studio",
     description:
       "Done-for-you content and website studio. Video, LinkedIn, blogs, ads and websites by one owner-operated team. 2 free edits, then a $299 Pilot.",
     creator: "@Lakshya_Creates",

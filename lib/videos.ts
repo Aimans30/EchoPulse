@@ -71,19 +71,25 @@ export function videosForIcp(icp: IcpKey): VideoEntry[] {
 // Converts embed-player links to direct .mp4 URLs sized for the card's display
 // width (×2 for retina). Skips non-Cloudinary sources.
 export function previewMp4Src(src: string, orientation?: Orientation): string | null {
-  const w = orientation === 'horizontal' ? 1500 : 700;
+  // Card previews are muted, looping and small on screen, so they do not need
+  // the full file. A sweep in November 2026 found niche pages downloading 6 to
+  // 10 MB per clip (about 28 MB on /real-estate). These settings give a silent
+  // 8-second loop at card size instead; the full clip still plays in the
+  // modal, which uses the original URL.
+  const w = orientation === 'horizontal' ? 854 : 480;
+  const t = `c_scale,w_${w},q_auto:low,ac_none,du_8`;
 
   if (src.includes('player.cloudinary.com/embed')) {
     try {
       const url      = new URL(src);
       const publicId = url.searchParams.get('public_id');
       const cloud    = url.searchParams.get('cloud_name') || 'du6yx2h01';
-      if (publicId) return `https://res.cloudinary.com/${cloud}/video/upload/c_scale,w_${w},q_auto:good,f_auto/${publicId}.mp4`;
+      if (publicId) return `https://res.cloudinary.com/${cloud}/video/upload/${t},f_auto/${publicId}.mp4`;
     } catch { return null; }
   }
   if (src.includes('res.cloudinary.com') && src.includes('/video/upload/')) {
     if (/[,/]w_\d+/.test(src)) return src;
-    return src.replace('/video/upload/', `/video/upload/c_scale,w_${w},q_auto:good/`);
+    return src.replace('/video/upload/', `/video/upload/${t}/`);
   }
   if (src.includes('.mp4')) return src;
   return null;

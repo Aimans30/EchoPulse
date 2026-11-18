@@ -11,7 +11,10 @@ function calUrl(base: string): string {
   const sep = base.includes('?') ? '&' : '?';
   const path = typeof window !== 'undefined' ? window.location.pathname : '/';
   const utm = `utm_source=echopulse.media&utm_medium=booking_modal&utm_content=${encodeURIComponent(path)}`;
-  return `${base}${sep}theme=light&layout=month_view&${utm}`;
+  // duration=15 preselects the 15-minute slot. The Cal.com event offers
+  // several lengths and defaulted to 20, which contradicted every page that
+  // promises a 15-minute call.
+  return `${base}${sep}duration=15&theme=light&layout=month_view&${utm}`;
 }
 
 export default function BookCallModal() {
@@ -21,6 +24,10 @@ export default function BookCallModal() {
   // ONCE per session.
   const [mounted, setMounted] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  // Cal.com can be slow or blocked (ad blockers, strict networks). After a few
+  // seconds of waiting, offer the same calendar in a new tab instead of an
+  // endless spinner.
+  const [slow, setSlow] = useState(false);
 
   useEffect(() => {
     (window as unknown as { openBookCallModal?: () => void; closeBookCallModal?: () => void }).openBookCallModal = () => { setMounted(true); setOpen(true); };
@@ -57,6 +64,12 @@ export default function BookCallModal() {
       document.documentElement.style.overflow = '';
     };
   }, [open]);
+
+  useEffect(() => {
+    if (!open || loaded) return;
+    const t = window.setTimeout(() => setSlow(true), 6000);
+    return () => window.clearTimeout(t);
+  }, [open, loaded]);
 
   // Idle-time prefetch — warms the browser cache 3s after first paint so
   // the iframe boots fast when the user actually clicks.
@@ -124,26 +137,28 @@ export default function BookCallModal() {
           position: 'relative',
           display: 'flex',
           flexDirection: 'column',
-          boxShadow: '0 40px 100px rgba(0,0,0,0.65), 0 0 0 1px rgba(232,84,26,0.28), 0 0 80px rgba(232,84,26,0.15)',
+          boxShadow: '0 40px 100px rgba(0,0,0,0.55), 0 0 0 1px rgba(12,12,11,0.12)',
           animation: open ? 'bcm-pop 0.36s cubic-bezier(0.16,1,0.3,1)' : undefined,
         }}
       >
-        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '3px', background: 'linear-gradient(90deg, transparent 0%, #E8541A 30%, #FF7A45 50%, #E8541A 70%, transparent 100%)', zIndex: 3 }} />
 
-        <header className="bcm-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 28px 18px', borderBottom: '1px solid rgba(12,12,11,0.07)', background: 'linear-gradient(135deg, #FFFFFF 0%, #FAF8F4 100%)', flexShrink: 0, gap: '16px', position: 'relative', zIndex: 2 }}>
+        <header className="bcm-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 28px 18px', borderBottom: '1px solid rgba(12,12,11,0.07)', background: '#FBF9F5', flexShrink: 0, gap: '16px', position: 'relative', zIndex: 2 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '14px', minWidth: 0 }}>
-            <div className="bcm-mark" style={{ width: '40px', height: '40px', borderRadius: '12px', background: '#0C0C0B', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 4px 16px rgba(12,12,11,0.25)' }} aria-hidden="true">
-              <span style={{ color: '#E8541A', fontFamily: 'Inter, sans-serif', fontSize: '16px', fontWeight: 900, letterSpacing: '-0.5px' }}>E</span>
-            </div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              className="bcm-mark"
+              src="/logo-128.png"
+              alt=""
+              width={40}
+              height={40}
+              style={{ width: '40px', height: '40px', borderRadius: '10px', flexShrink: 0, display: 'block' }}
+            />
             <div style={{ minWidth: 0 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '3px' }}>
-                <span style={{ fontFamily: 'Inter, sans-serif', fontSize: '15px', fontWeight: 800, color: '#0C0C0B', letterSpacing: '-0.3px', lineHeight: 1.2 }}>
-                  Book a Strategy Call
-                </span>
-                <span style={{ background: 'linear-gradient(135deg, #E8541A, #FF7A45)', color: '#fff', fontSize: '9.5px', fontWeight: 700, padding: '2px 7px', borderRadius: '20px', letterSpacing: '0.4px', textTransform: 'uppercase', flexShrink: 0 }}>Free</span>
+              <div id="bcm-title" style={{ fontFamily: 'Inter, sans-serif', fontSize: '16px', fontWeight: 800, color: '#0C0C0B', letterSpacing: '-0.3px', lineHeight: 1.25, marginBottom: '3px' }}>
+                Book a free 15-minute call
               </div>
-              <div className="bcm-sub" style={{ fontSize: '12px', color: '#8A877F', lineHeight: 1.4 }}>
-                15 min · Content audit + growth roadmap · No pitch unless you ask
+              <div className="bcm-sub" style={{ fontSize: '12.5px', color: '#6E6B63', lineHeight: 1.45 }}>
+                With Lakshya, the founder. We look at what you publish today and name the first three things to fix.
               </div>
             </div>
           </div>
@@ -159,9 +174,19 @@ export default function BookCallModal() {
 
         <div style={{ flex: 1, minHeight: 0, background: '#F2EEE7', position: 'relative' }}>
           {!loaded && (
-            <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '16px', background: '#F2EEE7', zIndex: 1 }}>
-              <div style={{ width: '44px', height: '44px', borderRadius: '50%', border: '3px solid rgba(232,84,26,0.15)', borderTop: '3px solid #E8541A', animation: 'bcm-spin 0.8s linear infinite' }} />
-              <span style={{ fontSize: '13px', color: '#8A877F', fontFamily: 'Inter, sans-serif' }}>Loading calendar…</span>
+            <div role="status" style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '14px', padding: '24px', textAlign: 'center', background: '#F2EEE7', zIndex: 1 }}>
+              <div style={{ width: '36px', height: '36px', borderRadius: '50%', border: '3px solid rgba(12,12,11,0.1)', borderTop: '3px solid #E8541A', animation: 'bcm-spin 0.8s linear infinite' }} />
+              <span style={{ fontSize: '14px', color: '#4A4740', fontFamily: 'Inter, sans-serif' }}>Loading the calendar</span>
+              {slow && (
+                <a
+                  href={calUrl(BOOK_CALL_URL)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ fontSize: '14px', fontWeight: 700, color: '#0C0C0B', textDecoration: 'underline', textDecorationColor: '#E8541A', textUnderlineOffset: '4px', minHeight: '44px', display: 'inline-flex', alignItems: 'center' }}
+                >
+                  Taking a while? Open the calendar in a new tab
+                </a>
+              )}
             </div>
           )}
           <iframe
@@ -174,12 +199,10 @@ export default function BookCallModal() {
           />
         </div>
 
-        <div className="bcm-footer" style={{ background: 'linear-gradient(135deg, #FAF8F4, #F2EEE7)', borderTop: '1px solid rgba(12,12,11,0.05)', padding: '10px 28px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', flexShrink: 0 }}>
-          <div style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#E8541A', opacity: 0.7 }} />
-          <span style={{ fontSize: '10.5px', color: '#A09D96', fontFamily: 'Inter, sans-serif', letterSpacing: '0.2px' }}>
-            EchoPulse · All meetings are free &amp; no-obligation
+        <div className="bcm-footer" style={{ background: '#FBF9F5', borderTop: '1px solid rgba(12,12,11,0.06)', padding: '10px 28px', textAlign: 'center', flexShrink: 0 }}>
+          <span style={{ fontSize: '12px', color: '#6E6B63', fontFamily: 'Inter, sans-serif' }}>
+            No pitch. You keep the notes whether or not you hire us.
           </span>
-          <div style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#E8541A', opacity: 0.7 }} />
         </div>
       </div>
 

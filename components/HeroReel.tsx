@@ -68,7 +68,24 @@ function useReducedMotion(): boolean {
   );
 }
 
+/**
+ * The hero hides this whole column at 640px and below. Hidden <video> elements
+ * still download, so on a phone the clips are simply not rendered.
+ */
+function useIsWide(): boolean {
+  return useSyncExternalStore(
+    (cb) => {
+      const mq = window.matchMedia('(min-width: 641px)');
+      mq.addEventListener('change', cb);
+      return () => mq.removeEventListener('change', cb);
+    },
+    () => window.matchMedia('(min-width: 641px)').matches,
+    () => false,
+  );
+}
+
 export default function HeroReel() {
+  const wide = useIsWide();
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
   const reduced = useReducedMotion();
@@ -134,7 +151,7 @@ export default function HeroReel() {
         {REEL.map((clip, i) => {
           const isCurrent = i === index;
           const isNext = next !== null && clip.id === next.id && !isCurrent;
-          if (!isCurrent && !isNext) return null;
+          if (!wide || (!isCurrent && !isNext)) return null;
           return (
             <video
               key={clip.id}
