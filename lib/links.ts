@@ -1,3 +1,5 @@
+import { ALL_PLANS, type PlanKey } from './pricing';
+
 // Single source of truth for outbound conversion links.
 // Every default CTA across the site reads from here.
 //
@@ -73,3 +75,73 @@ export const BOOK_CALL_ANCHOR = '#book-call';
  */
 export const FREE_EDITS_LABEL = 'Get 2 free edits';
 export const FREE_EDITS_URL = '/free-edits';
+
+/**
+ * Per-plan booking calendars, used by the plan intake modal
+ * (components/PlanIntakeModal.tsx) after a visitor picks a plan on a pricing
+ * card and answers a few questions.
+ *
+ * OWNER: every plan points at the one booking event today. To send a plan to
+ * its own Cal.com event (say a longer scoping call for Custom), paste that
+ * event's URL in place of BOOK_CALL_URL on that plan's line. Nothing else
+ * needs to change; the prefill and tracking parameters are added for you.
+ */
+export type BookablePlanKey = Exclude<PlanKey, 'free'>;
+
+export const PLAN_BOOK_URLS: Record<BookablePlanKey, string> = {
+  pilot: BOOK_CALL_URL, //    $299 Pilot
+  presence: BOOK_CALL_URL, // $399/month Presence Engine
+  growth: BOOK_CALL_URL, //   $1,997/month Growth
+  full: BOOK_CALL_URL, //     Custom
+};
+
+/** "Pilot, $299 one-off, 14 days" / "Growth, $1,997/month, month-to-month" / "Custom, scoped on a call". */
+export function planSummary(planKey: BookablePlanKey): string {
+  const plan = ALL_PLANS.find((p) => p.key === planKey);
+  if (!plan) return planKey;
+  if (plan.priceUsd <= 0) return `${plan.name}, ${plan.per}`;
+  return `${plan.name}, ${plan.priceLabel}${plan.per.startsWith('/') ? '' : ' '}${plan.per}`;
+}
+
+/** Cal.com shows the notes in a small field; keep what we prefill short. */
+const BOOK_NOTES_MAX = 500;
+
+/**
+ * Booking URL for a plan, with the visitor's details prefilled.
+ *
+ * Cal.com reads `name`, `email` and `notes` from the query string and fills
+ * the booking form with them. The notes always start with "Plan: <name>" so
+ * the booking itself says which plan the call is about. The rest matches what
+ * BookCallModal sends: the 15-minute slot, light theme, month view and the UTM
+ * parameters (utm_content = the page path), plus utm_campaign = the plan.
+ */
+export function planBookUrl(
+  planKey: BookablePlanKey,
+  prefill: { name?: string; email?: string; notes?: string } = {},
+): string {
+  const base = PLAN_BOOK_URLS[planKey] ?? BOOK_CALL_URL;
+  const path = typeof window !== 'undefined' ? window.location.pathname : '/';
+
+  let notes = `Plan: ${planSummary(planKey)}`;
+  const extra = (prefill.notes ?? '').trim();
+  if (extra) notes += `\n${extra}`;
+  if (notes.length > BOOK_NOTES_MAX) notes = `${notes.slice(0, BOOK_NOTES_MAX - 3).trimEnd()}...`;
+
+  const params: Array<[string, string]> = [];
+  const name = (prefill.name ?? '').trim();
+  const email = (prefill.email ?? '').trim();
+  if (name) params.push(['name', name]);
+  if (email) params.push(['email', email]);
+  params.push(
+    ['notes', notes],
+    ['duration', '15'],
+    ['theme', 'light'],
+    ['layout', 'month_view'],
+    ['utm_source', 'echopulse.media'],
+    ['utm_medium', 'booking_modal'],
+    ['utm_campaign', `plan_${planKey}`],
+    ['utm_content', path],
+  );
+  const query = params.map(([k, v]) => `${k}=${encodeURIComponent(v)}`).join('&');
+  return `${base}${base.includes('?') ? '&' : '?'}${query}`;
+}

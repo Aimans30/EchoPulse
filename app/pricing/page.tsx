@@ -5,7 +5,8 @@ import Footer from '@/components/Footer';
 import ICPBookButton from '@/components/icp/ICPBookButton';
 import { icps } from '@/lib/icpData';
 import { getCaseStudy } from '@/lib/caseStudyData';
-import { BOOK_CALL_LABEL, BOOK_CALL_REASSURANCE } from '@/lib/links';
+import { BOOK_CALL_LABEL, BOOK_CALL_REASSURANCE, FREE_EDITS_URL, type BookablePlanKey } from '@/lib/links';
+import PlanButton from '@/components/PlanButton';
 import {
   FREE_SAMPLE,
   PILOT,
@@ -144,13 +145,7 @@ function PlanCard({ plan }: { plan: Plan }) {
         ))}
       </ul>
       <div className="pr-card-cta">
-        <ICPBookButton
-          label={plan.key === 'pilot' ? plan.cta : BOOK_CALL_LABEL}
-          location={`pricing_page_${plan.key}`}
-          accent={ACCENT}
-          variant={dark ? 'light' : 'solid'}
-          fullWidthMobile
-        />
+        <PlanButton planKey={plan.key as BookablePlanKey} dark={dark} />
       </div>
     </article>
   );
@@ -284,8 +279,8 @@ export default function PricingPage() {
               ))}
             </ul>
             <div className="pr-card-cta">
-              <ICPBookButton label={FREE_SAMPLE.cta} location="pricing_page_free" accent={ACCENT} size="lg" fullWidthMobile />
-              <p className="pr-reassure">Tell us on the call where the footage is, or email it. No card is asked for at any point.</p>
+              <Link href={FREE_EDITS_URL} className="pr-free-btn">{FREE_SAMPLE.cta} <span aria-hidden="true">&rarr;</span></Link>
+              <p className="pr-reassure">A short form, or email the footage link. No card and no call are asked for at any point.</p>
             </div>
           </div>
         </section>
@@ -482,6 +477,10 @@ export default function PricingPage() {
           .pr-scope li::before { content: "\\2713"; position: absolute; left: 0; top: 0; color: ${ACCENT}; font-weight: 800; }
           .pr-card-cta { margin-top: auto; display: flex; flex-direction: column; gap: 12px; align-items: flex-start; }
           .pr-reassure { font-size: 13.5px !important; margin: 0; }
+          .pr-free-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 52px; padding: 0 28px; border-radius: 100px; background: #E8541A; color: #fff; font: 700 15px Inter, sans-serif; text-decoration: none; }
+          .pr-free-btn:hover { background: #FF6A2B; }
+          .pr-free-btn:focus-visible { outline: 3px solid #0C0C0B; outline-offset: 3px; }
+          @media (max-width: 640px) { .pr-free-btn { width: 100%; } }
           .pr-order-note { margin: 28px 0 0; font-size: 15px !important; }
 
           /* Table */

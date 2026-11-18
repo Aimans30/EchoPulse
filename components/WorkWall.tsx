@@ -162,6 +162,9 @@ export default function WorkWall({ clips }: { clips: WallClip[] }) {
   const grid = useMemo(() => (view ? makeGrid(view.vw, view.vh, visible) : null), [view, visible]);
   const tiles = grid?.tiles;
 
+  const gridRef = useRef<Grid | null>(null);
+  useEffect(() => { gridRef.current = grid; }, [grid]);
+
   const tileEls = useRef<Array<HTMLButtonElement | null>>([]);
   const videoEls = useRef<Array<HTMLVideoElement | null>>([]);
 
@@ -220,8 +223,9 @@ export default function WorkWall({ clips }: { clips: WallClip[] }) {
 
       const nx = st.hover ? (st.mx - cx) / cx : 0;
       const ny = st.hover ? (st.my - cy) / cy : 0;
-      const tfx = st.hover ? st.mx : cx;
-      const tfy = st.hover ? st.my : cy;
+      const seen = st.hover || st.mx !== 0 || st.my !== 0; // a mouse has been here
+      const tfx = seen ? st.mx : cx;
+      const tfy = seen ? st.my : cy;
       const tox = st.bx - nx * cx * g.gain;
       const toy = st.by - ny * cy * g.gain;
       const ease = (tau: number) => (reduce ? 1 : 1 - Math.exp(-dt / tau));
@@ -281,7 +285,7 @@ export default function WorkWall({ clips }: { clips: WallClip[] }) {
         const d = Math.hypot(Math.max(Math.abs(X - st.fx) - hw, 0), Math.max(Math.abs(Y - st.fy) - hh, 0));
         const near = 1 / (1 + (d / reach) * (d / reach));
         let k = 1 + 0.035 * near;
-        let light = 0.42 + 0.58 * near;
+        let light = 0.56 + 0.44 * near;
         if (intro) {
           const p = smooth(0, 0.6, age - Math.hypot(X - cx, Y - cy) / 1700);
           const e = 1 - (1 - p) * (1 - p) * (1 - p);
@@ -350,17 +354,55 @@ export default function WorkWall({ clips }: { clips: WallClip[] }) {
     const r = stageRef.current?.getBoundingClientRect();
     return { x: e.clientX - (r?.left ?? 0), y: e.clientY - (r?.top ?? 0) };
   };
+  // The mouse is tracked on the whole window, not the stage, so moving onto
+  // the filter pills or the booking bar is not mistaken for leaving. Whenever
+  // the cursor stops steering (it left the window, or it is over a control),
+  // the wall's current position is kept as its resting position, and when
+  // steering resumes it carries on from exactly there. Nothing snaps back.
+  useEffect(() => {
+    const st = s.current;
+    const park = () => {
+      if (!st.hover) return;
+      st.hover = false;
+      st.bx = st.ox;
+      st.by = st.oy;
+      st.settled = false;
+    };
+    const onMove = (e: PointerEvent) => {
+      if (e.pointerType !== 'mouse') return;
+      const g = gridRef.current;
+      const r = stageRef.current?.getBoundingClientRect();
+      if (!g || !r) return;
+      const overUi = !!(e.target as Element | null)?.closest?.('.ww-top, .ww-cta, .ww-lightbox');
+      if (overUi) { park(); return; }
+      const x = e.clientX - r.left;
+      const y = e.clientY - r.top;
+      if (!st.hover) {
+        // Resume from where the wall is resting.
+        st.bx = st.ox + (x - g.vw / 2) * g.gain;
+        st.by = st.oy + (y - g.vh / 2) * g.gain;
+        st.hover = true;
+      }
+      st.mx = x;
+      st.my = y;
+      st.settled = false;
+      setHinted(true);
+    };
+    const onOut = (e: MouseEvent) => { if (!e.relatedTarget) park(); };
+    window.addEventListener('pointermove', onMove);
+    document.addEventListener('mouseout', onOut);
+    window.addEventListener('blur', park);
+    return () => {
+      window.removeEventListener('pointermove', onMove);
+      document.removeEventListener('mouseout', onOut);
+      window.removeEventListener('blur', park);
+    };
+  }, []);
+
   const onPointerMove = (e: React.PointerEvent) => {
     const st = s.current;
+    if (e.pointerType === 'mouse') return;
     const p = local(e);
-    if (e.pointerType === 'mouse') {
-      st.mx = p.x;
-      st.my = p.y;
-      st.hover = true;
-      st.settled = false;
-      if (!hinted) setHinted(true);
-      return;
-    }
     if (!st.touching) return;
     const dx = p.x - st.lx;
     const dy = p.y - st.ly;
@@ -399,12 +441,6 @@ export default function WorkWall({ clips }: { clips: WallClip[] }) {
     st.touching = false;
     if (performance.now() - st.lt > 80) st.vx = st.vy = 0;
   };
-  const onLeave = (e: React.PointerEvent) => {
-    if (e.pointerType !== 'mouse') return;
-    s.current.hover = false;
-    s.current.settled = false;
-  };
-
   // Lightbox: Escape closes, wall previews pause while it is open.
   useEffect(() => {
     if (!open) return;
@@ -430,7 +466,6 @@ export default function WorkWall({ clips }: { clips: WallClip[] }) {
         onPointerMove={onPointerMove}
         onPointerUp={endTouch}
         onPointerCancel={endTouch}
-        onPointerLeave={onLeave}
       >
         <div ref={worldRef} className="ww-world">
           {grid &&

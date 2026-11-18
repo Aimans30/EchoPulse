@@ -3,9 +3,23 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useGeoPrice } from '@/lib/useGeoPrice';
-import { BOOK_CALL_URL } from '@/lib/links';
+import { type BookablePlanKey } from '@/lib/links';
 import { trackPilotClick, trackCallClick } from '@/lib/analytics';
 import { PRICING_CARDS, PROMISES, type Plan } from '@/lib/pricing';
+import PlanIntakeModal from './PlanIntakeModal';
+
+/**
+ * The one button on each pricing card. Plan-specific on purpose: the button
+ * opens the plan intake modal (components/PlanIntakeModal.tsx) with that plan
+ * preselected, so the label says which plan you are picking. There is no
+ * checkout; the modal ends on the booking calendar for a free intro call.
+ */
+const PLAN_BUTTON_LABEL: Record<BookablePlanKey, string> = {
+  pilot: 'Choose the Pilot',
+  presence: 'Choose Presence Engine',
+  growth: 'Choose Growth',
+  full: 'Scope a custom build',
+};
 
 /**
  * Drive the mobile swipe-carousel dots indicator. When the user swipes the
@@ -69,6 +83,16 @@ export default function Pricing({ pricingCopy }: { pricingCopy?: PricingCopy } =
   // start collapsed showing the headline benefits; tap the row to expand.
   const [expandedPlan, setExpandedPlan] = useState<string | null>(null);
 
+  // Plan intake modal. `n` re-keys the modal so each open starts on step 1
+  // with the clicked plan selected.
+  const [intake, setIntake] = useState<{ plan: BookablePlanKey; n: number } | null>(null);
+  const openIntake = (key: Plan['key'], location: string) => {
+    if (key === 'free') return;
+    if (key === 'pilot') trackPilotClick(location);
+    else trackCallClick(location);
+    setIntake((prev) => ({ plan: key, n: (prev?.n ?? 0) + 1 }));
+  };
+
   // Mobile swipe carousel — update dots indicator from scroll position.
   useMobilePricingDots();
 
@@ -82,7 +106,7 @@ export default function Pricing({ pricingCopy }: { pricingCopy?: PricingCopy } =
     badge: p.badge,
     tagline: p.tagline,
     features: pricingCopy?.[p.key] ?? p.scope,
-    cta: p.cta,
+    cta: p.key === 'free' ? p.cta : PLAN_BUTTON_LABEL[p.key],
     featured: !!p.featured,
   }));
 
@@ -218,22 +242,11 @@ export default function Pricing({ pricingCopy }: { pricingCopy?: PricingCopy } =
                     type="button"
                     className="pms-cta"
                     data-cursor-hover
-                    onClick={() => {
-                      // Every tier opens the booking modal, including the Pilot.
-                      //
-                      // The Pilot used to send people to /order, which does not
-                      // sell the Pilot. /order is a separate a-la-carte menu
-                      // (Reels $15-100, Long-form $49-749, Podcast $450+,
-                      // Repurpose $349) with no Pilot line item anywhere in
-                      // lib/orderData.ts. So "Claim the Pilot" dropped the buyer
-                      // into an unrelated checkout at different prices with no
-                      // way to buy the thing they just clicked. Desktop cards
-                      // already open the booking flow, so the same label was
-                      // doing two different things depending on device.
-                      trackPilotClick(`pricing_mobile_swipe_${plan.tier.toLowerCase()}`);
-                      trackCallClick(`pricing_mobile_swipe_${plan.tier.toLowerCase()}`);
-                      (window as unknown as { openBookCallModal?: () => void }).openBookCallModal?.();
-                    }}
+                    // Every tier, the Pilot included, opens the plan intake
+                    // modal and ends on the booking calendar. The Pilot must
+                    // never link to /order: that is a separate a-la-carte menu
+                    // with no Pilot line item in lib/orderData.ts.
+                    onClick={() => openIntake(plan.key, `pricing_mobile_swipe_${plan.key}`)}
                   >
                     {plan.cta}
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" aria-hidden="true">
@@ -400,21 +413,15 @@ export default function Pricing({ pricingCopy }: { pricingCopy?: PricingCopy } =
                 ))}
               </ul>
 
-              <a
+              <button
+                type="button"
                 className="tier-cta"
-                href={BOOK_CALL_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={`${plan.cta}, ${plan.tier} plan`}
-                onClick={() =>
-                  plan.tier === 'Pilot'
-                    ? trackPilotClick(`pricing_${plan.tier.toLowerCase().replace(/\s+/g, '_')}`)
-                    : trackCallClick(`pricing_${plan.tier.toLowerCase().replace(/\s+/g, '_')}`)
-                }
+                onClick={() => openIntake(plan.key, `pricing_${plan.key}`)}
                 style={{
                   display: 'block',
                   width: '100%',
                   padding: '12px',
+                  minHeight: '44px',
                   borderRadius: '100px',
                   fontSize: '12.5px',
                   fontWeight: 700,
@@ -439,7 +446,7 @@ export default function Pricing({ pricingCopy }: { pricingCopy?: PricingCopy } =
                 }}
               >
                 {plan.cta}
-              </a>
+              </button>
             </motion.div>
           ))}
         </div>
@@ -447,8 +454,13 @@ export default function Pricing({ pricingCopy }: { pricingCopy?: PricingCopy } =
         </motion.div>
       </div>
 
+      {intake && (
+        <PlanIntakeModal key={intake.n} initialPlan={intake.plan} onClose={() => setIntake(null)} />
+      )}
+
       <style>{`
         .tier-cta { cursor: pointer; }
+        .tier-cta:focus-visible, .pms-cta:focus-visible { outline: 2px solid #E8541A; outline-offset: 3px; border-radius: 100px; }
         /* The custom cursor is a desktop affordance. Hiding the pointer on a
            touch device does nothing useful, so the rule is gated. Declared
            after the pointer default on purpose: same specificity, later wins. */
