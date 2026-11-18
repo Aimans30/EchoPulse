@@ -671,6 +671,8 @@ export default function OurWork() {
                     {previewSrc ? (
                       // eslint-disable-next-line jsx-a11y/media-has-caption
                       <video
+                        // The phone-sized src is only known after mount.
+                        suppressHydrationWarning
                         data-src={previewSrc}
                         muted
                         loop
