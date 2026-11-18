@@ -16,7 +16,7 @@ import { PRESENCE, GROWTH } from '@/lib/pricing';
  * only and use transform and opacity.
  */
 const services = [
-  { name: 'Video Editing', slug: 'video-editing', desc: 'Send footage you already have. You get short-form videos, podcast clips and long-form edits back within 48 hours, with captions, hooks and music done. The first 2 edits are free.', from: `Included from Presence Engine, ${PRESENCE.priceLabel} a month` },
+  { name: 'Video Editing', slug: 'video-editing', desc: 'Send footage you already have. Short-form videos and clips come back within 48 hours, with captions, hooks and music done. Long-form edits take longer, depending on the length of the video. The first 2 edits are free.', from: `Included from Presence Engine, ${PRESENCE.priceLabel} a month` },
   { name: 'LinkedIn & Social', slug: 'linkedin-ghostwriting', desc: 'Posts and carousels written about your business, with the captions done. You read them, approve them and publish. Your pages stay active in the weeks you have no time to write.', from: `Included from Presence Engine, ${PRESENCE.priceLabel} a month` },
   { name: 'Blog Production', slug: 'blog-production', desc: 'Long blog posts on the questions your customers search for. Every statistic carries a working source link, and a person edits each post before you see it.', from: `Included from Growth, ${GROWTH.priceLabel} a month` },
   { name: 'Ad Creatives', slug: 'ad-creatives', desc: 'Static and video ads for your campaigns. New ones arrive every month, so your budget is not spent showing people an ad they have already seen.', from: `Included from Growth, ${GROWTH.priceLabel} a month` },
