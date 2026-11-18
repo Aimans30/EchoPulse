@@ -10,11 +10,11 @@ import BlogInlineCTA from '@/components/BlogInlineCTA';
 import BlogSideCTA from '@/components/BlogSideCTA';
 import BlogEmailCapture from '@/components/BlogEmailCapture';
 import BlogStickyBar from '@/components/BlogStickyBar';
-import { audienceForPost, blogAskFor, blogBookUrl } from '@/lib/blogLinks';
+import { audienceFor, blogAskFor, blogBookUrl } from '@/lib/blogLinks';
 import { FREE_EDITS_URL } from '@/lib/links';
 import TableOfContents from '@/components/TableOfContents';
 import { getPostBySlug, getAllPostSlugs, getRelatedPosts, resolveCategory, resolveAuthor, type BlogPostSummary } from '@/lib/blog';
-import { urlFor } from '@/lib/sanity';
+import { sanityClient, urlFor } from '@/lib/sanity';
 import { extractHeadings } from '@/lib/toc';
 import { extractFaqPairs, buildFaqPageLd } from '@/lib/faqSchema';
 
@@ -108,8 +108,18 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
   // Related posts for the bottom strip — prefer same category, fill with recent.
   const related = await getRelatedPosts(slug, post.category, 3);
-  // Which ICP + service page this article should send readers to.
-  const audience = audienceForPost(post);
+  // Which ICP + service page this article should send readers to. The `icp`
+  // and `service` the publisher stored on the document decide it; the keyword
+  // guess from the slug and title is only the fallback for older posts that
+  // have neither. A failed read falls back the same way, never a 500.
+  const stored = await sanityClient
+    .fetch<{ icp?: string | null; service?: string | null } | null>(
+      `*[_type == "blog" && slug.current == $slug][0]{ icp, service }`,
+      { slug },
+      { next: { revalidate: 60 } },
+    )
+    .catch(() => null);
+  const audience = audienceFor(post, stored);
   // What the post asks for (free sample or the call), keyed off its service.
   const ask = blogAskFor(audience.service);
 

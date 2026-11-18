@@ -11,12 +11,31 @@
  *   SANITY_WRITE_TOKEN=sk... node scripts/publish-blog.mjs            # oldest due post
  *   node scripts/publish-blog.mjs --max 3                             # up to 3 posts
  *   node scripts/publish-blog.mjs --file content/blog-queue/x.md      # one specific file
- *   node scripts/publish-blog.mjs --dry-run [--file ...]              # no network, no moves
- *   node scripts/publish-blog.mjs --validate                          # check every queued file
- *   node scripts/publish-blog.mjs --force                             # overwrite an existing slug
+ *   node scripts/publish-blog.mjs --dry-run [--file ...]              # writes nothing, moves nothing
+ *   node scripts/publish-blog.mjs --validate [--file x.md]            # check every queued file (or one)
+ *   node scripts/publish-blog.mjs --validate --published              # also check content/blog-published (warnings only)
+ *   node scripts/publish-blog.mjs --pull <slug>                       # live post -> content/blog-queue/<today>-<slug>.md
+ *   node scripts/publish-blog.mjs --refresh --file x.md               # update a live post in place (safe refresh)
+ *   node scripts/publish-blog.mjs --refresh --dry-run --file x.md     # show what the refresh would keep and change
+ *   node scripts/publish-blog.mjs --refresh-list                      # refresh order from content/blog-data/gsc-pages-*.csv
+ *   node scripts/publish-blog.mjs --force                             # REPLACE an existing slug (rebuilds the whole
+ *                                                                     # document and its cover; the engine never uses it)
+ *
+ * Safe refresh (--refresh) patches title, excerpt, body, read time and the
+ * engine fields on the existing document. It never touches the slug,
+ * publishedAt, category, author or any field set by hand in Studio, and it
+ * keeps the existing cover unless the text on the cover changes (or
+ * --new-cover is passed). Sanity bumps _updatedAt, which the site shows as
+ * "Updated <date>".
+ *
+ * Validation has two levels. The ENGINE STANDARD (content/BLOG-ENGINE.md) is
+ * enforced as errors on every file in content/blog-queue. A hand-written post
+ * can opt out with `engine: false` in its frontmatter, and files in
+ * content/blog-published are always checked as legacy: for both, the standard
+ * is reported as warnings and only the basic checks can fail.
  *
  * Env:
- *   SANITY_WRITE_TOKEN   required unless --dry-run / --validate (Editor token)
+ *   SANITY_WRITE_TOKEN   required to publish or refresh (Editor token). Reads need no token.
  *   SANITY_PROJECT_ID    optional, default qkz53g2a
  *   SANITY_DATASET       optional, default production
  *
@@ -25,7 +44,7 @@
  * the document exists.
  */
 
-import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, writeFileSync, appendFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, statSync, writeFileSync, appendFileSync } from 'node:fs';
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import yaml from 'js-yaml';
@@ -36,6 +55,7 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const QUEUE_DIR = join(ROOT, 'content', 'blog-queue');
 const PUBLISHED_DIR = join(ROOT, 'content', 'blog-published');
 const LOG_FILE = join(PUBLISHED_DIR, 'LOG.md');
+const DATA_DIR = join(ROOT, 'content', 'blog-data');
 const THUMBS_DIR = join(ROOT, '.thumbs');
 const SITE_URL = 'https://echopulse.media';
 
@@ -55,18 +75,30 @@ export const SERVICES = [
   'video-editing', 'linkedin-ghostwriting', 'blog-production', 'ad-creatives',
   'websites-funnels', 'automations', 'apps-software',
 ];
+/** The five ICPs that have a page (IcpKey in lib/blogLinks.ts). Engine posts use only these. */
+export const ENGINE_ICPS = ['real-estate', 'founders', 'coaches', 'dtc', 'business-owners'];
 export const DEFAULT_AUTHOR = 'Lakshya Soni';
 const EXCERPT_MAX = 160;
+const EXCERPT_MIN = 130;
+const TITLE_MAX_ENGINE = 60;
+/** Posts published before this date are under owner review for removal: not refreshed, not linked. */
+const LEGACY_CUTOFF = '2026-07-01';
 
 // ─── CLI args ────────────────────────────────────────────────────────────────
 
 function parseArgs(argv) {
-  const args = { dryRun: false, validate: false, force: false, max: 1, file: null };
+  const args = { dryRun: false, validate: false, force: false, max: 1, file: null, refresh: false, newCover: false, pull: null, refreshList: false, published: false };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === '--dry-run') args.dryRun = true;
     else if (a === '--validate') args.validate = true;
     else if (a === '--force') args.force = true;
+    else if (a === '--refresh') args.refresh = true;
+    else if (a === '--new-cover') args.newCover = true;
+    else if (a === '--refresh-list') args.refreshList = true;
+    else if (a === '--published') args.published = true;
+    else if (a === '--pull') args.pull = argv[++i];
+    else if (a.startsWith('--pull=')) args.pull = a.slice(7);
     else if (a === '--max') args.max = Number(argv[++i]);
     else if (a.startsWith('--max=')) args.max = Number(a.slice(6));
     else if (a === '--file') args.file = argv[++i];
@@ -77,6 +109,9 @@ function parseArgs(argv) {
     } else throw new Error(`Unknown argument "${a}"`);
   }
   if (!Number.isInteger(args.max) || args.max < 1) throw new Error('--max must be a positive integer');
+  if (args.refresh && args.force) throw new Error('Use --refresh or --force, not both. --refresh is the safe one.');
+  if (args.refresh && !args.file) throw new Error('--refresh needs --file content/blog-queue/<file>.md');
+  if (args.pull != null && !/^[a-z0-9][a-z0-9-]*$/.test(String(args.pull))) throw new Error('--pull needs the live post slug, e.g. --pull real-estate-video-editing-cost');
   return args;
 }
 
@@ -110,8 +145,8 @@ function splitFrontmatter(src) {
  * Parse + validate one post file. Returns the fully-resolved post (never
  * touches the network). Throws with a message that names the problem.
  */
-export function parsePost(filePath) {
-  const src = readFileSync(filePath, 'utf8');
+export function parsePost(filePath, opts = {}) {
+  const src = readFileSync(filePath, 'utf8').replace(/\r\n/g, '\n');
   let parsed;
   try {
     parsed = splitFrontmatter(src);
@@ -184,7 +219,11 @@ export function parsePost(filePath) {
 
   if (!body.trim()) errors.push('post body is empty');
 
-  const known = new Set(['title', 'slug', 'excerpt', 'category', 'author', 'publishAt', 'icp', 'service', 'tags', 'thumbnailText', 'thumbnailSub', 'readTime', 'postType', 'updateBy']);
+  const targetQuery = str(data.targetQuery);
+  const moneyPage = str(data.moneyPage).replace(/(.)\/$/, '$1');
+  const whatsNew = str(data.whatsNew);
+
+  const known = new Set(['title', 'slug', 'excerpt', 'category', 'author', 'publishAt', 'icp', 'service', 'tags', 'thumbnailText', 'thumbnailSub', 'readTime', 'postType', 'updateBy', 'targetQuery', 'moneyPage', 'whatsNew', 'ask', 'engine', 'refresh']);
   const warnings = [];
   for (const k of Object.keys(data)) if (!known.has(k)) warnings.push(`unknown frontmatter key "${k}" ignored`);
 
@@ -203,6 +242,33 @@ export function parsePost(filePath) {
     }
   }
 
+  // The engine standard. Errors for engine posts in the queue; warnings for
+  // hand-written posts (`engine: false`) and for anything already published.
+  // Files starting with "_" are templates: checked, reported, never publishable.
+  const template = basename(filePath).startsWith('_');
+  const legacy = Boolean(opts.legacy) || template || data.engine === false || str(data.engine).toLowerCase() === 'false';
+  let standard = { errors: [], warnings: [], facts: [], lastChecked: null };
+  if (!errors.length) {
+    // Tables must be counted as tables even while BLOG_TABLES=pipes is set.
+    let checkBlocks = blocks;
+    if (process.env.BLOG_TABLES === 'pipes') {
+      const saved = process.env.BLOG_TABLES;
+      delete process.env.BLOG_TABLES;
+      try { checkBlocks = markdownToPortableText(body).blocks; } finally { process.env.BLOG_TABLES = saved; }
+    }
+    standard = checkStandard({
+      src, body, data, blocks: checkBlocks, wordCount,
+      title, slug, excerpt, icp, service, postType, moneyPage, whatsNew, targetQuery,
+      thumbnailText, thumbnailSub, ask: str(data.ask), isRefresh: data.refresh === true, template,
+    }, opts.now ?? new Date());
+    if (legacy) {
+      warnings.push(...standard.errors.map((e) => `standard: ${e}`), ...standard.warnings);
+    } else {
+      errors.push(...standard.errors);
+      warnings.push(...standard.warnings);
+    }
+  }
+
   if (errors.length) {
     const err = new Error(`${basename(filePath)}:\n  - ${errors.join('\n  - ')}`);
     err.validation = true;
@@ -215,7 +281,344 @@ export function parsePost(filePath) {
     filePath,
     title, slug, excerpt, category, author, publishAt, icp, service, tags,
     thumbnailText, thumbnailSub, readTime, wordCount, blocks, warnings, postType, updateBy,
+    targetQuery, moneyPage, whatsNew, lastChecked: standard.lastChecked, legacy, facts: standard.facts,
+    coverTextExplicit: Boolean(str(data.thumbnailText)),
   };
+}
+
+// ─── the engine standard (content/BLOG-ENGINE.md), as machine checks ─────────
+//
+// Only what can be checked without judgement. Every message ends with the fix,
+// because the reader is an unattended model that has to act on it.
+
+let repoFactsCache = null;
+/** Routes, niche pages and prices, read from the checkout so they cannot drift. */
+export function repoFacts() {
+  if (repoFactsCache) return repoFactsCache;
+  const read = (rel) => {
+    try { return readFileSync(join(ROOT, rel), 'utf8'); } catch { return ''; }
+  };
+  const routes = new Set(['/']);
+  const appDir = join(ROOT, 'app');
+  if (existsSync(appDir)) {
+    for (const d of readdirSync(appDir)) {
+      if (/^[[(_]/.test(d) || d === 'api') continue;
+      const dir = join(appDir, d);
+      if (statSync(dir).isDirectory() && (existsSync(join(dir, 'page.tsx')) || existsSync(join(dir, 'page.jsx')))) routes.add(`/${d}`);
+    }
+  }
+  for (const s of SERVICES) routes.add(`/services/${s}`);
+  for (const i of ENGINE_ICPS) routes.add(`/${i}`);
+  const niche = new Set();
+  for (const m of read('lib/nicheIndex.ts').matchAll(/\{\s*icp:\s*'([a-z-]+)',\s*service:\s*'([a-z-]+)'/g)) {
+    niche.add(`/${m[1]}/${m[2]}`);
+    routes.add(`/${m[1]}/${m[2]}`);
+  }
+  for (const m of read('lib/caseStudyData.ts').matchAll(/^ {2}slug:\s*'([a-z0-9-]+)'/gm)) routes.add(`/case-studies/${m[1]}`);
+  // The EchoPulse prices a post may state: every priceLabel in lib/pricing.ts.
+  const prices = new Set([...read('lib/pricing.ts').matchAll(/priceLabel:\s*'(\$[\d,]+)'/g)].map((m) => m[1]));
+  if (!prices.size) for (const p of ['$299', '$399', '$1,997']) prices.add(p);
+  // ICP keyword rules, for posts published before `icp` was stored.
+  const icpRules = [];
+  const rulesSrc = (read('lib/blogLinks.ts').match(/const ICP_RULES[^=]*=\s*\[([\s\S]*?)\n\];/) || [])[1] || '';
+  for (const m of rulesSrc.matchAll(/\['([a-z-]+)',\s*\[([^\]]*)\]\]/g)) {
+    icpRules.push([m[1], [...m[2].matchAll(/'([^']+)'/g)].map((x) => x[1])]);
+  }
+  repoFactsCache = { routes, niche, prices, icpRules };
+  return repoFactsCache;
+}
+
+/** The one selling page a post feeds: the niche page when the pair exists, else the service page. */
+export function expectedMoneyPage(icp, service) {
+  const niche = `/${icp}/${service}`;
+  return repoFacts().niche.has(niche) ? niche : `/services/${service}`;
+}
+
+/** What the site's cards ask for on a post of this service (blogAskFor in lib/blogLinks.ts). */
+export function askFor(service) {
+  return service === 'video-editing' || service === 'ad-creatives' ? 'sample' : 'call';
+}
+
+const MONTHS = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'];
+const COST_RE = /\b(costs?|prices?|pricing|rates|how much)\b/i;
+
+/** Phrases that are never right. Each hit is an error. */
+const BANNED_HARD = [
+  [/\bdelv(e|es|ed|ing)\b/i, 'delve'], [/\bseamless(ly)?\b/i, 'seamless'], [/\bgame[- ]chang/i, 'game-changer'],
+  [/\bcutting[- ]edge\b/i, 'cutting-edge'], [/\btapestry\b/i, 'tapestry'], [/\bsupercharg/i, 'supercharge'],
+  [/\bever[- ]evolving\b/i, 'ever-evolving'], [/\bin today['’]s\b/i, "in today's"], [/^\s*in this (post|guide|article)\b|\bin this (post|guide|article),? (we|you|i)\b/i, 'in this post/guide'],
+  [/\blet['’]s dive\b|\bdive in\b|\bdeep dive\b/i, "let's dive / deep dive"], [/\bwhen it comes to\b/i, 'when it comes to'],
+  [/\bhere['’]s the thing\b/i, "here's the thing"], [/\bthe truth is\b/i, 'the truth is'], [/\bworth noting\b/i, "it's worth noting"],
+  [/\bimportant to (note|remember)\b/i, "it's important to note"], [/\bwhat most people miss\b/i, 'what most people miss'],
+  [/\bultimate guide\b|\bcomplete guide\b|\beverything you need to know\b/i, 'ultimate/complete guide'],
+];
+/** Words that are usually filler but have literal uses ("landscape video"). Warnings. */
+const BANNED_SOFT = /\b(elevat\w*|leverag\w*|robust|unlock\w*|empower\w*|streamlin\w*|transformative|foster\w*|realm|landscape|navigat\w*|crucial|really|very|truly|simply|essentially|arguably)\b/i;
+/** Things the engine cannot have done, or that EchoPulse never says. Errors. */
+const BANNED_CLAIMS = [
+  [/\bI (checked|tested|tried|reviewed|read|opened|compared|counted|looked|ran|found|built|pulled|priced|asked|called|spoke|use|used|have|recommend|think|would)\b|\bI['’](ve|d|m|ll)\b/, 'first person singular ("I ..."). The run is automated. Fix: write "we" for what was read or calculated ("we read 10 pricing pages"), or cut the sentence.'],
+  [/\b(in|from) (my|our) experience\b|\bmy (clients?|agency|team)\b|\bour clients?\b|\bwe(?: have|['’]ve) (seen|found|worked|helped|tested|tried)\b|\bwe (tested|tried)\b/i, 'an experience or client claim the engine cannot back. Fix: cut it, or replace it with what a linked source says.'],
+  [/cal\.com/i, 'a booking link. Fix: remove it; the site adds the tracked button itself.'],
+  [/4,?997|\bFull System\b/, 'a retired EchoPulse tier. Fix: remove it; state only the prices in lib/pricing.ts.'],
+  [/\bClutch\b/, 'Clutch. Fix: remove the mention.'],
+];
+
+/**
+ * @returns {{ errors: string[], warnings: string[], facts: string[], lastChecked: string|null }}
+ */
+export function checkStandard(p, now) {
+  const errors = [];
+  const warnings = [];
+  const facts = [];
+  const { routes, prices } = repoFacts();
+  const isAsset = p.postType !== 'trending';
+
+  // ── frontmatter ──
+  if (!p.icp) errors.push(`icp is required. Fix: set icp to one of ${ENGINE_ICPS.join(', ')}.`);
+  else if (!ENGINE_ICPS.includes(p.icp)) errors.push(`icp "${p.icp}" has no page on the site. Fix: use ${p.icp === 'saas' ? 'founders' : p.icp === 'home-services' ? 'business-owners' : `one of ${ENGINE_ICPS.join(', ')}`}.`);
+  if (!p.service) errors.push(`service is required. Fix: set service to one of ${SERVICES.join(', ')}.`);
+  if (p.data.postType == null || p.data.postType === '') errors.push('postType is required. Fix: add "postType: asset" (or trending, with updateBy).');
+  if (!p.targetQuery) errors.push('targetQuery is required. Fix: add the one search query this post answers, in the searcher\'s words.');
+  if (!p.whatsNew) errors.push('whatsNew is required. Fix: add one sentence naming the original asset with its count and date.');
+  else if (p.whatsNew.length < 20 || p.whatsNew.length > 160) errors.push(`whatsNew is ${p.whatsNew.length} chars. Fix: make it 20 to 160.`);
+  if (p.icp && p.service && ENGINE_ICPS.includes(p.icp)) {
+    const want = expectedMoneyPage(p.icp, p.service);
+    const servicePage = `/services/${p.service}`;
+    if (!p.moneyPage) errors.push(`moneyPage is required. Fix: add "moneyPage: ${want}".`);
+    else if (p.moneyPage !== want && p.moneyPage !== servicePage) errors.push(`moneyPage "${p.moneyPage}" is not the selling page for ${p.icp} + ${p.service}. Fix: set "moneyPage: ${want}".`);
+    else if (p.moneyPage !== want) warnings.push(`moneyPage is ${servicePage} although ${want} exists in this checkout. Only correct if ${want} did not return 200 on the live site; say so in the report.`);
+    const ask = askFor(p.service);
+    if (p.ask && p.ask !== ask) errors.push(`ask "${p.ask}" does not match the service. Fix: delete the ask line (it is derived: ${p.service} gives "${ask}").`);
+    facts.push(`ask ${ask}`);
+  }
+  if (p.title.length > TITLE_MAX_ENGINE) errors.push(`title is ${p.title.length} chars. Fix: cut it to ${TITLE_MAX_ENGINE} or fewer, keeping the query first and the number.`);
+  if (p.excerpt.length < EXCERPT_MIN) errors.push(`excerpt is ${p.excerpt.length} chars. Fix: make it ${EXCERPT_MIN} to ${EXCERPT_MAX} (the answer with its number, then how it was checked).`);
+  if (p.thumbnailText.length > 60) warnings.push(`thumbnailText is ${p.thumbnailText.length} chars; over 60 wraps badly on the cover.`);
+  if ((COST_RE.test(p.title) || COST_RE.test(p.targetQuery)) && !/cost|price|pricing|rates/.test(p.slug)) {
+    if (p.isRefresh) warnings.push(`cost post without cost, price, pricing or rates in the slug "${p.slug}". A live slug is never changed, so the site will not add its price line here.`);
+    else errors.push(`this is a cost post but the slug "${p.slug}" has none of cost, price, pricing, rates. Fix: put one in the slug (the site shows the EchoPulse price line only on those slugs).`);
+  }
+  facts.push(`title ${p.title.length} chars`, `excerpt ${p.excerpt.length} chars`);
+
+  // ── dashes, anywhere in the file ──
+  const lines = p.src.split('\n');
+  const dashLines = [];
+  lines.forEach((l, i) => { if (/[‒–—―]/.test(l)) dashLines.push(i + 1); });
+  if (dashLines.length) errors.push(`en or em dash on line${dashLines.length > 1 ? 's' : ''} ${dashLines.slice(0, 12).join(', ')}${dashLines.length > 12 ? ', ...' : ''}. Fix: write "to" for ranges ("15 to 30 seconds") and a comma, colon or full stop elsewhere.`);
+
+  // ── line-level phrase checks on the body ──
+  const bodyStart = lines.length - p.body.split('\n').length;
+  const bodyLines = p.body.split('\n');
+  const soft = [];
+  let fence = false;
+  bodyLines.forEach((l, i) => {
+    const n = bodyStart + i + 1;
+    if (/^\s*(```|~~~)/.test(l)) fence = !fence;
+    if (fence || /^\s*>/.test(l)) return; // quoted speech is someone else's words
+    const text = l.replace(/\]\([^)]*\)/g, ']'); // do not scan URLs
+    for (const [re, name] of BANNED_HARD) if (re.test(text)) errors.push(`line ${n}: banned phrase "${name}". Fix: rewrite the sentence so it states the fact directly.`);
+    for (const [re, why] of BANNED_CLAIMS) if (re.test(text)) errors.push(`line ${n}: ${why}`);
+    const m = text.match(BANNED_SOFT);
+    if (m) soft.push(`${n} (${m[0].toLowerCase()})`);
+    if (/echopulse/i.test(text)) {
+      if (/\bnotice\b/i.test(text)) errors.push(`line ${n}: a notice period next to EchoPulse. Fix: remove it. The only term stated is "month-to-month".`);
+      const hrs = [...text.matchAll(/\b(\d+)[- ]?(?:hours?|hrs?)\b/gi)].map((x) => x[1]);
+      if (hrs.some((h) => h !== '48')) errors.push(`line ${n}: an EchoPulse turnaround other than 48 hours. Fix: say only "short-form edits within 48 hours"; long-form depends on length and gets no number.`);
+    }
+  });
+  if (soft.length) warnings.push(`filler words on lines ${soft.slice(0, 15).join(', ')}${soft.length > 15 ? ', ...' : ''}. Rewrite each unless it is literal ("landscape video", "site navigation").`);
+
+  // ── structure, from the converted blocks ──
+  const info = p.blocks.map((b) => {
+    if (b._type === 'table') return { kind: 'table', text: b.rows.flatMap((r) => r.cells).join(' '), links: [] };
+    if (b._type !== 'block') return { kind: b._type, text: '', links: [] };
+    return { kind: b.listItem ? 'li' : b.style, text: b.children.map((c) => c.text).join(''), links: (b.markDefs || []).map((d) => String(d.href || '')) };
+  });
+  const norm = (t) => t.toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, ' ').trim();
+  const words = (t) => t.split(/\s+/).filter(Boolean).length;
+  const internalPath = (href) => {
+    const m = href.match(/^https?:\/\/(?:www\.)?echopulse\.media(\/[^?#]*)?/i);
+    const path = m ? (m[1] || '/') : href.startsWith('/') ? href.split(/[?#]/)[0] : null;
+    return path == null ? null : path.length > 1 ? path.replace(/\/$/, '') : path;
+  };
+  const isExternal = (href) => /^https?:\/\//i.test(href) && internalPath(href) == null;
+
+  // capsule
+  const first = info[0];
+  if (!first || first.kind !== 'normal') {
+    errors.push('the post must open with the answer paragraph, not a heading, list, quote or image. Fix: make the first block a 40 to 75 word paragraph that answers the title.');
+  } else {
+    const w = words(first.text);
+    facts.push(`capsule ${w} words`);
+    if (w < 40 || w > 75) errors.push(`the first paragraph (answer capsule) is ${w} words. Fix: make it 40 to 75 words, 2 to 3 sentences.`);
+    if (!/\d/.test(first.text)) errors.push('the first paragraph has no number. Fix: state the answer with its number, unit and date ("as of November 2026").');
+    if (/echopulse/i.test(first.text)) errors.push('the first paragraph mentions EchoPulse. Fix: remove it; the capsule answers the question and nothing else.');
+  }
+
+  // sections
+  let h2 = '';
+  let h3 = '';
+  let faqCount = 0;
+  let hasFaq = false;
+  let hasSources = false;
+  let hasFit = false;
+  const sourceLinks = new Set();
+  const allExternal = new Set();
+  const blogLinks = new Set();
+  const badInternal = new Set();
+  let moneyLinked = false;
+  let tables = 0;
+  let cite = false;
+  let h2Count = 0;
+  let h2Questions = 0;
+  let figureBlocks = 0;
+  const unsourced = [];
+  const fitPrices = new Set();
+  let fitText = '';
+  const isFaq = (t) => /^(faq|frequently asked questions|common questions)/.test(norm(t));
+  const FIGURE_RE = /[$£€]\s?\d|\d\s?%|\d\s?percent\b/;
+  const DERIVED_RE = /our arithmetic|we (calculated|worked out|added|counted)|works out (to|at)|could not (verify|confirm|find)|does not publish|do not publish|not published|no public price|table above|rows above/i;
+
+  // A figure counts as sourced when its paragraph links out, or names a source
+  // that is linked under "## Sources" (by the first word of the link text or
+  // by its domain: "Jobber's pricing page lists ..." matches getjobber.com).
+  const sourceNames = new Set();
+  {
+    let inSources = false;
+    for (const b of p.blocks) {
+      if (b._type !== 'block') continue;
+      const text = b.children.map((c) => c.text).join('');
+      if (b.style === 'h2') { inSources = /^sources/.test(norm(text)); continue; }
+      if (!inSources) continue;
+      for (const d of b.markDefs || []) {
+        const href = String(d.href || '');
+        if (!isExternal(href)) continue;
+        const host = href.replace(/^https?:\/\/(www\.)?/i, '').split('/')[0].split('.').slice(0, -1).pop() || '';
+        if (host.length >= 3) sourceNames.add(host.toLowerCase().replace(/[^a-z0-9]/g, ''));
+        const label = b.children.filter((c) => (c.marks || []).includes(d._key)).map((c) => c.text).join('');
+        const firstWord = (label.match(/[A-Za-z0-9][A-Za-z0-9.&'-]{2,}/) || [''])[0].toLowerCase().replace(/[^a-z0-9]/g, '');
+        if (firstWord.length >= 3 && !['the', 'how', 'why', 'what', 'our', 'new'].includes(firstWord)) sourceNames.add(firstWord);
+      }
+    }
+  }
+  const namesSource = (text) => {
+    const flat = text.toLowerCase().replace(/[^a-z0-9]/g, '');
+    for (const n of sourceNames) if (flat.includes(n)) return true;
+    return false;
+  };
+
+  info.forEach((b, idx) => {
+    if (b.kind === 'h2') {
+      h2 = norm(b.text); h3 = '';
+      h2Count++;
+      if (/\?\s*$/.test(b.text.trim())) h2Questions++;
+      if (isFaq(b.text)) hasFaq = true;
+      if (/^sources/.test(h2)) hasSources = true;
+      if (/echopulse/.test(h2)) hasFit = true;
+      return;
+    }
+    if (b.kind === 'h3') { h3 = norm(b.text); if (isFaq(h2)) faqCount++; return; }
+    if (b.kind === 'h1') errors.push('the body has an H1. Fix: start headings at "## "; the title is the only H1.');
+    if (b.kind === 'table') tables++;
+    if (b.kind === 'blockquote' && /^\s*cite this:/i.test(b.text)) {
+      cite = true;
+      if (!b.text.includes(`echopulse.media/blog/${p.slug}`)) errors.push(`the cite block does not contain this post's URL. Fix: end it with "https://echopulse.media/blog/${p.slug}".`);
+    }
+    for (const href of b.links) {
+      const path = internalPath(href);
+      if (path != null) {
+        if (path === p.moneyPage) moneyLinked = true;
+        const blog = path.match(/^\/blog\/([a-z0-9-]+)$/);
+        if (blog) { if (blog[1] !== p.slug) blogLinks.add(blog[1]); }
+        else if (path !== '/blog' && !routes.has(path)) badInternal.add(path);
+      } else if (isExternal(href)) {
+        allExternal.add(href);
+        if (/^sources/.test(h2)) sourceLinks.add(href);
+      }
+    }
+    const inFit = /echopulse/.test(h2);
+    if (inFit) fitText += ` ${b.text}`;
+    if (inFit) for (const m of b.text.matchAll(/\$\s?[\d,]+(?:\.\d+)?/g)) fitPrices.add(m[0].replace(/\s/g, '').replace(/,$/, ''));
+    // number sourcing: paragraphs and list items in the researched sections
+    const exempt = idx === 0 || inFit || isFaq(h2) || /^sources/.test(h2) || /example/.test(h2) || /example/.test(h3) || /last checked:/i.test(b.text);
+    if ((b.kind === 'normal' || b.kind === 'li') && !exempt && FIGURE_RE.test(b.text)) {
+      figureBlocks++;
+      if (!b.links.some(isExternal) && !DERIVED_RE.test(b.text) && !namesSource(b.text)) unsourced.push(b.text.slice(0, 70).trim());
+    }
+  });
+
+  if (isAsset) {
+    facts.push(`tables ${tables}`);
+    if (!tables) errors.push('an asset post needs at least one table. Fix: put the asset in a pipe table whose header row names the unit and the date.');
+    if (!cite) errors.push(`no cite block. Fix: directly after the asset add one blockquote: "> **Cite this:** <the finding with its number and date>. Source: EchoPulse Media, "<title>", https://echopulse.media/blog/${p.slug}".`);
+    if (p.template) { /* a format example is short on purpose */ } else if (p.wordCount < 1200) errors.push(`${p.wordCount} words. Fix: an asset post is 1,200 to 2,200 words; add the missing buyer questions, not padding.`);
+    else if (p.wordCount > 2400) warnings.push(`${p.wordCount} words; the target is 1,200 to 2,200. Cut restated points.`);
+  } else if (p.wordCount < 600) {
+    errors.push(`${p.wordCount} words. Fix: a trending post is at least 600 words.`);
+  }
+  facts.push(`${p.wordCount} words`);
+
+  if (!hasFaq) errors.push('no FAQ section. Fix: add "## FAQ" with 4 to 6 questions as "### " headings, each answered in 2 to 4 sentences.');
+  else if (faqCount < 4) errors.push(`the FAQ has ${faqCount} question${faqCount === 1 ? '' : 's'}. Fix: 4 to 6 real questions, each a "### " heading under "## FAQ".`);
+  else if (faqCount > 6) warnings.push(`the FAQ has ${faqCount} questions; keep the best 6.`);
+  facts.push(`FAQ ${faqCount}`);
+
+  const minSources = isAsset ? 4 : 2;
+  if (!hasSources) errors.push('no Sources section. Fix: end the post with "## Sources": every source as a link, what it gave, and the date read.');
+  else if (sourceLinks.size < minSources) errors.push(`Sources lists ${sourceLinks.size} external link${sourceLinks.size === 1 ? '' : 's'}. Fix: link at least ${minSources} primary sources there.`);
+  facts.push(`sources ${sourceLinks.size} links`);
+
+  // the "Last checked" line: the post's own refresh date
+  let lastChecked = null;
+  const lc = p.body.match(/Last checked:\s*(\d{1,2}) ([A-Za-z]+) (\d{4})/);
+  if (!lc || !MONTHS.includes(lc[2].toLowerCase())) {
+    errors.push('no "Last checked: D Month YYYY." line. Fix: end the "How we checked" paragraph with it, using today\'s date, for example "Last checked: 18 November 2026."');
+  } else {
+    const d = new Date(Date.UTC(Number(lc[3]), MONTHS.indexOf(lc[2].toLowerCase()), Number(lc[1])));
+    lastChecked = d.toISOString().slice(0, 10);
+    const days = (now.getTime() - d.getTime()) / 86400000;
+    if (!p.template && (days < -1.5 || days > 3)) errors.push(`"Last checked: ${lc[1]} ${lc[2]} ${lc[3]}" is not today. Fix: re-check the sources today and write today's date.`);
+    facts.push(`last checked ${lastChecked}`);
+  }
+
+  // links
+  if (badInternal.size) errors.push(`internal link${badInternal.size > 1 ? 's' : ''} to a page that does not exist in this checkout: ${[...badInternal].join(', ')}. Fix: link a real page (the money page, /pricing, /free-edits, /pilot, a /case-studies/ page or a /blog/ post) or remove the link.`);
+  if (p.moneyPage && !moneyLinked) errors.push(`the body never links the money page. Fix: link ${p.moneyPage} once, in a sentence that reads fine without the link.`);
+  else if (p.moneyPage) facts.push(`money page ${p.moneyPage} linked`);
+  if (blogLinks.size < 2) warnings.push(`${blogLinks.size} links to other posts; the standard is 2 siblings from the same cluster. Say in the report if the cluster has none.`);
+
+  // EchoPulse section and prices
+  const isCost = /cost|price|pricing|rates/.test(p.slug);
+  if (isCost && isAsset && !hasFit) errors.push('a cost post needs "## Where does EchoPulse Media fit?". Fix: add it (under 90 words, the fixed ladder sentence, the money page link).');
+  if (hasFit) {
+    const paid = [...prices].filter((x) => /\d/.test(x));
+    const absent = paid.filter((x) => !fitPrices.has(x));
+    if (isCost && absent.length) errors.push(`the EchoPulse section of a cost post must state the ladder (${paid.join(', ')}); missing ${absent.join(', ')}. Fix: use the fixed ladder sentence from BLOG-ENGINE.md section 6 with the numbers in lib/pricing.ts.`);
+    if (p.service && askFor(p.service) === 'call' && /\bfootage\b/i.test(fitText)) errors.push(`the EchoPulse section mentions footage, but a ${p.service} post offers the call, not the free edits. Fix: remove the footage sentence.`);
+    const fw = words(fitText);
+    if (fw > 90) warnings.push(`the EchoPulse section is ${fw} words; keep it under 90.`);
+  }
+  const wrongPrices = [...fitPrices].filter((x) => !prices.has(x));
+  if (wrongPrices.length) errors.push(`the EchoPulse section states ${wrongPrices.join(', ')}, which is not a price in lib/pricing.ts (${[...prices].join(', ')}). Fix: use the fixed ladder sentence only, and keep other vendors' prices out of that section.`);
+
+  // title number must be in the post
+  const bodyText = info.map((b) => b.text).join('\n');
+  const missing = (p.title.match(/[$£€]?\d[\d,]*(?:\.\d+)?%?/g) || [])
+    .map((t) => t.replace(/,$/, ''))
+    .filter((t) => !/^20[2-3]\d$/.test(t))
+    .filter((t) => !bodyText.includes(t));
+  if (missing.length) errors.push(`the title promises ${missing.join(', ')} but the body never states ${missing.length > 1 ? 'them' : 'it'}. Fix: make the title match the numbers in the post.`);
+
+  // number sourcing
+  if (unsourced.length) {
+    const msg = `${unsourced.length} of ${figureBlocks} paragraphs with a price or percentage name no source: ${unsourced.slice(0, 5).map((t) => `"${t}..."`).join('; ')}.`;
+    const fix = ' Fix: in the same paragraph link the source or name it as it is listed under Sources ("Jobber\'s pricing page lists ..."), or say it is "our arithmetic" from the table above, or say the figure "could not be verified" and where you looked, or delete the number.';
+    if (figureBlocks >= 4 && unsourced.length > figureBlocks / 2) errors.push(msg + fix);
+    else warnings.push(msg + fix);
+  }
+  if (h2Count && h2Questions < h2Count / 2) warnings.push(`${h2Questions} of ${h2Count} H2s are questions. Section headings should be the buyer's questions.`);
+
+  return { errors, warnings, facts, lastChecked };
 }
 
 /** Build the Sanity document (without the mainImage asset ref). */
@@ -234,6 +637,15 @@ export function buildDocument(post, publishedAt) {
     updateBy: post.updateBy ? post.updateBy.toISOString() : undefined,
     icp: post.icp || undefined,
     service: post.service || undefined,
+    // Engine declarations. Stored so the next (memoryless) run can dedupe by
+    // query, count clusters and order refreshes without re-reading bodies.
+    targetQuery: post.targetQuery || undefined,
+    moneyPage: post.moneyPage || undefined,
+    whatsNew: post.whatsNew || undefined,
+    lastChecked: post.lastChecked || undefined,
+    // The text printed on the rendered cover, so a refresh can tell whether
+    // the cover needs re-rendering.
+    coverText: post.thumbnailText || undefined,
     content: post.blocks,
   };
   return doc;
@@ -277,28 +689,449 @@ async function makeClient() {
   return createClient({ projectId: PROJECT_ID, dataset: DATASET, apiVersion: API_VERSION, token, useCdn: false, perspective: 'raw' });
 }
 
-async function publishOne(post, { client, dryRun, force, now }) {
+// ─── reading the live blog (no token needed) ─────────────────────────────────
+
+async function makeReadClient() {
+  const { createClient } = await import('@sanity/client');
+  // Reads are public. A placeholder token (the cloud proxy injects the real
+  // one) or no token both work; never fail a read for lack of one.
+  return createClient({ projectId: PROJECT_ID, dataset: DATASET, apiVersion: API_VERSION, useCdn: false, perspective: 'published' });
+}
+
+/** Every live slug with its publish date, for checking /blog/ links. Returns null when the network is unavailable. */
+async function liveSlugs(client) {
+  try {
+    const rows = await client.fetch(`*[_type == "blog" && defined(slug.current)]{ "slug": slug.current, publishedAt }`);
+    return new Map(rows.map((r) => [r.slug, String(r.publishedAt || '9999').slice(0, 10)]));
+  } catch {
+    return null;
+  }
+}
+
+function blogLinksIn(blocks, ownSlug) {
+  const out = new Set();
+  for (const b of blocks) {
+    for (const d of b.markDefs || []) {
+      const m = String(d.href || '').match(/^(?:https?:\/\/(?:www\.)?echopulse\.media)?\/blog\/([a-z0-9-]+)\/?(?:[?#].*)?$/i);
+      if (m && m[1] !== ownSlug) out.add(m[1]);
+    }
+  }
+  return [...out];
+}
+
+// ─── Portable Text -> markdown (for refreshing a live post) ──────────────────
+
+function escapeMd(text) {
+  return String(text).replace(/([\\*_`[\]<~])/g, '\\$1');
+}
+
+function spansToMd(block) {
+  const defs = new Map((block.markDefs || []).map((d) => [d._key, d]));
+  let out = '';
+  for (const c of block.children || []) {
+    const raw = String(c.text ?? '');
+    if (!raw) continue;
+    const lead = raw.match(/^\s*/)[0];
+    const trail = raw.slice(lead.length).match(/\s*$/)[0];
+    const core = raw.slice(lead.length, raw.length - trail.length);
+    if (!core) { out += raw; continue; }
+    const marks = c.marks || [];
+    let t = marks.includes('code') ? `\`${core.replace(/`/g, "'")}\`` : escapeMd(core).replace(/\n/g, '  \n');
+    if (marks.includes('em')) t = `_${t}_`;
+    if (marks.includes('strong')) t = `**${t}**`;
+    const link = marks.map((m) => defs.get(m)).find((d) => d && d._type === 'link' && d.href);
+    if (link) t = `[${t}](${String(link.href).replace(/\)/g, '%29').replace(/\s/g, '%20')})`;
+    out += lead + t + trail;
+  }
+  return out.trim();
+}
+
+/** Consecutive "a | b | c" paragraphs (written with BLOG_TABLES=pipes) become one table block. */
+function foldPipeParagraphs(blocks) {
+  const out = [];
+  const cellsOf = (b) => {
+    if (b._type !== 'block' || (b.style ?? 'normal') !== 'normal' || b.listItem) return null;
+    const t = (b.children || []).map((c) => c.text).join('');
+    const cells = t.split(' | ').map((x) => x.trim());
+    return cells.length >= 2 ? cells : null;
+  };
+  for (let i = 0; i < blocks.length; i++) {
+    const first = cellsOf(blocks[i]);
+    if (!first) { out.push(blocks[i]); continue; }
+    const rows = [first];
+    let j = i + 1;
+    for (; j < blocks.length; j++) {
+      const c = cellsOf(blocks[j]);
+      if (!c || c.length !== first.length) break;
+      rows.push(c);
+    }
+    if (rows.length < 2) { out.push(blocks[i]); continue; }
+    out.push({ _type: 'table', hasHeader: true, rows: rows.map((cells) => ({ cells })) });
+    i = j - 1;
+  }
+  return out;
+}
+
+/**
+ * @returns {{ markdown: string, unsupported: string[], shape: string[] }}
+ * `shape` is one line per block (kind + text), used to prove the round trip.
+ */
+export function portableTextToMarkdown(content) {
+  const blocks = foldPipeParagraphs(Array.isArray(content) ? content : []);
+  const parts = [];
+  const unsupported = [];
+  const counters = [];
+  let prevList = false;
+  for (const b of blocks) {
+    const isList = b._type === 'block' && Boolean(b.listItem);
+    if (!isList) counters.length = 0;
+    let md = null;
+    if (b._type === 'block') {
+      const text = spansToMd(b);
+      const style = b.style ?? 'normal';
+      if (isList) {
+        const level = Math.max(1, b.level || 1);
+        counters.length = level;
+        counters[level - 1] = (counters[level - 1] || 0) + 1;
+        md = `${'    '.repeat(level - 1)}${b.listItem === 'number' ? `${counters[level - 1]}.` : '-'} ${text}`;
+      } else if (/^h[1-4]$/.test(style)) {
+        md = `${'#'.repeat(Math.max(2, Number(style[1])))} ${text}`;
+      } else if (style === 'blockquote') {
+        md = `> ${text}`;
+      } else if (style === 'normal') {
+        if (!text) continue; // empty paragraphs carry nothing
+        md = text.replace(/^(#{1,6}\s|>|[-+]\s|\d+[.)]\s)/, '\\$1').replace(/^\\(\d+)([.)])/, '$1\\$2');
+      } else {
+        unsupported.push(`text style "${style}"`);
+        continue;
+      }
+    } else if (b._type === 'table') {
+      const rows = (b.rows || []).map((r) => (r.cells || []).map((c) => String(c ?? '').replace(/\|/g, '\\|').replace(/\s+/g, ' ').trim() || ' '));
+      if (!rows.length) continue;
+      const width = Math.max(...rows.map((r) => r.length));
+      const line = (r) => `| ${Array.from({ length: width }, (_, i) => r[i] ?? ' ').join(' | ')} |`;
+      md = [line(rows[0]), `| ${Array(width).fill('---').join(' | ')} |`, ...rows.slice(1).map(line)].join('\n');
+    } else if (b._type === 'imageUrl' && b.url) {
+      md = `![${String(b.alt || '').replace(/[[\]]/g, '')}](${b.url}${b.caption ? ` "${String(b.caption).replace(/"/g, "'")}"` : ''})`;
+    } else if (b._type === 'video' && b.url) {
+      md = b.url;
+    } else {
+      unsupported.push(`block type "${b._type}"`);
+      continue;
+    }
+    parts.push(isList && prevList ? `\n${md}` : `${parts.length ? '\n\n' : ''}${md}`);
+    prevList = isList;
+  }
+  return { markdown: `${parts.join('')}\n`, unsupported, shape: shapeOf(blocks) };
+}
+
+function shapeOf(blocks) {
+  const squash = (t) => String(t).replace(/\s+/g, ' ').trim();
+  return blocks
+    .map((b) => {
+      if (b._type === 'block') {
+        const text = squash((b.children || []).map((c) => c.text).join(''));
+        if (!text && !b.listItem) return null;
+        const style = b.style ?? 'normal';
+        return `${b.listItem ? `${b.listItem}${b.level || 1}` : style === 'h1' ? 'h2' : style}: ${text}`;
+      }
+      if (b._type === 'table') return `table: ${(b.rows || []).map((r) => (r.cells || []).map(squash).join('|')).join(' / ')}`;
+      return `${b._type}: ${b.url || ''}`;
+    })
+    .filter((x) => x != null);
+}
+
+/** `--pull <slug>`: write a live post into the queue as a refresh file. */
+async function runPull(slug) {
+  const client = await makeReadClient();
+  const doc = await client.fetch(
+    `*[_type == "blog" && slug.current == $slug][0]{ _id, title, "slug": slug.current, excerpt, category, author, icp, service, postType, updateBy, targetQuery, moneyPage, whatsNew, lastChecked, coverText, publishedAt, content }`,
+    { slug },
+  );
+  if (!doc) throw new Error(`No live post has the slug "${slug}". Check the slug in the Sanity list (it is never guessed).`);
+  const { markdown, unsupported, shape } = portableTextToMarkdown(doc.content);
+  if (unsupported.length) {
+    throw new Error(`"${slug}" cannot be refreshed safely: it contains ${[...new Set(unsupported)].join(', ')}, which markdown cannot express. Skip this post and name it in the report.`);
+  }
+  // Prove the markdown says what the live post says before anyone edits it.
+  const back = shapeOf(markdownToPortableText(markdown).blocks);
+  const diffAt = shape.findIndex((line, i) => line !== back[i]);
+  if (diffAt !== -1 || shape.length !== back.length) {
+    const i = diffAt === -1 ? Math.min(shape.length, back.length) : diffAt;
+    throw new Error(
+      `"${slug}" did not survive the round trip to markdown at block ${i + 1}.\n    live: ${shape[i] ?? '(nothing)'}\n    file: ${back[i] ?? '(nothing)'}\n  Skip this post and name it in the report.`,
+    );
+  }
+  const fm = {
+    refresh: true,
+    title: doc.title || '',
+    slug: doc.slug,
+    excerpt: doc.excerpt || '',
+    category: CATEGORIES.includes(doc.category) ? doc.category : 'Insights',
+    author: doc.author || DEFAULT_AUTHOR,
+    icp: doc.icp || undefined,
+    service: doc.service || undefined,
+    postType: doc.postType || 'asset',
+    updateBy: doc.postType === 'trending' && doc.updateBy ? String(doc.updateBy).slice(0, 10) : undefined,
+    targetQuery: doc.targetQuery || undefined,
+    moneyPage: doc.moneyPage || undefined,
+    whatsNew: doc.whatsNew || undefined,
+    thumbnailText: doc.coverText || doc.title || undefined,
+  };
+  for (const k of Object.keys(fm)) if (fm[k] === undefined) delete fm[k];
+  const head =
+    `# REFRESH FILE for the live post /blog/${doc.slug} (first published ${String(doc.publishedAt || '').slice(0, 10) || 'unknown'}).\n` +
+    `# Publish it with:  npm run blog:publish -- --refresh --file <this file>\n` +
+    `# Never change slug. category and author are not updated by a refresh.\n` +
+    `# The cover is kept unless thumbnailText changes.\n`;
+  mkdirSync(QUEUE_DIR, { recursive: true });
+  const dest = join(QUEUE_DIR, `${new Date().toISOString().slice(0, 10)}-${doc.slug}.md`);
+  if (existsSync(dest)) throw new Error(`${dest} already exists. Delete it first if you want a fresh copy of the live post.`);
+  writeFileSync(dest, `---\n${head}${yaml.dump(fm, { lineWidth: -1, quotingType: '"', forceQuotes: false })}---\n\n${markdown}`);
+  console.log(`Pulled /blog/${doc.slug} (${shape.length} blocks, round trip verified) to:\n  ${dest}`);
+  console.log(`Stored on the live post: icp=${doc.icp || 'none'} service=${doc.service || 'none'} lastChecked=${doc.lastChecked || 'none'}`);
+  console.log('Next: edit the file to the current standard, then `npm run blog:validate -- --file <file>`, then publish with --refresh.');
+  return 0;
+}
+
+// ─── refresh order (Search Console export + what is live) ────────────────────
+
+function newestGscFile() {
+  if (!existsSync(DATA_DIR)) return null;
+  const files = readdirSync(DATA_DIR).filter((f) => /^gsc-pages-\d{4}-\d{2}-\d{2}\.csv$/.test(f)).sort();
+  return files.length ? files[files.length - 1] : null;
+}
+
+function readGscPages(file) {
+  const rows = new Map();
+  const lines = readFileSync(join(DATA_DIR, file), 'utf8').replace(/^\uFEFF/, '').split(/\r?\n/).slice(1);
+  for (const line of lines) {
+    const cols = line.split(',');
+    if (cols.length < 5) continue;
+    const m = cols[0].match(/\/blog\/([a-z0-9-]+)\/?$/i);
+    if (!m) continue;
+    const clicks = Number(cols[1]);
+    const impr = Number(cols[2]);
+    const pos = Number(cols[4]);
+    if (!Number.isFinite(impr) || !Number.isFinite(pos)) continue;
+    // www and non-www rows for one post are added up; position is impression-weighted.
+    const r = rows.get(m[1]) || { slug: m[1], clicks: 0, impr: 0, posSum: 0 };
+    r.clicks += clicks; r.impr += impr; r.posSum += pos * impr;
+    rows.set(m[1], r);
+  }
+  return [...rows.values()].map((r) => ({ ...r, pos: r.impr ? r.posSum / r.impr : 0, ctr: r.impr ? (100 * r.clicks) / r.impr : 0 }));
+}
+
+function guessIcp(slug, title) {
+  const text = `${slug} ${title || ''}`.toLowerCase();
+  for (const [key, words] of repoFacts().icpRules) if (words.some((w) => text.includes(w))) return key;
+  return 'founders';
+}
+
+/** `--refresh-list`: print the refresh order so nobody sorts a CSV by hand. */
+async function runRefreshList() {
+  const now = new Date();
+  // The run's calendar is Asia/Kolkata (the trigger works out the weekday there).
+  const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata' }).format(now);
+  const file = newestGscFile();
+  let gsc = [];
+  if (file) {
+    gsc = readGscPages(file);
+    const age = Math.round((now.getTime() - new Date(`${file.slice(10, 20)}T00:00:00Z`).getTime()) / 86400000);
+    console.log(`Search Console data: content/blog-data/${file} (${age} days old${age > 60 ? '; OLDER THAN 60 DAYS, say so in the report' : ''}), ${gsc.length} blog URLs.`);
+  } else {
+    console.log('Search Console data: none (no content/blog-data/gsc-pages-YYYY-MM-DD.csv). Tiers A and B are empty; use Tier T and Tier C. Never guess a position.');
+  }
+  let live = null;
+  try {
+    const client = await makeReadClient();
+    live = await client.fetch(`*[_type == "blog" && defined(slug.current)]{ "slug": slug.current, title, icp, postType, updateBy, lastChecked, publishedAt }`);
+  } catch (e) {
+    console.log(`Could not read the live post list (${e.message.split('\n')[0]}). Showing Search Console rows only; check each slug is live before pulling it.`);
+  }
+  const bySlug = new Map((live || []).map((d) => [d.slug, d]));
+  const dayAge = (iso) => (iso ? Math.floor((now.getTime() - new Date(iso).getTime()) / 86400000) : null);
+  const row = (tier, g, d) => {
+    const lc = d?.lastChecked || null;
+    const age = dayAge(lc);
+    const due = age == null || age > 45;
+    const old = d && String(d.publishedAt || '9999').slice(0, 10) < LEGACY_CUTOFF;
+    const icp = d ? (ENGINE_ICPS.includes(d.icp) ? d.icp : guessIcp(d.slug, d.title)) : guessIcp(g.slug, '');
+    return `| ${tier} | ${g ? g.slug : d.slug} | ${icp} | ${g ? g.impr : '-'} | ${g ? g.pos.toFixed(1) : '-'} | ${g ? g.clicks : '-'} | ${g ? `${g.ctr.toFixed(2)}%` : '-'} | ${lc || 'never'} | ${old ? 'SKIP (legacy, owner is reviewing it for removal)' : due ? 'DUE' : `not due for ${45 - age} days`} |`;
+  };
+  const head = '| Tier | Slug | icp | Impr. | Pos. | Clicks | CTR | Last checked | Status |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- |';
+  const isLive = (g) => !live || bySlug.has(g.slug);
+  const tierT = (live || []).filter((d) => d.postType === 'trending' && d.updateBy && String(d.updateBy).slice(0, 10) <= today);
+  const tierA = gsc.filter((g) => isLive(g) && g.pos >= 5 && g.pos <= 15 && g.impr >= 100).sort((a, b) => b.impr - a.impr);
+  const tierB = gsc.filter((g) => isLive(g) && g.pos > 15 && g.impr >= 200).sort((a, b) => b.impr - a.impr);
+  const ranked = new Set([...tierT.map((d) => d.slug), ...tierA.map((g) => g.slug), ...tierB.map((g) => g.slug)]);
+  const tierC = (live || [])
+    .filter((d) => !ranked.has(d.slug) && String(d.publishedAt || '9999').slice(0, 10) >= LEGACY_CUTOFF)
+    .sort((a, b) => String(a.lastChecked || '').localeCompare(String(b.lastChecked || '')) || String(a.publishedAt || '').localeCompare(String(b.publishedAt || '')))
+    .slice(0, 5);
+
+  console.log(`\nRefresh order, top to bottom. Work the first DUE row that fits today's rule (BLOG-ENGINE.md section 8).\n`);
+  console.log(head);
+  for (const d of tierT) console.log(row('T', null, d));
+  for (const g of tierA) console.log(row('A', g, bySlug.get(g.slug)));
+  for (const g of tierB) console.log(row('B', g, bySlug.get(g.slug)));
+  for (const d of tierC) console.log(row('C', null, d));
+  if (live) {
+    // Weekday refreshes are capped at 2 between Monday and Saturday. Sunday has its own 2.
+    const t = new Date(`${today}T00:00:00Z`);
+    const dow = t.getUTCDay() || 7; // 1 = Monday ... 7 = Sunday
+    const monday = new Date(t.getTime() - (dow - 1) * 86400000).toISOString().slice(0, 10);
+    const done = live.filter((d) => d.lastChecked && d.lastChecked >= monday && d.lastChecked <= today
+      // a refresh, not a new post: checked at least 2 days after it was first published
+      && d.publishedAt && new Date(`${d.lastChecked}T00:00:00Z`).getTime() - new Date(d.publishedAt).getTime() > 2 * 86400000);
+    console.log(`\nToday is ${today} (Asia/Kolkata), weekday ${dow}. Posts refreshed since Monday ${monday}: ${done.length}${done.length ? ` (${done.map((d) => d.slug).join(', ')})` : ''}.`);
+    console.log(dow === 7 ? 'SUNDAY: refresh up to 3 posts today, Tier T rows first, then DUE rows from the top.' : `WEEKDAY REFRESHES LEFT THIS WEEK: ${Math.max(0, 2 - done.length)} of 2`);
+    const gone = gsc.filter((g) => !bySlug.has(g.slug) && g.impr >= 100).map((g) => g.slug);
+    if (gone.length) console.log(`In the export but no longer live (ignored): ${gone.join(', ')}`);
+  }
+  console.log(`SKIP rows were published before ${LEGACY_CUTOFF}: never refresh them and never link to them.`);
+  console.log('\nT = trending post past its updateBy. A = position 5 to 15 with 100+ impressions. B = position above 15 with 200+ impressions. C = no data, oldest check first (top 5 shown).');
+  console.log('icp is the stored value, or the keyword guess for posts published before it was stored.');
+  return 0;
+}
+
+async function publishOne(post, { client, dryRun, force, refresh, newCover, now }) {
   const publishedAt = post.publishAt ?? now;
   const doc = buildDocument(post, publishedAt);
   const url = `${SITE_URL}/blog/${post.slug}`;
 
-  console.log(`\n▶ ${basename(post.filePath)}`);
+  console.log(`\n▶ ${basename(post.filePath)}${refresh ? '  (refresh of a live post)' : ''}`);
   console.log(`  title:     ${post.title}`);
   console.log(`  slug:      ${post.slug}`);
   console.log(`  category:  ${post.category}  |  author: ${post.author}  |  ${post.wordCount} words, ${post.readTime} min`);
+  console.log(`  standard:  ${post.legacy ? 'NOT ENFORCED (engine: false)' : 'enforced'}  |  ${post.facts.join(' | ')}`);
   for (const w of post.warnings) console.log(`  warning:   ${w}`);
 
+  // The scheduled engine always publishes with the placeholder token (the
+  // cloud proxy swaps in the real one). It may not opt a post out of the standard.
+  if (!dryRun && post.legacy && process.env.SANITY_WRITE_TOKEN === 'proxy-injected') {
+    throw new Error('This post sets "engine: false", so the engine standard was not enforced. An engine run cannot publish it. Fix: remove the "engine: false" line, run npm run blog:validate, and fix every error.');
+  }
+
+  // 0. every /blog/ link must be a live post (needs one public read)
+  const reader = client ?? (await makeReadClient());
+  const wanted = blogLinksIn(post.blocks, post.slug);
+  if (wanted.length) {
+    const live = await liveSlugs(reader);
+    if (!live) {
+      if (!dryRun) throw new Error('Could not read the live post list to check the /blog/ links. Nothing was published; retry once.');
+      console.log('  links:     /blog/ links NOT checked (no network in this dry run)');
+    } else {
+      const dead = wanted.filter((s) => !live.has(s));
+      if (dead.length) {
+        throw new Error(`The post links to ${dead.map((s) => `/blog/${s}`).join(', ')}, which ${dead.length > 1 ? 'are' : 'is'} not live. Fix: copy the slug exactly from the Sanity list, or remove the link.`);
+      }
+      const old = wanted.filter((s) => live.get(s) < LEGACY_CUTOFF);
+      if (old.length && !post.legacy) {
+        throw new Error(`The post links to ${old.map((s) => `/blog/${s}`).join(', ')}, published before ${LEGACY_CUTOFF} and under review for removal. Fix: link a newer post from the same cluster instead, or remove the link.`);
+      }
+      console.log(`  links:     ${wanted.length} /blog/ link${wanted.length > 1 ? 's' : ''} checked, all live`);
+    }
+  }
+
+  const render = async () => {
+    const png = await renderThumbnail({
+      title: post.thumbnailText,
+      category: post.category,
+      subtitle: post.thumbnailSub || undefined,
+      icon: pickIcon({ category: post.category, icp: post.icp, service: post.service, title: post.title }),
+    });
+    mkdirSync(THUMBS_DIR, { recursive: true });
+    const thumbPath = join(THUMBS_DIR, `${post.slug}.png`);
+    writeFileSync(thumbPath, png);
+    console.log(`  thumbnail: ${thumbPath} (${(png.length / 1024).toFixed(0)} KB)`);
+    return png;
+  };
+  const upload = async (png) => {
+    const asset = await client.assets.upload('image', png, {
+      filename: `${post.slug}-1200x630.png`,
+      contentType: 'image/png',
+      title: post.title,
+    });
+    console.log(`  asset:     ${asset._id}`);
+    // The `mainImage` field in the schema has no alt field, so none is set.
+    return { _type: 'image', asset: { _type: 'reference', _ref: asset._id } };
+  };
+  const finish = (id, when, note) => {
+    mkdirSync(PUBLISHED_DIR, { recursive: true });
+    const date = when.toISOString().slice(0, 10);
+    let dest = join(PUBLISHED_DIR, `${date}-${post.slug}.md`);
+    if (existsSync(dest)) dest = join(PUBLISHED_DIR, `${date}-${post.slug}-${Date.now()}.md`);
+    renameSync(post.filePath, dest);
+    if (!existsSync(LOG_FILE)) {
+      writeFileSync(LOG_FILE, '# Published blog posts\n\nAppended automatically by scripts/publish-blog.mjs. Do not edit by hand.\n\n| Date | Slug | Sanity id | URL |\n| --- | --- | --- | --- |\n');
+    }
+    appendFileSync(LOG_FILE, `| ${when.toISOString()} | ${post.slug}${note} | ${id} | ${url} |\n`);
+    console.log(`  moved to:  ${dest}`);
+    console.log(`  LIVE:      ${url}`);
+    return { url, dest, id };
+  };
+
+  // ── safe refresh: patch the live document, keep everything else ──
+  if (refresh) {
+    let prior;
+    try {
+      prior = await reader.fetch(
+        `*[_type == "blog" && slug.current == $slug && !(_id in path("drafts.**"))][0]{ _id, title, excerpt, publishedAt, category, author, coverText, "hasCover": defined(mainImage.asset) || defined(mainImageUrl), "blocks": count(content) }`,
+        { slug: post.slug },
+      );
+    } catch (e) {
+      if (!dryRun) throw e;
+      console.log(`  dry run: could not read the live post (${e.message.split('\n')[0]}). A real refresh reads it first and stops if the slug is not live.`);
+      return { url, dryRun: true };
+    }
+    if (!prior) {
+      throw new Error(`--refresh updates an existing post, and no live post has the slug "${post.slug}". Fix: use the slug exactly as it is live (run --pull <slug> to start from the live post), or publish without --refresh if this is a new post.`);
+    }
+    // The cover is re-rendered only when the text printed on it changes.
+    const same = (a, b) => String(a || '').trim().toLowerCase() === String(b || '').trim().toLowerCase();
+    const oldCoverText = prior.coverText || prior.title;
+    const coverChanges = newCover || !prior.hasCover || !same(post.thumbnailText, oldCoverText);
+    const set = {
+      title: doc.title, excerpt: doc.excerpt, readTime: doc.readTime, content: doc.content,
+      postType: doc.postType,
+    };
+    for (const k of ['icp', 'service', 'targetQuery', 'moneyPage', 'whatsNew', 'lastChecked']) if (doc[k]) set[k] = doc[k];
+    if (doc.updateBy) set.updateBy = doc.updateBy;
+    const unset = doc.updateBy ? [] : ['updateBy'];
+
+    console.log('  refresh plan:');
+    console.log(`    keep:    _id ${prior._id}, slug, publishedAt ${String(prior.publishedAt || '').slice(0, 10)}, category "${prior.category ?? ''}", author "${prior.author ?? ''}", any field set in Studio`);
+    console.log(`    title:   ${same(prior.title, doc.title) ? 'unchanged' : `"${prior.title}" -> "${doc.title}"`}`);
+    console.log(`    excerpt: ${same(prior.excerpt, doc.excerpt) ? 'unchanged' : 'changed'}`);
+    console.log(`    body:    ${prior.blocks ?? 0} blocks -> ${doc.content.length} blocks`);
+    console.log(`    set:     ${Object.keys(set).filter((k) => k !== 'content').join(', ')}${unset.length ? `; unset: ${unset.join(', ')}` : ''}`);
+    console.log(`    cover:   ${coverChanges ? `RE-RENDERED (${newCover ? '--new-cover' : !prior.hasCover ? 'the post has no cover' : `cover text "${oldCoverText}" -> "${post.thumbnailText}"`})` : 'kept (cover text unchanged)'}`);
+    console.log('    date:    Sanity sets _updatedAt on write; the site shows "Updated <date>"');
+
+    let png = null;
+    if (coverChanges) png = await render();
+    if (dryRun) {
+      console.log(`  dry run: nothing written, file not moved. Would refresh ${url}`);
+      return { url, dryRun: true };
+    }
+    if (png) {
+      set.mainImage = await upload(png);
+      set.coverText = post.thumbnailText;
+    }
+    await client.patch(prior._id).set(set).unset(unset).commit();
+    const check = await client.fetch(`*[_id == $id][0]{ title, "slug": slug.current, publishedAt }`, { id: prior._id });
+    if (!check || check.title !== doc.title || check.slug !== post.slug || check.publishedAt !== prior.publishedAt) {
+      throw new Error(`Sanity did not confirm the refresh of ${prior._id}; file left in queue.`);
+    }
+    const draft = await client.fetch(`*[_id == $id][0]._id`, { id: `drafts.${prior._id}` });
+    if (draft) console.log(`  warning:   an unpublished draft of this post exists in Studio (${draft}). It was not touched; publishing it from Studio would undo this refresh. Name it in the report.`);
+    console.log(`  refreshed: ${prior._id}`);
+    return finish(prior._id, now, ' (refresh)');
+  }
+
   // 1. thumbnail
-  const png = await renderThumbnail({
-    title: post.thumbnailText,
-    category: post.category,
-    subtitle: post.thumbnailSub || undefined,
-    icon: pickIcon({ category: post.category, icp: post.icp, service: post.service, title: post.title }),
-  });
-  mkdirSync(THUMBS_DIR, { recursive: true });
-  const thumbPath = join(THUMBS_DIR, `${post.slug}.png`);
-  writeFileSync(thumbPath, png);
-  console.log(`  thumbnail: ${thumbPath} (${(png.length / 1024).toFixed(0)} KB)`);
+  const png = await render();
 
   if (dryRun) {
     doc.mainImage = { _type: 'image', asset: { _type: 'reference', _ref: 'image-<uploaded-at-publish>-1200x630-png' } };
@@ -316,15 +1149,15 @@ async function publishOne(post, { client, dryRun, force, now }) {
   if (existing.length && !force) {
     throw new Error(
       `A blog document with slug "${post.slug}" already exists in Sanity (${existing.map((e) => e._id).join(', ')}). ` +
-        `Change the slug in the frontmatter, or re-run with --force to overwrite.`,
+        `If this is a new post, change the slug in the frontmatter. If you are updating that post, re-run with --refresh ` +
+        `(it keeps the publish date, the cover and everything set by hand). --force replaces the whole document and is not for the engine.`,
     );
   }
   if (existing.length) console.log(`  --force: overwriting ${existing.map((e) => e._id).join(', ')}`);
-  // When refreshing a post that already exists (an update, not a new post),
-  // keep its _id and its original publishedAt. Sanity bumps _updatedAt on
-  // write, which the site shows as "Updated <date>" and sends as dateModified.
-  // Resetting publishedAt would make a 2025 post claim to be new, which Google
-  // treats as a trust problem, and a new _id would leave the old doc behind.
+  // When replacing a post that already exists, keep its _id and its original
+  // publishedAt. Resetting publishedAt would make an old post claim to be new,
+  // which Google treats as a trust problem, and a new _id would leave the old
+  // doc behind.
   const prior = existing.find((e) => !String(e._id).startsWith('drafts.')) || existing[0];
   const priorFull = prior ? await client.fetch(`*[_id == $id][0]{ _id, publishedAt }`, { id: prior._id }) : null;
   if (priorFull) {
@@ -333,14 +1166,7 @@ async function publishOne(post, { client, dryRun, force, now }) {
   }
 
   // 3. upload the thumbnail
-  const asset = await client.assets.upload('image', png, {
-    filename: `${post.slug}-1200x630.png`,
-    contentType: 'image/png',
-    title: post.title,
-  });
-  // The `mainImage` field in the schema has no alt field, so none is set.
-  doc.mainImage = { _type: 'image', asset: { _type: 'reference', _ref: asset._id } };
-  console.log(`  asset:     ${asset._id}`);
+  doc.mainImage = await upload(png);
 
   // 4. create / replace the PUBLISHED document (id has no drafts. prefix)
   const tx = client.transaction().createOrReplace(doc);
@@ -355,26 +1181,25 @@ async function publishOne(post, { client, dryRun, force, now }) {
   console.log(`  published: ${doc._id}`);
 
   // 6. move the file + log it
-  mkdirSync(PUBLISHED_DIR, { recursive: true });
-  const date = publishedAt.toISOString().slice(0, 10);
-  let dest = join(PUBLISHED_DIR, `${date}-${post.slug}.md`);
-  if (existsSync(dest)) dest = join(PUBLISHED_DIR, `${date}-${post.slug}-${Date.now()}.md`);
-  renameSync(post.filePath, dest);
-  if (!existsSync(LOG_FILE)) {
-    writeFileSync(LOG_FILE, '# Published blog posts\n\nAppended automatically by scripts/publish-blog.mjs. Do not edit by hand.\n\n| Date | Slug | Sanity id | URL |\n| --- | --- | --- | --- |\n');
-  }
-  appendFileSync(LOG_FILE, `| ${publishedAt.toISOString()} | ${post.slug} | ${doc._id} | ${url} |\n`);
-  console.log(`  moved to:  ${dest}`);
-  console.log(`  LIVE:      ${url}`);
-  return { url, dest, id: doc._id };
+  return finish(doc._id, publishedAt, '');
 }
 
 // ─── modes ───────────────────────────────────────────────────────────────────
 
-function runValidate() {
-  const files = listQueue();
-  const example = join(QUEUE_DIR, '_example.md');
-  if (existsSync(example)) files.push(example); // keep the example honest too
+function runValidate(args) {
+  let files;
+  if (args.file) {
+    const f = resolve(ROOT, args.file);
+    if (!existsSync(f)) throw new Error(`File not found: ${args.file}`);
+    files = [f];
+  } else {
+    files = listQueue();
+    const example = join(QUEUE_DIR, '_example.md');
+    if (existsSync(example)) files.push(example); // keep the example honest too
+    if (args.published && existsSync(PUBLISHED_DIR)) {
+      files.push(...readdirSync(PUBLISHED_DIR).filter((f) => f.endsWith('.md') && f !== 'LOG.md').sort().map((f) => join(PUBLISHED_DIR, f)));
+    }
+  }
   if (!files.length) {
     console.log('blog:validate — queue is empty, nothing to check.');
     return 0;
@@ -383,11 +1208,12 @@ function runValidate() {
   const seen = new Map();
   for (const f of files) {
     try {
-      const p = parsePost(f);
+      const p = parsePost(f, { legacy: dirname(f) === PUBLISHED_DIR });
       if (seen.has(p.slug)) throw new Error(`${basename(f)}: slug "${p.slug}" is also used by ${seen.get(p.slug)}`);
       seen.set(p.slug, basename(f));
       const when = p.publishAt ? `scheduled ${p.publishAt.toISOString()}` : 'next free slot';
       console.log(`✓ ${basename(f)}  →  /blog/${p.slug}  (${p.blocks.length} blocks, ${p.wordCount} words, ${when})`);
+      console.log(`    STANDARD ${p.legacy ? 'NOT ENFORCED (legacy or engine: false)' : 'ENFORCED'}: ${p.facts.join(' | ')}`);
       for (const w of p.warnings) console.log(`    warning: ${w}`);
     } catch (e) {
       failed++;
@@ -395,6 +1221,7 @@ function runValidate() {
     }
   }
   console.log(`\n${files.length - failed}/${files.length} files valid.`);
+  if (failed) console.log('Every line above that starts with " - " is an error. Each ends with its fix. Fix them all and run this again.');
   return failed ? 1 : 0;
 }
 
@@ -405,6 +1232,7 @@ async function runPublish(args) {
     const f = resolve(ROOT, args.file);
     if (!existsSync(f)) throw new Error(`File not found: ${args.file}`);
     posts = [parsePost(f)];
+    if (!args.dryRun && basename(f).startsWith('_')) throw new Error(`${basename(f)} is a template (its name starts with "_") and is never published. Write the post to its own file.`);
     if (!args.dryRun && posts[0].publishAt && posts[0].publishAt > now && !args.force) {
       throw new Error(`${basename(f)} is scheduled for ${posts[0].publishAt.toISOString()} (in the future). Use --force to publish now.`);
     }
@@ -437,10 +1265,10 @@ async function runPublish(args) {
   const client = args.dryRun ? null : await makeClient();
   const results = [];
   for (const post of posts) {
-    results.push(await publishOne(post, { client, dryRun: args.dryRun, force: args.force, now }));
+    results.push(await publishOne(post, { client, dryRun: args.dryRun, force: args.force, refresh: args.refresh, newCover: args.newCover, now }));
   }
 
-  console.log(`\n${args.dryRun ? 'Dry run complete' : 'Published'}: ${results.length} post(s).`);
+  console.log(`\n${args.dryRun ? 'Dry run complete' : args.refresh ? 'Refreshed' : 'Published'}: ${results.length} post(s).`);
   for (const r of results) console.log(`  ${r.url}`);
   return 0;
 }
@@ -450,7 +1278,11 @@ async function runPublish(args) {
 if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {
   try {
     const args = parseArgs(process.argv.slice(2));
-    const code = args.validate ? runValidate() : await runPublish(args);
+    let code;
+    if (args.validate) code = runValidate(args);
+    else if (args.pull != null) code = await runPull(args.pull);
+    else if (args.refreshList) code = await runRefreshList();
+    else code = await runPublish(args);
     process.exit(code);
   } catch (e) {
     console.error(`\n✗ ${e.message}`);

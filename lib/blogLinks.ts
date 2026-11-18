@@ -87,6 +87,33 @@ export function audienceForPost(p: Pick<BlogPostSummary, 'title' | 'slug'>): { i
   };
 }
 
+const ICP_KEYS = Object.keys(ICP_LABEL) as IcpKey[];
+const SERVICE_SLUGS = Object.keys(SERVICE_LABEL) as ServiceSlug[];
+/** Publisher keys that have no page of their own, mapped to the page that serves them. */
+const ICP_ALIAS: Record<string, IcpKey> = { saas: 'founders', 'home-services': 'business-owners' };
+
+/**
+ * The post's audience, from the `icp` and `service` the publisher stored on
+ * the Sanity document (scripts/publish-blog.mjs). Each field falls back to the
+ * keyword guess on its own, so posts written before those fields existed, or
+ * carrying a value this site has no page for, behave exactly as before.
+ *
+ * Why: the guess reads the slug and title, so an automation post with no
+ * automation keyword in its title fell through to video-editing and asked the
+ * reader to send footage.
+ */
+export function audienceFor(
+  p: Pick<BlogPostSummary, 'title' | 'slug'>,
+  stored?: { icp?: string | null; service?: string | null } | null,
+): { icp: IcpKey; service: ServiceSlug } {
+  const guess = audienceForPost(p);
+  const icp = stored?.icp ? (ICP_ALIAS[stored.icp] ?? stored.icp) : null;
+  return {
+    icp: ICP_KEYS.find((k) => k === icp) ?? guess.icp,
+    service: SERVICE_SLUGS.find((s) => s === stored?.service) ?? guess.service,
+  };
+}
+
 /**
  * The most specific money page for a post: the niche-plus-service page when
  * that pair is one of the 12 that exist (lib/nicheIndex.ts, the same list
