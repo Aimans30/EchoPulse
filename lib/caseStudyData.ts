@@ -241,6 +241,16 @@ export type CaseStudy = {
 
   /** Measurement screenshots. Empty on engagements with nothing to export. */
   proof: CaseStudyProof[];
+  /**
+   * Page-by-page before and after. Each pair shows the old page and the page
+   * that replaced it, top-aligned in equal frames, with one line on what
+   * changed. Only for rebuilds, where the evidence is something you look at.
+   */
+  pairs?: {
+    heading: string;
+    intro: string;
+    items: { label: string; note: string; before: CaseStudyMedia; after: CaseStudyMedia; afterUrl: string }[];
+  };
   /** Extra supporting screens, rendered as a grid under the comparison. */
   gallery?: { heading: string; intro: string; items: CaseStudyProof[] };
 
@@ -908,12 +918,21 @@ const workingWithGod: CaseStudy = {
   headline: 'Two businesses were sharing one website.',
   headlineAccent: 'Neither was winning.',
   summary:
-    'Dr. Eliyahu Lotzar runs an organizational consulting practice and a faith-based leadership practice. Both lived on the same GoDaddy Airo site, so a Christian executive looking for coaching landed on a page about five-factor organizational health frameworks and revenue targets. We split the two, gave the coaching practice its own site, and took the monthly platform bill to nothing.',
+    'Dr. Eliyahu Lotzar runs an organizational consulting practice and a faith-based leadership practice. Both lived on the same GoDaddy Airo site, so a Christian executive looking for coaching landed on a page about five-factor organizational health frameworks and revenue targets. We split the two, gave the coaching practice its own site, took the monthly platform bill to nothing, and wired up tracking so the practice can see for the first time which pages people read and where they click to book. The site is live, the client is happy with it, and we still look after it.',
+
+  tldr: [
+    'The problem: two businesses on one GoDaddy site. The coaching practice was one bullet in a list of seven services, and the only way in was a blank contact form.',
+    'What we did: gave Working With God its own site with its own audience, five ways to start (two free), the credentials under the headline, and a booking page of its own.',
+    'What it runs on: a static build with no monthly platform bill, down from $50 to $60 a month. One-time $599. Code and content handed over.',
+    'Tracking: Google Analytics 4 and Microsoft Clarity went live with the site. Page views, scroll depth and every "Book a call" click are recorded, where the old site recorded nothing we could use.',
+    'After launch: we did not hand over and disappear. If something breaks or needs changing, the client messages us and we fix it.',
+  ],
 
   windowLabel: 'Rebuilt and launched 2026',
   windowStartISO: '2026-01-01',
-  windowEndISO: '2026-09-19',
+  windowEndISO: '2026-11-18',
   publishedISO: '2026-09-19',
+  updatedISO: '2026-11-18',
 
   services: [
     'Positioning and brand split',
@@ -921,7 +940,9 @@ const workingWithGod: CaseStudy = {
     'Website design',
     'Website development',
     'Technical SEO and metadata',
+    'Analytics and session recording',
     'Launch and handover',
+    'Support after launch',
   ],
 
   heroMetrics: [
@@ -941,9 +962,9 @@ const workingWithGod: CaseStudy = {
       note: 'Webinar, Roundtable, coaching, Masters Class, the book',
     },
     {
-      value: 'Full handover',
-      label: 'code and content, editable without a developer',
-      note: 'No vendor lock-in and nothing to renew',
+      value: '2 tools',
+      label: 'tracking the site from day one, where there were none',
+      note: 'Google Analytics 4 and Microsoft Clarity, both checked live',
     },
   ],
 
@@ -954,10 +975,13 @@ const workingWithGod: CaseStudy = {
     { label: 'Engagement', value: 'Full site replacement: positioning, copy, design, build, launch, handover' },
     { label: 'What was built', value: 'workingwithgod.live, now live and replacing the old site' },
     { label: 'Stack', value: 'Static build on Netlify, media on Cloudinary, booking on Calendly, events on Meetup' },
+    { label: 'Tracking', value: 'Google Analytics 4 (page views, scroll depth, a "Book a call" click event that records which page it came from) and Microsoft Clarity session recordings. Both confirmed sending data on November 18, 2026.' },
+    { label: 'After launch', value: 'Ongoing. Fixes and small changes are handled by message, at no monthly fee.' },
+    { label: 'Handover', value: 'Code and content both transferred. Editable without a developer, nothing to renew.' },
     { label: 'Cost change', value: '$50 to $60 a month in plugins and add-ons, down to no monthly platform bill. One time $599 for the redesign.' },
     {
       label: 'What is NOT measured',
-      value: 'No analytics baseline carried over from the old platform, so this page makes no traffic or conversion claims. Measurement starts at launch.',
+      value: 'No analytics baseline carried over from the old platform, so there is nothing honest to compare the new numbers against and this page publishes no traffic or conversion figures. The tracking is live and collecting; the comparison does not exist.',
     },
   ],
 
@@ -968,14 +992,15 @@ const workingWithGod: CaseStudy = {
     beforeWidth: 850,
     beforeHeight: 1600,
     beforeLabel: 'Before, on GoDaddy',
-    // afterSrc is intentionally absent until a full-page capture of the new
-    // homepage is saved to /public/case-studies/wwg-after-home.png. Until then
-    // BeforeAfter renders the old screen on its own beside the live link, which
-    // is stronger evidence than a screenshot anyway.
+    afterSrc: '/case-studies/wwg-after-home.jpg',
+    afterAlt:
+      'The new workingwithgod.live homepage: a deep navy hero with a headline about leaders plateauing for lack of perspective, the line "Coaching for Christian Professionals", one "Book a discovery call" button, and a four-part credential strip directly underneath.',
+    afterWidth: 1200,
+    afterHeight: 2500,
     afterLabel: 'After, workingwithgod.live',
     liveUrl: 'https://workingwithgod.live',
     caption:
-      'Left, the old reframedreality.com homepage on GoDaddy Airo, captured before replacement. Right, workingwithgod.live as it stands today. The new site is live, so you can open it and check it against this rather than take the screenshot for it.',
+      'Left, the old reframedreality.com homepage on GoDaddy Airo, captured before replacement. Right, workingwithgod.live, captured November 18, 2026. The new site is live, so you can open it and check it against this rather than take the screenshot for it.',
   },
 
   situation: {
@@ -1055,6 +1080,40 @@ const workingWithGod: CaseStudy = {
       ],
     },
     {
+      name: 'Tracking that actually reports',
+      stat: { value: '3 signals', label: 'page views, scroll depth, booking clicks' },
+      media: [
+        {
+          src: '/case-studies/wwg-after-book-a-call.jpg',
+          alt: 'The new Book a call page on workingwithgod.live, with its own headline and the booking calendar on the page.',
+          width: 1200,
+          height: 1625,
+          caption: 'The booking page. Every button that leads here sends an event naming the page it was clicked on.',
+        },
+      ],
+      summary:
+        'The old site gave the practice nothing to learn from. The new one went live with Google Analytics 4 and Microsoft Clarity already running, so from the first visitor there has been a record of what people read and what they click.',
+      points: [
+        'Google Analytics 4 records a page view on every page, including when a visitor moves between pages without a full reload, which is the part that quietly breaks on most modern builds.',
+        'Scroll depth is recorded, so it is possible to see whether people reach the offers further down a page or leave before them.',
+        'Every "Book a call" button sends its own event with the page it was clicked on. That answers the question the old site never could: which page makes people want to talk.',
+        'Microsoft Clarity records sessions and heatmaps, so when a page underperforms the answer comes from watching what visitors did rather than guessing.',
+        'We checked this on the live site on November 18, 2026, not from memory: page view and scroll events reached Google Analytics and Clarity was collecting. It has been reporting cleanly since launch.',
+      ],
+    },
+    {
+      name: 'Still here after launch',
+      stat: { value: '$0 a month', label: 'for fixes and small changes' },
+      summary:
+        'Most small-business sites are built, invoiced and abandoned. This one was handed over in full and is still looked after, because a site that nobody answers for goes stale within a year.',
+      points: [
+        'If something breaks, looks wrong on a device, or stops working after a third-party change, the client messages us and we fix it. There is no ticket queue and no hourly meter running.',
+        'Small changes to copy, dates, events and images are done on request, on top of the client being able to make them himself.',
+        'Because the build is static, there is no plugin stack to keep patched and nothing that silently expires, which is most of what goes wrong with a site after launch.',
+        'Dr. Lotzar has told us he is happy with the site. We are saying that in our own words because we have not asked him for a quote to print, and we would rather under-claim than put words in a client\'s mouth.',
+      ],
+    },
+    {
       name: 'Hand it over completely',
       summary:
         'The point of leaving a site builder is not paying less. It is owning the thing. Everything transferred on launch.',
@@ -1068,78 +1127,93 @@ const workingWithGod: CaseStudy = {
 
   proof: [],
 
-  gallery: {
-    heading: 'What the old site asked a visitor to work through.',
+  pairs: {
+    heading: 'The same four jobs, before and after.',
     intro:
-      'Captured from reframedreality.com before it was replaced. These are the pages a Christian executive looking for coaching had to navigate to find out whether the practice was for them.',
+      'Each row is one job a visitor comes to the site to do. Left is the page that did it on reframedreality.com. Right is the page that does it now, captured from the live site on November 18, 2026. Every right-hand page is linked, so you can open it and check.',
     items: [
       {
-        src: '/case-studies/wwg-before-org.png',
-        alt: 'The old Organization-Level Services page: four dense paragraphs of body copy under small-caps headings, with no calls to action.',
-        width: 1067,
-        height: 1600,
-        caption: 'Organization-Level Services. Four paragraphs, no call to action, framework names and revenue targets in the opening lines.',
+        label: 'Homepage',
+        note: 'From a "Got Growth?" template speaking to two audiences, to one line that says who it is for, one button, and the credentials directly under the headline.',
+        before: { src: '/case-studies/wwg-before-home.png', alt: 'Old homepage on GoDaddy Airo: green and white template, stock bridge photo, a wall of body copy and a broken right-hand column.', width: 850, height: 1600 },
+        after: { src: '/case-studies/wwg-after-home.jpg', alt: 'New homepage: navy hero, the headline about perspective, "Coaching for Christian Professionals", one booking button, credential strip, a client quote and a welcome video.', width: 1200, height: 2500 },
+        afterUrl: 'https://workingwithgod.live',
       },
       {
-        src: '/case-studies/wwg-before-wwg.png',
-        alt: 'The old Working With God page, one section within the wider consulting site.',
-        width: 604,
-        height: 1600,
-        caption: 'Working With God, as one page inside a consulting site rather than a practice with its own home.',
+        label: 'About',
+        note: 'From unbroken bullet lists of certifications most visitors never scrolled through, to a page that tells the thirty-year story in order and keeps the credentials readable.',
+        before: { src: '/case-studies/wwg-before-about.png', alt: 'Old About page: one very long column of certifications, publications and organizations as unbroken bullet lists.', width: 427, height: 1600 },
+        after: { src: '/case-studies/wwg-after-about.jpg', alt: 'New About page for Dr. Eliyahu Lotzar, with a portrait, a short narrative and the credentials broken into sections.', width: 1200, height: 2500 },
+        afterUrl: 'https://workingwithgod.live/about',
       },
       {
-        src: '/case-studies/wwg-before-about.png',
-        alt: 'The old About page: a very long single column of certifications, publications and organizations served, as unbroken bullet lists.',
-        width: 427,
-        height: 1600,
-        caption: 'About. Thirty years of credentials, real and impressive, delivered as bullet lists most visitors never reached.',
+        label: 'Services',
+        note: 'From two columns of centred body copy with no next step, to a page of named ways to engage, each with its own button and its own depth of commitment.',
+        before: { src: '/case-studies/wwg-before-individual.png', alt: 'Old Individual-Level Services page: two columns of centred body text and no call to action.', width: 1132, height: 1600 },
+        after: { src: '/case-studies/wwg-after-services.jpg', alt: 'New Ways to Engage page: coaching, the Masters Class and speaking laid out as separate offers with their own buttons.', width: 1200, height: 2500 },
+        afterUrl: 'https://workingwithgod.live/services',
       },
       {
-        src: '/case-studies/wwg-before-individual.png',
-        alt: 'The old Individual-Level Services page, with two columns of centred body copy.',
-        width: 1132,
-        height: 1600,
-        caption: 'Individual-Level Services. Two columns of centred text, which is the hardest layout to read at length.',
+        label: 'Getting in touch',
+        note: 'From a bare form telling the visitor to "specify your interest in the message section", to a booking page that says what the call is for and puts the calendar on the page.',
+        before: { src: '/case-studies/wwg-before-contact.png', alt: 'Old Contact Us page: an empty form with the instruction to specify your interest in the message section.', width: 1600, height: 1480 },
+        after: { src: '/case-studies/wwg-after-book-a-call.jpg', alt: 'New Book a call page: a headline about the decision you are stuck on, above an embedded booking calendar.', width: 1200, height: 1625 },
+        afterUrl: 'https://workingwithgod.live/book-a-call',
+      },
+    ],
+  },
+
+  gallery: {
+    heading: 'Pages that did not exist before.',
+    intro:
+      'The old site had no page for the book, none for the Roundtable and no direct contact page for the coaching practice. These are new, captured from workingwithgod.live on November 18, 2026.',
+    items: [
+      {
+        src: '/case-studies/wwg-after-the-book.jpg',
+        alt: 'The Book page on workingwithgod.live, for Working With God: The Ten Modes of Elevated Leadership.',
+        width: 1200,
+        height: 2500,
+        caption: 'The Book. The method the coaching is built on finally has a page of its own that can be linked and found.',
       },
       {
-        src: '/case-studies/wwg-before-team.png',
-        alt: 'The old Team-Level Services page: eight stacked sections of dense copy.',
-        width: 588,
-        height: 1600,
-        caption: 'Team-Level Services. Eight stacked sections, each one a wall, competing for the same visitor.',
+        src: '/case-studies/wwg-after-roundtable.jpg',
+        alt: 'The Roundtable registration page on workingwithgod.live.',
+        width: 1200,
+        height: 2500,
+        caption: 'The Roundtable. A free, in-person way to start, with its own registration page instead of a line in a list.',
       },
       {
-        src: '/case-studies/wwg-before-contact.png',
-        alt: 'The old Contact Us page: a bare form with the instruction to specify your interest in the message section.',
-        width: 1600,
-        height: 1480,
-        caption: 'Contact Us. "Please specify your interest in the message section." The visitor had to supply the offer themselves.',
+        src: '/case-studies/wwg-after-contact.jpg',
+        alt: 'The Contact page on workingwithgod.live.',
+        width: 1200,
+        height: 1683,
+        caption: 'Contact. For the people who want to write rather than book, without having to invent the reason.',
       },
     ],
   },
 
   midCtaText:
-    'If your site is doing two jobs badly, or you are paying a builder every month for something you have outgrown, that is the conversation. We will tell you on the call if a rebuild is not what you actually need.',
+    'If your site is doing two jobs badly, or you are paying a builder every month for something you have outgrown, that is the conversation. We will tell you on the call if a rebuild is not what you actually need, and if we do build it, we stay around after it launches.',
   openProblemsAccent: 'including what this page cannot prove.',
 
   openProblems: [
     {
       title: 'There is no before and after in the numbers, and there will not be',
       detail:
-        'No analytics baseline came across from the old platform, so there is no honest traffic or conversion comparison to publish and this page does not attempt one. Everything above is either a confirmed fact about the engagement or something you can check by opening the site. Measurement starts from launch.',
+        'No analytics baseline came across from the old platform, so there is no honest traffic or conversion comparison to publish and this page does not attempt one. The new site has been tracked since launch, but numbers with nothing to compare them to prove very little, so they are not printed here. Everything above is either a confirmed fact about the engagement or something you can check by opening the site.',
       status: 'Structural',
     },
     {
       title: 'The booking link still carries the old company name',
       detail:
-        'Every "Book a call" on the new site hands off to a Calendly URL ending reframedreality, so a visitor who has just been reading about Working With God lands on a page branded with the other practice. It is a small inconsistency in exactly the place where hesitation is highest.',
+        'The booking calendar now sits on the site\'s own Book a call page, which is an improvement, but the Calendly account behind it is still named after reframedreality. A visitor who has just been reading about Working With God can still see the other practice\'s name at the moment of booking. It is a small inconsistency in exactly the place where hesitation is highest.',
       status: 'Next up',
     },
     {
-      title: 'The booking handoff is not instrumented',
+      title: 'Booking clicks are tracked. Completed bookings are not tied back yet',
       detail:
-        'Bookings complete on Calendly, off the site, so as it stands the site cannot tell which page produced a call. Until that is wired, any judgement about which section is working is guesswork. Worth fixing before a penny goes into promoting the site.',
-      status: 'Next up',
+        'The site now records every "Book a call" click and the page it came from, which was the missing half when this page was first published. The booking itself still completes inside Calendly, so the site knows who clicked but not who finished. Passing the completed booking back to Analytics is the next piece, and worth doing before any money goes into promoting the site.',
+      status: 'Half done',
     },
     {
       title: 'Redirects from the retired domain need confirming',
@@ -1148,9 +1222,9 @@ const workingWithGod: CaseStudy = {
       status: 'To verify',
     },
     {
-      title: 'One testimonial on the whole site',
+      title: 'Two named quotes on the whole site',
       detail:
-        'The new site carries a single named quote. A coaching practice is bought on social proof more than almost any other kind of business, and collecting three or four more is the single biggest available lift. That one is on the client, and we have said so.',
+        'The new site carries two named client quotes, up from one at launch. A coaching practice is bought on social proof more than almost any other kind of business, and collecting three or four more is still the single biggest available lift. That one is on the client, and we have said so.',
       status: 'With the client',
     },
   ],

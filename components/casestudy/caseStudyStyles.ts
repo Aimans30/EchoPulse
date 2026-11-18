@@ -184,6 +184,18 @@ export const CASE_STUDY_CSS = `
 .cs-change-down { color: #A23A12; }
 
 /* Gallery, comparison, proof */
+.cs-pairs { list-style: none; padding: 0; margin: 0; display: grid; gap: 44px; }
+.cs-pair-head { display: grid; grid-template-columns: minmax(0, 220px) minmax(0, 1fr); gap: 8px 28px; align-items: baseline; margin-bottom: 16px; }
+.cs-pair-head h3 { font: 800 22px/1.2 Inter, sans-serif; letter-spacing: -0.02em; margin: 0; color: #0C0C0B; }
+.cs-pair-head p { font-size: 15.5px; line-height: 1.6; color: #4A4740; margin: 0; max-width: 68ch; }
+.cs-pair-shots { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+.cs-pair-shot { margin: 0; position: relative; }
+.cs-pair-tag { position: absolute; left: 12px; top: 12px; z-index: 2; padding: 5px 10px; border-radius: 100px; background: rgba(12,12,11,0.78); color: #F2EEE7; font: 700 11px Inter, sans-serif; letter-spacing: 1.2px; text-transform: uppercase; }
+.cs-pair-tag-after { background: #E8541A; color: #fff; }
+.cs-pair-frame { height: 460px; overflow-y: auto; overscroll-behavior: contain; border-radius: 16px; border: 1px solid rgba(12,12,11,0.12); background: #fff; box-shadow: 0 18px 44px rgba(12,12,11,0.08); scrollbar-width: thin; }
+.cs-pair-frame:focus-visible { outline: 2px solid #E8541A; outline-offset: 3px; }
+.cs-pair-frame img { display: block; width: 100%; height: auto; }
+.cs-pair-link { display: inline-block; margin-top: 10px; font: 700 13.5px Inter, sans-serif; color: #B23A0C; text-decoration: underline; text-underline-offset: 3px; }
 .cs-gallery { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; align-items: start; }
 .cs-gal { margin: 0; }
 .cs-gal img { width: 100%; height: 260px; object-fit: cover; object-position: top center; display: block; border: 1px solid var(--cs-line); border-radius: 16px; background: #fff; }
@@ -256,6 +268,9 @@ export const CASE_STUDY_CSS = `
   .cs-proof-scroll img { min-width: 720px; }
   .cs-problems { grid-template-columns: minmax(0, 1fr); }
   .cs-gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .cs-pair-head { grid-template-columns: 1fr; }
+  .cs-pair-shots { grid-template-columns: 1fr; gap: 14px; }
+  .cs-pair-frame { height: 380px; }
   .cs-gal img { height: 190px; }
   .cs-midcta-section { padding-bottom: 56px; }
   .cs-midcta { padding: 28px 22px; border-radius: 22px; }

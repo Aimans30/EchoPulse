@@ -111,6 +111,7 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
     { id: "situation", label: situationKicker },
     { id: "work", label: workKicker },
     ...(hasNumbers ? [{ id: "numbers", label: "The numbers" }] : []),
+    ...(study.pairs ? [{ id: "pages", label: "Before and after" }] : []),
     ...(study.gallery ? [{ id: "screens", label: "Screens" }] : []),
     ...(study.proof.length > 0 ? [{ id: "export", label: "The export" }] : []),
     { id: "open", label: openKicker },
@@ -472,6 +473,50 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
                 </div>
               </Reveal>
             )}
+          </div>
+        </section>
+      )}
+
+      {/* ── Page-by-page before and after ──────────────────────────────── */}
+      {study.pairs && (
+        <section className="cs-section cs-tone-cream" id="pages">
+          <div className="cs-container">
+            <Reveal>
+              <div className="cs-section-head">
+                <p className="cs-kicker">Before and after</p>
+                <h2 className="cs-h2">{study.pairs.heading}</h2>
+                <p className="cs-lead">{study.pairs.intro}</p>
+              </div>
+            </Reveal>
+            <ol className="cs-pairs">
+              {study.pairs.items.map((pair, i) => (
+                <Reveal as="li" key={pair.label} delay={Math.min(i * 0.05, 0.15)}>
+                  <div className="cs-pair">
+                    <div className="cs-pair-head">
+                      <h3>{pair.label}</h3>
+                      <p>{pair.note}</p>
+                    </div>
+                    <div className="cs-pair-shots">
+                      <figure className="cs-pair-shot">
+                        <span className="cs-pair-tag">Before</span>
+                        <div className="cs-pair-frame" tabIndex={0} role="group" aria-label={`${pair.label}, old page. Scroll to see more.`}>
+                          <Image src={pair.before.src} alt={pair.before.alt} width={pair.before.width} height={pair.before.height} sizes="(max-width: 760px) 92vw, 520px" />
+                        </div>
+                      </figure>
+                      <figure className="cs-pair-shot">
+                        <span className="cs-pair-tag cs-pair-tag-after">After</span>
+                        <div className="cs-pair-frame" tabIndex={0} role="group" aria-label={`${pair.label}, new page. Scroll to see more.`}>
+                          <Image src={pair.after.src} alt={pair.after.alt} width={pair.after.width} height={pair.after.height} sizes="(max-width: 760px) 92vw, 520px" />
+                        </div>
+                        <a className="cs-pair-link" href={pair.afterUrl} target="_blank" rel="noopener noreferrer">
+                          Open the live page <span aria-hidden="true">&rarr;</span>
+                        </a>
+                      </figure>
+                    </div>
+                  </div>
+                </Reveal>
+              ))}
+            </ol>
           </div>
         </section>
       )}
