@@ -207,6 +207,16 @@ export const BLOG_REDIRECTS: Record<string, string> = {
   "why-the-best-businesses-don-t-chase-customers": "/blog/inbound-leads-without-cold-outreach",
   "the-architecture-of-scalability-why-your-business-systems-are-failing-and-how-to-fix-them": "/blog/what-to-automate-first-small-business",
   "operational-mastery-the-exact-framework-used-by-8-figure-founders": "/blog/what-to-automate-first-small-business",
+
+  // ── Legacy post merges, 18 November 2026 ──────────────────────────────────
+  // 5 pre-July posts from the same audit, marked "merge": each duplicated a
+  // live post and added nothing the live post lacks, so they are unpublished
+  // and pointed at the post that covers the topic. Drafts are kept in Sanity.
+  "the-3-second-war-the-ultimate-guide-to-scripting-viral-short-form-content": "/blog/short-form-video-hooks-for-founders",
+  "the-vertical-video-monopoly-how-to-build-a-revenue-generating-content-engine-in-2026": `/blog/${SURVIVORS.batchProduction}`,
+  "building-a-digital-presence-for-business-growth": "/blog/posting-content-vs-digital-presence",
+  "what-90-of-founders-get-wrong-about-content": "/blog/why-founders-get-brand-positioning-wrong-2026",
+  "entity-based-seo-the-secret-to-dominating-ai-search-queries-in-2026": "/blog/ai-overviews-dominate-google-searches-content-framework-get-cited-2026",
 };
 
 /** Slugs that are still live. Used to avoid redirect chains from /blogs/*. */
