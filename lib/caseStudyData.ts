@@ -350,7 +350,7 @@ const magicbnb: CaseStudy = {
   windowStartISO: '2026-02-19',
   windowEndISO: '2026-11-11',
   publishedISO: '2026-08-20',
-  updatedISO: '2026-11-13',
+  updatedISO: '2026-11-18',
 
   services: [
     'Site rebuild and development',
@@ -608,6 +608,13 @@ const magicbnb: CaseStudy = {
       height: 895,
       caption:
         'Google Search Console, property magicbnb.io, performance report for 19 February to 17 August 2026. Exported 18 August 2026, the first export behind this page. Published with the client written consent.',
+    },    {
+      src: '/case-studies/magicbnb-gsc-6mo-nov18.png',
+      alt: 'Google Search Console performance report for magicbnb.io over six months, 17 May to 16 November 2026: 1.57K total clicks, 374K total impressions, 0.4% average click-through rate, average position 9.9. The impressions line climbs from near zero in May to between four and six thousand a day in November.',
+      width: 1536,
+      height: 757,
+      caption:
+        'Google Search Console, property magicbnb.io, web search, last 6 months (17 May to 16 November 2026), captured 18 November 2026. Totals as the console rounds them: 1.57K clicks, 374K impressions, 0.4% click-through rate, average position 9.9. This is a later and shorter window than the headline figures above, which is why the two do not match to the digit.',
     },
   ],
 
