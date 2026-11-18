@@ -9,7 +9,9 @@ import BlogFooterCTA from '@/components/BlogFooterCTA';
 import BlogInlineCTA from '@/components/BlogInlineCTA';
 import BlogSideCTA from '@/components/BlogSideCTA';
 import BlogEmailCapture from '@/components/BlogEmailCapture';
-import { audienceForPost } from '@/lib/blogLinks';
+import BlogStickyBar from '@/components/BlogStickyBar';
+import { audienceForPost, blogAskFor, blogBookUrl } from '@/lib/blogLinks';
+import { FREE_EDITS_URL } from '@/lib/links';
 import TableOfContents from '@/components/TableOfContents';
 import { getPostBySlug, getAllPostSlugs, getRelatedPosts, resolveCategory, resolveAuthor, type BlogPostSummary } from '@/lib/blog';
 import { urlFor } from '@/lib/sanity';
@@ -108,6 +110,8 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   const related = await getRelatedPosts(slug, post.category, 3);
   // Which ICP + service page this article should send readers to.
   const audience = audienceForPost(post);
+  // What the post asks for (free sample or the call), keyed off its service.
+  const ask = blogAskFor(audience.service);
 
   const headerImageSrc = post.mainImage?.asset
     ? urlFor(post.mainImage).width(1200).height(630).fit('crop').auto('format').url()
@@ -445,16 +449,23 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                 around a long post other than scrolling it end to end. */}
             <TableOfContents headings={headings} variant="mobile" />
 
-            {/* Body content, with the in-article CTA after the intro (before
-                the second H2) and a compact one about two thirds of the way
-                down. Both are plain links; see components/BlogInlineCTA. */}
+            {/* Body content. The first ask sits directly after the answer
+                paragraph (the first paragraph of the body) on every screen
+                size: these posts answer the question up top, and on a phone
+                the old slot before the second H2 was seven screens down. A
+                compact repeat sits about two thirds of the way down. Both are
+                plain links; see components/BlogInlineCTA. */}
             {post.content && post.content.length > 0 ? (
               (() => {
                 const blocks = post.content;
                 const h2s = blocks
                   .map((b, i) => (b._type === 'block' && (b as { style?: string }).style === 'h2' ? i : -1))
                   .filter((i) => i > 0);
-                const introEnd = h2s.length >= 2 ? h2s[1] : h2s.length === 1 ? h2s[0] : Math.min(4, blocks.length);
+                const firstPara = blocks.findIndex((b) => {
+                  const blk = b as { _type?: string; style?: string; listItem?: string };
+                  return blk._type === 'block' && (blk.style ?? 'normal') === 'normal' && !blk.listItem;
+                });
+                const introEnd = firstPara >= 0 ? firstPara + 1 : Math.min(1, blocks.length);
                 const midIdx = h2s.length >= 4 ? h2s[Math.floor(h2s.length * 0.66)] : -1;
                 const parts: Array<{ key: string; value: typeof blocks; after?: 'intro' | 'mid' }> = [];
                 if (midIdx > introEnd) {
@@ -478,23 +489,20 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               </p>
             )}
 
+            {/* Closing card: one offer, above the newsletter form and Related
+                Articles. See components/BlogFooterCTA. */}
+            <BlogFooterCTA ask={ask} bookUrl={blogBookUrl('blog_footer', slug)} category={resolveCategory(post)} />
+
             <BlogEmailCapture />
           </article>
 
           {/* Right rail: sticky offer cards, desktop only (hidden under 1280px,
               where the inline CTAs in the article do the same job). */}
           <aside className="blog-post-rail">
-            <BlogSideCTA icp={audience.icp} slug={slug} />
+            <BlogSideCTA icp={audience.icp} service={audience.service} slug={slug} />
           </aside>
         </div>
 
-        {/* Order below the article is deliberate: Related Articles first, then
-            the CTA last. The CTA used to sit inside <article>, which is capped
-            at 760px, so a wide dark card was squeezed into the narrow prose
-            column and read as cramped. It now sits outside the two-column grid
-            at the full 1180px content width, and it is the final thing on the
-            page, so a reader who is not ready to talk still has three more
-            articles to fall into first. */}
         {related.length > 0 && (
           <section className="blog-post-related">
             <h2 className="blog-post-related-title">Related Articles</h2>
@@ -506,9 +514,13 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           </section>
         )}
 
-        <section className="blog-post-cta-band">
-          <BlogFooterCTA category={resolveCategory(post)} />
-        </section>
+        {/* Phone only: one-line bar with the same single button as the first
+            in-article card, shown after 50% scroll. See BlogStickyBar. */}
+        <BlogStickyBar
+          kind={ask.kind}
+          label={ask.buttonLabel}
+          href={ask.kind === 'sample' ? FREE_EDITS_URL : blogBookUrl('sticky_bar', slug)}
+        />
 
         <style>{`
           .blog-post-breadcrumb {
@@ -635,14 +647,6 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             margin: 96px auto 0;
             padding: 0 56px;
           }
-          /* The closing CTA band. Same 1180px content width as Related above
-             it, so the two blocks line up rather than the CTA being inset
-             inside the 760px prose column the way it was. */
-          .blog-post-cta-band {
-            max-width: 1180px;
-            margin: 72px auto 0;
-            padding: 0 56px;
-          }
           .blog-post-related-title {
             font-family: Inter, sans-serif;
             font-size: 24px;
@@ -669,11 +673,11 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           }
           @media (max-width: 900px) {
             .blog-post-main { padding-top: 100px !important; }
-            .blog-post-layout, .blog-post-breadcrumb, .blog-post-related, .blog-post-cta-band { padding: 0 32px !important; }
+            .blog-post-layout, .blog-post-breadcrumb, .blog-post-related { padding: 0 32px !important; }
           }
           @media (max-width: 720px) {
             .blog-post-main { padding-top: 84px !important; padding-bottom: 72px !important; }
-            .blog-post-layout, .blog-post-breadcrumb, .blog-post-related, .blog-post-cta-band { padding: 0 20px !important; }
+            .blog-post-layout, .blog-post-breadcrumb, .blog-post-related { padding: 0 20px !important; }
             .blog-post-related { margin-top: 64px !important; }
             .blog-post-related-grid { grid-template-columns: 1fr !important; }
             .blog-post-crumb-current { max-width: 60vw; }
@@ -682,7 +686,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             .blog-post-h1 { font-size: 30px !important; letter-spacing: -1px !important; line-height: 1.1 !important; overflow-wrap: break-word; }
             .blog-post-excerpt { font-size: 17px !important; line-height: 1.6 !important; margin-bottom: 24px !important; }
             .blog-post-crumb-link { min-height: 44px; }
-            .blog-post-layout, .blog-post-breadcrumb, .blog-post-related, .blog-post-cta-band { padding: 0 18px !important; }
+            .blog-post-layout, .blog-post-breadcrumb, .blog-post-related { padding: 0 18px !important; }
           }
 
           /* globals.css carries a blanket mobile rule, \`main article {

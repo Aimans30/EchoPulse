@@ -16,6 +16,9 @@
  * exist at all.
  */
 import { getAllPosts, type BlogPostSummary } from '@/lib/blog';
+import { NICHE_INDEX } from '@/lib/nicheIndex';
+import { BOOK_CALL_URL } from '@/lib/links';
+import { FREE_SAMPLE, PILOT, PRESENCE, GROWTH } from '@/lib/pricing';
 
 export type IcpKey = 'real-estate' | 'founders' | 'coaches' | 'dtc' | 'business-owners';
 export type ServiceSlug =
@@ -83,6 +86,123 @@ export function audienceForPost(p: Pick<BlogPostSummary, 'title' | 'slug'>): { i
     service: firstMatch(SERVICE_RULES, text) ?? 'video-editing',
   };
 }
+
+/**
+ * The most specific money page for a post: the niche-plus-service page when
+ * that pair is one of the 12 that exist (lib/nicheIndex.ts, the same list
+ * NICHE_PAGES is built from), otherwise the audience page.
+ */
+export function nichePageFor(icp: string, service: string): string {
+  return NICHE_INDEX.some((e) => e.icp === icp && e.service === service) ? `/${icp}/${service}` : `/${icp}`;
+}
+
+/** Link text to go with nichePageFor: the niche page's own H1, or the audience. */
+export function nicheLinkLabel(icp: IcpKey, service: string): string {
+  const hit = NICHE_INDEX.find((e) => e.icp === icp && e.service === service);
+  if (!hit) return `how we work with ${ICP_LABEL[icp]}`;
+  // Sentence-internal: lower the first letter unless the H1 opens with a name.
+  return /^(LinkedIn|DTC)/.test(hit.h1) ? hit.h1 : hit.h1.charAt(0).toLowerCase() + hit.h1.slice(1);
+}
+
+/** The 14-day Pilot page (app/pilot). */
+export const PILOT_URL = '/pilot';
+export const BLOG_CALL_LABEL = 'Book a free 15-minute call';
+export const BLOG_SAMPLE_LABEL = 'Get my 2 free edits';
+
+/** Booking link tagged with where in the post it was clicked and which post. */
+export function blogBookUrl(medium: string, slug: string): string {
+  const sep = BOOK_CALL_URL.includes('?') ? '&' : '?';
+  return `${BOOK_CALL_URL}${sep}utm_source=blog&utm_medium=${medium}&utm_campaign=${encodeURIComponent(slug)}`;
+}
+
+/**
+ * What a blog post asks the reader to do, keyed off the post's service.
+ *
+ * Video and ad-creative readers have footage, so they get the free sample.
+ * Everyone else gets the 15-minute call as the button and one text link that
+ * fits what they came to read about. A post about blog writing or websites
+ * never mentions footage. Plain serialisable data, so server components can
+ * hand it to the client ones (footer card, phone bar) as props.
+ */
+export type BlogAsk = {
+  kind: 'sample' | 'call';
+  /** The one button. */
+  buttonLabel: string;
+  /** The one text link beside it. For `sample` posts this is the call. */
+  linkLabel: string;
+  linkHref: string;
+  /** True when linkHref is the booking link (needs the per-post UTM). */
+  linkIsCall: boolean;
+  /** Lead line of the first in-article card. */
+  lead: string;
+  /** One line for the compact card further down. */
+  short: string;
+  /** Closing card. */
+  closeHead: string;
+  closeSub: string;
+};
+
+const CALL_SUB =
+  '15 minutes with Lakshya, the founder. He looks at your site and tells you the first three things he would fix. No pitch.';
+
+export function blogAskFor(service: ServiceSlug): BlogAsk {
+  if (service === 'video-editing' || service === 'ad-creatives') {
+    return {
+      kind: 'sample',
+      buttonLabel: BLOG_SAMPLE_LABEL,
+      linkLabel: BLOG_CALL_LABEL,
+      linkHref: BOOK_CALL_URL,
+      linkIsCall: true,
+      lead: 'Reading this because you need it done? Send raw footage and get 2 edited videos back free within 48 hours. No card, no call.',
+      short: 'Want this done for you? Send footage, get 2 edited videos back free within 48 hours.',
+      closeHead: 'Send footage. Get 2 edited videos back, free.',
+      closeSub: 'Back within 48 hours. No card and no call. You keep the files whether or not you hire us.',
+    };
+  }
+  const call = { kind: 'call' as const, buttonLabel: BLOG_CALL_LABEL, linkIsCall: false, closeSub: CALL_SUB };
+  if (service === 'blog-production') {
+    return {
+      ...call,
+      linkLabel: 'See what this did for MagicBNB',
+      linkHref: '/case-studies/magicbnb-seo-aeo',
+      lead: 'Want posts like this on your own site? Book 15 minutes with Lakshya. He will look at your site and tell you the first three things he would fix.',
+      short: 'Want posts like this on your own site? Book 15 minutes and get the first three things to fix.',
+      closeHead: 'Want the first three fixes for your own site?',
+    };
+  }
+  if (service === 'linkedin-ghostwriting') {
+    return {
+      ...call,
+      linkLabel: `See the ${PILOT.priceLabel} Pilot`,
+      linkHref: PILOT_URL,
+      lead: `Want this done for you, in your own voice? Book 15 minutes with Lakshya, or look at the ${PILOT.priceLabel} Pilot: 14 days of real work before any monthly plan.`,
+      short: `Want this done for you, in your own voice? Book 15 minutes, or look at the ${PILOT.priceLabel} Pilot.`,
+      closeHead: 'Want this done for you, in your own voice?',
+      closeSub:
+        '15 minutes with Lakshya, the founder. He looks at your profile and your last few posts and tells you the first three things he would fix. No pitch.',
+    };
+  }
+  // Websites, automations, apps: builds, quoted in writing before any payment.
+  const website = service === 'websites-funnels';
+  return {
+    ...call,
+    linkLabel: 'See prices',
+    linkHref: '/pricing',
+    lead: `${website ? 'Pricing a website?' : 'Want this built for you?'} Book 15 minutes with Lakshya. You get a written scope and a fixed price before you pay anything.`,
+    short: `${website ? 'Pricing a website?' : 'Want this built for you?'} Book 15 minutes. Written scope and a fixed price before you pay anything.`,
+    closeHead: website ? 'Want a fixed price for your own site?' : 'Want a fixed price for your own build?',
+    closeSub:
+      '15 minutes with Lakshya, the founder. You get a written scope and a fixed price before you pay anything. No pitch.',
+  };
+}
+
+/** True for posts about what something costs. They get the price line. */
+export function isPricingPost(slug: string): boolean {
+  return /cost|price|pricing|rates/.test(slug.toLowerCase());
+}
+
+/** Where EchoPulse sits in a price range, built from lib/pricing.ts. */
+export const BLOG_PRICE_LINE = `Where EchoPulse sits in this range: ${FREE_SAMPLE.cta.replace(/^Get /, '')}, ${PILOT.priceLabel} Pilot, ${PRESENCE.priceLabel} a month, ${GROWTH.priceLabel} a month. Month-to-month.`;
 
 export type Guide = { title: string; slug: string; excerpt?: string };
 

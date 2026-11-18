@@ -1,145 +1,107 @@
 'use client';
 
+import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { usePathname } from 'next/navigation';
-import { trackPilotClick, trackCallClick } from '@/lib/analytics';
-import { useGeoPrice } from '@/lib/useGeoPrice';
+import { track, trackCallClick } from '@/lib/analytics';
 import { fadeUp, stagger, DUR, RISE } from '@/lib/motion';
-import { BOOK_CALL_URL, BOOK_CALL_REASSURANCE, FREE_EDITS_URL, FREE_EDITS_LABEL } from '@/lib/links';
-import { PILOT } from '@/lib/pricing';
-import { ShimmerText } from '@/components/ui/Premium';
+import { FREE_EDITS_URL } from '@/lib/links';
+import type { BlogAsk } from '@/lib/blogLinks';
 
 /**
- * Closing CTA band on a blog post.
+ * Closing card on a blog post.
  *
- * Placement: rendered by app/blog/[slug]/page.tsx OUTSIDE the two-column grid,
- * after Related Articles, at the full 1180px content width. It used to sit
- * inside <article>, which is capped at 760px, so a wide dark card was wedged
- * into the prose column and read as cramped. This mirrors the MagicBnB blog,
- * where the closing CTA is a full-width band and Related Articles comes first.
+ * One offer per card, and the button does what the copy says. The old card had
+ * a "14-day Pilot" chip, a Pilot deliverables list and a $299 price block over
+ * a button that booked a free call, so the reader could not tell what a click
+ * would do. Now the copy comes from blogAskFor (lib/blogLinks.ts): video and
+ * ad posts get the free sample, every other post gets the 15-minute call. Under
+ * the button sits one text link (the call, the MagicBNB case study, prices or
+ * the Pilot, by service).
  *
- * The old background was a single unsized radial gradient anchored off the
- * card's top-right corner. Because the card clips its own overflow, the soft
- * edge of that circle landed inside the visible area and drew a faint diagonal
- * seam across the panel. Fixed by using a linear base plus a radial that is
- * fully contained, so there is no visible terminator.
+ * Placement: the last thing inside <article>, above the newsletter form and
+ * Related Articles, because the newsletter is the weaker ask. It used to be
+ * the final block on the page (y=17,316 on a phone). The card is short now, so
+ * it sits comfortably in the 760px prose column.
  *
- * Every claim below already exists elsewhere on the site:
- *   - $299 / $599 come from lib/useGeoPrice.ts, the same pair Pricing.tsx and
- *     the Offer schema render.
- *   - The deliverable line is built from PILOT.scope in lib/pricing.ts, so it
- *     cannot drift from the pricing section, /pricing or the FAQ.
- *   - "Revisions until you are satisfied" and the 48-hour turnaround are the
- *     standing terms on every service page.
- * Nothing here is a new promise invented for the sake of the pitch.
+ * This is a client component only for the click events. The page works the
+ * ask out on the server and passes it in as plain props, so lib/blogLinks.ts
+ * (which imports the Sanity client) stays out of the browser bundle, and both
+ * links are in the server-rendered HTML.
  */
-/**
- * Booking link for the blog footer: the one canonical Cal.com event with UTM
- * parameters, built the same way components/BookCallModal.tsx builds them
- * (utm_content = the page path), with utm_medium set to blog_footer so a
- * booking in Cal.com shows it came from the bottom of a post.
- */
-function blogBookUrl(pathname: string): string {
-  const sep = BOOK_CALL_URL.includes('?') ? '&' : '?';
-  return `${BOOK_CALL_URL}${sep}utm_source=echopulse.media&utm_medium=blog_footer&utm_content=${encodeURIComponent(pathname)}`;
-}
-
-/** Pilot deliverables (videos, posts, blog) straight from PILOT.scope. */
-const PILOT_DELIVERABLES = PILOT.scope
-  .slice(1, 4)
-  .map((line) => line.replace(/, captions ready$/, ''))
-  .join(', ');
-
-export default function BlogFooterCTA({ category }: { category?: string }) {
-  const { currency, prices } = useGeoPrice();
-  const pathname = usePathname() || '/blog';
-
-  const REASONS = [
-    'A 30-day content plan built around your business, yours to keep either way',
-    PILOT_DELIVERABLES,
-    'Revisions until you would post it under your own name',
-    'No contract, no retainer, no auto-renew. It ends on day 14 unless you say otherwise.',
-  ];
+export default function BlogFooterCTA({
+  ask,
+  bookUrl,
+  category,
+}: {
+  ask: BlogAsk;
+  /** Booking link already UTM-tagged for this post (blogBookUrl). */
+  bookUrl: string;
+  category?: string;
+}) {
+  const sample = ask.kind === 'sample';
+  const chip = sample ? 'Free sample' : '15 minutes, free';
+  const arrow = (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" aria-hidden="true">
+      <path d="M5 12h14M12 5l7 7-7 7" />
+    </svg>
+  );
 
   return (
-    <div
-      className="blog-cta"
-      data-dark-bg="true"
-    >
+    <div className="blog-cta" data-dark-bg="true" data-ask={ask.kind}>
       <div className="blog-cta-inner">
-        {/* Each block reveals on the shared scale rather than all at once.
-            The order (chip, headline, sub, reasons, price, button) is the order
-            a reader's eye takes anyway, so the motion follows attention instead
-            of competing with it. */}
         <motion.span className="blog-cta-chip" {...fadeUp({ y: RISE.sm, duration: DUR.md })}>
           <span className="blog-cta-chip-dot" aria-hidden="true" />
-          {category ? `${category} · 14-day Pilot` : '14-day Pilot'}
+          {category ? `${category} · ${chip}` : chip}
         </motion.span>
 
         <motion.h2 className="blog-cta-head" {...fadeUp({ delay: stagger(1) })}>
-          Stop reading about content.
-          <br />
-          {/* The one shimmering element on the page. It works because it is
-              rare and because it is the line the whole card turns on. */}
-          <ShimmerText base="rgba(232,84,26,0.55)" highlight="#FF7A45">
-            Go and look at yours.
-          </ShimmerText>
+          {ask.closeHead}
         </motion.h2>
 
         <motion.p className="blog-cta-sub" {...fadeUp({ delay: stagger(2) })}>
-          Most agencies ask you to sign a six-month retainer based on a slide deck.
-          We would rather just do the work first and let you judge it. That is the
-          entire idea behind the Pilot.
+          {ask.closeSub}
         </motion.p>
 
-        <ul className="blog-cta-list">
-          {REASONS.map((line, i) => (
-            <motion.li key={line} {...fadeUp({ y: RISE.sm, duration: DUR.md, delay: stagger(i + 3) })}>
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path d="M5 12.5l4.5 4.5L19 7.5" stroke="#E8541A" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-              <span>{line}</span>
-            </motion.li>
-          ))}
-        </ul>
+        {sample ? (
+          <a
+            href={FREE_EDITS_URL}
+            onClick={() => track('cta_free_edits_click', { location: 'blog_footer' })}
+            data-cursor-hover
+            className="blog-cta-btn"
+          >
+            {ask.buttonLabel}
+            {arrow}
+          </a>
+        ) : (
+          <a
+            href={bookUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => trackCallClick('blog_footer')}
+            data-cursor-hover
+            className="blog-cta-btn"
+          >
+            {ask.buttonLabel}
+            {arrow}
+          </a>
+        )}
 
-        {/* The struck-through pilotOriginal was removed here for the same
-            reason it was removed from Pricing.tsx: it is a static value shown
-            to every visitor forever, so presenting it as a former price was
-            not true. $299 stands on its own. */}
-        <motion.div className="blog-cta-price" {...fadeUp({ delay: stagger(7) })}>
-          <span className="blog-cta-price-now">{currency}{prices.pilot}</span>
-          <span className="blog-cta-price-note">one time, not a subscription</span>
-        </motion.div>
-
-        {/* One action that books: a plain link to the canonical Cal.com event
-            with UTM parameters (see blogBookUrl). It opens in a new tab so the
-            reader keeps their place in the post. */}
-        <a
-          href={blogBookUrl(pathname)}
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={() => trackCallClick('blog_footer')}
-          data-cursor-hover
-          className="blog-cta-btn"
-        >
-          Book a free 15-minute call
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" aria-hidden="true">
-            <path d="M5 12h14M12 5l7 7-7 7" />
-          </svg>
-        </a>
-
-        <p className="blog-cta-reassure">{BOOK_CALL_REASSURANCE}</p>
-
-        {/* The second and last action: the free sample. Internal path, same tab. */}
-        <a
-          href={FREE_EDITS_URL}
-          onClick={() => trackPilotClick('blog_footer_free_edits')}
-          data-cursor-hover
-          className="blog-cta-alt"
-        >
-          {FREE_EDITS_LABEL}, no card and no call
-        </a>
+        {ask.linkIsCall ? (
+          <a
+            href={bookUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => trackCallClick('blog_footer_link')}
+            data-cursor-hover
+            className="blog-cta-alt"
+          >
+            {ask.linkLabel}
+          </a>
+        ) : (
+          <Link href={ask.linkHref} data-cursor-hover className="blog-cta-alt">
+            {ask.linkLabel}
+          </Link>
+        )}
       </div>
 
       <style>{`
@@ -152,13 +114,14 @@ export default function BlogFooterCTA({ category }: { category?: string }) {
             linear-gradient(135deg, #14110F 0%, #0C0C0B 55%, #17110D 100%);
           color: #F2EEE7;
           border: 1px solid rgba(232,84,26,0.18);
+          margin: 56px 0 0;
           box-shadow: 0 30px 80px -20px rgba(12,12,11,0.45);
         }
         .blog-cta-inner {
           position: relative;
           max-width: 620px;
           margin: 0 auto;
-          padding: 56px 40px 48px;
+          padding: 44px 36px 38px;
           text-align: center;
         }
         .blog-cta-chip {
@@ -192,56 +155,12 @@ export default function BlogFooterCTA({ category }: { category?: string }) {
           margin: 0 0 16px;
           color: #F2EEE7;
         }
-        .blog-cta-head-accent { color: #E8541A; }
         .blog-cta-sub {
           font-size: 15.5px;
           line-height: 1.65;
           color: rgba(242,238,231,0.62);
-          margin: 0 auto 28px;
+          margin: 0 auto 26px;
           max-width: 500px;
-        }
-        .blog-cta-list {
-          list-style: none;
-          padding: 0;
-          margin: 0 auto 30px;
-          display: flex;
-          flex-direction: column;
-          gap: 12px;
-          text-align: left;
-          max-width: 460px;
-        }
-        .blog-cta-list li {
-          display: flex;
-          gap: 11px;
-          align-items: flex-start;
-          font-size: 14.5px;
-          line-height: 1.5;
-          color: rgba(242,238,231,0.88);
-        }
-        .blog-cta-list svg { flex-shrink: 0; margin-top: 2px; }
-        .blog-cta-price {
-          display: flex;
-          align-items: baseline;
-          justify-content: center;
-          flex-wrap: wrap;
-          gap: 10px;
-          margin-bottom: 26px;
-        }
-        .blog-cta-price-now {
-          font-size: 40px;
-          font-weight: 900;
-          letter-spacing: -1.4px;
-          color: #F2EEE7;
-          line-height: 1;
-        }
-        .blog-cta-price-was {
-          font-size: 18px;
-          color: rgba(242,238,231,0.35);
-          text-decoration: line-through;
-        }
-        .blog-cta-price-note {
-          font-size: 13px;
-          color: rgba(242,238,231,0.5);
         }
         .blog-cta-btn {
           display: inline-flex;
@@ -267,14 +186,10 @@ export default function BlogFooterCTA({ category }: { category?: string }) {
           transform: translateY(-1px);
           box-shadow: 0 16px 38px rgba(232,84,26,0.42);
         }
-        .blog-cta-reassure {
-          font-size: 12.5px;
-          color: rgba(242,238,231,0.45);
-          margin: 14px 0 0;
-        }
         .blog-cta-alt {
-          display: inline-block;
-          margin-top: 16px;
+          display: block;
+          width: fit-content;
+          margin: 14px auto 0;
           font-size: 13px;
           font-weight: 500;
           color: rgba(242,238,231,0.5);
@@ -286,11 +201,10 @@ export default function BlogFooterCTA({ category }: { category?: string }) {
 
         @media (max-width: 720px) {
           .blog-cta { border-radius: 20px; }
-          .blog-cta-inner { padding: 40px 22px 36px; }
+          .blog-cta { margin-top: 44px; }
+          .blog-cta-inner { padding: 34px 20px 30px; }
           .blog-cta-head { font-size: 26px; letter-spacing: -0.8px; }
           .blog-cta-sub { font-size: 14.5px; margin-bottom: 24px; }
-          .blog-cta-list li { font-size: 14px; }
-          .blog-cta-price-now { font-size: 34px; }
           /* Full-width tap target on phones. */
           .blog-cta-btn { width: 100%; padding: 16px 22px; }
         }
