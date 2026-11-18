@@ -68,7 +68,7 @@ const COMPARE: { label: string; cells: [string, string, string, string] }[] = [
   { label: 'Website', cells: ['None', 'None', 'Free tune-up in month one, then ongoing upgrades', 'Rebuilt in month one, tuned every month after'] },
   { label: 'Search and AI visibility', cells: ['None', 'Content audit and 30-day plan', 'Pages, Google Business Profile and structured data', 'Funnel optimization with conversion tracking'] },
   { label: 'Planning', cells: ['None', '30-day plan', 'Monthly calendar, weekly shot list, posting plan', '30-day content calendar, monthly performance review'] },
-  { label: 'Turnaround', cells: ['48 hours', '48 hours per deliverable', '48 hours per deliverable', '48 hours per deliverable'] },
+  { label: 'Turnaround', cells: ['48 hours', '48 hours on short-form edits', '48 hours on short-form edits', '48 hours on short-form edits'] },
   { label: 'Replies', cells: ['Email', 'Within 3 hours in the workday', 'Within 3 hours in the workday', 'Within 3 hours in the workday'] },
   { label: 'You keep the files', cells: ['Yes', 'Yes', 'Yes', 'Yes'] },
   { label: 'Extras', cells: ['None', 'None', 'None', '20% off any custom app or software build'] },

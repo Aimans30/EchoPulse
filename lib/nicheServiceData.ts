@@ -206,7 +206,7 @@ const RAW_PAGES: NichePageRaw[] = [
       },
       {
         q: 'How fast do I get a listing reel back?',
-        a: `Within ${T48} per deliverable. If the listing goes live on a Saturday, say so when you send the footage and we will tell you whether 24 hours is possible that week. A rush adds 30 percent.`,
+        a: `Within ${T48} for short-form edits. If the listing goes live on a Saturday, say so when you send the footage and we will tell you whether 24 hours is possible that week. A rush adds 30 percent.`,
       },
       {
         q: 'What file formats do you deliver?',
@@ -525,7 +525,7 @@ const RAW_PAGES: NichePageRaw[] = [
       },
       {
         q: 'How fast is a course module?',
-        a: `Within ${T48} per deliverable. If a launch date depends on a batch of modules, say so on the call and we will tell you what we can hit.`,
+        a: `Short clips come back within ${T48}. Full modules take longer, depending on their length. If a launch date depends on a batch of modules, say so on the call and we will tell you what we can hit.`,
       },
     ],
     posts: [
@@ -1333,7 +1333,7 @@ const RAW_PAGES: NichePageRaw[] = [
       },
       {
         q: 'How fast is an edit?',
-        a: `Within ${T48} per deliverable. If something has a real date on it, tell us before you send the footage.`,
+        a: `Within ${T48} for short-form edits; long-form depends on its length. If something has a real date on it, tell us before you send the footage.`,
       },
       {
         q: 'What does it cost for a business like mine?',

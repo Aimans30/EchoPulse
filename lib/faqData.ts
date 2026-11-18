@@ -121,7 +121,7 @@ export const FAQ_GROUPS: FaqGroup[] = [
       {
         home: 5,
         q: 'How fast is the turnaround on video edits?',
-        a: `48 hours per deliverable as standard. The free sample (2 edited videos) is back within 48 hours of receiving your footage, and the Pilot's 6 video edits, 2 posts and 1 blog land inside its 14 days. Late content is content that missed its moment, so if a deadline is genuinely at risk we tell you before it slips, not after.`,
+        a: `48 hours for short-form edits. Long-form video takes longer, depending on its length. The free sample (2 edited videos) is back within 48 hours of receiving your footage, and the Pilot's 6 video edits, 2 posts and 1 blog land inside its 14 days. Late content is content that missed its moment, so if a deadline is genuinely at risk we tell you before it slips, not after.`,
       },
       {
         home: 3,

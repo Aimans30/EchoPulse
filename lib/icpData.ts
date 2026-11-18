@@ -273,7 +273,7 @@ export const icps: IcpData[] = [
       // path and the 30 percent surcharge. To an agent already suspicious of
       // marketers, near-identical answers two rows apart read as padding.
       // Merged into one, which freed a slot for the question he actually had.
-      { q: 'How fast do I get a listing reel back, including on a weekend?', a: 'Standard turnaround is 48 hours per deliverable, and a listing that goes live on a Saturday is part of that conversation rather than excluded from it. When one cannot wait, message us directly and we will confirm whether 24 hours is possible that week before you send the footage. Rush carries a 30 percent surcharge and is arranged with us directly, not through the order page.' },
+      { q: 'How fast do I get a listing reel back, including on a weekend?', a: 'Standard turnaround is 48 hours for a short-form reel, and a listing that goes live on a Saturday is part of that conversation rather than excluded from it. When one cannot wait, message us directly and we will confirm whether 24 hours is possible that week before you send the footage. Rush carries a 30 percent surcharge and is arranged with us directly, not through the order page.' },
       // Every persona who read this page asked what it costs them in hours and
       // could not find an answer. The founders page has carried this reassurance
       // for months; an agent working evenings and weekends needs it more.

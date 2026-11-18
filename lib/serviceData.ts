@@ -54,7 +54,7 @@ export const services: ServiceData[] = [
     name: 'Video Editing',
     tagline: 'Every Format. One Editor at Your Disposal.',
     heroSub: 'Whatever needs cutting, we cut it. YouTube long-form, podcast episodes and highlight cuts, course module edits, Reels and TikToks, cinematic property work, talking-head founder content. One production pipeline, every kind of edit you need, retention-tested for the platform it is shipping to.',
-    metaDescription: 'Video editing for founders: Reels, YouTube long-form, podcasts, and course modules. One team, every format, 48-hour turnaround per deliverable.',
+    metaDescription: 'Video editing for founders: Reels, YouTube long-form, podcasts, and course modules. One team, every format. Short-form edits back in 48 hours.',
     accentColor: '#E8541A',
     problemHeadline: 'Great footage. Mediocre results.',
     problemBody: 'You record, post, and watch the views stall. The drop-off is brutal, the engagement is flat, and you cannot tell whether the content or the edit is the problem. In our experience it is almost always the edit.',
