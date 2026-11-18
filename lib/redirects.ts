@@ -183,6 +183,30 @@ export const BLOG_REDIRECTS: Record<string, string> = {
   // Podcast audience-growth opinion piece, unpublished. Nearest live post on
   // podcasts is the clip-workflow guide.
   "the-joe-rogan-fallacy-why-your-podcast-has-12-listeners-and-how-to-fix-it": "/blog/turn-podcast-episode-into-clips",
+
+  // ── Legacy post removal, 18 November 2026 ─────────────────────────────────
+  // 19 pre-July posts unpublished after a content audit (off-topic, thin, or
+  // carrying unverifiable client claims). Each points at the closest live page.
+  // The audit list is the owner's; do not re-publish without re-checking claims.
+  "the-roi-war-gemini-pro-vs-chatgpt-5-2-in-high-ticket-marketing": "/blog/does-ai-written-content-rank",
+  "the-2026-instagram-algorithm-why-saves-are-the-new-likes-the-utility-shift": "/blog/how-to-add-captions-reels-shorts-tiktok",
+  "beyond-chatgpt-why-world-models-are-the-end-of-generative-ai": "/blog/does-ai-written-content-rank",
+  "the-official-guide-to-echopulse-media-founder-vision-and-architecture-2026": "/what-is-echopulse-media",
+  "the-silent-vetting-why-you-lost-the-usd25k-contract-before-the-phone-rang": "/blog/linkedin-personal-profile-vs-company-page-2026",
+  "the-death-of-resilience-why-somatic-leadership-is-the-next-billion-dollar-niche": "/blog/marketing-for-coaches-and-therapists-cost",
+  "the-ghost-network-why-your-5-000-linkedin-connections-are-worthles": "/blog/linkedin-personal-profile-vs-company-page-2026",
+  "saving-usd1-000-to-lose-usd100-000-the-math-of-a-bad-business-decision": "/pricing",
+  "stop-uploading-to-the-graveyard-why-your-content-isn-t-converting": "/blog/turn-podcast-episode-into-clips",
+  "visual-density-101-why-your-45-minute-keynote-is-boring-on-linkedin": "/blog/turn-podcast-episode-into-clips",
+  "it-s-official-echopulse-named-certified-manychat-partner-and-what-this-means-for-your-growth": "/services/automations",
+  "the-great-social-media-reset-6-trends-that-will-define-b2b-marketing-in-2026": "/blog/what-does-a-social-media-manager-do",
+  "the-creator-s-stack-the-definitive-guide-to-how-boris-anthropic-actually-uses-claude-code": "/blog",
+  "beyond-gemini-3-the-complete-whisk-to-flow-architecture-for-high-retention-landing-pages": "/blog/what-to-prepare-before-website-redesign",
+  "the-2026-youtube-state-of-the-union-why-your-website-is-obsolete": "/services/video-editing",
+  "the-product-market-fit-protocol-how-to-bridge-the-gap-between-customer-dreams-and-scalable": "/blog/validate-your-offer-before-you-build-it",
+  "why-the-best-businesses-don-t-chase-customers": "/blog/inbound-leads-without-cold-outreach",
+  "the-architecture-of-scalability-why-your-business-systems-are-failing-and-how-to-fix-them": "/blog/what-to-automate-first-small-business",
+  "operational-mastery-the-exact-framework-used-by-8-figure-founders": "/blog/what-to-automate-first-small-business",
 };
 
 /** Slugs that are still live. Used to avoid redirect chains from /blogs/*. */
