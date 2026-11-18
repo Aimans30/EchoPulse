@@ -1,9 +1,8 @@
 'use client';
 
-import Link from 'next/link';
-import { BOOK_CALL_LABEL, FREE_EDITS_LABEL, FREE_EDITS_URL } from '@/lib/links';
+import { FREE_EDITS_LABEL, FREE_EDITS_URL } from '@/lib/links';
 import { PROMISES } from '@/lib/pricing';
-import { trackCallClick, trackPilotClick } from '@/lib/analytics';
+import { trackPilotClick } from '@/lib/analytics';
 
 /**
  * The founder's note. (File keeps the name Testimonials because the homepage
@@ -17,8 +16,8 @@ import { trackCallClick, trackPilotClick } from '@/lib/analytics';
  * template, and it sat directly under another dark section.
  *
  * This one is a short letter on a plain card: who is writing, what he did
- * before, what he saw, what he built because of it, and one low-risk next
- * step. Every claim is the founder's own account of his work history and is
+ * before, what he saw, the growth-partner role he built because of it, and
+ * one next step (a single button: the owner asked for no rows of three). Every claim is the founder's own account of his work history and is
  * repeated, with its caveats, on /case-studies/founder-200-real-estate-agents.
  * No toggle: the whole letter is on the page, so readers and crawlers see the
  * same thing.
@@ -31,7 +30,7 @@ export default function Testimonials() {
       <div className="fl-wrap">
         <p className="fl-eyebrow">From the founder</p>
         <h2 id="fl-heading" className="fl-h2">
-          Why EchoPulse is three people <span className="fl-accent">and not an agency.</span>
+          A growth partner, <span className="fl-accent">not another vendor.</span>
         </h2>
 
         <article className="fl-card">
@@ -47,7 +46,7 @@ export default function Testimonials() {
             />
             <div>
               <p className="fl-name">Lakshya Soni</p>
-              <p className="fl-role">Founder. I edit, write and build the sites.</p>
+              <p className="fl-role">Founder and growth partner, EchoPulse Media</p>
             </div>
           </header>
 
@@ -62,13 +61,19 @@ export default function Testimonials() {
               waiting.
             </p>
             <p>
-              So I built the studio I would want to hire. The price is on the page. The person you talk to
-              is the person who cuts your footage. Nothing reaches you until I would post it under my own
-              name.
+              So I built the partner I would want to hire. Not someone who hands over files and disappears,
+              but someone who sits with you every week and works on the whole thing: the content plan, the
+              videos and posts, your personal brand, the website, and the funnel that turns attention into
+              booked calls.
             </p>
             <p>
-              There are three of us. I edit, write and build. Shaurya designs. Aiman runs delivery. There is
-              no account manager, and there never will be.
+              In practice that means a weekly call where we look at the numbers together, decide what to make
+              next, fix what is leaking on the site or in the funnel, and plan the month around what is
+              working. The price is on the page. The person you talk to is the person doing the work.
+            </p>
+            <p>
+              There are three of us. I lead strategy, edit, write and build. Shaurya designs. Aiman runs
+              delivery. There is no account manager between you and the work.
             </p>
             <p>
               You do not have to take my word for it. Send footage you already have and I will send two
@@ -94,20 +99,6 @@ export default function Testimonials() {
             >
               {FREE_EDITS_LABEL}
             </a>
-            <button
-              type="button"
-              className="fl-btn fl-btn-ghost"
-              data-cursor-hover
-              onClick={() => {
-                trackCallClick('founder_letter');
-                (window as unknown as { openBookCallModal?: () => void }).openBookCallModal?.();
-              }}
-            >
-              {BOOK_CALL_LABEL}
-            </button>
-            <Link href="/case-studies/founder-200-real-estate-agents" className="fl-link">
-              Read the full story
-            </Link>
           </div>
         </article>
       </div>
@@ -137,10 +128,7 @@ export default function Testimonials() {
         .fl-btn { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 26px; border-radius: 100px; font-family: inherit; font-size: 14px; font-weight: 700; text-decoration: none; cursor: pointer; transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease; }
         .fl-btn-primary { background: #0C0C0B; color: #F2EEE7; border: 1px solid #0C0C0B; }
         .fl-btn-primary:hover { background: #E8541A; border-color: #E8541A; color: #0C0C0B; }
-        .fl-btn-ghost { background: transparent; color: #0C0C0B; border: 1px solid rgba(12,12,11,0.22); }
-        .fl-btn-ghost:hover { border-color: #0C0C0B; }
-        .fl-btn:focus-visible, .fl-link:focus-visible { outline: 2px solid #E8541A; outline-offset: 3px; }
-        .fl-link { font-size: 14px; font-weight: 600; color: #0C0C0B; text-decoration: underline; text-decoration-color: #E8541A; text-underline-offset: 4px; min-height: 44px; display: inline-flex; align-items: center; }
+        .fl-btn:focus-visible { outline: 2px solid #E8541A; outline-offset: 3px; }
 
         @media (max-width: 640px) {
           .fl-section { padding: 72px 16px; }
@@ -149,7 +137,6 @@ export default function Testimonials() {
           .fl-body p { font-size: 17px; }
           .fl-actions { flex-direction: column; align-items: stretch; }
           .fl-btn { width: 100%; }
-          .fl-link { justify-content: center; }
         }
         @media (prefers-reduced-motion: reduce) { .fl-btn { transition: none; } }
       `}</style>

@@ -582,15 +582,6 @@ export default function Hero() {
               >
                 {FREE_EDITS_LABEL}
               </a>
-              <a
-                href="#work"
-                className="hero-see-work"
-                data-cursor-hover
-                onClick={() => trackPilotClick('hero_tertiary_see_work')}
-                style={{ fontSize: 13, fontWeight: 600, color: '#6E6B63', textDecoration: 'underline', textUnderlineOffset: 3 }}
-              >
-                See work
-              </a>
             </div>
 
           </div>
