@@ -82,6 +82,12 @@ function VideoModal({ src, onClose }: { src: string; onClose: () => void }) {
 }
 
 // ─── Main component ──────────────────────────────────────────────────────────
+/** Give a lazily-mounted clip its real src the first time it is needed. */
+function attachSrc(v: HTMLVideoElement) {
+  const src = v.dataset.src;
+  if (src && !v.getAttribute('src')) { v.src = src; v.load(); }
+}
+
 export default function OurWork() {
   const [activeTab,  setActiveTab ] = useState('all');
   // Tab-pill animation runs at high priority. The heavy carousel re-filter
@@ -220,6 +226,7 @@ export default function OurWork() {
             const video = entry.target.querySelector<HTMLVideoElement>('video');
             if (!video) return;
             if (entry.isIntersecting && !pauseRef.current) {
+              attachSrc(video);
               video.play().catch(() => { /* autoplay blocked — silent */ });
             } else {
               video.pause();
@@ -237,10 +244,26 @@ export default function OurWork() {
       root.querySelectorAll<HTMLElement>('.vid-card').forEach(card => observer.observe(card));
 
       (root as HTMLElement & { _vidObserver?: IntersectionObserver })._vidObserver = observer;
+
+      // Warm-up: a clip only gets its src when it is within ~one card of the
+      // visible area, so the homepage no longer opens ~30 Cloudinary requests
+      // on load. Also gated on the whole carousel being near the viewport.
+      const warm = new IntersectionObserver(
+        (entries) => entries.forEach(e => {
+          if (!e.isIntersecting) return;
+          const v = e.target.querySelector<HTMLVideoElement>('video');
+          if (v) attachSrc(v);
+          warm.unobserve(e.target);
+        }),
+        { root, rootMargin: '0px 320px', threshold: 0 },
+      );
+      root.querySelectorAll<HTMLElement>('.vid-card').forEach(card => warm.observe(card));
+      (root as HTMLElement & { _warmObserver?: IntersectionObserver })._warmObserver = warm;
     }, 80);
 
     return () => {
       clearTimeout(timer);
+      (root as HTMLElement & { _warmObserver?: IntersectionObserver })._warmObserver?.disconnect();
       const obs = (root as HTMLElement & { _vidObserver?: IntersectionObserver })._vidObserver;
       obs?.disconnect();
     };
@@ -265,7 +288,7 @@ export default function OurWork() {
             entries.forEach(entry => {
               const video = entry.target.querySelector<HTMLVideoElement>('video');
               if (!video) return;
-              if (entry.isIntersecting) video.play().catch(() => {});
+              if (entry.isIntersecting) { attachSrc(video); video.play().catch(() => {}); }
               else video.pause();
             });
           },
@@ -637,7 +660,6 @@ export default function OurWork() {
                 : previewMp4Src(video.url, orient);
               // Duplicate items (second half) use preload="none" — browser
               // caches the src from the first copy so playback is instant.
-              const isFirstCopy = i < filtered.length;
               return (
                 <div
                   key={`${video.url}-${i}`}
@@ -649,7 +671,7 @@ export default function OurWork() {
                     {previewSrc ? (
                       // eslint-disable-next-line jsx-a11y/media-has-caption
                       <video
-                        src={previewSrc}
+                        data-src={previewSrc}
                         muted
                         loop
                         playsInline
@@ -666,7 +688,7 @@ export default function OurWork() {
                         // visitor is actually looking at. `none` defers every
                         // byte until the observer calls play(), which triggers
                         // the load itself. Desktop keeps the warm-up.
-                        preload={caps.isPhone ? 'none' : isFirstCopy ? 'metadata' : 'none'}
+                        preload="none"
                         // Reads videoWidth/videoHeight as soon as the file
                         // header lands → tells the parent to flip the card
                         // size if our manual orientation hint was missing or

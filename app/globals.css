@@ -817,16 +817,6 @@ img, video {
    blank page. The `+ div` is the page wrapper that app/page.tsx renders
    immediately after <Loader/>; do not insert a sibling between them.
    ────────────────────────────────────────────────────────────────────── */
-@media (max-width: 767.98px), (prefers-reduced-motion: reduce) {
-  /* Matches the `innerWidth < 768` / reduced-motion skip in app/page.tsx. */
-  [data-loader="true"] {
-    display: none !important;
-  }
-  [data-loader="true"] + div {
-    opacity: 1 !important;
-    pointer-events: auto !important;
-  }
-}
 
 /* Hero entrance animation, pinned to its FINAL state on phones.
    Two reasons, both measurable:
