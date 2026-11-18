@@ -63,58 +63,41 @@ export default async function BlogIndexPage() {
         style={{
           background: '#F2EEE7',
           minHeight: '100vh',
-          paddingTop: '140px',
+          paddingTop: '124px',
           paddingBottom: '120px',
         }}
       >
-        <div className="blog-inner" style={{ maxWidth: '1080px', margin: '0 auto', padding: '0 56px' }}>
-          {/* Header */}
-          <div className="blog-header" style={{ marginBottom: '48px' }}>
-            <div
-              style={{
-                fontSize: '10px',
-                fontWeight: 600,
-                letterSpacing: '4px',
-                textTransform: 'uppercase',
-                color: '#6E6B63',
-                marginBottom: '20px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '14px',
-              }}
-            >
-              <span style={{ width: '22px', height: '1px', background: '#E8541A', display: 'block' }} />
-              Guides &amp; Insights
-            </div>
+        <div className="blog-inner" style={{ maxWidth: '1212px', margin: '0 auto', padding: '0 56px' }}>
+          {/* Header: same 1100px column as the nav, the filter and the grid. */}
+          <header className="blog-header" style={{ marginBottom: '28px' }}>
             <h1
               className="blog-h1"
               style={{
                 fontFamily: 'Inter, sans-serif',
-                fontSize: 'clamp(40px, 5.4vw, 76px)',
-                fontWeight: 900,
-                letterSpacing: 'clamp(-2px, -0.05em, -3.6px)',
-                lineHeight: 1.0,
+                fontSize: 'clamp(30px, 3.2vw, 42px)',
+                fontWeight: 800,
+                letterSpacing: '-0.03em',
+                lineHeight: 1.1,
                 margin: 0,
                 color: '#0C0C0B',
-                maxWidth: '880px',
               }}
             >
-              What content actually costs, and what it{' '}
-              <span style={{ color: '#E8541A' }}>actually returns.</span>
+              Content pricing, comparisons and guides
             </h1>
             <p
+              className="blog-intro"
               style={{
-                marginTop: '20px',
-                fontSize: '16px',
-                lineHeight: 1.7,
-                color: '#6E6B63',
-                maxWidth: '620px',
+                margin: '12px 0 0',
+                fontSize: '17px',
+                lineHeight: 1.55,
+                color: '#55524B',
+                maxWidth: '680px',
               }}
             >
-              Real pricing, honest comparisons, and the systems behind founder-led content.
-              Written by the people doing the work, with every number sourced.
+              Real prices, side-by-side comparisons and how-to guides on content, video, LinkedIn,
+              websites and AI search, written for small businesses.
             </p>
-          </div>
+          </header>
 
           {/* Filters + featured + list (interactive) */}
           {posts.length === 0 ? (
@@ -125,19 +108,18 @@ export default async function BlogIndexPage() {
         </div>
 
         <style>{`
-          @media (max-width: 900px) {
-            .blog-main { padding-top: 100px !important; padding-bottom: 80px !important; }
+          @media (max-width: 1100px) {
             .blog-inner { padding: 0 32px !important; }
           }
-          @media (max-width: 720px) {
-            .blog-main { padding-top: 80px !important; padding-bottom: 64px !important; }
-            .blog-inner { padding: 0 20px !important; }
-            .blog-header { margin-bottom: 32px !important; }
+          @media (max-width: 900px) {
+            .blog-main { padding-top: 116px !important; padding-bottom: 80px !important; }
           }
-          @media (max-width: 480px) {
-            .blog-h1 { font-size: 30px !important; letter-spacing: -1px !important; line-height: 1.08 !important; }
-            .blog-main { padding-top: 72px !important; padding-bottom: 56px !important; }
-            .blog-inner { padding: 0 16px !important; }
+          @media (max-width: 640px) {
+            .blog-main { padding-top: 108px !important; padding-bottom: 64px !important; }
+            .blog-inner { padding: 0 20px !important; }
+            .blog-header { margin-bottom: 24px !important; }
+            .blog-h1 { font-size: 28px !important; letter-spacing: -0.025em !important; line-height: 1.15 !important; }
+            .blog-intro { font-size: 16px !important; }
           }
         `}</style>
       </main>
