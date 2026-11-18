@@ -4,7 +4,7 @@ import { ArrowLeft } from 'lucide-react';
 
 // /terms — Comprehensive Terms of Service.
 // EchoPulse is currently a sole proprietorship operated by Lakshya Soni
-// from Bhopal, with co-founders Shaurya and Aiman. Planned registered
+// from Bhopal, with Shaurya and Aiman as team members. Planned registered
 // office on incorporation: Gurgaon. Jurisdiction + arbitration seat are
 // Bhopal now, automatically shift to Gurgaon on incorporation.
 
@@ -77,8 +77,8 @@ export default function TermsPage() {
           <p><strong>Order</strong> means any purchase placed via the website, an invoice, a written engagement, or a verbal confirmation followed by payment.</p>
           <p><strong>Deliverable</strong> means the final output of an Order, for example an edited video file, a written document, a designed asset, a software build, or source files.</p>
           <p><strong>Source Material</strong> means any footage, audio, image, document, brand asset, or other input provided by the Client to EchoPulse for use in producing a Deliverable.</p>
-          <p><strong>Status of EchoPulse.</strong> EchoPulse is currently a sole proprietorship operated by Lakshya Soni in his individual capacity in {OPERATING_CITY}, India, together with co-founders Shaurya and Aiman who collaborate on the studio&apos;s work on a remote, ongoing basis. EchoPulse is not registered as a private limited company, LLP, or partnership at this time, and is not GST-registered (operating below the statutory threshold under the Central Goods and Services Tax Act, 2017). EchoPulse will incorporate (planned registered office: {FUTURE_REGISTERED_OFFICE}, India) and obtain GSTIN as and when statutory thresholds are crossed. All rights, obligations, indemnities, limitations of liability, and dispute-resolution clauses set out in these Terms apply to Lakshya Soni in his capacity as proprietor of EchoPulse, to the co-founders and other team members, and to any successor entity formed upon future incorporation.</p>
-          <p><strong>Production team.</strong> EchoPulse&apos;s core team consists of Lakshya Soni, Shaurya, and Aiman, working remotely as co-founders. We may also engage independent contractors and freelance specialists to deliver Services. All work is supervised by the founding team and delivered to You under the EchoPulse brand. All warranties, limitations, and indemnities in these Terms cover the founding team, contractors, and freelancers collectively as &quot;Indemnified Parties&quot; under Section 5.</p>
+          <p><strong>Status of EchoPulse.</strong> EchoPulse is currently a sole proprietorship operated by Lakshya Soni in his individual capacity in {OPERATING_CITY}, India, together with Shaurya (design) and Aiman (delivery), who work with him on the studio&apos;s projects on a remote, ongoing basis as team members, not co-owners. EchoPulse is not registered as a private limited company, LLP, or partnership at this time, and is not GST-registered (operating below the statutory threshold under the Central Goods and Services Tax Act, 2017). EchoPulse will incorporate (planned registered office: {FUTURE_REGISTERED_OFFICE}, India) and obtain GSTIN as and when statutory thresholds are crossed. All rights, obligations, indemnities, limitations of liability, and dispute-resolution clauses set out in these Terms apply to Lakshya Soni in his capacity as proprietor of EchoPulse, to the team members and contractors, and to any successor entity formed upon future incorporation.</p>
+          <p><strong>Production team.</strong> EchoPulse is founded and owned by Lakshya Soni. His core team is Shaurya (design) and Aiman (delivery), working remotely. We may also engage independent contractors and freelance specialists to deliver Services. All work is supervised by Lakshya Soni and delivered to You under the EchoPulse brand. All warranties, limitations, and indemnities in these Terms cover the team, contractors, and freelancers collectively as &quot;Indemnified Parties&quot; under Section 5.</p>
         </Section>
 
         <Section n="2" title="Eligibility and authority">
@@ -261,7 +261,7 @@ export default function TermsPage() {
         </div>
 
         <div style={{ marginTop: '40px', fontSize: '11.5px', color: 'rgba(242,238,231,0.4)', textAlign: 'center' }}>
-          (C) {new Date().getFullYear()} EchoPulse (Lakshya Soni, sole proprietor, Bhopal, India). Co-founders: Shaurya, Aiman. All rights reserved.
+          (C) {new Date().getFullYear()} EchoPulse (Lakshya Soni, sole proprietor, Bhopal, India). Team: Shaurya, Aiman. All rights reserved.
         </div>
       </div>
     </main>
