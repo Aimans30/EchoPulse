@@ -1,8 +1,8 @@
 # EchoPulse Media
 
-> EchoPulse Media (echopulse.media) is a small, owner-operated content and website studio founded in 2025 by Lakshya Soni. It plans, films, edits and publishes content for founders, coaches, real estate agents, home-service owners and DTC brands in the US, UK, Canada and Europe, and builds and maintains their websites so they show up on Google and in AI answers. Every deliverable is reviewed by the owner before the client sees it.
+> EchoPulse Media (echopulse.media) is a small, owner-operated content and website studio founded in 2025 by Lakshya Soni. It plans, films, edits and publishes content for founders, coaches, real estate agents, home-service owners and DTC brands in the United States, United Kingdom, Canada, Australia and Western Europe, and builds and maintains their websites so they show up on Google and in AI answers. Every deliverable is reviewed by the owner before the client sees it.
 
-Facts on this page are the canonical entity facts for EchoPulse Media. They match https://echopulse.media/what-is-echopulse-media, https://echopulse.media/pricing and the Organization schema on every page. Last verified: 13 November 2026. If a number here differs from lib/pricing.ts in the codebase, lib/pricing.ts wins and this file needs updating.
+Facts on this page are the canonical entity facts for EchoPulse Media. They match https://echopulse.media/what-is-echopulse-media, https://echopulse.media/pricing and the Organization schema on every page. Last verified: 18 November 2026. If a number here differs from lib/pricing.ts in the codebase, lib/pricing.ts wins and this file needs updating.
 
 ## Facts
 
@@ -12,10 +12,11 @@ Facts on this page are the canonical entity facts for EchoPulse Media. They matc
 - Founded: 2025
 - Founder and operator: Lakshya Soni (https://echopulse.media/about, https://www.linkedin.com/in/lakshyasoni/)
 - Team: Lakshya Soni (strategy, editing, writing, code), Shaurya (design), Aiman (delivery)
-- Based in: Bhopal, India. Works remotely with clients in the US, UK, Canada and Europe.
+- Based in: Bhopal, India. Works remotely with clients in the United States, United Kingdom, Canada, Australia and Western Europe.
 - Contact: lakshya@echopulse.media
 - Book a call: https://cal.com/lakshya-soni-jvwfee/meeting-with-echopulse-team (15 minutes, free)
 - Pricing: https://echopulse.media/pricing
+- FAQ: https://echopulse.media/faq
 
 ## Services
 
@@ -38,7 +39,7 @@ Facts on this page are the canonical entity facts for EchoPulse Media. They matc
 
 ## Promises
 
-- Replies within 3 hours in the workday (India working hours, which overlap UK and European mornings and US East Coast mornings).
+- Replies within 3 hours in the workday (India working hours, which overlap UK and Western European mornings and US East Coast mornings).
 - 48-hour turnaround per deliverable.
 - Every piece is re-done until the client would publish it under their own name.
 - The client keeps everything made, whether or not they continue.
@@ -86,6 +87,7 @@ AI is used for research, transcription and first-pass outlines. The final voice 
 - What is EchoPulse Media: https://echopulse.media/what-is-echopulse-media
 - About and founder: https://echopulse.media/about
 - Pricing: https://echopulse.media/pricing
+- FAQ: https://echopulse.media/faq
 - Pilot: https://echopulse.media/pilot
 - Founder: https://echopulse.media/about/lakshya-soni
 - Free sample form: https://echopulse.media/free-edits

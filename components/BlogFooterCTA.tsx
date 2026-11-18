@@ -1,11 +1,13 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { usePathname } from 'next/navigation';
 import { trackPilotClick, trackCallClick } from '@/lib/analytics';
 import { useGeoPrice } from '@/lib/useGeoPrice';
 import { fadeUp, stagger, DUR, RISE } from '@/lib/motion';
-import { BOOK_CALL_LABEL, BOOK_CALL_REASSURANCE } from '@/lib/links';
-import { MagneticButton, ShimmerText } from '@/components/ui/Premium';
+import { BOOK_CALL_URL, BOOK_CALL_REASSURANCE, FREE_EDITS_URL, FREE_EDITS_LABEL } from '@/lib/links';
+import { PILOT } from '@/lib/pricing';
+import { ShimmerText } from '@/components/ui/Premium';
 
 /**
  * Closing CTA band on a blog post.
@@ -25,17 +27,36 @@ import { MagneticButton, ShimmerText } from '@/components/ui/Premium';
  * Every claim below already exists elsewhere on the site:
  *   - $299 / $599 come from lib/useGeoPrice.ts, the same pair Pricing.tsx and
  *     the Offer schema render.
- *   - The deliverable lines are trimmed from Pricing.tsx DEFAULT_PILOT_FEATURES.
+ *   - The deliverable line is built from PILOT.scope in lib/pricing.ts, so it
+ *     cannot drift from the pricing section, /pricing or the FAQ.
  *   - "Revisions until you are satisfied" and the 48-hour turnaround are the
  *     standing terms on every service page.
  * Nothing here is a new promise invented for the sake of the pitch.
  */
+/**
+ * Booking link for the blog footer: the one canonical Cal.com event with UTM
+ * parameters, built the same way components/BookCallModal.tsx builds them
+ * (utm_content = the page path), with utm_medium set to blog_footer so a
+ * booking in Cal.com shows it came from the bottom of a post.
+ */
+function blogBookUrl(pathname: string): string {
+  const sep = BOOK_CALL_URL.includes('?') ? '&' : '?';
+  return `${BOOK_CALL_URL}${sep}utm_source=echopulse.media&utm_medium=blog_footer&utm_content=${encodeURIComponent(pathname)}`;
+}
+
+/** Pilot deliverables (videos, posts, blog) straight from PILOT.scope. */
+const PILOT_DELIVERABLES = PILOT.scope
+  .slice(1, 4)
+  .map((line) => line.replace(/, captions ready$/, ''))
+  .join(', ');
+
 export default function BlogFooterCTA({ category }: { category?: string }) {
   const { currency, prices } = useGeoPrice();
+  const pathname = usePathname() || '/blog';
 
   const REASONS = [
     'A 30-day content plan built around your business, yours to keep either way',
-    '8 short-form videos and 5 long-form SEO blogs, written, edited, delivered',
+    PILOT_DELIVERABLES,
     'Revisions until you would post it under your own name',
     'No contract, no retainer, no auto-renew. It ends on day 14 unless you say otherwise.',
   ];
@@ -91,35 +112,33 @@ export default function BlogFooterCTA({ category }: { category?: string }) {
           <span className="blog-cta-price-note">one time, not a subscription</span>
         </motion.div>
 
-        {/* MagneticButton: drifts a few px toward the cursor. Deliberately
-            subtle enough that most people never consciously notice it, which
-            is the point. It reads as the interface being responsive rather
-            than as an effect. No-ops on touch and under prefers-reduced-motion. */}
-        <MagneticButton
-          onClick={() => {
-            trackCallClick('blog_footer');
-            (window as unknown as { openBookCallModal?: () => void }).openBookCallModal?.();
-          }}
+        {/* One action that books: a plain link to the canonical Cal.com event
+            with UTM parameters (see blogBookUrl). It opens in a new tab so the
+            reader keeps their place in the post. */}
+        <a
+          href={blogBookUrl(pathname)}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={() => trackCallClick('blog_footer')}
+          data-cursor-hover
           className="blog-cta-btn"
         >
-          {BOOK_CALL_LABEL}
+          Book a free 15-minute call
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" aria-hidden="true">
             <path d="M5 12h14M12 5l7 7-7 7" />
           </svg>
-        </MagneticButton>
+        </a>
 
-        {/* Was a local "Free, 30 minutes..." string that said 30 while the
-            booking modal and every other surface say 45. Reads from the shared
-            constant so the duration cannot drift again. */}
         <p className="blog-cta-reassure">{BOOK_CALL_REASSURANCE}</p>
 
+        {/* The second and last action: the free sample. Internal path, same tab. */}
         <a
-          href="/#pricing"
-          onClick={() => trackPilotClick('blog_footer_pricing')}
+          href={FREE_EDITS_URL}
+          onClick={() => trackPilotClick('blog_footer_free_edits')}
           data-cursor-hover
           className="blog-cta-alt"
         >
-          Or see what everything costs
+          {FREE_EDITS_LABEL}, no card and no call
         </a>
       </div>
 
@@ -239,6 +258,7 @@ export default function BlogFooterCTA({ category }: { category?: string }) {
           letter-spacing: -0.1px;
           border: none;
           cursor: pointer;
+          text-decoration: none;
           box-shadow: 0 12px 30px rgba(232,84,26,0.32);
           transition: transform 0.2s ease, box-shadow 0.2s ease;
           touch-action: manipulation;

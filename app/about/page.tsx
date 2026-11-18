@@ -245,6 +245,26 @@ export default function AboutPage() {
         </ol>
       </section>
 
+      {/* ── Team: names and roles only ────────────────────────────────────── */}
+      <section className="about-team" aria-labelledby="team-heading">
+        <p className="about-eyebrow">The team</p>
+        <h2 id="team-heading" className="about-h2">Three people, no account managers</h2>
+        <ul className="about-team-list">
+          <li>
+            <strong><Link href="/about/lakshya-soni">Lakshya Soni</Link></strong>
+            <span>Founder. Strategy, editing, writing and code.</span>
+          </li>
+          <li>
+            <strong>Shaurya</strong>
+            <span>Design.</span>
+          </li>
+          <li>
+            <strong>Aiman</strong>
+            <span>Delivery.</span>
+          </li>
+        </ul>
+      </section>
+
       {/* ── Facts table ───────────────────────────────────────────────────────
           A literal table of plain facts. This is the single most citable format
           for AI answer engines: structured, unambiguous, quotable without
@@ -405,6 +425,24 @@ export default function AboutPage() {
         }
         .about-table td { color: #4A4740; line-height: 1.6; }
 
+        /* Team */
+        .about-team {
+          padding-top: 64px !important; padding-bottom: 64px !important;
+          border-top: 1px solid rgba(12,12,11,0.08);
+        }
+        .about-team-list {
+          list-style: none; padding: 0; margin: 0;
+          display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+        }
+        .about-team-list li {
+          display: flex; flex-direction: column; gap: 6px;
+          padding: 20px; border: 1px solid rgba(12,12,11,0.1);
+          border-radius: 18px; background: rgba(255,255,255,0.45);
+          color: #4A4740; line-height: 1.6; font-size: 15.5px;
+        }
+        .about-team-list strong { font-size: 17px; font-weight: 800; color: #0C0C0B; }
+        .about-team-list a { color: #0C0C0B; text-decoration: underline; text-decoration-color: #E8541A; text-underline-offset: 3px; }
+
         /* Services */
         .about-services {
           padding-top: 64px !important; padding-bottom: 64px !important;
@@ -442,6 +480,7 @@ export default function AboutPage() {
         .about-cta-alt a { color: #E8541A; font-weight: 600; }
 
         @media (max-width: 760px) {
+          .about-team-list { grid-template-columns: 1fr; }
           .about-hero { padding-top: 110px !important; }
           .about-founder { grid-template-columns: 1fr; gap: 32px; }
           .about-founder-photo { max-width: 240px; }

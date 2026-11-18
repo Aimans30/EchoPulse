@@ -29,7 +29,7 @@ const KEYBOARD_HEIGHT_THRESHOLD = 0.75;
 /**
  * Routes this bar must never appear on.
  *
- * Same reasoning as components/PilotPopup.tsx: an article reader arrived from
+ * An article reader arrived from
  * search to read something, and a permanent sales bar pinned over the bottom
  * of the text is an interruption rather than an offer. It also competes with
  * the closing CTA the post already ends with (components/BlogFooterCTA.tsx),

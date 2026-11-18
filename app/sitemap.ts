@@ -122,6 +122,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   };
 
+  // /faq is the full FAQ page, built from lib/faqData.ts (shared with the
+  // homepage FAQ section).
+  const faq: MetadataRoute.Sitemap[number] = {
+    url: `${SITE_URL}/faq`,
+    lastModified: BRAND_PAGE_UPDATED,
+    changeFrequency: 'monthly',
+    priority: 0.8,
+  };
+
   // /pilot is the one-screen $299 Pilot page sent in DMs; /free-edits is the
   // free sample form; /about/lakshya-soni is the founder's author page.
   const pilot: MetadataRoute.Sitemap[number] = {
@@ -300,6 +309,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...blogPosts,
     pricing,
     whatIs,
+    faq,
     pilot,
     freeEdits,
     founderPage,

@@ -41,10 +41,6 @@ export interface ServiceData {
   result: { client: string; role: string; stat: string; statLabel: string; body: string };
   testimonial: { quote: string; name: string; role: string };
   faq: { q: string; a: string }[];
-  // Optional service-specific Cal.com event URL. If set, the page CTAs link
-  // here instead of opening the default booking modal. Useful for separating
-  // intent (e.g. a "Website Strategy Call" vs the general content call).
-  bookCallUrl?: string;
 }
 
 export const services: ServiceData[] = [
@@ -102,8 +98,8 @@ export const services: ServiceData[] = [
     slug: 'linkedin-ghostwriting',
     name: 'LinkedIn & Social',
     tagline: 'Posts your buyers actually stop scrolling for.',
-    heroSub: 'Done-for-you LinkedIn and social content built around a 90-minute onboarding interview. Written, edited, scheduled, shipped. No "Here is the thing," no em-dashes, no template energy. Just posts that fit your business and earn replies from real buyers.',
-    metaDescription: 'Done-for-you LinkedIn ghostwriting for founders. Built from a 90-minute interview so posts sound like you, not like a template. You approve every draft.',
+    heroSub: 'Done-for-you LinkedIn and social content built around a recorded onboarding interview of about an hour. Written, edited, scheduled, shipped. No "Here is the thing," no em-dashes, no template energy. Just posts that fit your business and earn replies from real buyers.',
+    metaDescription: 'Done-for-you LinkedIn ghostwriting for founders. Built from a recorded interview of about an hour so posts sound like you, not like a template. You approve every draft.',
     accentColor: '#8b5cf6',
     problemHeadline: 'Most LinkedIn content reads like a robot wrote it. Your audience knows.',
     problemBody: 'You hire a $5K per month agency. They send posts that sound exactly like every other agency. Your audience can tell. Replies dry up. The post gets likes from bots and nothing from real buyers, real prospects, or real referrals. Your name is on it, but nothing about it sounds like you.',
@@ -114,10 +110,10 @@ export const services: ServiceData[] = [
       'No real stories, no specific POVs, no business context, just bland advice',
     ],
     solutionHeadline: 'One onboarding session. Posts that fit your business.',
-    solutionBody: 'Every client starts with a 90-minute onboarding interview at kickoff. We cover your offer, your buyers, your competitors, your wins, and the way you already talk about what you do. That session becomes the brief our writers work from on every post. Every draft gets read by a human who knows the brief, and rewritten if it sounds generic. Result: posts that fit your business and your buyers.',
+    solutionBody: 'Every client starts with a recorded onboarding interview of about an hour at kickoff. We cover your offer, your buyers, your competitors, your wins, and the way you already talk about what you do. That session becomes the brief our writers work from on every post. Every draft gets read by a human who knows the brief, and rewritten if it sounds generic. Result: posts that fit your business and your buyers.',
     methodTimeline: '48-HOUR TURNAROUND',
     steps: [
-      { num: '01', title: 'Onboarding Interview', body: '90-minute recorded session. We cover your offer, your buyers, your competitors, the wins you talk about, and the way you already describe your business. Compiled into a structured brief the whole team works from.' },
+      { num: '01', title: 'Onboarding Interview', body: 'A recorded session of about an hour. We cover your offer, your buyers, your competitors, the wins you talk about, and the way you already describe your business. Compiled into a structured brief the whole team works from.' },
       { num: '02', title: 'Editorial Calendar', body: 'Monthly content calendar built from your brief, the questions your buyers actually ask, and what your audience responds to. We pick topics that earn replies, not just impressions. You approve each calendar before we write.' },
       { num: '03', title: 'Write, Edit, Ship', body: 'Drafts written against the brief. Read by a human editor who flags anything that sounds like generic LinkedIn. Rewritten until it fits. You approve every post before it publishes.' },
     ],
@@ -125,16 +121,15 @@ export const services: ServiceData[] = [
       { icon: '✍️', title: 'Short-Form Posts', desc: '8 photo or carousel posts a month on Presence Engine, 20 social posts a month on Growth. Story-driven, opinion-driven, or tactical. Never generic listicles.' },
       { icon: '📊', title: 'Carousel Posts', desc: 'Carousels count toward your monthly post total. 8 to 12 slides built for saves, shares, and DMs.' },
       { icon: '🎙️', title: 'Brand Brief Document', desc: 'Your brand brief. Interview transcript, audience map, offer breakdown, story bank, banned phrases. Yours forever, even if you cancel.' },
-      { icon: '💬', title: 'Engagement Drafts', desc: '5 daily comment drafts on prospect and influencer posts. Visibility in their feed without you posting more.' },
       { icon: '📝', title: 'Profile Optimization', desc: 'Headline, About, Featured section, and banner rewritten once per quarter to match your evolving positioning.' },
       { icon: '📈', title: 'Monthly Performance Review', desc: 'Impressions, comments, profile visits, DMs from buyers. Optimize the calendar based on what is working.' },
     ],
     result: {
       client: 'Onboarding Interview',
       role: 'Kickoff standard',
-      stat: '90 min',
+      stat: '1 hour',
       statLabel: 'recorded onboarding session',
-      body: 'Every engagement starts with a 90-minute recorded onboarding session where we map your offer, your buyer, and the way you already talk about your business. The transcript becomes the source brief for every post we write for the next 12 months. Refreshed quarterly to stay aligned with how the business is evolving.',
+      body: 'Every engagement starts with a recorded onboarding session of about an hour where we map your offer, your buyer, and the way you already talk about your business. The transcript becomes the source brief for every post we write for the next 12 months. Refreshed quarterly to stay aligned with how the business is evolving.',
     },
     testimonial: {
       quote: 'The structured onboarding brief is the whole difference. Without it you are guessing at someone\'s voice. With it you are working from the way they already describe their own business.',
@@ -142,8 +137,8 @@ export const services: ServiceData[] = [
       role: 'Founder, EchoPulse',
     },
     faq: [
-      { q: 'How is this different from a $200 per month content writer?', a: 'Cheap writers use templates. We use a structured brand brief built from a 90-minute recorded interview with you. The posts fit your business because we built a system around your actual offer and audience, not a template stuffed with industry buzzwords.' },
-      { q: 'Will my audience know it is written by someone else?', a: 'That is the bar we write to. The brand brief is built from a 90-minute recorded interview, so every post is anchored to phrases and stories you have actually used, not to a template. You approve each draft before it goes out, so nothing publishes in a voice you would not use yourself.' },
+      { q: 'How is this different from a $200 per month content writer?', a: 'Cheap writers use templates. We use a structured brand brief built from a recorded interview of about an hour with you. The posts fit your business because we built a system around your actual offer and audience, not a template stuffed with industry buzzwords.' },
+      { q: 'Will my audience know it is written by someone else?', a: 'That is the bar we write to. The brand brief is built from a recorded interview of about an hour, so every post is anchored to phrases and stories you have actually used, not to a template. You approve each draft before it goes out, so nothing publishes in a voice you would not use yourself.' },
       { q: 'How many posts per month?', a: 'Presence Engine at $399 a month includes 8 photo or carousel posts a month. Growth at $1,997 a month includes 20 social posts a month. Carousels count toward those totals.' },
       { q: 'Do I have to approve every post?', a: 'Yes. You see every draft before it publishes. Revisions are unlimited until you are satisfied with the post. Most clients only revise the first 5 to 10 posts before they trust the system.' },
       { q: 'What actually happens on the strategy call?', a: '15 minutes. We look at what you are publishing now, map a 30-day plan against it, and put the numbers in writing. No pitch, and you keep the plan whether or not you hire us.' },
@@ -261,11 +256,6 @@ export const services: ServiceData[] = [
     tagline: 'Stunning sites. Buttery UX. Real conversions.',
     heroSub: 'Beautiful, fast websites for founders, coaches, business owners, real estate agents, and DTC brands. Brand sites, e-commerce stores, landing pages, property listings, course platforms, sales funnels, portfolios. Whatever kind of site your business needs, designed to look stunning and built to convert. Sub-2-second mobile load. Copy and design built together. Every section has a job. Every word moves the visitor closer to working with you.',
     metaDescription: 'Websites and sales funnels built to convert, not just to look good. Sub-2-second mobile load, conversion copywriting included on every build.',
-    // TODO: replace with the dedicated Cal.com event URL for website builds
-    // once it's created. While unset, this falls back to the global modal.
-    // Suggested event: "Website Strategy Call" (30 min) — different intent
-    // and prep than the general content/marketing call.
-    bookCallUrl: 'https://cal.com/lakshya-soni-jvwfee/meeting-with-echopulse-team',
     accentColor: '#10b981',
     problemHeadline: 'A pretty website that does not get you customers.',
     problemBody: 'Traffic lands on your site, scrolls for 8 seconds, and leaves. No inquiry. No booking. No sale. Your designer made it look beautiful, but the layout is wrong, the copy is fluff, and the call-to-action is buried. A beautiful site that does not convert is an expensive business card.',
@@ -384,7 +374,7 @@ export const services: ServiceData[] = [
     solutionBody: 'We design and ship the websites, apps, and AI tools your business needs, engineered for the two outcomes that move the needle: a buying experience your customers remember, and an operating system your team actually wants to work inside. Your website converts because it was built around YOUR buyer journey, not a Webflow template. Your client portal makes customers feel premium because it was built around YOUR offer. Your internal dashboard saves the team 10 hours a week because it was built around YOUR workflow. Fixed price, fixed timeline, full code handover on launch day. Hosting your call, no vendor lock-in, no monthly rent.',
     methodTimeline: '2 TO 8 WEEKS BY SCOPE',
     steps: [
-      { num: '01', title: 'Map the value', body: 'A 30-minute call where we map exactly where you are losing customers, where your team is losing hours, and what software would change that. You leave with a written scope, a fixed price, and a delivery date in your inbox. If a custom build is not the right move for your stage, we will tell you. We do not pitch builds that will not pay for themselves.' },
+      { num: '01', title: 'Map the value', body: 'A free 15-minute call where we map exactly where you are losing customers, where your team is losing hours, and what software would change that. You leave with a written scope, a fixed price, and a delivery date in your inbox. If a custom build is not the right move for your stage, we will tell you. We do not pitch builds that will not pay for themselves.' },
       { num: '02', title: 'Build in the open', body: 'Every week you get real working screens you can click through. Not Figma mockups, not status decks. You give feedback in Slack, we ship updates in days. You see your customer experience taking shape, you spot friction early, and the team that uses it daily gets a voice in how it works. This is the part agencies hide behind status reports. We put it on display.' },
       { num: '03', title: 'Ship and hand over the keys', body: 'Goes live with domain configured, hosting set up, analytics wired, customer-facing flow polished, and team training delivered. You get the code on your GitHub, the documentation, a walkthrough video, and 14 days of free fixes. From that point on you can extend it with any developer in the world, or keep us on a small monthly retainer. Your call.' },
     ],
@@ -402,7 +392,7 @@ export const services: ServiceData[] = [
       role: 'Built by operators, priced like a fair trade',
       stat: '$4,997+',
       statLabel: 'fixed price, code yours on launch',
-      body: 'You get three founders who have shipped websites, software, and AI tools in production. Not a 20-person agency layering project managers, account directors, and strategists on top of every billable hour. Lakshya leads the build. Shaurya and Aiman lead design and delivery. Small team, real engineering experience, fast cycles, zero middle layers. Three transparent tiers. STARTER ($4,997 to $9,997, 2 to 3 weeks): landing page with motion, client portal, internal dashboard, or 3D hero. GROWTH ($9,997 to $19,997, 3 to 5 weeks): immersive 3D brand site, course platform, custom CRM, AI agents. FULL BUILD ($19,997 to $49,997, 4 to 8 weeks): SaaS MVP with auth and payments, marketplace, multi-user product. Every tier includes hosting, full code transfer, documentation, training, and 14 days of free post-launch fixes. Growth retainer clients get 20% off. Full System retainer clients get one small build per quarter included plus 30% off bigger builds. Get a quote from a traditional dev agency for the same scope and compare the number, the timeline, and crucially who owns the code at the end of it.',
+      body: 'You get three founders who have shipped websites, software, and AI tools in production. Not a 20-person agency layering project managers, account directors, and strategists on top of every billable hour. Lakshya leads the build. Shaurya and Aiman lead design and delivery. Small team, real engineering experience, fast cycles, zero middle layers. Three transparent tiers. STARTER ($4,997 to $9,997, 2 to 3 weeks): landing page with motion, client portal, internal dashboard, or 3D hero. GROWTH ($9,997 to $19,997, 3 to 5 weeks): immersive 3D brand site, course platform, custom CRM, AI agents. FULL BUILD ($19,997 to $49,997, 4 to 8 weeks): SaaS MVP with auth and payments, marketplace, multi-user product. Every tier includes hosting, full code transfer, documentation, training, and 14 days of free post-launch fixes. Growth retainer clients get 20% off. Get a quote from a traditional dev agency for the same scope and compare the number, the timeline, and crucially who owns the code at the end of it.',
     },
     testimonial: {
       quote: 'A business is only as good as the experience it gives customers and the system its team works in. We build both. Designed around how your business actually operates, not bent to fit a template. That is what software should have always been.',
@@ -418,7 +408,7 @@ export const services: ServiceData[] = [
       { q: 'What does an AI tool actually do for my business?', a: 'Practical, money-saving stuff. A chatbot that answers customer questions at 2am in your brand voice and books qualified calls. An email assistant that drafts personalized replies your team just edits and sends. A lead-scoring system that triages incoming inquiries so your calendar only fills with serious buyers. A knowledge-base search across your team notes and Slack. The kind of AI that saves 5 to 10 hours a week, not the kind that impresses on a demo.' },
       { q: 'Will I really own the code?', a: 'Yes. On launch day the entire project transfers to your GitHub account. You own it. You can hire any developer in the world to extend it. We do not hold code hostage, we do not run hosting on our credit card, we do not charge retainer fees to access your own product. Full independence, that is the whole point.' },
       { q: 'What if something breaks after launch?', a: '14 days of free fixes included with every build. After that, you can hire us per change at our hourly rate, hand the codebase to any developer, or keep us on a small monthly retainer for ongoing improvements. We ship clean, documented, well-architected code, so any engineer can pick it up without weeks of ramp-up.' },
-      { q: 'How does this work if I am already on a content retainer?', a: 'Growth retainer clients get 20% off any custom build. Full System clients get one small build (up to $9,997 scope) included every quarter at no extra cost, plus 30% off larger builds. Over a year, Full System clients can pull $30K+ of build value out of the retainer they are already paying for. Standalone clients are welcome too, no retainer required.' },
+      { q: 'How does this work if I am already on a content retainer?', a: 'Growth retainer clients get 20% off any custom build. Standalone clients are welcome too, no retainer required.' },
       { q: 'Why is this cheaper than what dev agencies quote?', a: 'Because we are three operators, not a 20-person agency layering project managers, account directors, two designers, three developers, a QA, and a head of strategy on top of every billable hour. Lakshya leads the build. Shaurya and Aiman lead design and delivery. No middle layers, no kickbacks, no quarterly steering committees. The same scope at half the timeline, a quarter of the cost, and zero contract lock-in.' },
       { q: 'Do you take equity instead of cash?', a: 'No. Fixed pricing keeps the relationship clean. Your equity should stay yours. Our incentive is shipping you working software, not negotiating a cap table.' },
       { q: 'What actually happens on the strategy call?', a: '15 minutes. We map what you want customers and your team to experience, and you leave with a written scope, a fixed price and a delivery date. If a custom build is not right for your stage we will say so. No pitch, and you keep the spec either way.' },

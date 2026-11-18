@@ -159,9 +159,9 @@ export default function HomeClient({ latestPosts }: { latestPosts?: ReactNode })
         <main id="main">
           <Hero />
           <Manifesto />
+          <OurWork />
           <Testimonials />
           <WhoWeWorkWith />
-          <OurWork />
           <Services />
           <Process />
           <Pricing />

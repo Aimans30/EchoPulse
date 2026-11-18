@@ -2,83 +2,21 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { useGeoPrice } from '@/lib/useGeoPrice';
+import Link from 'next/link';
+import { HOME_FAQS, type FaqItem } from '@/lib/faqData';
 
 /**
- * Build the grouped FAQ sections. Takes the price tokens from useGeoPrice so
- * answer copy always matches the tier cards rather than hardcoding numbers in
- * two places.
+ * The homepage FAQ section.
  *
- * Retainer pricing went flat USD worldwide in Oct 2026, so these currently
- * resolve to "$299" and "$1,997" everywhere. The plumbing stays because the
- * point of it is that the FAQ and the cards cannot drift apart, which matters
- * just as much when the numbers change as when they vary by region.
- *
- * ─── Question selection ──────────────────────────────────────────────────────
- *
- * Trimmed to 8 questions, every one phrased as a real search query a buyer
- * types into Google or ChatGPT ("how much does a content agency cost", "freelance
- * video editor vs agency", "do content agencies use AI"). Brand-specific
- * objection questions that no one searches ("Why is the Pilot $299", "will it
- * sound like me") were cut — they added length without adding a keyword to rank
- * for. The objection-handling still lives inside the answers.
+ * The questions and answers live in lib/faqData.ts and are shared with the
+ * full /faq page, so the two can never drift. Prices and the Pilot scope in
+ * those answers are built from lib/pricing.ts.
  *
  * Answer rules that get us cited, not just ranked:
  *   1. First sentence answers the question directly (extraction engines lift it).
  *   2. Concrete numbers we can honestly stand behind (our prices, our turnaround).
- *   3. No invented industry statistics — unsourced stats are a trust liability.
+ *   3. No invented industry statistics (unsourced stats are a trust liability).
  */
-const buildFaqs = (pilotPrice: string, presencePrice: string, growthPrice: string) => [
-      {
-        q: 'How much does a content agency cost per month?',
-        a: `Ours runs ${presencePrice} a month for the Presence Engine (8 to 9 edited videos, 8 posts, a weekly call and your website looked after) or ${growthPrice} a month for the Growth retainer, both month-to-month with no contract. Most content agencies price one of three ways: per deliverable (cheapest headline, most expensive in practice once revisions stack up), per hour (you pay for their inefficiency), or a flat monthly retainer covering a defined output (what we do). Before that, you can run a ${pilotPrice} 14-day Pilot: real work on your brand, 21 deliverables, and you keep everything whether you continue or not. That way you're comparing actual output, not sales decks.`,
-      },
-      {
-        q: 'Is it cheaper to hire a freelance video editor or an agency?',
-        a: "A freelancer is cheaper per edit. An agency is cheaper per outcome, and the gap widens as volume grows. One freelancer gives you one skill, one timezone, and one point of failure: when they take a holiday, your content stops. You also stay the project manager, writing briefs, chasing revisions, and stitching together an editor, a writer, and a designer who have never spoken. We're the alternative when the coordination cost has started to exceed the production cost. If you publish two videos a month and enjoy managing it, hire a freelancer. That's an honest answer, not a pitch.",
-      },
-      {
-        q: 'What is included in a monthly content retainer?',
-        a: `Two options. The Presence Engine at ${presencePrice} a month: a 20 to 30 minute call every week, 8 to 9 short videos, 8 posts, up to 5 free clips from footage you already have, a posting plan, and your website tuned up and kept current. The Growth retainer at ${growthPrice} a month covers a bigger defined output across video, social, written content and ads, plus strategy and monthly reporting. The exact mix is set during onboarding, because a real estate agent needs listing videos and a SaaS founder needs LinkedIn essays, and pretending those are the same package would be dishonest. What is fixed regardless of mix: senior review on every deliverable, a 3-hour reply window during business hours, and unlimited revisions within scope. Book a call and we'll spec the exact deliverable count for your channels.`,
-      },
-      {
-        q: 'Do content agencies use AI to write the content?',
-        a: "Many do, and most will not tell you. Here is our position, stated plainly: we use AI for research, transcription, and first-pass structuring. We do not use it to generate the final voice of your content, because AI writes in the average of everyone, and the entire point of founder-led content is that it sounds like one specific person. Every deliverable is written and reviewed by a human who has read your brand brief. If you can tell a post was machine-written, so can your buyer, and so can the algorithm that decides whether to distribute it.",
-      },
-      {
-        q: 'What is a done-for-you content agency?',
-        a: "A done-for-you content agency handles the entire pipeline from raw footage to published post, so the only thing you do is show up and record. In practice that means: you send us a video call recording, a podcast episode, or 30 minutes of talking to your phone, and we return edited short-form video, LinkedIn posts, blog articles, and ad creative built from it. The distinction from a normal agency is scope. Most agencies do one channel and hand you the rest. EchoPulse covers video editing, LinkedIn ghostwriting, blogs, ads, websites, and automations under one team and one invoice.",
-      },
-      {
-        q: 'How fast is the turnaround on video edits?',
-        a: "48 hours per deliverable as standard. The free sample (2 edited videos) is back within 48 hours of receiving your footage, and the Pilot delivers its 9 pieces inside 14 days. Turnaround is the metric we hold ourselves to hardest, because content that arrives late is content that missed its moment. If a deadline is genuinely at risk we tell you before it slips, not after.",
-      },
-      {
-        q: 'How long does it take to see results from content marketing?',
-        a: "It depends on the channel, and any agency giving you one number is guessing. LinkedIn and short-form video can produce inbound DMs and profile visits within 2 to 4 weeks when the content lands. Ad creative generates usable data in week one but needs 2 to 4 weeks to optimise. SEO and blogging realistically take 3 to 6 months before meaningful organic traffic, and nobody can compress that. We put these expectations in writing before month one, because setting them honestly is cheaper for both of us than resetting them in month three.",
-      },
-      {
-        q: 'Can a content agency guarantee leads or sales?',
-        a: "No, and any agency that guarantees leads is either lying or about to redefine the word 'lead'. Too much of the outcome sits outside our control: your offer, your pricing, your sales calls, your market. What we do guarantee is what we control, which is output quality, turnaround speed, and revision responsiveness. What we measure and report monthly: profile views, engagement rate, reach, content-driven website traffic, and blog time-on-page. When something isn't performing we flag it and change direction, rather than quietly producing more of it.",
-      },
-      {
-        q: 'Is the free sample really free?',
-        a: "Yes. Send 1 or 2 pieces of footage you already have (a talk, a podcast episode, a listing tour, a job-site clip) and you get 2 edited short videos back within 48 hours. No card, no call required, and you keep the files whether or not you hire us. It is the fastest way to judge the quality, so we would rather start there than with a pitch.",
-      },
-      // Added after a buyer-panel review. The site promises "48-hour
-      // turnaround" and "3-hour replies during work hours" to a US, UK,
-      // Canadian and Australian audience while the team works from India, and
-      // nowhere did it say whose work hours those are. A US buyer with a
-      // time-sensitive job had to either dig through the About page or ask on
-      // the call. Volunteering it is both more honest and less friction, and
-      // it answers the question a cautious buyer is already silently asking.
-      {
-        q: 'Where is the team based, and what hours do you actually cover?',
-        a: "EchoPulse is run from Bhopal, India, by Lakshya Soni, with Shaurya on design and Aiman on delivery. That is on the About page and in our Terms, and we would rather tell you here than have you find it later. In practice it means our working day overlaps comfortably with UK and European mornings and with US East Coast mornings. The 3-hour reply window applies during our workday; a message sent late on a US evening is answered the next morning your time. Turnaround is measured in calendar hours, not business hours, so a 48-hour deliverable is 48 hours regardless of the gap. If you need someone reachable in your own timezone at 5pm on a Friday, say so on the call and we will tell you honestly whether we are the right fit.",
-      },
-];
-
-type FaqItem = ReturnType<typeof buildFaqs>[number];
 
 function FaqCard({
   faq,
@@ -172,6 +110,11 @@ function FaqCard({
         style={{ overflow: 'hidden' }}
       >
         <p className="faq-a">{faq.a}</p>
+        {faq.link && (
+          <p className="faq-a faq-a-link">
+            <Link href={faq.link.href} tabIndex={isOpen ? 0 : -1}>{faq.link.label}</Link>
+          </p>
+        )}
       </motion.div>
     </motion.div>
   );
@@ -179,12 +122,11 @@ function FaqCard({
 
 export default function FAQ() {
   const [open, setOpen] = useState<number | null>(0);
-  const { currency, prices } = useGeoPrice();
 
   // One flat list — no section grouping. The section labels ("Pricing &
   // comparison" / "Results & delivery") split 8 questions into two visually
   // disconnected blocks, which read as two separate FAQs rather than one.
-  const flatFaqs = buildFaqs(`${currency}${prices.pilot}`, `${currency}${prices.presence}`, `${currency}${prices.growth}`);
+  const flatFaqs = HOME_FAQS;
 
   // Split down the middle so the two columns fill evenly.
   const half = Math.ceil(flatFaqs.length / 2);
@@ -346,6 +288,10 @@ export default function FAQ() {
           color: #6E6B63;
           font-weight: 400;
         }
+
+        .faq-a-link { margin-top: -10px; }
+        .faq-a-link a { color: #0C0C0B; font-weight: 600; text-decoration: underline; text-decoration-color: #E8541A; text-underline-offset: 3px; }
+        .faq-a-link a:hover { color: #E8541A; }
 
         .faq-card:hover {
           background: rgba(255,255,255,0.85) !important;

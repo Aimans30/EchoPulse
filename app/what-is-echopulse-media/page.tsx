@@ -33,8 +33,8 @@ import { FREE_SAMPLE, PILOT, PRESENCE, GROWTH, PRICE_LADDER_SENTENCE, PROMISES }
 
 const SITE_URL = 'https://echopulse.media';
 const ACCENT = '#E8541A';
-const LAST_VERIFIED = '10 November 2026';
-const LAST_VERIFIED_ISO = '2026-11-10';
+const LAST_VERIFIED = '18 November 2026';
+const LAST_VERIFIED_ISO = '2026-11-18';
 
 export const metadata: Metadata = {
   title: { absolute: 'What Is EchoPulse Media? Facts, Team, Pricing and Proof' },
@@ -52,7 +52,7 @@ export const metadata: Metadata = {
 };
 
 const DEFINITION =
-  'EchoPulse Media is a done-for-you content studio for founders, coaches, course creators, business owners and real estate agents. You record; the studio edits the video, writes the LinkedIn posts and blogs, makes the ad creative, and builds the website and funnel they point at. It was founded in 2025 by Lakshya Soni, is run from Bhopal, India, and serves clients in the United States, the United Kingdom, Canada, Australia and the European Union. Work starts with a free sample, then a $299 Pilot, then a monthly plan from $399.';
+  'EchoPulse Media is a done-for-you content studio for founders, coaches, course creators, business owners and real estate agents. You record; the studio edits the video, writes the LinkedIn posts and blogs, makes the ad creative, and builds the website and funnel they point at. It was founded in 2025 by Lakshya Soni, is run from Bhopal, India, and serves clients in the United States, the United Kingdom, Canada, Australia and Western Europe. Work starts with a free sample, then a $299 Pilot, then a monthly plan from $399.';
 
 const FAQ: { q: string; a: string }[] = [
   {
@@ -73,7 +73,7 @@ const FAQ: { q: string; a: string }[] = [
   },
   {
     q: 'Where is EchoPulse Media based, and does it work with clients in the US and UK?',
-    a: 'The team works from Bhopal, India. Most clients are in the United States, the United Kingdom and Canada, with some in Australia and the EU. The working day overlaps with UK and European mornings and US East Coast mornings. Replies come within 3 hours in the workday and turnaround is measured in calendar hours, so a 48-hour deliverable is 48 hours regardless of the time difference.',
+    a: 'The team works from Bhopal, India. Most clients are in the United States, the United Kingdom and Canada, with some in Australia and Western Europe. The working day overlaps with UK and European mornings and US East Coast mornings. Replies come within 3 hours in the workday and turnaround is measured in calendar hours, so a 48-hour deliverable is 48 hours regardless of the time difference.',
   },
   {
     q: 'What proof is there that the work gets results?',
@@ -91,7 +91,7 @@ export default function WhatIsEchoPulseMediaPage() {
     { label: 'Founder', value: <Link href="/about">Lakshya Soni</Link> },
     { label: 'Team', value: 'Lakshya Soni (founder, editing, writing, code), Shaurya (design), Aiman (delivery)' },
     { label: 'Based in', value: 'Bhopal, Madhya Pradesh, India. Remote-first.' },
-    { label: 'Serves', value: 'United States, United Kingdom, Canada, Australia, European Union' },
+    { label: 'Serves', value: 'United States, United Kingdom, Canada, Australia, Western Europe' },
     {
       label: 'Services',
       value: (
@@ -322,7 +322,7 @@ export default function WhatIsEchoPulseMediaPage() {
         {/* ── CTA ────────────────────────────────────────────────────────── */}
         <section className="wi-cta">
           <h2 className="wi-h2">Want to see it on your own footage?</h2>
-          <p>Thirty minutes on a call, or send two clips and get them back edited within 48 hours. Either way you keep what we make.</p>
+          <p>Book a free 15-minute call, or send two clips and get them back edited within 48 hours. Either way you keep what we make.</p>
           <div className="wi-cta-row">
             <ICPBookButton label={BOOK_CALL_LABEL} location="what_is_page" accent={ACCENT} size="lg" fullWidthMobile />
             <Link href="/pricing" className="wi-cta-alt">See pricing</Link>

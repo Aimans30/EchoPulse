@@ -1,14 +1,12 @@
 // Single source of truth for outbound conversion links.
 // Every default CTA across the site reads from here.
 //
-// Service-specific override: components/ServicePageClient.tsx checks
-// service.bookCallUrl (set in lib/serviceData.ts) before falling back to
-// this URL. The Websites service currently uses a dedicated event:
-//   https://cal.com/lakshya-soni-jvwfee/echopulse-website-strategy-call (30m)
-// All other services use the default below.
+// There is exactly ONE booking event. Every booking button on the site (the
+// modal, the service pages, the blog footer) points at BOOK_CALL_URL below;
+// there are no per-service overrides.
 
 // One booking link everywhere (site, blog CTAs, outreach emails). 15 minutes.
-// Decided 10 Nov 2026; the old `echopulse-marketing-agency-call` event is retired.
+// Decided 10 Nov 2026; the old marketing-agency event is retired.
 export const BOOK_CALL_URL = 'https://cal.com/lakshya-soni-jvwfee/meeting-with-echopulse-team';
 
 /**

@@ -127,7 +127,7 @@ export default function Pricing({ pricingCopy }: { pricingCopy?: PricingCopy } =
             transition={{ duration: 0.6, delay: 0.1 }}
             style={{ fontFamily: 'Inter, sans-serif', fontSize: 'clamp(28px, 3.4vw, 48px)', fontWeight: 900, letterSpacing: '-1.6px', margin: '0 0 14px', lineHeight: 1.05, color: '#0C0C0B' }}
           >
-            Simple pricing. <span style={{ color: '#E8541A' }}>Real work upfront.</span>
+            Prices, <span style={{ color: '#E8541A' }}>in full.</span>
           </motion.h2>
           <motion.p
             className="pricing-sub"
@@ -137,15 +137,7 @@ export default function Pricing({ pricingCopy }: { pricingCopy?: PricingCopy } =
             transition={{ delay: 0.2 }}
             style={{ color: '#6E6B63', fontSize: '14px', maxWidth: '620px', lineHeight: 1.6, margin: '0 0 16px' }}
           >
-            {/* Dropped "why we ship sharper than agencies twice our size".
-                That is an unfalsifiable comparative against unnamed competitors
-                and it leaned on a track record this studio has not published.
-                What replaces it is the same three commitments, stated as terms
-                the reader can hold us to rather than as a boast. */}
-            Owner-operated, with senior eyes on every deliverable.{' '}
-            <strong style={{ color: '#0C0C0B', fontWeight: 700 }}>{PROMISES.replies.toLowerCase()}, {PROMISES.turnaround.toLowerCase()}, re-done until it&apos;s right, and no surprise invoices</strong>
-            {' '}are the terms, not the sales pitch. You are buying output,
-            not a seat in someone&apos;s account-management queue.
+            The terms on every plan: {PROMISES.replies.toLowerCase()}, {PROMISES.turnaround.toLowerCase()}, work {PROMISES.revisions.toLowerCase()}, and no contract.
           </motion.p>
 
           {/* Region indicator */}

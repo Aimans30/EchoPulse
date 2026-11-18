@@ -118,7 +118,7 @@ export interface IcpData {
   /**
    * Config for the animated hero explainer. Shows the whole offer in motion:
    * one input → the studio → four channels → how that compounds into revenue.
-   * `count` values must stay true to the Growth retainer's real deliverables;
+   * `count` values must stay true to the plan they describe (see lib/pricing.ts);
    * `outcomes` describe the MECHANISM only, never promised results.
    */
   pipeline: PipelineConfig;
@@ -184,10 +184,10 @@ export const icps: IcpData[] = [
     pipeline: {
       input: { label: 'You shoot the listing', detail: 'Phone footage, or we direct the shoot' },
       outputs: [
-        { label: 'Property reels', benefit: 'Listings buyers actually watch', count: '12/mo', kind: 'reel' },
-        { label: 'Listing walkthroughs', benefit: 'They tour before they call', count: '4/mo', kind: 'video' },
-        { label: 'Personal-brand video', benefit: 'Sellers pick who they trust', count: '8/mo', kind: 'reel' },
-        { label: 'Meta ads', benefit: 'Puts listings in front of buyers', count: '6/mo', kind: 'ad' },
+        { label: 'Listing videos', benefit: 'Listings buyers actually watch', count: '8-9/mo', kind: 'reel' },
+        { label: 'Just-listed and market posts', benefit: 'Sellers see you every week', count: '8/mo', kind: 'post' },
+        { label: 'Extra clips from tours', benefit: 'Up to 5 a month, free', count: '5/mo', kind: 'video' },
+        { label: 'Site and Google profile', benefit: 'Found when sellers search', count: 'Month one', kind: 'site' },
       ],
       outcomes: ['Listing views', 'Enquiries', 'Booked viewings'],
     },
@@ -269,7 +269,7 @@ export const icps: IcpData[] = [
       // could not find an answer. The founders page has carried this reassurance
       // for months; an agent working evenings and weekends needs it more.
       { q: 'How much of my time does this actually take each month?', a: 'Roughly 2 to 3 hours after onboarding. You shoot listing footage on your phone during walkthroughs you are already doing, we send a short shot list so you are not guessing, and the rest is batched approvals. If you would rather not shoot at all, we direct the shoot instead.' },
-      { q: 'Can you make ads from the listing videos too?', a: 'Yes. We cut the reel into Meta and Instagram ad variants built to book viewings, with proper aspect ratios, hooks in the first two seconds, and a clear call to action. Ads are a separate line item from the edit.' },
+      { q: 'Can you make ads from the listing videos too?', a: 'Yes. We cut the reel into Meta and Instagram ad variants built to book viewings, with proper aspect ratios, hooks in the first two seconds, and a clear call to action. Ads are part of the Growth plan, which includes 6 ad creatives a month. The Presence Engine does not include ads.' },
       { q: 'What formats do you deliver for?', a: 'Vertical reels for Instagram, TikTok, and YouTube Shorts; horizontal cuts for YouTube and listing-site embeds; and MLS/portal-ready MP4 exports. One shoot, every format you list on.' },
       { q: 'I tried a videographer once and the turnaround killed me. How is this different?', a: 'That is the exact frustration this is built for. You get a 48-hour standard cycle, a shared folder you drop footage into, revisions until you are satisfied, and one team that knows real estate shot grammar, not a one-off freelancer you have to re-brief every time.' },
     ],
@@ -310,20 +310,6 @@ export const icps: IcpData[] = [
         'Monthly performance review so you see which listings pull leads',
         '20% off any custom app or software build (IDX tools, lead portals, agent CRMs)',
       ],
-      full: [
-        'Everything in Growth, scaled for a full listing pipeline',
-        'Long-form editing (full property tours, agent vlogs, market-update videos)',
-        'Just-listed and just-sold cut packages for every property',
-        'Personal-brand video library (agent intros, testimonials, area guides)',
-        'Company process optimization (listing intake, shoot-to-publish workflows)',
-        '30 social posts + 8 long-form market-guide blogs per month',
-        'Full listing-ad engine across Meta, Instagram, YouTube, Google',
-        'Custom listing or lead-capture site build each quarter (4 builds/year)',
-        'One small custom app build per quarter included (up to $9,997 scope, IDX or lead tools) + 30% off larger builds',
-        'Automation stack setup (lead routing, viewing bookings, CRM sync)',
-        'Dedicated account lead + bi-weekly strategy session',
-        'Live performance dashboard + monthly reporting',
-      ],
     },
   },
 
@@ -347,7 +333,7 @@ export const icps: IcpData[] = [
     heroHeadline: 'Your buyers decide before they ever contact you.',
     heroHeadlineAccent: 'Be there when they do.',
     heroSub:
-      'Most of the B2B decision happens before the first call: they read, they watch, they shortlist. We run the LinkedIn, video, blogs, and ads that put you in that window, as one team. You record once a month. We handle the rest.',
+      'Most of the B2B decision happens before the first call: they read, they watch, they shortlist. We edit the video and write the LinkedIn posts that put you in that window, as one team. Blogs and ad creative come with the Growth plan. You record, we handle the rest.',
     keywords: ['done-for-you content studio', 'founder-led content', 'content for SaaS founders', 'LinkedIn content for founders'],
     whyNow: {
       headline: 'Your buyers decide before they ever call.',
@@ -369,10 +355,10 @@ export const icps: IcpData[] = [
     pipeline: {
       input: { label: 'You record once', detail: 'One call, podcast, or 30 min to camera' },
       outputs: [
-        { label: 'LinkedIn posts', benefit: 'Where founder pipeline starts', count: '20/mo', kind: 'post' },
-        { label: 'Short-form video', benefit: 'Trust that closes long cycles', count: '12/mo', kind: 'reel' },
-        { label: 'SEO blogs', benefit: 'Ranks and compounds', count: '4/mo', kind: 'doc' },
-        { label: 'Ad creative', benefit: 'Amplifies what already works', count: '6/mo', kind: 'ad' },
+        { label: 'LinkedIn posts', benefit: 'Where founder pipeline starts', count: '8/mo', kind: 'post' },
+        { label: 'Short-form video', benefit: 'Trust that closes long cycles', count: '8-9/mo', kind: 'reel' },
+        { label: 'Extra clips from talks', benefit: 'Up to 5 a month, free', count: '5/mo', kind: 'video' },
+        { label: 'Site tune-up', benefit: 'Turns profile visits into calls', count: 'Month one', kind: 'site' },
       ],
       outcomes: ['Visibility', 'Inbound', 'Booked calls'],
     },
@@ -434,8 +420,8 @@ export const icps: IcpData[] = [
     ],
     starterStack: 'Start with LinkedIn & Social + Short-Form Video + Blog. Add Automations once volume justifies it.',
     faq: [
-      { q: 'Will the content actually sound like me, not a generic ghostwriter?', a: 'That is the whole point. We open with a 90-minute recorded voice interview to pull your actual words, opinions, and hot takes, then build a brand brief every writer and editor reads before touching a draft. If the first batch does not sound like you, we redo it at no charge.' },
-      { q: 'Can three people actually handle a full content pipeline?', a: 'The studio is owner-operated. Lakshya Soni runs it, Shaurya leads design, Aiman leads delivery, and every deliverable gets senior review before it reaches you. The volume in Growth and Full System is scoped to what that team ships on a 48-hour cycle, not stretched past what three people can actually review.' },
+      { q: 'Will the content actually sound like me, not a generic ghostwriter?', a: 'That is the whole point. We open with a recorded onboarding session of about an hour to pull your actual words, opinions, and hot takes, then build a brand brief every writer and editor reads before touching a draft. If the first batch does not sound like you, we redo it at no charge.' },
+      { q: 'Can three people actually handle a full content pipeline?', a: 'The studio is owner-operated. Lakshya Soni runs it, Shaurya leads design, Aiman leads delivery, and every deliverable gets senior review before it reaches you. The volume in Growth is scoped to what that team ships on a 48-hour cycle, not stretched past what three people can actually review.' },
       { q: 'I already work with a freelancer or two. Can you slot in?', a: 'Yes. Plenty of founders start by handing us the channel that is eating the most of their time, usually LinkedIn or video, and expand once they see the work. You do not have to fire anyone to start.' },
       { q: 'How much of my time does this take each month?', a: 'After onboarding, most founders spend 2 to 3 hours a month with us: one strategy call, batched approvals, and sending raw footage for video. The heavy lift is the onboarding interview up front. After that, you approve, we produce.' },
       { q: 'Do you lock me into a contract?', a: 'No. After the $299 14-day Pilot, plans are month-to-month, cancel with 14 days written notice. We would rather earn the next month than trap you in it.' },
@@ -476,20 +462,6 @@ export const icps: IcpData[] = [
         '48-hour turnaround on every deliverable, as standard',
         'Monthly performance review tied to inbound pipeline',
         '20% off any custom app or software build (MVPs, dashboards, internal tools)',
-      ],
-      full: [
-        'Everything in Growth, scaled for category authority',
-        'Long-form YouTube editing (founder vlogs, sponsored, educational deep-dives)',
-        'Podcast editing: full episodes + 8 to 12 highlight cuts each',
-        'Course or lead-magnet module editing (Kajabi, Teachable, Thinkific, Skool)',
-        'Company process optimization (SOPs, workflows, internal automations)',
-        '30 LinkedIn-led social posts + 8 long-form authority blogs per month',
-        'Full ad creative engine across LinkedIn, Meta, YouTube, Google',
-        'Custom website or inbound funnel build each quarter (4 builds/year)',
-        'One small custom app build per quarter included (up to $9,997 scope) + 30% off larger builds',
-        'Automation stack setup (Make.com, ManyChat, CRM lead routing)',
-        'Dedicated account lead + bi-weekly strategy session',
-        'Live performance dashboard + monthly reporting',
       ],
     },
   },
@@ -539,10 +511,10 @@ export const icps: IcpData[] = [
     pipeline: {
       input: { label: 'You teach one session', detail: 'A workshop, client call, or 30 min to camera' },
       outputs: [
-        { label: 'Evergreen short-form', benefit: 'Fills the funnel daily', count: '12/mo', kind: 'reel' },
-        { label: 'Nurture sequences', benefit: 'Sells while you teach', count: '8/mo', kind: 'mail' },
-        { label: 'Lead magnet + funnel', benefit: 'Turns viewers into leads', count: 'Built', kind: 'funnel' },
-        { label: 'Ad creative', benefit: 'Scales what converts', count: '6/mo', kind: 'ad' },
+        { label: 'Evergreen short-form', benefit: 'Fills the funnel every week', count: '8-9/mo', kind: 'reel' },
+        { label: 'Photo and carousel posts', benefit: 'Keeps you in the feed', count: '8/mo', kind: 'post' },
+        { label: 'Extra clips from sessions', benefit: 'Up to 5 a month, free', count: '5/mo', kind: 'video' },
+        { label: 'Site tune-up', benefit: 'Turns viewers into leads', count: 'Month one', kind: 'site' },
       ],
       outcomes: ['Audience', 'Applications', 'Enrolled'],
     },
@@ -654,20 +626,6 @@ export const icps: IcpData[] = [
         'Monthly performance review tied to opt-ins and enrollments',
         '20% off any custom app or software build (course platforms, membership portals, quiz funnels)',
       ],
-      full: [
-        'Everything in Growth, scaled for a bigger roster',
-        'Long-form editing (course modules, webinar replays, masterclass cuts)',
-        'Podcast editing: full episodes + 8 to 12 highlight cuts each',
-        'Course and membership module editing (Kajabi, Teachable, Thinkific, Skool)',
-        'Company process optimization (enrolment runbooks, nurture workflows, automations)',
-        '30 nurture-and-authority social posts + 8 long-form funnel blogs per month',
-        'Full paid-ad engine across Meta, Instagram, TikTok, YouTube',
-        'Custom funnel or membership site build each quarter (4 builds/year)',
-        'One small custom app build per quarter included (up to $9,997 scope, quiz or course tools) + 30% off larger builds',
-        'Automation stack setup (email nurture, DM flows, CRM enrollment sync)',
-        'Dedicated account lead + bi-weekly strategy session',
-        'Live performance dashboard + monthly reporting',
-      ],
     },
   },
 
@@ -712,10 +670,10 @@ export const icps: IcpData[] = [
         // roughly 85% shortfall between the pitch and the contract is.
         // The pricing was the truth and the pipeline was aspirational, so the
         // pipeline came down rather than the price going up.
-        { label: 'Static ad variants', benefit: 'Beats creative fatigue', count: '4/mo', kind: 'ad' },
-        { label: 'Video ads', benefit: 'Stops the scroll', count: '2/mo', kind: 'reel' },
-        { label: 'UGC-style edits', benefit: 'Converts colder traffic', count: '4/mo', kind: 'video' },
-        { label: 'Landing pages', benefit: 'Protects the click you paid for', count: 'Ongoing', kind: 'site' },
+        { label: 'Static ad variants', benefit: 'Growth plan. Beats creative fatigue', count: '4/mo', kind: 'ad' },
+        { label: 'Video ads', benefit: 'Growth plan. Stops the scroll', count: '2/mo', kind: 'reel' },
+        { label: 'Short-form edits', benefit: 'Growth plan. Converts colder traffic', count: '12/mo', kind: 'video' },
+        { label: 'Landing pages', benefit: 'Growth plan. Protects the click you paid for', count: 'Ongoing', kind: 'site' },
       ],
       outcomes: ['Fresh creative', 'Lower CPA', 'More orders'],
     },
@@ -823,12 +781,12 @@ export const icps: IcpData[] = [
       { value: '<2 sec', label: 'site load, where conversion meaningfully climbs' },
     ],
     pipeline: {
-      input: { label: 'You answer our questions', detail: 'One 30-minute interview a month' },
+      input: { label: 'You answer our questions', detail: 'A weekly call of 20 to 30 minutes' },
       outputs: [
-        { label: 'SEO blogs', benefit: 'Ranks for what buyers search', count: '4/mo', kind: 'doc' },
-        { label: 'Social posts', benefit: 'Keeps you top of mind with buyers', count: '20/mo', kind: 'post' },
-        { label: 'Short-form video', benefit: 'Puts a face to the business', count: '12/mo', kind: 'reel' },
-        { label: 'Site and lead capture', benefit: 'Converts the traffic you earn', count: 'Ongoing', kind: 'site' },
+        { label: 'Short-form video', benefit: 'Puts a face to the business', count: '8-9/mo', kind: 'reel' },
+        { label: 'Photo and carousel posts', benefit: 'Keeps you top of mind with buyers', count: '8/mo', kind: 'post' },
+        { label: 'Extra clips from your footage', benefit: 'Up to 5 a month, free', count: '5/mo', kind: 'video' },
+        { label: 'Site, Google profile, structured data', benefit: 'Found when buyers search', count: 'Ongoing', kind: 'site' },
       ],
       outcomes: ['Found in search', 'Enquiries', 'Booked work'],
     },

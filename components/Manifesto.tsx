@@ -1,164 +1,67 @@
-'use client';
+import { PRESENCE, PROMISES } from '@/lib/pricing';
 
-import { motion } from 'framer-motion';
-
-const lines = [
-  { parts: [{ text: 'We handle your content.', muted: true }, { text: ' Marketing and post-production.', accent: true }], arrow: true },
-  { parts: [{ text: 'Built around your offer.' }, { text: ' Not a template.', accent: true }] },
-  { parts: [{ text: 'Done-for-you marketing.', accent: true }, { text: ' Run by operators.' }], arrow: true },
-  { parts: [{ text: 'Get your time back.' }, { text: ' Hours', accent: true }, { text: ' every week.', accent: true }] },
+/**
+ * "How it works in one week". Replaces the four slogan lines that used to sit
+ * here. Three facts a buyer can check, taken from lib/pricing.ts: the counts
+ * are PRESENCE.scope, the timings are PROMISES. If those change, change this.
+ * The export keeps the name Manifesto so HomeClient's import still works.
+ */
+const columns = [
+  {
+    title: 'What you send',
+    lines: [
+      'Raw footage from your phone, a link, or 10 minutes of your time.',
+      'On the monthly plan, add a 20 to 30 minute call each week.',
+    ],
+  },
+  {
+    title: 'What comes back',
+    lines: [
+      'Each month on the ' + PRESENCE.priceLabel + ' plan: 8 to 9 short-form videos, 8 photo or carousel posts and up to 5 extra clips cut from footage you already have.',
+      'A website tune-up in month one, then upgrades.',
+    ],
+  },
+  {
+    title: 'When',
+    lines: [
+      PROMISES.turnaround + '.',
+      PROMISES.replies + '.',
+    ],
+  },
 ];
 
 export default function Manifesto() {
-  // Note: previous GSAP + ScrollTrigger intro was replaced with Framer Motion
-  // whileInView. The old setup interacted badly with the Lenis smooth-scroll
-  // wrapper inside this dynamic-imported chunk, occasionally locking page
-  // scroll. Framer Motion's IntersectionObserver-based whileInView is the
-  // safer pattern here and renders identically.
-
   return (
-    <section
-      data-dark-bg="true"
-      className="manifesto-section"
-      style={{
-        padding: '128px 56px',
-        background: '#0C0C0B',
-        overflow: 'hidden',
-        position: 'relative',
-      }}
-    >
-      <div
-        className="manifesto-glow"
-        style={{
-          position: 'absolute',
-          inset: 0,
-          background: 'radial-gradient(ellipse at 80% 50%, rgba(232,84,26,0.06) 0%, transparent 60%)',
-          pointerEvents: 'none',
-        }}
-      />
-      <div
-        className="manifesto-eyebrow"
-        style={{
-          fontSize: '10px',
-          fontWeight: 600,
-          letterSpacing: '4px',
-          textTransform: 'uppercase',
-          color: 'rgba(242,238,231,0.28)',
-          marginBottom: '20px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '14px',
-        }}
-      >
-        <span style={{ width: '22px', height: '1px', background: '#E8541A', display: 'block' }} />
-        How we work
-      </div>
-
-      <div style={{ maxWidth: '1080px' }}>
-        {lines.map((line, i) => (
-          <div
-            key={i}
-            style={{
-              overflow: 'hidden',
-              borderBottom: i < lines.length - 1 ? '1px solid rgba(255,255,255,0.06)' : 'none',
-            }}
-          >
-            <motion.div
-              className="manifesto-line"
-              initial={{ y: '100%', opacity: 0 }}
-              whileInView={{ y: '0%', opacity: 1 }}
-              // Tight bottom margin so EACH line waits until it's clearly
-              // entering the viewport before animating — no more "all four
-              // lines pop in together" on mobile, where the section is tall
-              // relative to the screen. Each line gets its own scroll moment.
-              viewport={{ once: true, margin: '0px 0px -25% 0px' }}
-              // No per-line delay — each line is gated by its own scroll
-              // trigger now, so a stacked delay would compound the wait.
-              transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-              style={{
-                fontFamily: 'Inter, sans-serif',
-                fontSize: 'clamp(34px, 5.2vw, 80px)',
-                fontWeight: 900,
-                letterSpacing: '-2px',
-                lineHeight: 1.06,
-                display: 'flex',
-                alignItems: 'baseline',
-                gap: '18px',
-                flexWrap: 'wrap',
-                padding: '24px 0',
-                color: '#F2EEE7',
-              }}
-            >
-              {line.parts.map((part, j) => (
-                <span
-                  key={j}
-                  style={{
-                    color: part.accent ? '#E8541A' : (part as { muted?: boolean }).muted ? 'rgba(242,238,231,0.18)' : '#F2EEE7',
-                  }}
-                >
-                  {part.text}
-                </span>
-              ))}
-              {line.arrow && (
-                <svg
-                  aria-hidden="true"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="#E8541A"
-                  strokeWidth="2.4"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  style={{
-                    width: '0.55em',
-                    height: '0.55em',
-                    marginLeft: 'auto',
-                    opacity: 0.85,
-                    flexShrink: 0,
-                  }}
-                >
-                  <path d="M7 17L17 7M17 7H8M17 7V16" />
-                </svg>
-              )}
-            </motion.div>
-          </div>
-        ))}
-      </div>
-
+    <section className="mf-section" aria-labelledby="mf-heading">
       <style>{`
-        /* ── Mobile polish for Manifesto ──
-           Pulls in the section padding and tones down the ambient gradient
-           on phones. Typography for .manifesto-line is handled in
-           globals.css (display:block + clamp font-size) so words flow as
-           a natural sentence instead of wrapping word-by-word. */
-        /* ── Mobile app-UI tightening ──
-           Goal: full manifesto + CTA fit ~one viewport on a 375×800 phone.
-           Section padding cut nearly in half, line spacing tightened,
-           eyebrow margin reduced. */
-        @media (max-width: 900px) {
-          .manifesto-section { padding: 64px 28px !important; }
-        }
-        @media (max-width: 640px) {
-          .manifesto-section { padding: 48px 20px !important; }
-          .manifesto-eyebrow {
-            margin-bottom: 10px !important;
-            /* 9px + 3px tracking on a dark background is at the edge of
-               legible on a phone. 10.5px costs no vertical space. */
-            font-size: 10.5px !important;
-            letter-spacing: 2.5px !important;
-          }
-          /* Arrow icon: don't shove right on mobile, nest tight to text. */
-          .manifesto-line > svg {
-            margin-left: 4px !important;
-            opacity: 0.7 !important;
-          }
-          /* Soften the ambient orange glow — cheap paint on small screens. */
-          .manifesto-glow { opacity: 0.55 !important; }
-        }
-        @media (max-width: 380px) {
-          .manifesto-section { padding: 40px 16px !important; }
-          .manifesto-eyebrow { margin-bottom: 8px !important; }
+        .mf-section { background: #F2EEE7; color: #0C0C0B; font-family: Inter, sans-serif; padding: 72px 24px 64px; }
+        .mf-wrap { max-width: 1120px; margin: 0 auto; }
+        .mf-h2 { font-size: clamp(30px, 4.2vw, 48px); font-weight: 800; letter-spacing: -0.035em; line-height: 1.08; margin: 0 0 32px; max-width: 20ch; }
+        .mf-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+        .mf-item { border-top: 2px solid #0C0C0B; padding: 20px 8px 0 0; }
+        .mf-num { font-size: 13px; font-weight: 700; letter-spacing: 0.04em; color: #B23A0C; margin: 0 0 8px; }
+        .mf-title { font-size: 22px; font-weight: 800; letter-spacing: -0.02em; margin: 0 0 12px; }
+        .mf-item p.mf-line { font-size: 16px; line-height: 1.6; color: #2E2C28; margin: 0 0 8px; max-width: 62ch; }
+        @media (max-width: 800px) {
+          .mf-section { padding: 56px 16px 56px; }
+          .mf-h2 { margin-bottom: 28px; }
+          .mf-list { grid-template-columns: 1fr; gap: 24px; }
         }
       `}</style>
+      <div className="mf-wrap">
+        <h2 id="mf-heading" className="mf-h2">How it works in one week</h2>
+        <ol className="mf-list">
+          {columns.map((c, i) => (
+            <li key={c.title} className="mf-item">
+              <p className="mf-num">{String(i + 1).padStart(2, '0')}</p>
+              <h3 className="mf-title">{c.title}</h3>
+              {c.lines.map((l) => (
+                <p key={l} className="mf-line">{l}</p>
+              ))}
+            </li>
+          ))}
+        </ol>
+      </div>
     </section>
   );
 }

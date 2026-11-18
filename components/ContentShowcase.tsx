@@ -126,7 +126,7 @@ export default function ContentShowcase() {
             transition={{ delay:0.15, duration:0.7 }}
             style={{ fontSize:'16px', color:'#6E6B63', lineHeight:1.75, maxWidth:'460px', margin:'0 0 40px' }}
           >
-            We run a 90-minute recorded voice interview with every founder so the LinkedIn posts, blogs, video scripts, and ad copy we produce sound like you. Not like a junior copywriter or ChatGPT. Free strategy call to see how it works.
+            We run a recorded onboarding session of about an hour with every founder so the LinkedIn posts, blogs, video scripts, and ad copy we produce sound like you. Not like a junior copywriter or ChatGPT. Free strategy call to see how it works.
           </motion.p>
 
           {/* Pain → Gain rows */}

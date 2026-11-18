@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect, useCallback, useMemo, useTransition } from 'react';
 import { motion } from 'framer-motion';
 import { videos, previewMp4Src, type Orientation, type VideoEntry } from '@/lib/videos';
-import { BOOK_CALL_LABEL } from '@/lib/links';
+import Link from 'next/link';
 
 // ─── Tab definitions ────────────────────────────────────────────────────────
 const tabs = [
@@ -406,7 +406,7 @@ export default function OurWork() {
   }, []);
 
   return (
-    <section ref={sectionRef} id="work" style={{ padding: '140px 0 100px', scrollMarginTop: '80px', background: '#F2EEE7', overflow: 'hidden' }}>
+    <section ref={sectionRef} id="work" style={{ padding: '72px 0 72px', scrollMarginTop: '80px', background: '#0C0C0B', overflow: 'hidden' }} data-dark-bg="true">
       <style>{`
         .work-track-outer { overflow: hidden; position: relative; }
         .work-track {
@@ -477,31 +477,30 @@ export default function OurWork() {
         .work-arrow {
           position: absolute; top: 50%; transform: translateY(-50%);
           width: 48px; height: 48px; border-radius: 50%;
-          background: #0C0C0B; border: none;
+          background: #F2EEE7; border: none;
           display: flex; align-items: center; justify-content: center;
           cursor: none; z-index: 10;
-          box-shadow: 0 4px 24px rgba(12,12,11,0.2);
           transition: background 0.25s, transform 0.25s;
         }
+        .work-arrow:focus-visible { outline: 3px solid #E8541A; outline-offset: 3px; }
         .work-arrow:hover { background: #E8541A; transform: translateY(-50%) scale(1.08); }
         .work-arrow-left  { left: 12px; }
         .work-arrow-right { right: 12px; }
 
         /* Tab bar */
         .tab-bar {
-          background: rgba(255,255,255,0.65);
-          backdrop-filter: blur(20px);
-          -webkit-backdrop-filter: blur(20px);
-          border: 1px solid rgba(255,255,255,0.82);
+          background: rgba(242,238,231,0.08);
+          border: 1px solid rgba(242,238,231,0.2);
           border-radius: 14px; padding: 5px;
           display: inline-flex; gap: 2px;
-          box-shadow: 0 4px 20px rgba(12,12,11,0.07), inset 0 1px 0 rgba(255,255,255,0.9);
-          max-width: 100%; overflow-x: auto; scrollbar-width: none;
+                    max-width: 100%; overflow-x: auto; scrollbar-width: none;
         }
         .tab-bar::-webkit-scrollbar { display: none; }
+        .work-see-all:hover { background: #E8541A !important; }
+        .work-see-all:focus-visible { outline: 3px solid #E8541A; outline-offset: 3px; }
         .tab-btn {
           position: relative;
-          background: none; border: none; color: #6E6B63;
+          background: none; border: none; color: #B8B2A6;
           padding: 9px 18px; font-size: 11px; font-weight: 700;
           cursor: none; border-radius: 10px;
           transition: color 0.22s ease;
@@ -509,14 +508,14 @@ export default function OurWork() {
           font-family: Inter, sans-serif;
           isolation: isolate;
         }
-        .tab-btn.active { color: #F2EEE7; }
-        .tab-btn:not(.active):hover { color: #0C0C0B; }
+        .tab-btn.active { color: #0C0C0B; }
+        .tab-btn:not(.active):hover { color: #F2EEE7; }
+        .tab-btn:focus-visible { outline: 3px solid #E8541A; outline-offset: 2px; }
         .tab-btn-label { position: relative; z-index: 1; display: inline-flex; align-items: center; }
         .tab-pill-bg {
           position: absolute; inset: 0;
-          background: #0C0C0B;
+          background: #F2EEE7;
           border-radius: 10px;
-          box-shadow: 0 2px 12px rgba(12,12,11,0.22);
           z-index: 0;
           /* Pre-promote to its own compositor layer so the framer-motion
              FLIP animation (transform under the hood) runs on the GPU
@@ -527,14 +526,14 @@ export default function OurWork() {
       `}</style>
 
       {/* ── Header ── */}
-      <div className="work-header" style={{ padding: '0 56px', marginBottom: '48px' }}>
+      <div className="work-header" style={{ padding: '0 max(24px, calc((100% - 1120px) / 2))', marginBottom: '32px' }}>
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: '32px', flexWrap: 'wrap' }}>
           <div>
             <motion.div
               initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '4px', textTransform: 'uppercase', color: '#6E6B63', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '14px' }}
+              style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '4px', textTransform: 'uppercase', color: '#B8B2A6', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '14px' }}
             >
               <span style={{ width: '22px', height: '1px', background: '#E8541A', display: 'block' }} />
               Portfolio
@@ -544,25 +543,16 @@ export default function OurWork() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-              style={{ fontFamily: 'Inter, sans-serif', fontSize: 'clamp(64px, 9vw, 120px)', fontWeight: 900, letterSpacing: '-4px', lineHeight: 0.88, margin: 0 }}
+              style={{ fontFamily: 'Inter, sans-serif', fontSize: 'clamp(36px, 5.2vw, 64px)', fontWeight: 800, letterSpacing: '-0.035em', lineHeight: 1.05, margin: 0, color: '#F2EEE7' }}
             >
-              The<br />
-              <span style={{ color: '#E8541A' }}>Craft.</span>
+              Edits you can <span style={{ color: '#E8541A' }}>watch.</span>
             </motion.h2>
           </div>
 
           <motion.div initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }}>
-            <p style={{ color: '#6E6B63', fontSize: '14px', lineHeight: 1.75, margin: '0 0 20px', maxWidth: '270px' }}>
-              Cinematic edits, motion graphics, talking-head reels, podcast cuts, and ad creative. Every clip here was cut by Lakshya. Send yours and get 2 back free.
+            <p style={{ color: '#B8B2A6', fontSize: '16px', lineHeight: 1.6, margin: 0, maxWidth: '34ch' }}>
+              Every clip here was cut by us. Send yours and get 2 back free.
             </p>
-            <div className="work-stats" style={{ display: 'flex', gap: '28px' }}>
-              {[{ n: '48hrs', l: 'Standard turnaround' }, { n: '6', l: 'Service formats' }].map(s => (
-                <div key={s.l}>
-                  <div style={{ fontFamily: 'Inter', fontSize: '22px', fontWeight: 900, letterSpacing: '-1px', color: '#0C0C0B' }}>{s.n}</div>
-                  <div style={{ fontSize: '10px', color: '#A8A49B', marginTop: '2px', fontWeight: 500 }}>{s.l}</div>
-                </div>
-              ))}
-            </div>
           </motion.div>
         </div>
       </div>
@@ -574,7 +564,7 @@ export default function OurWork() {
         viewport={{ once: true }}
         transition={{ duration: 0.5 }}
         className="work-tabs"
-        style={{ padding: '0 56px', marginBottom: '28px' }}
+        style={{ padding: '0 max(24px, calc((100% - 1120px) / 2))', marginBottom: '28px' }}
       >
         <div className="tab-bar">
           {tabs.map(tab => {
@@ -618,7 +608,7 @@ export default function OurWork() {
       {/* ── Carousel ── */}
       <div style={{ position: 'relative' }}>
         <button className="work-arrow work-arrow-left" onClick={() => scrollBy(-1)} aria-label="Previous">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F2EEE7" strokeWidth="2.5" strokeLinecap="round"><path d="M19 12H5M12 19l-7-7 7-7" /></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0C0C0B" strokeWidth="2.5" strokeLinecap="round"><path d="M19 12H5M12 19l-7-7 7-7" /></svg>
         </button>
 
         {/* Outer clip container — IntersectionObserver root */}
@@ -701,7 +691,7 @@ export default function OurWork() {
         </div>
 
         <button className="work-arrow work-arrow-right" onClick={() => scrollBy(1)} aria-label="Next">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F2EEE7" strokeWidth="2.5" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0C0C0B" strokeWidth="2.5" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
         </button>
       </div>
 
@@ -715,25 +705,21 @@ export default function OurWork() {
         initial={{ opacity: 0, y: 16 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
-        style={{ display: 'flex', justifyContent: 'center', marginTop: '48px', gap: '16px', flexWrap: 'wrap', alignItems: 'center', padding: '0 56px' }}
+        style={{ display: 'flex', justifyContent: 'center', marginTop: '40px', gap: '16px', flexWrap: 'wrap', alignItems: 'center', padding: '0 56px' }}
       >
-        <button
-          type="button"
-          onClick={() => (window as unknown as { openBookCallModal?: () => void }).openBookCallModal?.()}
-          data-cursor-hover
-          style={{ background: '#0C0C0B', color: '#F2EEE7', padding: '14px 32px', borderRadius: '100px', fontSize: '13px', fontWeight: 700, cursor: 'none', transition: 'all 0.3s', border: 'none', fontFamily: 'Inter, sans-serif', display: 'inline-flex', alignItems: 'center', gap: '8px', minHeight: '44px' }}
-          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#E8541A'; }}
-          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#0C0C0B'; }}
+        <Link
+          href="/work"
+          className="work-see-all"
+          style={{ background: '#F2EEE7', color: '#0C0C0B', padding: '14px 32px', borderRadius: '100px', fontSize: '14px', fontWeight: 700, textDecoration: 'none', fontFamily: 'Inter, sans-serif', display: 'inline-flex', alignItems: 'center', gap: '8px', minHeight: '48px' }}
         >
-          {BOOK_CALL_LABEL}
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-        </button>
+          See all work
+        </Link>
       </motion.div>
 
       {/* ── Responsive overrides ── */}
       <style>{`
         @media(max-width:900px) {
-          #work { padding: 80px 0 70px !important; }
+          #work { padding: 72px 0 64px !important; }
         }
         /* ── Mobile app-UI tightening ─────────────────────────────
            Goal: section fits ~one viewport on a 375×800 phone.
@@ -742,7 +728,7 @@ export default function OurWork() {
            fold. Cards shrunk to 180px so 2 fit horizontally pre-scroll.
         ─────────────────────────────────────────────────────────── */
         @media(max-width:640px) {
-          #work { padding: 48px 0 44px !important; }
+          #work { padding: 56px 0 56px !important; }
           .work-arrow { display:none !important; }
 
           .work-tabs { padding: 0 14px !important; margin-bottom: 16px !important; }
@@ -771,9 +757,8 @@ export default function OurWork() {
           .work-header { padding: 0 20px !important; margin-bottom: 20px !important; }
           .work-header > div { flex-direction: column !important; align-items: flex-start !important; gap: 10px !important; }
           .work-header > div > div > div:first-child { margin-bottom: 12px !important; } /* eyebrow margin */
-          .work-header h2 { font-size: 44px !important; letter-spacing: -1.6px !important; line-height: 0.95 !important; }
-          .work-header p  { max-width: none !important; font-size: 13px !important; line-height: 1.5 !important; margin-top: 12px !important; }
-          .work-stats     { display: none !important; }
+          .work-header h2 { font-size: 32px !important; letter-spacing: -0.035em !important; line-height: 1.08 !important; }
+          .work-header p  { max-width: none !important; font-size: 15px !important; line-height: 1.5 !important; margin-top: 12px !important; }
           .work-cta-wrap  { margin-top: 24px !important; padding: 0 20px !important; }
 
           .work-modal       { padding: 12px !important; }
@@ -786,7 +771,7 @@ export default function OurWork() {
         }
         @media(max-width:380px) {
           #work { padding: 40px 0 36px !important; }
-          .work-header h2           { font-size: 38px !important; letter-spacing: -1.3px !important; }
+          .work-header h2           { font-size: 30px !important; }
           .work-header { margin-bottom: 16px !important; }
           .tab-btn                  { font-size: 8.5px !important; }
           .vid-card                 { height: 168px !important; }

@@ -210,12 +210,8 @@ const promisesDefault: Promise[] = [
     stat: '__PILOT_PRICE__',
     statLabel: 'Pilot to start',
     headline: 'Try first. Commit when convinced.',
-    // The scope here used to read "8 short-form and 5 clipped content pieces,
-    // 5 long-form blogs", which is 18 deliverables. The audience pages and the
-    // homepage FAQ both describe 21. The two statics and the carousel were
-    // being quietly dropped on every service page, so a buyer who read a
-    // service page and then an audience page was quoted two different Pilots
-    // for the same $299. The audience-page list is canonical.
+    // Scope mirrors PILOT.scope in lib/pricing.ts (6 edits, 2 posts, 1 blog,
+    // onboarding session, audit and 30-day plan). Keep it in step with that file.
     body: 'Send footage and get 2 edited videos free within 48 hours. Then a two-week Pilot at __PILOT_PRICE__: an onboarding session, 6 short-form videos, 2 posts, 1 sourced SEO blog, a content audit and a 30-day plan. See the quality before any monthly plan.',
   },
 ];
@@ -223,7 +219,8 @@ const promisesDefault: Promise[] = [
 /**
  * Pilot overrides for the two services where a content Pilot makes no sense.
  *
- * The default Pilot buys 21 pieces of content. Selling that to someone who
+ * The default Pilot is the content Pilot (PILOT in lib/pricing.ts: 6 video edits,
+ * 2 posts, 1 blog, a strategy session, an audit and a plan). Selling that to someone who
  * came to the page for an automation build or a custom app is answering a
  * question they did not ask, and it was the same block on all seven services.
  * Both of these describe the same $299, the same 14 days and the same
@@ -286,7 +283,7 @@ const promisesWebsites: Promise[] = [
 function getPromisesForSlug(slug: string): Promise[] {
   if (slug === 'websites-funnels') return promisesWebsites;
   // Same three guarantees, service-appropriate fourth card. The default
-  // fourth card sells 21 pieces of content, which is not what someone on the
+  // fourth card sells the content Pilot, which is not what someone on the
   // automations or apps page is buying.
   if (slug === 'automations') return [...promisesDefault.slice(0, 3), pilotAutomations];
   if (slug === 'apps-software') return [...promisesDefault.slice(0, 3), pilotApps];
@@ -615,17 +612,11 @@ export default function ServicePageClient({ service, guides = [] }: { service: S
     `${localCurrency}${localPrices.pilot}`,
   );
 
-  // Service-aware booking trigger. If the service has its own Cal.com URL
-  // set (e.g. a dedicated "Website Strategy Call" event), open it in a new
-  // tab so it pre-fills the right event type. Otherwise fall back to the
-  // global modal which uses the default call URL from lib/links.ts.
+  // Every booking button on every service page opens the same booking modal
+  // (BookCallModal, the one canonical Cal.com event in lib/links.ts).
   const bookCall = () => {
     // These three buttons were the only untracked booking CTAs on the site.
     trackCallClick(`service_${service.slug}`);
-    if (service.bookCallUrl) {
-      window.open(service.bookCallUrl, '_blank', 'noopener,noreferrer');
-      return;
-    }
     (window as unknown as { openBookCallModal?: () => void }).openBookCallModal?.();
   };
 

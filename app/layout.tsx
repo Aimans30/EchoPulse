@@ -6,7 +6,6 @@ import ConsentGate from "@/components/ConsentGate";
 import SmoothScroll from "@/components/SmoothScroll";
 import Cursor from "@/components/Cursor";
 import EmojiNormalizer from "@/components/EmojiNormalizer";
-import PilotPopup from "@/components/PilotPopup";
 import AnalyticsProvider from "@/components/AnalyticsProvider";
 import BookCallModal from "@/components/BookCallModal";
 import MobileStickyCTA from "@/components/MobileStickyCTA";
@@ -290,8 +289,6 @@ export default function RootLayout({
             <Cursor />
             {children}
           </SmoothScroll>
-          {/* Desktop-leaning Pilot popup — auto-shows after a delay or scroll past hero */}
-          <PilotPopup />
           {/* Normalizes every emoji in the DOM to Twemoji SVGs for consistent rendering. */}
           <EmojiNormalizer />
           {/* Analytics — scroll milestones, Calendly book listener, Clarity loader */}

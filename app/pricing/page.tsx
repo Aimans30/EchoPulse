@@ -59,9 +59,9 @@ const COMPARE: { label: string; cells: [string, string, string, string] }[] = [
   { label: 'Price', cells: [FREE_SAMPLE.priceLabel, PILOT.priceLabel, PRESENCE.priceLabel, GROWTH.priceLabel] },
   { label: 'Billing', cells: ['No card, no call', 'One-off, 14 days', 'Monthly, cancel with 14 days notice', 'Monthly, cancel with 14 days notice'] },
   { label: 'Strategy calls', cells: ['None', '60-minute onboarding session, recorded', '20 to 30 minutes every week', 'Onboarding session, then monthly, plus a quarterly brief refresh'] },
-  { label: 'Short-form video edits', cells: ['2', '5', '8 to 9 a month, plus up to 5 extra clips from existing footage', '12 edits plus 12 clips a month'] },
+  { label: 'Short-form video edits', cells: ['2', '6', '8 to 9 a month, plus up to 5 extra clips from existing footage', '12 edits plus 12 clips a month'] },
   { label: 'Long-form video edits', cells: ['None', 'None', 'None', '2 a month (YouTube, podcast, listing tours)'] },
-  { label: 'Photo and carousel posts', cells: ['None', '3', '8 a month', '20 social posts a month across platforms'] },
+  { label: 'Photo and carousel posts', cells: ['None', '2', '8 a month', '20 social posts a month across platforms'] },
   { label: 'Long-form SEO blogs', cells: ['None', '1 (1,500 words, sourced)', 'None', '4 a month (1,500 to 2,500 words, sourced)'] },
   { label: 'Ad creatives', cells: ['None', 'None', 'None', '6 a month (4 static, 2 video)'] },
   { label: 'Website', cells: ['None', 'None', 'Free tune-up in month one, then ongoing upgrades', 'Rebuilt in month one, tuned every month after'] },
@@ -86,7 +86,7 @@ const NOT_INCLUDED: { title: string; body: string }[] = [
 /** Which ICP each plan usually suits, with a link to that audience page. */
 const FIT: { icpKey: string; plan: string; why: string }[] = [
   { icpKey: 'founders', plan: `${PRESENCE.name} or ${GROWTH.name}`, why: 'Founders usually start on Presence Engine for a weekly video and post cadence, and move to Growth when blogs and ad creative need to run alongside.' },
-  { icpKey: 'coaches', plan: `${PILOT.name}, then ${PRESENCE.name}`, why: 'Coaches have recorded sessions and workshops already. The Pilot turns one into five clips in 14 days, and Presence keeps that going every week.' },
+  { icpKey: 'coaches', plan: `${PILOT.name}, then ${PRESENCE.name}`, why: 'Coaches have recorded sessions and workshops already. The Pilot turns one into six edited clips in 14 days, and Presence keeps that going every week.' },
   { icpKey: 'real-estate', plan: PRESENCE.name, why: 'Listing tours, walkthroughs and agent intros on a weekly rhythm, plus the Google Business Profile and site work that gets you found locally.' },
   { icpKey: 'business-owners', plan: PRESENCE.name, why: 'One person you can call every week who runs your content and keeps your website current, at a price that does not need a marketing budget line.' },
   { icpKey: 'dtc', plan: GROWTH.name, why: 'Ad creative volume is what DTC needs. Growth is the only plan with ad creatives in it, and the website and funnel work protects the click you paid for.' },
@@ -107,7 +107,7 @@ const FAQ: { q: string; a: string }[] = [
   },
   {
     q: 'What currency are prices in, and do they change by country?',
-    a: 'All prices are in US dollars and are the same everywhere. Clients in the UK, Canada, Australia and the EU pay the USD amount; your card issuer converts it at its rate. Prices shown do not include any sales tax or VAT that your country requires you to self-account for.',
+    a: 'All prices are in US dollars and are the same everywhere. Clients in the UK, Canada, Australia and Western Europe pay the USD amount; your card issuer converts it at its rate. Prices shown do not include any sales tax or VAT that your country requires you to self-account for.',
   },
   {
     q: 'How do I pay?',
@@ -420,7 +420,7 @@ export default function PricingPage() {
         <section className="pr-cta">
           <h2 className="pr-h2">Not sure which one? Ask.</h2>
           <p>
-            Thirty minutes. We look at what you already have, tell you which step makes sense,
+            A free 15-minute call. We look at what you already have, tell you which step makes sense,
             and if the answer is &quot;none of them yet&quot; we say so.
           </p>
           <div className="pr-card-cta">
