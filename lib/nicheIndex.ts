@@ -11,7 +11,8 @@ export type NicheServiceSlug =
   | 'video-editing'
   | 'linkedin-ghostwriting'
   | 'websites-funnels'
-  | 'ad-creatives';
+  | 'ad-creatives'
+  | 'personal-branding';
 
 export interface NicheIndexEntry {
   icp: IcpKey;
@@ -28,6 +29,7 @@ export const NICHE_INDEX: NicheIndexEntry[] = [
   { icp: 'coaches', service: 'linkedin-ghostwriting', h1: 'LinkedIn ghostwriting for coaches' },
   { icp: 'coaches', service: 'websites-funnels', h1: 'Websites and funnels for coaches' },
   { icp: 'founders', service: 'linkedin-ghostwriting', h1: 'LinkedIn ghostwriting for founders' },
+  { icp: 'founders', service: 'personal-branding', h1: 'Personal branding for founders' },
   { icp: 'founders', service: 'video-editing', h1: 'Video editing for founders' },
   { icp: 'dtc', service: 'ad-creatives', h1: 'Ad creatives for DTC brands' },
   { icp: 'dtc', service: 'video-editing', h1: 'Video editing for DTC and e-commerce brands' },

@@ -15,7 +15,7 @@ import { FREE_SAMPLE, PILOT, PRESENCE, GROWTH, FULL_SYSTEM, PROMISES, type Plan 
  * Prices are never typed as numbers in the price table: the table reads the
  * Plan objects. Where a sentence quotes a price it interpolates the constant.
  *
- * Only the 12 combinations in NICHE_PAGES exist. app/[icp]/[service]/page.tsx
+ * Only the 13 combinations in NICHE_PAGES exist. app/[icp]/[service]/page.tsx
  * sets dynamicParams = false, so every other combination 404s.
  *
  * Source conflicts found while writing: serviceData used to say ad creatives
@@ -90,6 +90,10 @@ export interface NichePage {
   notFit: string[];
   faq: NicheFaq[];
   posts: NicheBlogPost[];
+  /** Replaces the default link to /services/{service} when no page of that slug exists. */
+  serviceLink?: { href: string; label: string };
+  /** Extra links under "On this site". */
+  extraLinks?: { href: string; label: string }[];
 }
 
 // Short handles so the copy below reads naturally and every number stays tied
@@ -830,6 +834,118 @@ const RAW_PAGES: NichePageRaw[] = [
       { slug: 'personal-branding-agency-vs-ghostwriter', title: 'Personal Branding Agency vs Ghostwriter: Which to Hire' },
       { slug: 'linkedin-personal-profile-vs-company-page-2026', title: 'LinkedIn Personal Profile vs Company Page: Profiles Win' },
     ],
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // 7b. founders / personal-branding
+  // No results, client names or testimonials: EchoPulse has no personal-brand
+  // case study. The only checkable thing offered is the free sample.
+  // ─────────────────────────────────────────────────────────────────────────
+  {
+    icp: 'founders',
+    service: 'personal-branding',
+    buyer: 'founders',
+    serviceName: 'Personal branding',
+    metaTitle: 'Personal Branding for Founders',
+    metaDescription: `Personal branding for founders: LinkedIn posts, short videos and a tuned website, run by Lakshya Soni. Free 2-edit sample, ${PILOT_P} Pilot, from ${PRES_P} a month.`,
+    capsule: `EchoPulse builds a founder's personal brand by writing LinkedIn posts and carousels from a recorded interview and editing short videos from footage you already have. Lakshya Soni, the founder, runs it with Shaurya on design and Aiman on delivery. Start with a free sample of 2 edits, then the ${PILOT_P} Pilot (14 days), ${PRES_P} a month for Presence Engine, or ${GROW_P} a month for Growth. Plans are month-to-month.`,
+    getHeading: 'What you get',
+    deliverables: [
+      {
+        title: 'Posts and carousels in your voice',
+        body: 'Written from a recorded interview and a brand brief every writer reads first. Nothing goes out until you approve it. The Pilot has 2, Presence Engine has 8 a month, and Growth has 20 social posts a month.',
+      },
+      {
+        title: 'Short videos from footage you already have',
+        body: 'Talks, calls, podcasts or phone clips, cut with captions, hooks and music. Presence Engine has 8 to 9 a month, plus up to 5 extra clips.',
+      },
+      {
+        title: 'A brand brief you keep',
+        body: 'Your offer, who you are talking to, your stories and the phrases you never use. It is yours whether or not you keep working with us.',
+      },
+      {
+        title: 'A website tune-up',
+        body: 'Presence Engine includes a free website tune-up in month one, so the page people land on from your posts says the same thing you do.',
+      },
+      {
+        title: 'A weekly call on Presence Engine',
+        body: 'A 20 to 30 minute call every week to plan the week, go over the numbers and decide what to change.',
+      },
+    ],
+    steps: [
+      {
+        title: 'Free sample',
+        body: `Send footage you already have. 2 edited videos come back within ${T48}, with no card and no call. You keep the files.`,
+      },
+      {
+        title: `${PILOT_P} Pilot`,
+        body: '14 days of real work on your brand: a recorded onboarding session, a brand brief, 2 posts, 6 short-form edits, 1 blog, a content audit and a 30-day plan. You keep all of it.',
+      },
+      {
+        title: `${PRES_P} a month`,
+        body: 'Presence Engine, month-to-month. A calendar you approve, a weekly call, posts, videos and the website tune-up.',
+      },
+      {
+        title: `${GROW_P} a month`,
+        body: 'Growth, month-to-month. More of everything, including 4 SEO blogs a month and 6 ad creatives.',
+      },
+    ],
+    ladder: {
+      free: 'Not writing. 2 edited videos from footage you already have, so you can judge the work before paying.',
+      pilot: '2 posts or carousels in your voice from a recorded onboarding session, 6 short-form edits, 1 sourced blog, a content audit and a 30-day plan, over 14 days.',
+      presence: '8 to 9 short-form videos and 8 photo or carousel posts a month, a weekly call, a posting plan and a website tune-up in month one.',
+      growth: '20 social posts, 4 SEO blogs, 12 short-form edits plus 12 clips, 6 ad creatives and a monthly review.',
+      custom: 'More volume, podcast or YouTube editing at scale, or a build alongside. Scoped in writing with a fixed price before you pay.',
+    },
+    ladderNote: 'Prices are per month and you can cancel with 14 days notice after the Pilot.',
+    proof: {
+      heading: 'What we can and cannot show',
+      paragraphs: [
+        'We have no personal-branding case study yet, so this page claims no results and shows no testimonials. We do not guarantee followers, leads or revenue.',
+        'What you can check yourself is the free sample: send footage, get 2 edited videos back, and judge the standard before you spend anything.',
+      ],
+      links: [{ href: '/free-edits', label: 'Get the 2 free edits' }],
+      showClips: false,
+    },
+    notFit: [
+      'You need new customers this month. Personal branding builds a record over months, and we guarantee output, turnaround and revisions, not leads or followers.',
+      'You do not want to record, talk or review anything. The posts and videos start from you talking, so with no raw material the work is thin.',
+      'You want someone to invent your opinions. We write down and tighten what you think, we do not supply a point of view.',
+      'You want posts published for you without reading them first. Nothing goes out until you approve it.',
+    ],
+    faq: [
+      {
+        q: 'What do you mean by personal branding?',
+        a: 'Content that comes from you and reaches the people who look you up: LinkedIn posts and carousels, short videos, and a website that matches. We make it from a recorded interview and footage you already have.',
+      },
+      {
+        q: 'Who does the work?',
+        a: 'Lakshya Soni, the founder, leads it. Shaurya handles design and Aiman handles delivery. AI helps with transcription and first outlines, and a person writes and reviews the final version against your brief.',
+      },
+      {
+        q: 'What does it cost?',
+        a: `The sample of 2 edited videos is free. The Pilot is ${PILOT_P} for 14 days, Presence Engine is ${PRES_P} a month and Growth is ${GROW_P} a month. Bigger scopes are quoted in writing first.`,
+      },
+      {
+        q: 'Do I have to be on camera?',
+        a: 'No. The posts come from a voice interview. Video is optional and cut from footage you already have, such as a talk, a call or a podcast.',
+      },
+      {
+        q: 'Do you guarantee followers or leads?',
+        a: 'No. We guarantee what we control: the number of deliverables, a 48 hour turnaround per deliverable and re-dos until you would post it under your own name.',
+      },
+      {
+        q: 'Am I locked in?',
+        a: `No. After the ${PILOT_P} Pilot, plans are month-to-month and you cancel with 14 days notice.`,
+      },
+    ],
+    posts: [
+      { slug: 'personal-branding-agency-vs-ghostwriter', title: 'Personal Branding Agency vs Ghostwriter: Which to Hire' },
+      { slug: 'linkedin-personal-profile-vs-company-page-2026', title: 'LinkedIn Personal Profile vs Company Page: Profiles Win' },
+      { slug: 'how-much-does-linkedin-ghostwriting-cost-2026', title: 'LinkedIn Ghostwriting Pricing: $500 to $15,000 a Month' },
+    ],
+    serviceLink: { href: '/services/linkedin-ghostwriting', label: 'The LinkedIn and social service in full' },
+    extraLinks: [{ href: '/pilot', label: `The ${PILOT_P} Pilot in detail` }],
   },
 
   // ─────────────────────────────────────────────────────────────────────────

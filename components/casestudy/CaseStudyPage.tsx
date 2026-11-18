@@ -11,6 +11,7 @@ import {
   FREE_EDITS_LABEL,
   FREE_EDITS_URL,
 } from "@/lib/links";
+import { GROWTH } from "@/lib/pricing";
 import Reveal from "@/components/icp/Reveal";
 import ImpressionChart from "./ImpressionChart";
 import BeforeAfter from "./BeforeAfter";
@@ -190,6 +191,12 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
                     {BOOK_CALL_LABEL}
                   </a>
                   <p className="cs-reassure">{BOOK_CALL_REASSURANCE}</p>
+                  {study.slug === "magicbnb-seo-aeo" ? (
+                    <p className="cs-reassure">
+                      This is the search work in the Growth plan, {GROWTH.priceLabel} a month, month-to-month.{" "}
+                      <Link href="/pricing">See prices</Link>.
+                    </p>
+                  ) : null}
                 </div>
               </Reveal>
             </div>

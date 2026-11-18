@@ -181,7 +181,7 @@ export default function ContentShowcase() {
           >
             <div style={{ width:'7px', height:'7px', borderRadius:'50%', background:'#10b981', animation:'bdot 2s ease-in-out infinite', flexShrink:0 }} />
             <span style={{ fontSize:'12px', color:'#A8A49B', fontWeight:500 }}>
-              <strong style={{ color:'#0C0C0B' }}>Now booking</strong> strategy calls. 15 minutes, free, zero pitch.
+              <strong style={{ color:'#0C0C0B' }}>Now booking</strong> 15-minute calls. Free, no pitch.
             </span>
           </motion.div>
         </div>
@@ -266,7 +266,7 @@ export default function ContentShowcase() {
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background='#d94a14'; (e.currentTarget as HTMLElement).style.transform='scale(1.02)'; }}
               onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background='#E8541A'; (e.currentTarget as HTMLElement).style.transform='scale(1)'; }}
             >
-              Book My Free Strategy Call →
+              Book a free 15-minute call →
             </a>
             <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:'6px', marginTop:'14px' }}>
               <div style={{ width:'5px', height:'5px', borderRadius:'50%', background:'#10b981' }} />

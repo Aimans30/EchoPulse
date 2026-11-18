@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { PRESENCE, GROWTH } from '@/lib/pricing';
 
 /**
- * Seven services as a plain list. The "Included from" line states only what
+ * Eight services as a plain list. The "Included from" line states only what
  * lib/pricing.ts supports: video, posts and website tune-ups are in
  * PRESENCE.scope; blogs and ad creatives are in GROWTH.scope; automations and
  * apps are not listed in any plan, so they are "scoped on a call" (Custom).
@@ -19,6 +19,7 @@ const services = [
   { name: 'Video Editing', slug: 'video-editing', desc: 'Send footage you already have. Short-form videos and clips come back within 48 hours, with captions, hooks and music done. Long-form edits take longer, depending on the length of the video. The first 2 edits are free.', from: `Included from Presence Engine, ${PRESENCE.priceLabel} a month` },
   { name: 'LinkedIn & Social', slug: 'linkedin-ghostwriting', desc: 'Posts and carousels written about your business, with the captions done. You read them, approve them and publish. Your pages stay active in the weeks you have no time to write.', from: `Included from Presence Engine, ${PRESENCE.priceLabel} a month` },
   { name: 'Blog Production', slug: 'blog-production', desc: 'Long blog posts on the questions your customers search for. Every statistic carries a working source link, and a person edits each post before you see it.', from: `Included from Growth, ${GROWTH.priceLabel} a month` },
+  { name: 'SEO & AI Search', slug: 'seo-aeo', desc: 'Pages, structured data and sourced blogs so Google and AI tools can find and quote you. Includes a monthly review of the numbers.', from: `Pages in Presence Engine, ${PRESENCE.priceLabel} a month. Blogs and the full work in Growth, ${GROWTH.priceLabel} a month` },
   { name: 'Ad Creatives', slug: 'ad-creatives', desc: 'Static and video ads for your campaigns. New ones arrive every month, so your budget is not spent showing people an ad they have already seen.', from: `Included from Growth, ${GROWTH.priceLabel} a month` },
   { name: 'Websites & Funnels', slug: 'websites-funnels', desc: 'Tune-ups to the site you have now, or a new site and funnel built from scratch. The work is aimed at one thing: more visitors getting in touch.', from: `Tune-ups from Presence Engine, ${PRESENCE.priceLabel} a month. New builds are scoped on a call` },
   { name: 'Automations', slug: 'automations', desc: 'DM flows, email sequences and CRM connections. A new lead gets a reply while you are busy with a client, and their details are saved in your CRM.', from: 'Scoped on a call' },
@@ -111,7 +112,7 @@ export default function Services() {
       `}</style>
       <div className="sv-wrap">
         <div className="sv-head">
-          <h2 id="sv-heading" className="sv-h2">Seven services. Three people do the work.</h2>
+          <h2 id="sv-heading" className="sv-h2">Eight services. Three people do the work.</h2>
           <p className="sv-lede">Lakshya handles strategy, editing, writing and builds. Shaurya designs. Aiman runs delivery. Each row says what you receive and which plan includes it.</p>
         </div>
         <ul className="sv-list" ref={listRef}>

@@ -140,7 +140,7 @@ export default function BookCallModal() {
       }}
       aria-modal={open ? true : undefined}
       aria-hidden={!open}
-      aria-label="Book a strategy call"
+      aria-label="Book a free 15-minute call"
     >
       <div className="bcm-decor" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', width: '600px', height: '600px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(232,84,26,0.22) 0%, transparent 65%)', top: '50%', left: '50%', transform: 'translate(-50%, -60%)', filter: 'blur(40px)' }} />
@@ -181,7 +181,7 @@ export default function BookCallModal() {
                 Book a free 15-minute call
               </div>
               <div className="bcm-sub" style={{ fontSize: '12.5px', color: '#6E6B63', lineHeight: 1.45 }}>
-                With Lakshya, the founder. We look at what you publish today and name the first three things to fix.
+                15 minutes with Lakshya, the founder. He looks at your site and your last few posts and tells you the first three things he would fix. No pitch.
               </div>
             </div>
           </div>

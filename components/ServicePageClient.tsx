@@ -128,6 +128,14 @@ const comparisonsByService: Record<string, ComparisonRow[]> = {
     { feature: 'Revisions',           us: 'Unlimited until you are satisfied',              them: 'One round, then per-post fees' },
     { feature: 'Pilot',               us: 'Two-week paid Pilot, see work first',            them: 'Pay full retainer upfront' },
   ],
+  'seo-aeo': [
+    { feature: 'Starting point',      us: 'Your pages, structured data and Google Business Profile', them: 'Blogs published onto an unchanged site' },
+    { feature: 'Sources',             us: 'Working source link on every statistic',         them: 'Unsourced claims' },
+    { feature: 'Editing',             us: 'A person edits every piece before you see it',   them: 'Unreviewed AI drafts' },
+    { feature: 'Reporting',           us: 'Monthly review of impressions, clicks and positions', them: 'Rankings screenshot' },
+    { feature: 'Guarantees',          us: 'The work, not a position or a citation count',   them: 'A promised page-one ranking' },
+    { feature: 'Contract',            us: 'Month-to-month, 14 days notice',                 them: '6 to 12 month terms' },
+  ],
   'blog-production': [
     { feature: 'Research depth',      us: 'Multi-agent + human source verification',        them: 'ChatGPT one-shot, no review' },
     { feature: 'Sources',             us: 'Real verifiable links on every stat',            them: 'Fabricated metrics' },
@@ -1434,7 +1442,7 @@ export default function ServicePageClient({ service, guides = [] }: { service: S
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10b981', boxShadow: '0 0 10px #10b981' }} />
               <span style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', color: 'rgba(242,238,231,0.5)' }}>
-                Now booking strategy calls
+                Now booking 15-minute calls
               </span>
             </div>
             <span style={{ fontSize: '14px', color: 'rgba(242,238,231,0.7)', flex: 1, lineHeight: 1.5 }}>
@@ -1556,11 +1564,11 @@ export default function ServicePageClient({ service, guides = [] }: { service: S
           >
             {offersFreeEdits
               ? 'Send footage you already have and get 2 edited videos back within 48 hours, free. No card, no call.'
-              : `Free 15-minute strategy call. We map your ${service.name.toLowerCase()} system end to end and send a plan you can use, with us or without.`}
+              : '15 minutes with Lakshya, the founder. He looks at your site and your last few posts and tells you the first three things he would fix. No pitch.'}
           </motion.p>
 
           {/* One button and one text link. This was a row of three ("Order a
-              service", "Or book a strategy call", "All services"). */}
+              service", "Or book a free 15-minute call", "All services"). */}
           <div className="svc-final-actions" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '18px' }}>
             {offersFreeEdits ? (
               <Link

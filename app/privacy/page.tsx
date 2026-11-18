@@ -47,7 +47,7 @@ const PROCESSORS: { name: string; role: string; where: string }[] = [
   { name: 'Vercel and Netlify', role: 'Hosting and server logs for this website', where: 'United States' },
   { name: 'Google Analytics 4', role: 'Page and event analytics, only after you allow it', where: 'United States' },
   { name: 'Microsoft Clarity', role: 'Session recording and heatmaps, only after you allow it', where: 'United States' },
-  { name: 'Cal.com', role: 'Booking the strategy call', where: 'United States' },
+  { name: 'Cal.com', role: 'Booking the free 15-minute call', where: 'United States' },
   { name: 'Razorpay', role: 'Card and bank payments', where: 'India' },
   { name: 'Dodo Payments', role: 'Card payments on the order page', where: 'United States' },
   { name: 'Asana', role: 'Our task and client records, where form submissions become tasks', where: 'United States' },

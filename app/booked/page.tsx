@@ -34,7 +34,7 @@ export default function BookedPage() {
         </h1>
         <p style={{ margin: '0 0 22px', fontSize: 16, lineHeight: 1.65, color: '#6E6B63' }}>
           The calendar invite is in your inbox. To get the most from 15 minutes, have your website open and, if you
-          have one, a video you would like edited. I will tell you the first three things I would fix.
+          have one, a video you would like edited. I will look at your site and your last few posts and tell you the first three things I would fix. No pitch.
         </p>
         <p style={{ margin: 0, fontSize: 14, lineHeight: 1.6 }}>
           While you wait:{' '}

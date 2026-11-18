@@ -105,7 +105,7 @@ export const FAQ_GROUPS: FaqGroup[] = [
       },
       {
         q: 'What happens on the call?',
-        a: 'The intro call is free and lasts 15 minutes. We look at what you already have, tell you which step makes sense (the free sample, the Pilot or a monthly plan), and answer your questions about scope and price. There is no pitch past that, and if the answer is none of them yet, we say so. You keep any plan we map out whether or not you hire us.',
+        a: '15 minutes with Lakshya, the founder. He looks at your site and your last few posts and tells you the first three things he would fix. No pitch. If you want to know which step fits (the free sample, the Pilot or a monthly plan), ask him then.',
       },
     ],
   },

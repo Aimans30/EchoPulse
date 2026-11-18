@@ -98,7 +98,7 @@ export const PRESENCE: Plan = {
     'Pages, Google Business Profile and structured data so you show up on Google and ChatGPT',
     'Replies within 3 hours in the workday',
   ],
-  cta: 'Book a free strategy call',
+  cta: 'Book a free 15-minute call',
   featured: true,
 };
 
@@ -122,7 +122,7 @@ export const GROWTH: Plan = {
     'Monthly performance review',
     '20% off any custom app or software build',
   ],
-  cta: 'Book a free strategy call',
+  cta: 'Book a free 15-minute call',
 };
 
 export const FULL_SYSTEM: Plan = {
@@ -139,7 +139,7 @@ export const FULL_SYSTEM: Plan = {
     'A website, funnel or app build alongside the content',
     'Written scope, fixed price and a delivery date before you pay',
   ],
-  cta: 'Book a free strategy call',
+  cta: 'Book a free 15-minute call',
   // The old "Full System" at $4,997 promised a dedicated account lead and a
   // quarterly app build, which an owner-operated studio cannot staff. It is
   // now a custom card with no number; the number is set on the call.

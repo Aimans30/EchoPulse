@@ -470,7 +470,7 @@ const magicbnb: CaseStudy = {
     {
       name: 'Content planning: what gets written, and why',
       stat: { value: '11.7 to 9.5', label: 'average position, last 90 days' },
-      serviceSlug: 'blog-production',
+      serviceSlug: 'seo-aeo',
       summary:
         'Nothing is written because it is Tuesday. Every article comes out of one of four inputs, and the plan is rebuilt from the data every week.',
       points: [
@@ -484,7 +484,7 @@ const magicbnb: CaseStudy = {
     {
       name: 'Content architecture, shipped before the content',
       stat: { value: '219', label: 'articles live' },
-      serviceSlug: 'blog-production',
+      serviceSlug: 'seo-aeo',
       summary:
         'The sequencing is the part most teams get wrong. Publishing 199 articles onto a site that cannot cluster, link or surface them produces 199 orphan pages.',
       points: [
@@ -498,7 +498,7 @@ const magicbnb: CaseStudy = {
     {
       name: 'Choosing what to rank for',
       stat: { value: '52,793', label: 'impressions from one article, May to mid August' },
-      serviceSlug: 'blog-production',
+      serviceSlug: 'seo-aeo',
       summary:
         'The single highest-leverage decision was refusing to fight for head terms. Phrases like short term rental software are owned by companies with a decade of domain authority and budgets a young SaaS does not have.',
       points: [
@@ -511,7 +511,7 @@ const magicbnb: CaseStudy = {
     {
       name: 'Answer engines and AI presence',
       stat: { value: '86', label: 'visits from AI assistants in 90 days' },
-      serviceSlug: 'blog-production',
+      serviceSlug: 'seo-aeo',
       summary:
         'Most of these searches end without a click, because Google answers in place. Most agencies would bury that. It is the centre of the strategy.',
       points: [

@@ -208,7 +208,10 @@ export default function NichePage({ page }: { page: NichePageData }) {
               <h3>On this site</h3>
               <ul className="np-links">
                 <li><Link href={`/${page.icp}`}>Everything we do for {icpName.toLowerCase()}</Link></li>
-                <li><Link href={`/services/${page.service}`}>The {page.serviceName.toLowerCase()} service in full</Link></li>
+                <li><Link href={page.serviceLink?.href ?? `/services/${page.service}`}>{page.serviceLink?.label ?? `The ${page.serviceName.toLowerCase()} service in full`}</Link></li>
+                {page.extraLinks?.map((l) => (
+                  <li key={l.href}><Link href={l.href}>{l.label}</Link></li>
+                ))}
                 <li><Link href="/pricing">Pricing</Link></li>
                 {siblings.map((s) => (
                   <li key={s.service}><Link href={`/${s.icp}/${s.service}`}>{s.h1}</Link></li>

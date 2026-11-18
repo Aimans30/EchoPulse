@@ -14,7 +14,7 @@ Facts on this page are the canonical entity facts for EchoPulse Media. They matc
 - Team: Lakshya Soni (strategy, editing, writing, code), Shaurya (design), Aiman (delivery)
 - Based in: Bhopal, India. Works remotely with clients in the United States, United Kingdom, Canada, Australia and Western Europe.
 - Contact: lakshya@echopulse.media
-- Book a call: https://cal.com/lakshya-soni-jvwfee/meeting-with-echopulse-team (15 minutes, free)
+- Book a call: https://cal.com/lakshya-soni-jvwfee/meeting-with-echopulse-team (free 15-minute call: 15 minutes with Lakshya, the founder. He looks at your site and your last few posts and tells you the first three things he would fix. No pitch.)
 - Pricing: https://echopulse.media/pricing
 - FAQ: https://echopulse.media/faq
 
@@ -27,6 +27,7 @@ Facts on this page are the canonical entity facts for EchoPulse Media. They matc
 5. Websites and funnels: fast, conversion-built sites and landing pages. The client owns the code and the domain. https://echopulse.media/services/websites-funnels
 6. Automations: DM flows, lead routing, CRM and email automations (Make, ManyChat, Zapier). https://echopulse.media/services/automations
 7. Apps and software: custom web apps and MVPs in Next.js, React and TypeScript. https://echopulse.media/services/apps-software
+8. SEO and AI search: pages, structured data and sourced blogs so Google and AI tools can find and quote a site. Growth plan, $1,997 a month, month-to-month. The one published case, MagicBNB (5.8 to 4,859 daily Google impressions, April to early November 2026), is not a typical result. https://echopulse.media/services/seo-aeo
 
 ## Pricing (USD, same worldwide, all month-to-month)
 
@@ -72,6 +73,7 @@ One page per buyer and service, each with the price ladder, deliverables, an hon
 - Video editing for coaches and course creators: https://echopulse.media/coaches/video-editing
 - LinkedIn ghostwriting for coaches: https://echopulse.media/coaches/linkedin-ghostwriting
 - Websites and funnels for coaches: https://echopulse.media/coaches/websites-funnels
+- Personal branding for founders: https://echopulse.media/founders/personal-branding
 - LinkedIn ghostwriting for founders: https://echopulse.media/founders/linkedin-ghostwriting
 - Video editing for founders: https://echopulse.media/founders/video-editing
 - Ad creatives for DTC brands: https://echopulse.media/dtc/ad-creatives
@@ -97,7 +99,7 @@ AI is used for research, transcription and first-pass outlines. The final voice 
   - Optional: website or social handle, phone or WhatsApp, kind of video, where it will be posted, editing style, captions on or off, music, a reference video whose editing they like, brand colours or fonts.
   - What comes back: 2 edited short-form videos within 48 hours of the footage arriving. No card, no call, and the files are theirs to keep.
 - Free resources: https://echopulse.media/resources (listing video shot list for real estate agents: https://echopulse.media/resources/listing-video-shot-list)
-- Services: https://echopulse.media/services/video-editing (and the six others listed above)
+- Services: https://echopulse.media/services/video-editing (and the seven others listed above)
 - Case studies: https://echopulse.media/case-studies
 - Privacy: https://echopulse.media/privacy
 - Terms: https://echopulse.media/terms

@@ -16,7 +16,7 @@ export const BOOK_CALL_URL = 'https://cal.com/lakshya-soni-jvwfee/meeting-with-e
  * CTA labels. THREE ONLY. Import from here, never hand-write a button label.
  *
  * A Sept 2026 audit counted nine different CTA labels across the site: Get a
- * free content audit, Book a Call, Book a Free Strategy Call, Talk to Us,
+ * free content audit, Book a Call, Book a Free Strategy Call (old label), Talk to Us,
  * Claim the Pilot, Start the Pilot, See how it works, Order this service, and
  * Let us build this for you. A visitor moving between three pages met three
  * different asks and had to work out whether they were the same thing.
@@ -32,9 +32,9 @@ export const BOOK_CALL_URL = 'https://cal.com/lakshya-soni-jvwfee/meeting-with-e
  */
 
 /** Primary. Every booking CTA site-wide. */
-export const BOOK_CALL_LABEL = 'Book a free strategy call';
+export const BOOK_CALL_LABEL = 'Book a free 15-minute call';
 /** Same action, used where the button has room for a possessive. */
-export const BOOK_CALL_LABEL_LONG = 'Book your free strategy call';
+export const BOOK_CALL_LABEL_LONG = 'Book your free 15-minute call';
 /** Secondary. Scrolls or links to explanatory content, never to booking. */
 export const SECONDARY_CTA_LABEL = 'See how it works';
 /**
@@ -60,7 +60,7 @@ export function pilotCtaLabel(localizedPrice: string): string {
  * Sub-line under the CTA. Answers the two questions that stop the click: how
  * long this costs me, and whether I am about to be sold to.
  */
-export const BOOK_CALL_REASSURANCE = 'No pitch. You keep the roadmap whether or not you hire us.';
+export const BOOK_CALL_REASSURANCE = '15 minutes with Lakshya, the founder. No pitch.';
 
 // Anchor target for in-page CTAs that should scroll to the bottom CTA
 // section instead of leaving the page.

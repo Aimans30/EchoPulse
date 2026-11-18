@@ -7,7 +7,7 @@ import { NICHE_PAGES_UPDATED_ISO } from '@/lib/siteMeta';
 
 const SITE_URL = 'https://echopulse.media';
 
-// Only the 12 combinations listed in lib/nicheServiceData.ts exist. With
+// Only the 13 combinations listed in lib/nicheServiceData.ts exist. With
 // dynamicParams = false every other /[icp]/[service] path 404s instead of
 // rendering an empty shell. Static routes such as /services/[slug] and
 // /case-studies/[slug] are more specific, so they still win.

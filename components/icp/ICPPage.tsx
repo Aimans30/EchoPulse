@@ -449,7 +449,7 @@ export default function ICPPage({ data, videos, guides = [] }: { data: IcpData; 
                 <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
                   <h2 className="icp-final-h">Ready to stop doing it all yourself?</h2>
                   <p className="icp-final-p">
-                    Book a free 15-minute call. We will review what you are publishing today, map a 30-day plan, and put the numbers in writing.
+                    15 minutes with Lakshya, the founder. He looks at your site and your last few posts and tells you the first three things he would fix. No pitch.
                   </p>
                   <div style={{ marginTop: 12 }}>
                     <ICPBookButton label={BOOK_CALL_LABEL_LONG} location="icp_final" accent={accent} size="lg" />

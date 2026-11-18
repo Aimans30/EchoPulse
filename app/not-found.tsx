@@ -22,7 +22,7 @@ import { BOOK_CALL_LABEL } from '@/lib/links';
 
 export const metadata: Metadata = {
   title: { absolute: 'Page not found | EchoPulse Media' },
-  description: 'That page does not exist. Pick a section below or book a free strategy call.',
+  description: 'That page does not exist. Pick a section below or book a free 15-minute call.',
   robots: { index: false, follow: true },
 };
 

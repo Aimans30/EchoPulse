@@ -299,7 +299,7 @@ export default function AboutPage() {
       {/* ── Services: real internal links to the money pages ──────────────── */}
       <section className="about-services" aria-labelledby="services-heading">
         <p className="about-eyebrow">What we do</p>
-        <h2 id="services-heading" className="about-h2">Seven services, one team</h2>
+        <h2 id="services-heading" className="about-h2">Eight services, one team</h2>
 
         <ul className="about-service-list">
           {services.map((s) => (

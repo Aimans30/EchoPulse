@@ -563,7 +563,7 @@ export default function Hero() {
                 // while the visible span said something else entirely, so a
                 // screen-reader or voice-control user was told a different
                 // value proposition than the one on screen, and "click Book a
-                // strategy call" would not match the accessible name (WCAG
+                // free 15-minute call" would not match the accessible name (WCAG
                 // 2.5.3 Label in Name). The visible text is a perfectly good
                 // accessible name on its own, so let it be the name.
                 data-cursor-hover
