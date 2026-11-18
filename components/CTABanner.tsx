@@ -82,9 +82,9 @@ export default function CTABanner() {
               color: '#F2EEE7',
             }}
           >
-            <span style={{ display: 'block' }}>Get back 20 to 30 hours a week.</span>
-            <span style={{ color: '#E8541A', display: 'block' }}>We run your content.</span>
-            <span style={{ display: 'block' }}>You run your business.</span>
+            <span style={{ display: 'block' }}>See the work first.</span>
+            <span style={{ color: '#E8541A', display: 'block' }}>Two edits, free.</span>
+            <span style={{ display: 'block' }}>Then decide.</span>
           </motion.div>
           <motion.p
             className="cta-banner-p"
@@ -100,7 +100,7 @@ export default function CTABanner() {
               lineHeight: 1.7,
             }}
           >
-            That is what most founders, coaches, business owners, and real estate agents lose every week. Editing clips. Writing posts. Chasing freelancers. Reviewing drafts that still miss the mark. We handle all of it. Book a free 45-minute call. We will review what you are publishing today, map a 30-day plan, and put the numbers in writing.
+            Send footage you already have and get two edited videos back within 48 hours. No card, and you keep the files. Or book a free 15-minute call: we look at what you publish today and tell you the first three things to fix.
           </motion.p>
         </div>
 
