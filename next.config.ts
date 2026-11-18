@@ -82,6 +82,10 @@ const nextConfig: NextConfig = {
         permanent: true,
       },
 
+      // Guessable audience URLs that used to 404.
+      { source: "/agents", destination: "/real-estate", permanent: true },
+      { source: "/home-services", destination: "/business-owners", permanent: true },
+
       // 2. Retired duplicate posts -> their cluster survivor.
       ...deadSlugRedirects,
 

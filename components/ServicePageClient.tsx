@@ -1505,7 +1505,8 @@ export default function ServicePageClient({ service, guides = [] }: { service: S
           </motion.p>
 
           <div className="svc-final-actions" style={{ display: 'flex', gap: '14px', flexWrap: 'wrap' }}>
-            {/* PRIMARY — order this service directly (deep-links the OrderFlow to the right service slug) */}
+            {/* Only video editing has an order form; other services book a call. */}
+            {service.slug === 'video-editing' && (
             <Link
               href={`/order?service=${service.slug}`}
               data-cursor-hover
@@ -1527,14 +1528,15 @@ export default function ServicePageClient({ service, guides = [] }: { service: S
               Order a service
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
             </Link>
+            )}
             {/* WARM — talk it through first (opens BookCallModal, respects per-service Cal.com URL) */}
             <button
               type="button"
               onClick={() => bookCall()}
               data-cursor-hover
               style={{
-                background: 'transparent',
-                color: '#F2EEE7',
+                background: service.slug === 'video-editing' ? 'transparent' : service.accentColor,
+                color: service.slug === 'video-editing' ? '#F2EEE7' : '#fff',
                 padding: '20px 36px',
                 borderRadius: '100px',
                 fontSize: '15px',
@@ -1543,11 +1545,11 @@ export default function ServicePageClient({ service, guides = [] }: { service: S
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '10px',
-                border: '1px solid rgba(255,255,255,0.18)',
+                border: service.slug === 'video-editing' ? '1px solid rgba(255,255,255,0.18)' : 'none',
                 cursor: 'pointer',
               }}
             >
-              Or book a strategy call
+              {service.slug === 'video-editing' ? 'Or book a strategy call' : 'Book a free strategy call'}
             </button>
             <Link
               href="/#services"

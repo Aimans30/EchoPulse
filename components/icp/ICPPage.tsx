@@ -8,7 +8,7 @@ import NicheLinks from '@/components/niche/NicheLinks';
 import type { Guide } from '@/lib/blogLinks';
 import { type IcpData, AGENCY_COMPARISON } from '@/lib/icpData';
 import { type VideoEntry } from '@/lib/videos';
-import { BOOK_CALL_LABEL_LONG } from '@/lib/links';
+import { BOOK_CALL_LABEL_LONG, FREE_EDITS_LABEL, FREE_EDITS_URL } from '@/lib/links';
 import Reveal from './Reveal';
 import ICPBookButton from './ICPBookButton';
 import ICPFaq from './ICPFaq';
@@ -365,6 +365,11 @@ export default function ICPPage({ data, videos, guides = [] }: { data: IcpData; 
                     <span className="icp-risk-num" style={{ color: accent }}>{`0${i + 1}`}</span>
                     <h3 className="icp-risk-title">{item.t}</h3>
                     <p className="icp-risk-desc">{item.d}</p>
+                    {i === 0 && (
+                      <Link href={FREE_EDITS_URL} style={{ display: 'inline-block', marginTop: 14, fontSize: 14, fontWeight: 700, color: accent, textDecoration: 'underline', textUnderlineOffset: 3 }}>
+                        {FREE_EDITS_LABEL} →
+                      </Link>
+                    )}
                   </div>
                 </Reveal>
               ))}
