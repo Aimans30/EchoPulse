@@ -500,6 +500,7 @@ export default function WorkWall({ clips }: { clips: WallClip[] }) {
                     loop
                     playsInline
                     preload="none"
+                    onPlaying={(e) => { e.currentTarget.dataset.ready = '1'; }}
                     tabIndex={-1}
                     aria-hidden="true"
                   />
@@ -545,7 +546,8 @@ export default function WorkWall({ clips }: { clips: WallClip[] }) {
           <span>Free 15-minute call. Your first 2 edits are free.</span>
         </p>
         <a href={BOOK_CALL_URL} target="_blank" rel="noopener noreferrer" className="ww-book">
-          Book a call <span aria-hidden="true">&rarr;</span>
+          <i className="ww-book-dot" aria-hidden="true" />
+          Book a call <span className="ww-book-arrow" aria-hidden="true">&rarr;</span>
         </a>
       </div>
 
@@ -596,7 +598,7 @@ export default function WorkWall({ clips }: { clips: WallClip[] }) {
           pointer-events: none;
         }
         .ww-in video { opacity: 0; transition: opacity .35s ease; }
-        .ww-tile.is-live .ww-in video { opacity: 1; }
+        .ww-tile.is-live .ww-in video[data-ready] { opacity: 1; }
         .ww-tile.is-focus { z-index: 3; }
         .ww-tile.is-focus .ww-in {
           transform: scale(1.055);
@@ -677,7 +679,25 @@ export default function WorkWall({ clips }: { clips: WallClip[] }) {
           background: #E8541A; color: #fff; text-decoration: none; font: 800 14px Inter, sans-serif; white-space: nowrap; min-height: 46px; padding: 0 22px; flex: 0 0 auto;
           box-shadow: 0 10px 30px rgba(232,84,26,0.35); transition: background .2s, transform .2s;
         }
-        .ww-book:hover { background: #FF6A2B; transform: translateY(-1px); }
+        .ww-book { position: relative; overflow: hidden; isolation: isolate; animation: ww-glow 2.8s ease-in-out infinite; }
+        .ww-book::before {
+          content: ''; position: absolute; top: 0; bottom: 0; left: -60%; width: 45%; z-index: -1;
+          background: linear-gradient(100deg, transparent, rgba(255,255,255,0.42), transparent);
+          transform: skewX(-18deg); animation: ww-shine 3.6s cubic-bezier(.4,0,.2,1) infinite;
+        }
+        .ww-book-dot { width: 7px; height: 7px; border-radius: 50%; background: #fff; flex: 0 0 auto; animation: ww-dot 1.6s ease-in-out infinite; }
+        .ww-book-arrow { display: inline-block; animation: ww-arrow 1.8s ease-in-out infinite; }
+        .ww-book:hover { background: #FF6A2B; transform: translateY(-1px) scale(1.03); }
+        .ww-book:active { transform: scale(0.96); }
+        .ww-cta { animation: ww-rise .7s cubic-bezier(.16,1,.3,1) .5s both; }
+        @keyframes ww-rise { from { opacity: 0; transform: translate(-50%, 26px); } to { opacity: 1; transform: translate(-50%, 0); } }
+        @keyframes ww-shine { 0%, 55% { left: -60%; } 100% { left: 130%; } }
+        @keyframes ww-glow {
+          0%, 100% { box-shadow: 0 10px 30px rgba(232,84,26,0.35), 0 0 0 0 rgba(232,84,26,0.5); }
+          50% { box-shadow: 0 10px 34px rgba(232,84,26,0.5), 0 0 0 9px rgba(232,84,26,0); }
+        }
+        @keyframes ww-dot { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: .45; transform: scale(.7); } }
+        @keyframes ww-arrow { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(4px); } }
         .ww-chip:focus-visible, .ww-home:focus-visible, .ww-book:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
 
         .ww-hint {
@@ -716,12 +736,31 @@ export default function WorkWall({ clips }: { clips: WallClip[] }) {
 
 
 
+        @media (max-width: 350px) {
+          .ww-cta strong { font-size: 12px !important; }
+          .ww-book { padding: 0 13px !important; font-size: 13px; }
+        }
         @media (max-width: 640px) {
-          .ww-top { padding: 12px; gap: 8px; }
+          .ww-top { padding: max(10px, env(safe-area-inset-top)) 10px 10px; gap: 8px; }
+          .ww-chips {
+            -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+            mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+            padding-right: 22px; scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; overscroll-behavior: contain;
+          }
+          .ww-chip { padding: 9px 13px; scroll-snap-align: start; }
+          .ww-home img { width: 32px; height: 32px; }
           .ww-home span { display: none; }
           .ww-home { padding: 6px; }
           .ww-chips { margin: 0; min-width: 0; flex: 1 1 auto; }
-          .ww-cta { gap: 10px; padding: 6px 6px 6px 16px; bottom: 14px; }
+          .ww-cta {
+            gap: 10px; padding: 6px 6px 6px 16px; bottom: max(14px, env(safe-area-inset-bottom));
+            width: calc(100% - 20px); max-width: 420px; justify-content: space-between;
+          }
+          .ww-cta strong { overflow: hidden; text-overflow: ellipsis; }
+          .ww-lightbox { padding: 12px; }
+          .ww-lightbox-actions, .ww-lightbox-actions .ww-btn { width: 100%; text-align: center; }
+          .ww-lightbox-actions .ww-btn { flex: 1 1 0; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; }
+          .ww-lightbox-video { max-height: calc(100dvh - 190px); }
           .ww-cta p span { display: none; }
           .ww-cta strong { font-size: 13px; }
           .ww-book { padding: 0 16px; min-height: 42px; }
@@ -731,6 +770,7 @@ export default function WorkWall({ clips }: { clips: WallClip[] }) {
         }
         @media (prefers-reduced-motion: reduce) {
           .ww-in, .ww-in video, .ww-hint, .ww-cursor { transition: none; }
+          .ww-book, .ww-book::before, .ww-book-dot, .ww-book-arrow, .ww-cta { animation: none; }
         }
       `}</style>
     </div>
