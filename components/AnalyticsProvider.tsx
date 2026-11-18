@@ -4,7 +4,8 @@
  * AnalyticsProvider — mounts in app/layout.tsx and handles cross-cutting
  * analytics signals that don't belong to any single component:
  *  • Scroll-depth milestones (25/50/75/100%)
- *  • Calendly book-confirmed via postMessage
+ *  • Booking confirmed (postMessage from /booked inside a booking iframe)
+ *  • First-touch attribution + conversion link tracking (AttributionTracker)
  *  • Microsoft Clarity script loader (GA4 is loaded via @next/third-parties)
  *
  * Reads NEXT_PUBLIC_GA_ID and NEXT_PUBLIC_CLARITY_ID from env. Both are
@@ -14,7 +15,8 @@
 
 import { useEffect, useRef } from 'react';
 import Script from 'next/script';
-import { trackCallBooked, trackScrollDepth } from '@/lib/analytics';
+import { trackBookingConfirmed, trackScrollDepth } from '@/lib/analytics';
+import AttributionTracker from './AttributionTracker';
 
 
 export default function AnalyticsProvider() {
@@ -69,15 +71,16 @@ export default function AnalyticsProvider() {
   // Cal.com, which never sends that message, so `call_booked` could not fire
   // and no booking was ever attributed to a page. Cal.com is now set to
   // redirect to /booked after a booking. When that page loads inside the
-  // booking modal's iframe it posts `ep:call_booked` to this window, and the
-  // event is recorded here with the page the visitor booked from. (Opened
-  // directly in a tab, /booked records the event itself.)
+  // booking modal's iframe it posts `ep:call_booked` to this window, and
+  // `booking_confirmed` is recorded here with the page the visitor booked
+  // from, the button they used and their first-touch source. (Opened in its
+  // own tab, /booked records the event itself: app/booked/BookedSignal.tsx.)
   useEffect(() => {
     const onMessage = (e: MessageEvent) => {
       if (e.origin !== window.location.origin) return;
       const data = e.data as { type?: string } | undefined;
       if (data && typeof data === 'object' && data.type === 'ep:call_booked') {
-        trackCallBooked(window.location.pathname);
+        trackBookingConfirmed('modal', window.location.pathname);
       }
     };
     window.addEventListener('message', onMessage);
@@ -89,6 +92,9 @@ export default function AnalyticsProvider() {
 
   return (
     <>
+      {/* First-touch attribution and the site-wide booking / free-edits link
+          listener. Mounted here so app/layout.tsx needs no second mount. */}
+      <AttributionTracker />
       {/* Microsoft Clarity — only when the env var is set AND the visitor has
           allowed analytics.
           This is the second of the two Clarity snippets that used to exist.

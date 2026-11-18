@@ -65,7 +65,7 @@ export default function Process() {
             </li>
           ))}
         </ol>
-        <Link href={FREE_EDITS_URL} className="pr-btn">{FREE_EDITS_LABEL}</Link>
+        <Link href={FREE_EDITS_URL} data-track-location="process_section" className="pr-btn">{FREE_EDITS_LABEL}</Link>
       </div>
     </section>
   );

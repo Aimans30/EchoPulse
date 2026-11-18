@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import { trackCallClick } from '@/lib/analytics';
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
+import { trackCallClick, trackPilotClick } from '@/lib/analytics';
 import GuidesSection from '@/components/GuidesSection';
 import NicheLinks from '@/components/niche/NicheLinks';
 import type { Guide } from '@/lib/blogLinks';
@@ -14,7 +14,7 @@ import { type ServiceData, services as ALL_SERVICES } from '@/lib/serviceData';
 import { useGeoPrice } from '@/lib/useGeoPrice';
 import { DUR, EASE } from '@/lib/motion';
 import Nav from './Nav';
-import { BOOK_CALL_LABEL } from '@/lib/links';
+import { BOOK_CALL_LABEL, FREE_EDITS_LABEL, FREE_EDITS_URL } from '@/lib/links';
 import { PAGES_UPDATED_LABEL, PAGES_UPDATED_ISO } from '@/lib/siteMeta';
 
 // ServiceHeroVisual is 2.4K lines of SVG / animation code per service.
@@ -620,6 +620,27 @@ export default function ServicePageClient({ service, guides = [] }: { service: S
     (window as unknown as { openBookCallModal?: () => void }).openBookCallModal?.();
   };
 
+  // The free sample is two edited videos, so it is only offered as the ask on
+  // the two services where that is what the visitor came for.
+  const offersFreeEdits = service.slug === 'video-editing' || service.slug === 'ad-creatives';
+
+  const finalPrimaryStyle: CSSProperties = {
+    background: service.accentColor,
+    color: '#fff',
+    padding: '20px 40px',
+    borderRadius: '100px',
+    fontSize: '15px',
+    fontWeight: 700,
+    textDecoration: 'none',
+    fontFamily: 'Inter, sans-serif',
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '10px',
+    boxShadow: `0 14px 44px ${service.accentColor}55`,
+    border: 'none',
+    cursor: 'pointer',
+  };
+
   return (
     <>
       {/* Fixed-position elements — must stay outside the slide wrapper so they anchor to viewport, not the animating container */}
@@ -638,9 +659,19 @@ export default function ServicePageClient({ service, guides = [] }: { service: S
           main section { padding-top: 48px !important; padding-bottom: 48px !important; }
           main section h2 { font-size: clamp(26px, 7vw, 38px) !important; letter-spacing: -1.1px !important; line-height: 1.05 !important; margin-bottom: 18px !important; }
           main section .section-label,
-          main section [class*="eyebrow"] { margin-bottom: 10px !important; font-size: 9.5px !important; letter-spacing: 2.5px !important; }
+          main section [class*="eyebrow"] { margin-bottom: 10px !important; font-size: 12px !important; letter-spacing: 2.2px !important; }
           .deliverable-row { padding: 14px 0 !important; gap: 14px !important; }
           .deliverable-row h3 { font-size: 15px !important; }
+          /* Phone legibility pass (Nov 2026): the labels and card copy below
+             rendered at 10px to 13px on a phone. Desktop sizes are untouched. */
+          .svc-section-label { font-size: 12px !important; letter-spacing: 2.4px !important; }
+          .promise-card p { font-size: 15px !important; }
+          .promise-card .promise-small { font-size: 12px !important; letter-spacing: 2px !important; }
+          .svc-promise-strip > div > span:last-child { font-size: 12px !important; }
+          .svc-promise-strip > span { font-size: 15px !important; flex-basis: 100% !important; }
+          .svc-promise-strip > button { font-size: 14px !important; min-height: 44px; }
+          .svc-related a > div:nth-child(3) { font-size: 14.5px !important; }
+          .svc-related a > div:nth-child(4) { font-size: 13px !important; }
         }
         @media (max-width: 380px) {
           main section { padding-top: 36px !important; padding-bottom: 36px !important; }
@@ -772,6 +803,25 @@ export default function ServicePageClient({ service, guides = [] }: { service: S
                   {BOOK_CALL_LABEL}
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
                 </button>
+                {offersFreeEdits ? (
+                <Link
+                  href={FREE_EDITS_URL}
+                  onClick={() => trackPilotClick(`service_${service.slug}_hero_free_edits`)}
+                  style={{
+                    background: 'transparent',
+                    color: '#F2EEE7',
+                    padding: '15px 28px',
+                    borderRadius: '100px',
+                    fontSize: '13px',
+                    fontWeight: 700,
+                    textDecoration: 'none',
+                    fontFamily: 'Inter, sans-serif',
+                    border: '1px solid rgba(255,255,255,0.18)',
+                  }}
+                >
+                  {FREE_EDITS_LABEL}
+                </Link>
+                ) : (
                 <a
                   href="#deliverables"
                   style={{
@@ -788,6 +838,7 @@ export default function ServicePageClient({ service, guides = [] }: { service: S
                 >
                   See Deliverables
                 </a>
+                )}
               </motion.div>
             </div>
 
@@ -799,7 +850,7 @@ export default function ServicePageClient({ service, guides = [] }: { service: S
           </div>
 
           <p style={{ fontFamily: 'Inter, sans-serif', fontSize: '12.5px', lineHeight: 1.5, color: 'rgba(242,238,231,0.55)', margin: '32px 0 0', overflowWrap: 'anywhere' }}>
-            Written and reviewed by <Link href="/about" style={{ color: 'rgba(242,238,231,0.8)', textDecoration: 'underline', textUnderlineOffset: '3px' }}>Lakshya Soni</Link>, founder. Last updated{' '}
+            Written and reviewed by <Link href="/about/lakshya-soni" style={{ color: 'rgba(242,238,231,0.8)', textDecoration: 'underline', textUnderlineOffset: '3px' }}>Lakshya Soni</Link>, founder. Last updated{' '}
             <time dateTime={PAGES_UPDATED_ISO}>{PAGES_UPDATED_LABEL}</time>.
           </p>
 
@@ -828,7 +879,7 @@ export default function ServicePageClient({ service, guides = [] }: { service: S
                 margin-bottom: 18px !important;
               }
               .svc-hero p {
-                font-size: 14.5px !important;
+                font-size: 16px !important;
                 line-height: 1.6 !important;
                 margin-bottom: 28px !important;
               }
@@ -1076,10 +1127,10 @@ export default function ServicePageClient({ service, guides = [] }: { service: S
               min-width: 440px !important;
             }
 
-            .cmp-header-cell { padding: 12px 14px !important; font-size: 10px !important; }
-            .cmp-feature-cell { padding: 14px 14px !important; font-size: 12px !important; }
-            .cmp-us-cell { padding: 14px 14px !important; font-size: 12px !important; line-height: 1.45 !important; }
-            .cmp-them-cell { padding: 14px 14px !important; font-size: 12px !important; line-height: 1.45 !important; }
+            .cmp-header-cell { padding: 12px 14px !important; font-size: 12px !important; }
+            .cmp-feature-cell { padding: 14px 14px !important; font-size: 14px !important; }
+            .cmp-us-cell { padding: 14px 14px !important; font-size: 14px !important; line-height: 1.45 !important; }
+            .cmp-them-cell { padding: 14px 14px !important; font-size: 14px !important; line-height: 1.45 !important; }
           }
         `}</style>
       </section>
@@ -1251,6 +1302,7 @@ export default function ServicePageClient({ service, guides = [] }: { service: S
               >
                 {/* Index badge */}
                 <div
+                  className="promise-small"
                   style={{
                     position: 'absolute',
                     top: '20px',
@@ -1285,6 +1337,7 @@ export default function ServicePageClient({ service, guides = [] }: { service: S
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '28px' }}>
                   <div style={{ width: '20px', height: '1px', background: service.accentColor }} />
                   <div
+                    className="promise-small"
                     style={{
                       fontSize: '10px',
                       fontWeight: 700,
@@ -1501,72 +1554,39 @@ export default function ServicePageClient({ service, guides = [] }: { service: S
             transition={{ duration: 0.7, delay: 0.15 }}
             style={{ fontSize: '17px', color: 'rgba(242,238,231,0.5)', lineHeight: 1.7, maxWidth: '600px', margin: '0 0 56px' }}
           >
-            Free 15-minute strategy call. We map your {service.name.toLowerCase()} system end to end and send a plan you can use, with us or without.
+            {offersFreeEdits
+              ? 'Send footage you already have and get 2 edited videos back within 48 hours, free. No card, no call.'
+              : `Free 15-minute strategy call. We map your ${service.name.toLowerCase()} system end to end and send a plan you can use, with us or without.`}
           </motion.p>
 
-          <div className="svc-final-actions" style={{ display: 'flex', gap: '14px', flexWrap: 'wrap' }}>
-            {/* Only video editing has an order form; other services book a call. */}
-            {service.slug === 'video-editing' && (
-            <Link
-              href={`/order?service=${service.slug}`}
-              data-cursor-hover
-              style={{
-                background: service.accentColor,
-                color: '#fff',
-                padding: '20px 40px',
-                borderRadius: '100px',
-                fontSize: '15px',
-                fontWeight: 700,
-                textDecoration: 'none',
-                fontFamily: 'Inter, sans-serif',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '10px',
-                boxShadow: `0 14px 44px ${service.accentColor}55`,
-              }}
-            >
-              Order a service
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
-            </Link>
+          {/* One button and one text link. This was a row of three ("Order a
+              service", "Or book a strategy call", "All services"). */}
+          <div className="svc-final-actions" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '18px' }}>
+            {offersFreeEdits ? (
+              <Link
+                href={FREE_EDITS_URL}
+                data-cursor-hover
+                onClick={() => trackPilotClick(`service_${service.slug}_final_free_edits`)}
+                style={finalPrimaryStyle}
+              >
+                {FREE_EDITS_LABEL}
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
+              </Link>
+            ) : (
+              <button type="button" onClick={() => bookCall()} data-cursor-hover style={finalPrimaryStyle}>
+                {BOOK_CALL_LABEL}
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
+              </button>
             )}
-            {/* WARM — talk it through first (opens BookCallModal, respects per-service Cal.com URL) */}
-            <button
-              type="button"
-              onClick={() => bookCall()}
-              data-cursor-hover
-              style={{
-                background: service.slug === 'video-editing' ? 'transparent' : service.accentColor,
-                color: service.slug === 'video-editing' ? '#F2EEE7' : '#fff',
-                padding: '20px 36px',
-                borderRadius: '100px',
-                fontSize: '15px',
-                fontWeight: 700,
-                fontFamily: 'Inter, sans-serif',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '10px',
-                border: service.slug === 'video-editing' ? '1px solid rgba(255,255,255,0.18)' : 'none',
-                cursor: 'pointer',
-              }}
-            >
-              {service.slug === 'video-editing' ? 'Or book a strategy call' : 'Book a free strategy call'}
-            </button>
-            <Link
-              href="/#services"
-              style={{
-                background: 'rgba(255,255,255,0.05)',
-                color: 'rgba(242,238,231,0.55)',
-                padding: '20px 30px',
-                borderRadius: '100px',
-                fontSize: '14px',
-                fontWeight: 600,
-                textDecoration: 'none',
-                fontFamily: 'Inter, sans-serif',
-                border: '1px solid rgba(255,255,255,0.08)',
-              }}
-            >
-              All services
-            </Link>
+            {offersFreeEdits ? (
+              <button type="button" onClick={() => bookCall()} data-cursor-hover className="svc-final-text-link">
+                Or book a free 15-minute call
+              </button>
+            ) : (
+              <Link href="/#services" className="svc-final-text-link">
+                Or see all services
+              </Link>
+            )}
           </div>
 
           {/* ─── Related services — cross-link 3 other services so each page is a hub ─── */}
@@ -1584,6 +1604,16 @@ export default function ServicePageClient({ service, guides = [] }: { service: S
         @media (hover: hover) and (pointer: fine) {
           .svc-faq-toggle { cursor: none; }
         }
+
+        .svc-final-text-link {
+          background: none; border: none; padding: 0; min-height: 44px;
+          display: inline-flex; align-items: center;
+          color: rgba(242,238,231,0.72); font-family: Inter, sans-serif;
+          font-size: 15px; font-weight: 600; cursor: pointer;
+          text-decoration: underline; text-underline-offset: 4px;
+          text-decoration-color: rgba(242,238,231,0.35);
+        }
+        .svc-final-text-link:hover { color: #F2EEE7; text-decoration-color: currentColor; }
 
         /* Hide the desktop floating pill CTA on phones — MobileStickyCTA handles it */
         @media (max-width: 768px) {

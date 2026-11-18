@@ -2,6 +2,7 @@
 
 import { useId, useState } from 'react';
 import { trackLeadMagnetSubmit } from '@/lib/analytics';
+import { getAttribution } from '@/lib/attribution';
 
 const SOURCE = 'lead_magnet_listing_shot_list';
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -37,6 +38,7 @@ export default function ShotListCapture() {
           source: SOURCE,
           serviceInterest: 'Listing video shot list',
           notes: 'Asked for the printable PDF of the listing video shot list. Send it by hand.',
+          attribution: getAttribution(),
         }),
       });
       if (!res.ok) throw new Error('submit failed');

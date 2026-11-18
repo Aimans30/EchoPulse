@@ -6,7 +6,7 @@ import ICPBookButton from '@/components/icp/ICPBookButton';
 import { services } from '@/lib/serviceData';
 import { icps } from '@/lib/icpData';
 import { getCaseStudy } from '@/lib/caseStudyData';
-import { BOOK_CALL_LABEL, BOOK_CALL_URL } from '@/lib/links';
+import { BOOK_CALL_LABEL, BOOK_CALL_URL, staticBookingUrl } from '@/lib/links';
 import { FREE_SAMPLE, PILOT, PRESENCE, GROWTH, PRICE_LADDER_SENTENCE, PROMISES } from '@/lib/pricing';
 
 /**
@@ -129,7 +129,7 @@ export default function WhatIsEchoPulseMediaPage() {
       ),
     },
     { label: 'Promises', value: `${PROMISES.replies}. ${PROMISES.turnaround}. ${PROMISES.revisions}. ${PROMISES.ownership}.` },
-    { label: 'Book a call', value: <a href={BOOK_CALL_URL} rel="noopener noreferrer" target="_blank">{BOOK_CALL_URL}</a> },
+    { label: 'Book a call', value: <a href={staticBookingUrl('what_is_facts')} data-track-location="what_is_facts" rel="noopener noreferrer" target="_blank">{BOOK_CALL_URL}</a> },
     { label: 'Website', value: <a href={SITE_URL}>{SITE_URL}</a> },
     { label: 'Email', value: <a href="mailto:lakshya@echopulse.media">lakshya@echopulse.media</a> },
     { label: 'Last verified', value: LAST_VERIFIED },

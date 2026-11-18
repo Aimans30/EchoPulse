@@ -55,7 +55,7 @@ export default function NichePage({ page }: { page: NichePageData }) {
           <h1 className="np-h1">{page.h1}</h1>
           <p className="np-capsule">{page.capsule}</p>
           <div className="np-cta-row">
-            <Link href={FREE_EDITS_URL} className="np-btn np-btn-primary" data-cursor-hover>
+            <Link href={FREE_EDITS_URL} data-track-location="niche_hero" className="np-btn np-btn-primary" data-cursor-hover>
               {FREE_EDITS_LABEL}
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
             </Link>
@@ -233,7 +233,7 @@ export default function NichePage({ page }: { page: NichePageData }) {
             Send footage you already have and get 2 edited videos back within 48 hours. No card, no call, and you keep the files. Or book 15 minutes and we will look at your situation together.
           </p>
           <div className="np-cta-row">
-            <Link href={FREE_EDITS_URL} className="np-btn np-btn-primary" data-cursor-hover>
+            <Link href={FREE_EDITS_URL} data-track-location="niche_final" className="np-btn np-btn-primary" data-cursor-hover>
               {FREE_EDITS_LABEL}
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
             </Link>
@@ -342,6 +342,13 @@ export default function NichePage({ page }: { page: NichePageData }) {
           @media (max-width: 640px) {
             .np-page > section { padding: 52px 20px; }
             .np-page > section.np-hero { padding-top: 112px; padding-bottom: 44px; }
+          }
+          /* padding-top needs !important here: globals.css forces a 56px top padding on every section under 768px, which pulled this hero's first line up underneath the fixed nav pill (nav bottom edge is at 84px). */
+          @media (max-width: 768px) {
+            .np-page > section.np-hero { padding-top: 112px !important; }
+            /* Breadcrumb links are navigation, so they get 44px rows on touch. */
+            .np-crumb a, .np-crumb span[aria-current] { min-height: 44px; }
+            .np-crumb { margin-bottom: 20px; }
             .np-dark-in { padding: 52px 20px; }
             .np-steps { grid-template-columns: 1fr; gap: 22px; }
             .np-step-n { font-size: 40px; margin-bottom: 8px; }

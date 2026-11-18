@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { motion } from 'framer-motion';
+import Link from 'next/link';
 import { BOOK_CALL_LABEL, FREE_EDITS_LABEL, FREE_EDITS_URL } from '@/lib/links';
 import { PRESENCE } from '@/lib/pricing';
 import HeroReel from '@/components/HeroReel';
@@ -195,6 +196,9 @@ export default function Hero() {
         @media (hover: hover) and (pointer: fine) {
           .btn-p, .btn-o { cursor: none; }
         }
+        .hero-proof{margin:22px 0 0;max-width:520px;font-family:Inter,sans-serif;font-size:13.5px;line-height:1.6;color:#6E6B63;}
+        .hero-proof a{color:inherit;text-decoration:underline;text-decoration-color:rgba(232,84,26,0.55);text-underline-offset:3px;transition:color 0.2s;}
+        .hero-proof a:hover{color:#0C0C0B;}
         .scroll-hint{position:absolute;bottom:24px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:6px;color:#A8A49B;font-size:9px;letter-spacing:3px;text-transform:uppercase;font-weight:600;}
         .scroll-line{width:1px;height:28px;background:linear-gradient(to bottom,#E8541A,transparent);animation:sline 1.8s ease-in-out infinite;}
         @keyframes sline{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
@@ -340,6 +344,7 @@ export default function Hero() {
             justify-content:center !important;
             gap:6px !important;
           }
+          .hero-proof{ margin:20px auto 0 !important; max-width:340px !important; font-size:14px !important; text-align:center !important; }
           .scroll-hint{ display:none !important; }
           /* Hide the orbital entirely — replaced by mobile service grid below */
           .hero-right{ display:none !important; }
@@ -583,6 +588,15 @@ export default function Hero() {
                 {FREE_EDITS_LABEL}
               </a>
             </div>
+
+            {/* The one published result, straight under the buttons on both
+                sizes. Figures are the ones on the case study page. */}
+            <p className="hero-proof">
+              <Link href="/case-studies/magicbnb-seo-aeo" data-cursor-hover>
+                MagicBNB went from 5.8 to 4,859 Google impressions a day in seven months. See the
+                Search Console export, including what is still not working.
+              </Link>
+            </p>
 
           </div>
 

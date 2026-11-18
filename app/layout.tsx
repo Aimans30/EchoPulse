@@ -145,7 +145,9 @@ const structuredData = {
       url: "https://echopulse.media",
       logo: "https://echopulse.media/logo-512.png",
       description:
-        "EchoPulse Media is a content and AI studio for founders, coaches, business owners, and real estate agents. Video edits, social posts, blogs, ad creative, websites, automations, and custom software. One team, one bill, every channel. Built to give clients 20 to 30 hours back every week.",
+        // Opens with the same sentence as public/llms.txt so every machine
+        // reader gets one definition of the company. No results claims here.
+        "EchoPulse Media is a small, owner-operated content and website studio founded in 2025 by Lakshya Soni. It makes video edits, social posts, blogs, ad creative, websites, automations and custom software for founders, coaches, business owners and real estate agents. One team, one bill, every channel.",
       foundingDate: "2025",
       founder: { "@id": "https://echopulse.media/#founder" },
       // Where we operate FROM (Bhopal, India) vs which markets we SELL INTO
@@ -156,10 +158,9 @@ const structuredData = {
       // lib/schema.ts for the Search Console numbers behind that decision.
       address: BUSINESS_ADDRESS,
       areaServed: AREA_SERVED,
-      sameAs: [
-        "https://www.linkedin.com/in/lakshyasoni/",
-        "https://x.com/Lakshya_Creates",
-      ],
+      // No sameAs yet. It used to list the founder's personal LinkedIn and X,
+      // which describe the Person below, not the company. Add the company's
+      // own profiles here when they exist.
       makesOffer: pricingOffers(),
       contactPoint: {
         "@type": "ContactPoint",
@@ -192,10 +193,11 @@ const structuredData = {
       ],
       worksFor: { "@id": "https://echopulse.media/#organization" },
       // Point the Person entity at the dedicated founder page, not the homepage.
-      // An entity needs one canonical page describing it; /about is that page,
-      // and every blog author box links back to it to reinforce the chain.
-      url: "https://echopulse.media/about",
-      mainEntityOfPage: "https://echopulse.media/about",
+      // An entity needs one canonical page describing it; /about/lakshya-soni
+      // is that page (its ProfilePage schema names this node as mainEntity),
+      // and bylines link to it.
+      url: "https://echopulse.media/about/lakshya-soni",
+      mainEntityOfPage: "https://echopulse.media/about/lakshya-soni",
       sameAs: [
         "https://www.linkedin.com/in/lakshyasoni/",
         "https://x.com/Lakshya_Creates",
@@ -223,7 +225,7 @@ const structuredData = {
       name: "EchoPulse Media",
       alternateName: "EchoPulse",
       description:
-        "Done-for-you marketing for serious businesses. Video, content, ads, websites, and custom software for founders, coaches, business owners, and real estate agents. 20 to 30 hours a week back.",
+        "EchoPulse Media is a small, owner-operated content and website studio founded in 2025 by Lakshya Soni. Video, content, ads, websites and custom software for founders, coaches, business owners and real estate agents.",
       publisher: { "@id": "https://echopulse.media/#organization" },
       inLanguage: "en",
     },

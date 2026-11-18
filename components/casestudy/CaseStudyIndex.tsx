@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import type { CaseStudy } from '@/lib/caseStudyData';
-import { BOOK_CALL_URL, BOOK_CALL_LABEL, BOOK_CALL_REASSURANCE } from '@/lib/links';
+import { staticBookingUrl, BOOK_CALL_LABEL, BOOK_CALL_REASSURANCE } from '@/lib/links';
 import Reveal from '@/components/icp/Reveal';
 import ImpressionChart from './ImpressionChart';
 
@@ -284,7 +284,14 @@ export default function CaseStudyIndex({ studies }: { studies: CaseStudy[] }) {
               We open your Search Console, tell you what is structurally stopping the site from ranking, and
               leave you with a 30 day plan. You keep the plan whether or not you hire us.
             </p>
-            <a className="csi-btn" href={BOOK_CALL_URL} target="_blank" rel="noopener">
+            <a
+              className="csi-btn"
+              href={staticBookingUrl('case_study_index')}
+              data-track="case_study_cta_click"
+              data-track-location="case_study_index"
+              target="_blank"
+              rel="noopener"
+            >
               {BOOK_CALL_LABEL}
             </a>
             <p className="csi-reassure">{BOOK_CALL_REASSURANCE}</p>

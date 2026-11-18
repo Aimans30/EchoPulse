@@ -12,7 +12,7 @@ import type { PipelineConfig } from '@/components/icp/ICPPipelineAnimation';
 // "results we got you". Framing stays "here's what's true in your market".
 
 export interface IcpStat {
-  /** The big number, e.g. "403%" or "70%". */
+  /** The big number, e.g. "73%" or "70%". */
   value: string;
   /** One-line context under the number. */
   label: string;
@@ -126,6 +126,8 @@ export interface IcpData {
   authority: AuthorityCase;
   /** Optional compact founder-background block rendered just under the authority section. */
   founderStory?: { heading: string; body: string; linkLabel: string; href: string };
+  /** Optional one-line pointer to a free resource, shown under the work strip. */
+  resource?: { text: string; linkLabel: string; href: string };
   /** Concrete deliverables list — what they actually receive. */
   deliverables: IcpDeliverable[];
   /** The before → after transformation, two short strings. */
@@ -155,7 +157,7 @@ export const icps: IcpData[] = [
     accentColor: '#f59e0b',
     metaTitle: 'Real Estate Video Editing & Listing Reels',
     metaDescription:
-      'Cinematic property reels, listing walkthroughs, and ads that book viewings. Listings with video get up to 403% more inquiries. You shoot, we edit.',
+      'Listing reels, agent clips and market updates cut from your phone footage in 48 hours. First 2 edits free, then $399 a month.',
     eyebrow: 'For Real Estate Agents & Brokerages',
     // Hero rewrite: the old version led with an industry stat ("nine in ten
     // agents skip video"), which is interesting but not about them. This leads
@@ -176,10 +178,10 @@ export const icps: IcpData[] = [
       ],
     },
     stats: [
-      { value: '403%', label: 'more inquiries on listings marketed with video (NAR)' },
       { value: '73%', label: 'of homeowners prefer an agent who uses video (NAR, 2025)' },
       { value: '26%', label: 'of agents use video on every listing. That gap is your edge.' },
       { value: '48 hr', label: 'standard edit turnaround per deliverable' },
+      { value: '2', label: 'free edits to start, no card' },
     ],
     pipeline: {
       input: { label: 'You shoot the listing', detail: 'Phone footage, or we direct the shoot' },
@@ -206,9 +208,11 @@ export const icps: IcpData[] = [
       // data, which puts consistent video use at 26%. The replacements make the
       // same argument and survive being fact-checked.
       stats: [
-        { value: '403%', label: 'more inquiries on listings marketed with video', source: 'NAR' },
         { value: '73%', label: 'of homeowners are more likely to list with an agent who uses video', source: 'NAR Profile of Home Buyers and Sellers, 2025' },
         { value: '26%', label: 'of agents consistently use video on every listing. That gap is your edge.', source: 'NAR, Real Estate in a Digital Age, 2025' },
+        // Replaces an inquiries-uplift figure attributed to NAR that could not
+        // be traced to a NAR report. This one is ours and checkable.
+        { value: '48 hr', label: 'standard edit turnaround per deliverable', source: 'EchoPulse Media, every plan' },
       ],
       split: {
         left: {
@@ -256,6 +260,11 @@ export const icps: IcpData[] = [
       body: "Before starting EchoPulse, founder Lakshya Soni edited listing tours, agent brand videos and ads for more than 200 Canadian agents as an editor at a real estate media company. Those were that company's clients, not EchoPulse clients.",
       linkLabel: 'Read the founder story',
       href: '/case-studies/founder-200-real-estate-agents',
+    },
+    resource: {
+      text: 'Filming a listing this week?',
+      linkLabel: 'Use the room-by-room listing video shot list',
+      href: '/resources/listing-video-shot-list',
     },
     faq: [
       { q: 'Do I have to shoot the footage myself?', a: 'Either works. If you have a phone or a drone and a steady hand, shoot it and send us the raw clips, and we will guide you on what to capture. If you would rather not, we direct the shot list so a local videographer (or you) captures exactly what the edit needs. Then we handle the cinematic edit, captions, music, and exports.' },

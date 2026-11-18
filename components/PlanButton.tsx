@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import PlanIntakeModal from './PlanIntakeModal';
 import type { BookablePlanKey } from '@/lib/links';
+import { trackPlanSelect } from '@/lib/analytics';
 
 const LABEL: Record<BookablePlanKey, string> = {
   pilot: 'Choose the Pilot',
@@ -23,7 +24,7 @@ export default function PlanButton({ planKey, dark }: { planKey: BookablePlanKey
         type="button"
         data-cursor-hover
         className={`plan-btn${dark ? ' plan-btn-dark' : ''}`}
-        onClick={() => setOpen((n) => n + 1)}
+        onClick={() => { trackPlanSelect(planKey, 'pricing_page'); setOpen((n) => n + 1); }}
       >
         {LABEL[planKey]} <span aria-hidden="true">&rarr;</span>
       </button>

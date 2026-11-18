@@ -64,15 +64,17 @@ export default function HomeClient({ latestPosts }: { latestPosts?: ReactNode })
         <Nav />
         <main id="main">
           <Hero />
-          <Manifesto />
+          {/* Order: the work first, then how a week runs. */}
           <OurWork />
+          <Manifesto />
           <Testimonials />
           <WhoWeWorkWith />
           <Services />
           <Process />
           <Pricing />
-          {latestPosts}
           <FAQ />
+          {/* Kept on the homepage (its only links to the newest posts), below the FAQ. */}
+          {latestPosts}
           <CTABanner />
         </main>
         <Footer />

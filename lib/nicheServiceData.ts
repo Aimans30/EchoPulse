@@ -181,6 +181,7 @@ const RAW_PAGES: NichePageRaw[] = [
       ],
       links: [
         { href: '/case-studies/founder-200-real-estate-agents', label: 'Read the founder story' },
+        { href: '/resources/listing-video-shot-list', label: 'Use the listing video shot list' },
       ],
       showClips: true,
       clipsNote: 'Listing and agent clips from our work page. They show the edit, not a result.',

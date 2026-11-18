@@ -1,4 +1,5 @@
 import { ALL_PLANS, type PlanKey } from './pricing';
+import { getFirstTouch, mediumOf, sourceOf } from './attribution';
 
 // Single source of truth for outbound conversion links.
 // Every default CTA across the site reads from here.
@@ -107,41 +108,138 @@ export function planSummary(planKey: BookablePlanKey): string {
 const BOOK_NOTES_MAX = 500;
 
 /**
+ * ONE BUILDER FOR EVERY CAL.COM LINK. Do not hand-write a Cal.com URL.
+ *
+ * What each parameter means on the booking (docs/tracking.md has the table):
+ *   utm_source    where the visitor first came from: their utm_source, else
+ *                 the referring host (google.com, chatgpt.com), else "direct"
+ *   utm_medium    their utm_medium, else the kind of referrer
+ *                 (search, ai, social, email, paid, referral, direct)
+ *   utm_campaign  their utm_campaign, when they arrived with one
+ *   utm_term      the page they first landed on
+ *   utm_content   the button that was clicked (the `location`)
+ *   metadata[ep_page]      the page the button was on
+ *   metadata[ep_landing]   the landing page again, for the Cal.com webhook
+ *   metadata[ep_source], metadata[ep_medium], metadata[ep_location], metadata[ep_plan]
+ *
+ * Three ways to use it:
+ *   1. `bookingUrl({ location })` in the browser, in an event handler or an
+ *      effect (iframes, window.open). Full attribution.
+ *   2. `staticBookingUrl(location)` for the href of an anchor that is rendered
+ *      on the server or during hydration. It is a real, working link with the
+ *      button name in it; components/AttributionTracker upgrades it to (1) at
+ *      the moment of the click, for every Cal.com anchor on the site.
+ *   3. `decorateBookingUrl(href, location)` to upgrade an existing Cal.com URL
+ *      that already carries its own campaign parameters (the blog links):
+ *      their utm_* values are kept and only the metadata[...] fields are added.
+ */
+export interface BookingUrlOptions {
+  /** Which button. snake_case, page first: "case_study_hero", "work_wall_lightbox". */
+  location: string;
+  /** A different Cal.com event URL. Defaults to BOOK_CALL_URL. */
+  base?: string;
+  /** Adds the modal's display parameters (15-minute slot, light theme, month view). */
+  embed?: boolean;
+  /** Plan key, when the booking follows a plan choice. */
+  plan?: string;
+  /** Cal.com prefills its form from these. Never sent to analytics. */
+  prefill?: { name?: string; email?: string; notes?: string };
+}
+
+/** Shown in Cal.com when the real source is not known (no JavaScript, or a server render). */
+const PLACEHOLDER_SOURCE = 'echopulse.media';
+
+export function isBookingUrl(href: string): boolean {
+  try {
+    return /(^|\.)cal\.com$/.test(new URL(href, 'https://echopulse.media').hostname);
+  } catch {
+    return false;
+  }
+}
+
+/** Server-safe href: a working booking link that names the button. Pure, so it never causes a hydration mismatch. */
+export function staticBookingUrl(location: string, base: string = BOOK_CALL_URL): string {
+  const q = `utm_source=${PLACEHOLDER_SOURCE}&utm_medium=website&utm_content=${encodeURIComponent(location)}`;
+  return `${base}${base.includes('?') ? '&' : '?'}${q}`;
+}
+
+/** Add first-touch attribution to any Cal.com URL. Browser only; on the server it returns the URL unchanged. */
+export function decorateBookingUrl(href: string, location: string): string {
+  if (typeof window === 'undefined') return href;
+  let url: URL;
+  try {
+    url = new URL(href);
+  } catch {
+    return href;
+  }
+  const touch = getFirstTouch();
+  const page = window.location.pathname;
+  const source = touch ? sourceOf(touch) : 'direct';
+  const medium = touch ? mediumOf(touch) : 'direct';
+  const landing = touch?.landing_path || page;
+  const q = url.searchParams;
+
+  // A link that arrives with its own campaign tagging (lib/blogLinks.ts tags
+  // per post) keeps it. Only our own placeholder is replaced.
+  const ownTagging = q.has('utm_source') && q.get('utm_source') !== PLACEHOLDER_SOURCE;
+  if (!ownTagging) {
+    q.set('utm_source', source);
+    q.set('utm_medium', medium);
+    if (touch?.utm_campaign) q.set('utm_campaign', touch.utm_campaign);
+    q.set('utm_term', landing);
+    q.set('utm_content', location);
+  }
+  q.set('metadata[ep_source]', source);
+  q.set('metadata[ep_medium]', medium);
+  q.set('metadata[ep_landing]', landing);
+  q.set('metadata[ep_page]', page);
+  q.set('metadata[ep_location]', location);
+  return url.toString();
+}
+
+/** The booking URL for a button, with everything known about where the visitor came from. */
+export function bookingUrl(opts: BookingUrlOptions): string {
+  const base = opts.base ?? BOOK_CALL_URL;
+  const params: Array<[string, string]> = [];
+  const name = (opts.prefill?.name ?? '').trim();
+  const email = (opts.prefill?.email ?? '').trim();
+  const notes = (opts.prefill?.notes ?? '').trim();
+  if (name) params.push(['name', name]);
+  if (email) params.push(['email', email]);
+  if (notes) params.push(['notes', notes]);
+  // duration=15 preselects the 15-minute slot. The Cal.com event offers
+  // several lengths and defaulted to 20, which contradicted every page that
+  // promises a 15-minute call.
+  if (opts.embed) params.push(['duration', '15'], ['theme', 'light'], ['layout', 'month_view']);
+  if (opts.plan) params.push(['metadata[ep_plan]', opts.plan]);
+  const query = params.map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`).join('&');
+  const withQuery = query ? `${base}${base.includes('?') ? '&' : '?'}${query}` : base;
+  return decorateBookingUrl(staticBookingUrl(opts.location, withQuery), opts.location);
+}
+
+/**
  * Booking URL for a plan, with the visitor's details prefilled.
  *
  * Cal.com reads `name`, `email` and `notes` from the query string and fills
  * the booking form with them. The notes always start with "Plan: <name>" so
- * the booking itself says which plan the call is about. The rest matches what
- * BookCallModal sends: the 15-minute slot, light theme, month view and the UTM
- * parameters (utm_content = the page path), plus utm_campaign = the plan.
+ * the booking itself says which plan the call is about. Everything else (the
+ * 15-minute slot, the display settings and the attribution parameters) comes
+ * from bookingUrl above, with the button recorded as plan_intake_<plan>.
  */
 export function planBookUrl(
   planKey: BookablePlanKey,
   prefill: { name?: string; email?: string; notes?: string } = {},
 ): string {
-  const base = PLAN_BOOK_URLS[planKey] ?? BOOK_CALL_URL;
-  const path = typeof window !== 'undefined' ? window.location.pathname : '/';
-
   let notes = `Plan: ${planSummary(planKey)}`;
   const extra = (prefill.notes ?? '').trim();
   if (extra) notes += `\n${extra}`;
   if (notes.length > BOOK_NOTES_MAX) notes = `${notes.slice(0, BOOK_NOTES_MAX - 3).trimEnd()}...`;
 
-  const params: Array<[string, string]> = [];
-  const name = (prefill.name ?? '').trim();
-  const email = (prefill.email ?? '').trim();
-  if (name) params.push(['name', name]);
-  if (email) params.push(['email', email]);
-  params.push(
-    ['notes', notes],
-    ['duration', '15'],
-    ['theme', 'light'],
-    ['layout', 'month_view'],
-    ['utm_source', 'echopulse.media'],
-    ['utm_medium', 'booking_modal'],
-    ['utm_campaign', `plan_${planKey}`],
-    ['utm_content', path],
-  );
-  const query = params.map(([k, v]) => `${k}=${encodeURIComponent(v)}`).join('&');
-  return `${base}${base.includes('?') ? '&' : '?'}${query}`;
+  return bookingUrl({
+    location: `plan_intake_${planKey}`,
+    base: PLAN_BOOK_URLS[planKey] ?? BOOK_CALL_URL,
+    embed: true,
+    plan: planKey,
+    prefill: { name: prefill.name, email: prefill.email, notes },
+  });
 }

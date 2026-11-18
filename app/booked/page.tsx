@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 /**
  * Where Cal.com sends people after a booking (set as the event's redirect
  * URL). It exists so a booking can be measured: BookedSignal records the
- * `call_booked` event, attributed to the page the visitor booked from. It is
+ * `booking_confirmed` event, attributed to the page the visitor booked from. It is
  * usually shown inside the booking modal's iframe, so it carries no nav and
  * stays short.
  */

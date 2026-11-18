@@ -176,6 +176,8 @@ export async function createLead(args: {
   serviceInterest?: string;
   source: 'Cal.com' | 'Contact form' | 'WhatsApp' | 'DM' | 'Referral' | string;
   notes?: string;
+  /** "Where this lead came from" block from formatOriginNotes (lib/attribution.ts). */
+  originNotes?: string;
   /** Comma-separated emails/GIDs to tag as followers on the task. */
   followers?: string;
   /** Override the auto-generated title (used by Pune flow to make it actionable: "📞 Call ..."). */
@@ -196,7 +198,7 @@ export async function createLead(args: {
     `Source: ${args.source}`,
     '',
     args.notes ?? '',
-  ].filter(Boolean).join('\n');
+  ].filter(Boolean).join('\n') + (args.originNotes ? `\n\n${args.originNotes}` : '');
 
   return createAsanaTask({
     projectId: gid('ASANA_SALES_PROJECT_GID') ?? '',

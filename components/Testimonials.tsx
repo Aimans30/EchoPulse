@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { FREE_EDITS_LABEL, FREE_EDITS_URL } from '@/lib/links';
 import { PROMISES } from '@/lib/pricing';
 import { trackPilotClick } from '@/lib/analytics';
@@ -88,6 +89,9 @@ export default function Testimonials() {
             </p>
           </div>
           <p className="fl-sign">Lakshya</p>
+          <Link href="/case-studies" className="fl-more" data-cursor-hover>
+            Read the case studies
+          </Link>
         </article>
       </div>
 
@@ -109,6 +113,10 @@ export default function Testimonials() {
         .fl-body p { font-size: 16.5px; line-height: 1.62; color: #2E2C28; margin: 0 0 14px; }
         .fl-body p:last-child { margin-bottom: 0; }
         .fl-sign { font-size: 24px; font-weight: 800; font-style: italic; letter-spacing: -0.03em; margin: 20px 0 0; }
+
+        .fl-more { display: inline-flex; align-items: center; min-height: 44px; margin-top: 10px; color: #B23A0C; font-size: 15px; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+        .fl-more:hover { color: #0C0C0B; }
+        .fl-more:focus-visible { outline: 2px solid #E8541A; outline-offset: 3px; }
 
         .fl-btn { display: inline-flex; align-items: center; justify-content: center; min-height: 50px; padding: 0 28px; border-radius: 100px; font-family: inherit; font-size: 14.5px; font-weight: 700; text-decoration: none; cursor: pointer; transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease; }
         .fl-btn-primary { background: #0C0C0B; color: #F2EEE7; border: 1px solid #0C0C0B; }

@@ -5,7 +5,7 @@ import Image from "next/image";
 import type { CaseStudy } from "@/lib/caseStudyData";
 import { getIcp } from "@/lib/icpData";
 import {
-  BOOK_CALL_URL,
+  staticBookingUrl,
   BOOK_CALL_LABEL,
   BOOK_CALL_REASSURANCE,
   FREE_EDITS_LABEL,
@@ -181,7 +181,9 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
                 <div className="cs-hero-cta">
                   <a
                     className="cs-btn cs-btn-primary"
-                    href={BOOK_CALL_URL}
+                    href={staticBookingUrl("case_study_hero")}
+                    data-track="case_study_cta_click"
+                    data-track-location="case_study_hero"
                     target="_blank"
                     rel="noopener"
                   >
@@ -602,13 +604,20 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
               <p className="cs-midcta-text">{study.midCtaText}</p>
               <div className="cs-midcta-actions">
                 {isFounder && (
-                  <a className="cs-btn cs-btn-primary" href={FREE_EDITS_URL}>
+                  <a
+                    className="cs-btn cs-btn-primary"
+                    href={FREE_EDITS_URL}
+                    data-track="case_study_cta_click"
+                    data-track-location="case_study_mid_free_edits"
+                  >
                     {FREE_EDITS_LABEL}
                   </a>
                 )}
                 <a
                   className={`cs-btn ${isFounder ? "cs-btn-ghost" : "cs-btn-primary"}`}
-                  href={BOOK_CALL_URL}
+                  href={staticBookingUrl("case_study_mid")}
+                  data-track="case_study_cta_click"
+                  data-track-location="case_study_mid"
                   target="_blank"
                   rel="noopener"
                 >
@@ -716,7 +725,9 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
             <div className="cs-close-cta">
               <a
                 className="cs-btn cs-btn-primary cs-btn-lg"
-                href={BOOK_CALL_URL}
+                href={staticBookingUrl("case_study_close")}
+                data-track="case_study_cta_click"
+                data-track-location="case_study_close"
                 target="_blank"
                 rel="noopener"
               >

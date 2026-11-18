@@ -174,6 +174,14 @@ export default function ICPAuthority({
         @media (max-width: 640px) {
           .auth-stats-3, .auth-stats-4 { grid-template-columns: 1fr 1fr; }
           .auth-stat { padding: 20px 16px; }
+          /* Phone legibility: labels were 10px to 10.5px, list copy 14px. */
+          .auth-eyebrow { font-size: 12px; letter-spacing: 3px; }
+          .auth-side-tag { font-size: 12px; letter-spacing: 1.6px; }
+          .auth-stat-label { font-size: 14px; }
+          .auth-stat-src { font-size: 12px; }
+          .auth-points li { font-size: 15px; }
+          /* A lone third stat left an empty cell beside it; it spans the row. */
+          .auth-stats > *:last-child:nth-child(odd) { grid-column: 1 / -1; }
         }
       `}</style>
     </section>

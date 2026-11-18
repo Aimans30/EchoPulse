@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useGeoPrice } from '@/lib/useGeoPrice';
 import { type BookablePlanKey } from '@/lib/links';
-import { trackPilotClick, trackCallClick } from '@/lib/analytics';
+import { trackPlanSelect } from '@/lib/analytics';
 import { PRICING_CARDS, PROMISES, type Plan } from '@/lib/pricing';
 import PlanIntakeModal from './PlanIntakeModal';
 
@@ -88,8 +88,10 @@ export default function Pricing({ pricingCopy }: { pricingCopy?: PricingCopy } =
   const [intake, setIntake] = useState<{ plan: BookablePlanKey; n: number } | null>(null);
   const openIntake = (key: Plan['key'], location: string) => {
     if (key === 'free') return;
-    if (key === 'pilot') trackPilotClick(location);
-    else trackCallClick(location);
+    // One event for every plan, with the plan as a parameter. These used to be
+    // split across cta_pilot_click and cta_call_click, which made a plan
+    // choice look like a booking click.
+    trackPlanSelect(key, location);
     setIntake((prev) => ({ plan: key, n: (prev?.n ?? 0) + 1 }));
   };
 

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { createLead, addAsanaSubtask } from '@/lib/asana';
 import { postToSlack } from '@/lib/slack';
+import { formatBookingOrigin } from '@/lib/attribution';
 
 /**
  * Cal.com webhook receiver — fires when someone books / cancels / reschedules.
@@ -41,6 +42,8 @@ interface CalWebhookPayload {
     uid?: string;
     location?: string;
     additionalNotes?: string;
+    /** metadata[...] URL parameters from the booking link (see bookingUrl in lib/links.ts). */
+    metadata?: Record<string, unknown>;
   };
 }
 
@@ -79,6 +82,9 @@ export async function POST(req: Request) {
   const fullName = attendee.name ?? 'Unknown attendee';
   const email = attendee.email ?? 'no-email@unknown';
   const notes = p.additionalNotes ?? '';
+  // Where the visitor came from and which button they booked with, when the
+  // booking link carried it. Empty for links shared by hand.
+  const cameFrom = formatBookingOrigin(p.metadata);
 
   // ── BOOKING_CREATED — the meaty path ─────────────────────────────────
   if (event.triggerEvent === 'BOOKING_CREATED') {
@@ -87,6 +93,7 @@ export async function POST(req: Request) {
       source: 'Cal.com',
       serviceInterest: eventTypeName,
       notes: `Meeting: ${eventTypeName}\nWhen: ${startStr}\n${notes ? `Notes from attendee: ${notes}` : ''}`,
+      originNotes: cameFrom ? `Where this booking came from\n${cameFrom.split(' · ').join('\n')}` : undefined,
     });
 
     // Pre-seed prep subtasks so the call doesn't ambush you
@@ -111,7 +118,7 @@ export async function POST(req: Request) {
           type: 'section',
           text: {
             type: 'mrkdwn',
-            text: `*${fullName}*  ·  ${email}\n*When:* ${startStr} (IST)\n*Type:* ${eventTypeName}${notes ? `\n*Notes:* ${notes}` : ''}`,
+            text: `*${fullName}*  ·  ${email}\n*When:* ${startStr} (IST)\n*Type:* ${eventTypeName}${cameFrom ? `\n*Came from:* ${cameFrom}` : ''}${notes ? `\n*Notes:* ${notes}` : ''}`,
           },
         },
         ...(asanaTask ? [{

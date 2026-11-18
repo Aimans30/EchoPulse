@@ -35,13 +35,13 @@ const WEIGHT_LABEL: Record<IcpData['services'][number]['weight'], string> = {
 // omitted here (the homepage nav keeps it); these standalone pages have no blog
 // section to route to.
 const ICP_NAV_LINKS: NavLink[] = [
+  { label: 'Work', href: '#work' },
   { label: 'Why now', href: '#why' },
   { label: 'Services', href: '#services' },
-  { label: 'Work', href: '#work' },
   { label: 'Pricing', href: '#pricing' },
   { label: 'FAQ', href: '#faq' },
 ];
-const ICP_SECTION_IDS = ['why', 'services', 'work', 'pricing', 'faq'];
+const ICP_SECTION_IDS = ['work', 'why', 'services', 'pricing', 'faq'];
 
 // Eyebrow badge: icon tile + uppercase label, matching the service-page voice.
 function Eyebrow({ label, accent, Icon, onDark = false }: { label: string; accent: string; Icon: LucideIcon; onDark?: boolean }) {
@@ -58,7 +58,11 @@ function Eyebrow({ label, accent, Icon, onDark = false }: { label: string; accen
 export default function ICPPage({ data, videos, guides = [] }: { data: IcpData; videos: VideoEntry[]; guides?: Guide[] }) {
   const accent = data.accentColor;
   const Icon = ICON_MAP[data.icon];
-  const stats = data.stats.slice(0, 4);
+  // One statistics block per page. Where the education section carries its own
+  // sourced figures, those are the ones shown and this band is skipped; it was
+  // rendering directly above them as a second copy.
+  const hasAuthorityStats = (data.authority.stats?.length ?? 0) > 0;
+  const stats = hasAuthorityStats ? [] : data.stats.slice(0, 4);
   // Describes the animated pipeline for screen readers and crawlers: what the
   // client supplies, what EchoPulse produces, and how it compounds.
   const deviceAlt = `How EchoPulse works for ${data.name.toLowerCase()}: ${data.pipeline.input.label.toLowerCase()}, and EchoPulse produces ${data.pipeline.outputs
@@ -102,7 +106,7 @@ export default function ICPPage({ data, videos, guides = [] }: { data: IcpData; 
               <p className="icp-hero-sub">{data.heroSub}</p>
               <div className="icp-hero-actions">
                 <ICPBookButton label={BOOK_CALL_LABEL_LONG} location="icp_hero" accent={accent} size="lg" fullWidthMobile />
-                <a href="#services" className="icp-hero-secondary">See how it works</a>
+                <Link href={FREE_EDITS_URL} className="icp-hero-secondary">{FREE_EDITS_LABEL}</Link>
               </div>
             </div>
             <div className="icp-hero-visual">
@@ -111,13 +115,66 @@ export default function ICPPage({ data, videos, guides = [] }: { data: IcpData; 
           </div>
           <div className="icp-container icp-byline-wrap">
             <p className="icp-byline">
-              Written and reviewed by <Link href="/about">Lakshya Soni</Link>, founder. Last updated{' '}
+              Written and reviewed by <Link href="/about/lakshya-soni">Lakshya Soni</Link>, founder. Last updated{' '}
               <time dateTime={PAGES_UPDATED_ISO}>{PAGES_UPDATED_LABEL}</time>.
             </p>
           </div>
         </section>
 
-        {/* ── 2. WHY NOW (light) ── */}
+        {/* ── 2. WORK (dark) — directly under the hero. Real tagged clips, or a
+             labeled placeholder. Visitors arrive wanting to see the edits. ── */}
+        <section id="work" className="icp-section icp-section-dark icp-work-section" data-dark-bg="true">
+          <div className="icp-container">
+            <Reveal>
+              <div className="icp-eyebrow-line" style={{ color: 'rgba(242,238,231,0.55)' }}>
+                <span style={{ width: 22, height: 1, background: accent, display: 'block' }} />
+                Work in this space
+              </div>
+              <h2 className="icp-h2" style={{ color: '#F2EEE7' }}>
+                Edits we cut for <span style={{ color: accent }}>{data.name.toLowerCase()}</span>.
+              </h2>
+            </Reveal>
+          </div>
+          {videos.length > 0 ? (
+            <ICPWork videos={videos} accent={accent} />
+          ) : (
+            <div className="icp-container">
+              {/* This placeholder previously read "Sample work for this segment
+                  is being produced. Book a call and we will walk you through
+                  the closest examples." Every single buyer in a 10-person panel
+                  stopped here. Telling someone the proof exists but they have
+                  to book a call to see it is the worst possible trade: it asks
+                  for commitment before giving evidence.
+
+                  There IS one real, permissioned proof asset: a published case
+                  study carrying a genuine Google Search Console export, shared
+                  with the client's written consent. Almost nothing on the site
+                  linked to it. Naming the gap honestly and handing over the one
+                  real thing beats asking them to take it on faith. */}
+              <div className="icp-work-placeholder">
+                We have not published work for this segment yet, and we are not going to
+                dress up someone else&apos;s as if we had.{' '}
+                <Link href="/case-studies/magicbnb-seo-aeo" style={{ color: accent, fontWeight: 700 }}>
+                  Read the one case study we can show you
+                </Link>
+                , with a real Search Console export published with the client&apos;s permission,
+                and the open problems still on the account listed at the bottom of it. It is a
+                different industry, and you can judge the work on its own terms.
+              </div>
+            </div>
+          )}
+          {data.resource && (
+            <div className="icp-container icp-work-resource-wrap">
+              <p className="icp-work-resource">
+                {data.resource.text}{' '}
+                <Link href={data.resource.href} style={{ color: accent }}>{data.resource.linkLabel}</Link>
+              </p>
+            </div>
+          )}
+        </section>
+
+
+        {/* ── 3. WHY NOW (light) ── */}
         <section id="why" className="icp-section icp-section-light">
           <div className="icp-container icp-narrow">
             <Reveal>
@@ -137,7 +194,9 @@ export default function ICPPage({ data, videos, guides = [] }: { data: IcpData; 
           </div>
         </section>
 
-        {/* ── 3. THE MARKET REALITY (dark) — big stat blocks ── */}
+        {/* ── 4. THE MARKET REALITY (dark) — big stat blocks. Only where the
+             education section below has no figures of its own. ── */}
+        {stats.length > 0 && (
         <section className="icp-section icp-section-dark" data-dark-bg="true">
           <div className="icp-container">
             <Reveal>
@@ -164,6 +223,7 @@ export default function ICPPage({ data, videos, guides = [] }: { data: IcpData; 
             </p>
           </div>
         </section>
+        )}
 
         {/* ── 3b. THE EDUCATION (light) — why this matters to THEM, with the
              psychology sequence: reframe → sourced evidence → both-sides
@@ -289,49 +349,6 @@ export default function ICPPage({ data, videos, guides = [] }: { data: IcpData; 
               </div>
             </Reveal>
           </div>
-        </section>
-
-        {/* ── 7. WORK (dark) — real tagged clips, or a labeled placeholder ── */}
-        <section id="work" className="icp-section icp-section-dark icp-work-section" data-dark-bg="true">
-          <div className="icp-container">
-            <Reveal>
-              <div className="icp-eyebrow-line" style={{ color: 'rgba(242,238,231,0.55)' }}>
-                <span style={{ width: 22, height: 1, background: accent, display: 'block' }} />
-                Work in this space
-              </div>
-              <h2 className="icp-h2" style={{ color: '#F2EEE7' }}>
-                Edits we cut for <span style={{ color: accent }}>{data.name.toLowerCase()}</span>.
-              </h2>
-            </Reveal>
-          </div>
-          {videos.length > 0 ? (
-            <ICPWork videos={videos} accent={accent} />
-          ) : (
-            <div className="icp-container">
-              {/* This placeholder previously read "Sample work for this segment
-                  is being produced. Book a call and we will walk you through
-                  the closest examples." Every single buyer in a 10-person panel
-                  stopped here. Telling someone the proof exists but they have
-                  to book a call to see it is the worst possible trade: it asks
-                  for commitment before giving evidence.
-
-                  There IS one real, permissioned proof asset: a published case
-                  study carrying a genuine Google Search Console export, shared
-                  with the client's written consent. Almost nothing on the site
-                  linked to it. Naming the gap honestly and handing over the one
-                  real thing beats asking them to take it on faith. */}
-              <div className="icp-work-placeholder">
-                We have not published work for this segment yet, and we are not going to
-                dress up someone else&apos;s as if we had.{' '}
-                <Link href="/case-studies/magicbnb-seo-aeo" style={{ color: accent, fontWeight: 700 }}>
-                  Read the one case study we can show you
-                </Link>
-                , with a real Search Console export published with the client&apos;s permission,
-                and the open problems still on the account listed at the bottom of it. It is a
-                different industry, and you can judge the work on its own terms.
-              </div>
-            </div>
-          )}
         </section>
 
         {/* ── 7b. RISK REVERSAL (light) — the strongest close available without
@@ -527,7 +544,13 @@ export default function ICPPage({ data, videos, guides = [] }: { data: IcpData; 
         .icp-cmp-dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; margin-right: 6px; }
 
         /* Work */
+        /* Sits directly under the dark hero, so it does not need a full
+           section's top padding on top of the hero's bottom padding. */
+        .icp-work-section { padding-top: 24px; }
         .icp-work-section .icp-container { margin-bottom: 40px; }
+        .icp-work-section .icp-work-resource-wrap { margin: 28px auto 0; }
+        .icp-work-resource { font-family: Inter, sans-serif; font-size: 14.5px; line-height: 1.6; color: rgba(242,238,231,0.66); margin: 0; }
+        .icp-work-resource a { font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
         .icp-work-placeholder { border: 1px dashed rgba(242,238,231,0.25); border-radius: 18px; padding: 48px 32px; text-align: center; color: rgba(242,238,231,0.6); font-size: 15px; line-height: 1.6; max-width: 720px; margin: 0 auto; }
 
         /* Risk reversal */
@@ -614,6 +637,27 @@ export default function ICPPage({ data, videos, guides = [] }: { data: IcpData; 
           .icp-cmp-us { border-left: none; }
           .icp-cmp-them { border-left: none; border-top: 1px dashed rgba(12,12,11,0.08); }
           .icp-final { padding: 48px 24px; }
+
+          /* Phone legibility pass (Nov 2026). Desktop sizes are untouched.
+             1. globals.css forces a 56px top padding on every section under
+                768px, which slid the hero eyebrow underneath the fixed nav
+                pill (its bottom edge is at 84px). The hero states its own. */
+          .icp-hero { padding-top: 104px !important; }
+          /* 2. Labels were 9px to 11px and paragraph copy 13.5px to 14px. */
+          .icp-hero-eyebrow { font-size: 12px; letter-spacing: 1.4px; }
+          .icp-eyebrow-line { font-size: 12px; letter-spacing: 3px; }
+          .icp-svc-weight { font-size: 11.5px; letter-spacing: 0.6px; }
+          .icp-stat-meaning { font-size: 14.5px; }
+          .icp-stat-note { font-size: 13px; }
+          .icp-svc-why, .icp-deliv-desc, .icp-risk-desc { font-size: 15px; }
+          .icp-cmp-feature, .icp-cmp-us, .icp-cmp-them { font-size: 15px; }
+          .icp-cmp-head > div, .icp-cmp-head .icp-cmp-us, .icp-cmp-head .icp-cmp-them { font-size: 12px; }
+          .icp-final-note { font-size: 13px; }
+          /* 3. A lone third stat left an empty grey cell beside it in the
+                two-column grid. It now spans the row. */
+          .icp-stat-grid > *:last-child:nth-child(odd) { grid-column: 1 / -1; }
+          /* 4. Standalone link, so it gets a thumb-sized row. */
+          .icp-founder-link { display: inline-flex; align-items: center; min-height: 44px; }
         }
       `}</style>
     </>

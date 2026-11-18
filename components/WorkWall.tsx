@@ -3,7 +3,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import type { WallClip, IcpKey } from '@/lib/videos';
-import { BOOK_CALL_URL, FREE_EDITS_LABEL, FREE_EDITS_URL } from '@/lib/links';
+import { staticBookingUrl, FREE_EDITS_LABEL, FREE_EDITS_URL } from '@/lib/links';
+import { trackWorkVideoOpen } from '@/lib/analytics';
 
 /**
  * The /work wall: a full-screen bento of every edit, shot like a camera move.
@@ -479,7 +480,12 @@ export default function WorkWall({ clips }: { clips: WallClip[] }) {
                 tabIndex={t.first ? 0 : -1}
                 aria-hidden={t.first ? undefined : true}
                 aria-label={`${t.clip.brand}: ${t.clip.label}. Open video.`}
-                onClick={() => { if (!s.current.moved) setOpen(t.clip); }}
+                onClick={() => {
+                  if (s.current.moved) return;
+                  // The main proof asset: which clip, for which brand. No visitor data.
+                  trackWorkVideoOpen(t.clip.label, t.clip.brand);
+                  setOpen(t.clip);
+                }}
                 onFocus={(e) => {
                   // Keyboard: bring the focused tile to the middle of the screen.
                   if (!e.currentTarget.matches(':focus-visible')) return;
@@ -545,7 +551,14 @@ export default function WorkWall({ clips }: { clips: WallClip[] }) {
           <strong>Want edits like these?</strong>
           <span>Free 15-minute call. Your first 2 edits are free.</span>
         </p>
-        <a href={BOOK_CALL_URL} target="_blank" rel="noopener noreferrer" className="ww-book">
+        <a
+          href={staticBookingUrl('work_wall_bar')}
+          data-track="work_wall_cta_click"
+          data-track-location="work_wall_bar"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="ww-book"
+        >
           <i className="ww-book-dot" aria-hidden="true" />
           Book a call <span className="ww-book-arrow" aria-hidden="true">&rarr;</span>
         </a>
@@ -566,8 +579,8 @@ export default function WorkWall({ clips }: { clips: WallClip[] }) {
                 <span>{[open.label, ...open.types.map((t) => TYPE_LABEL[t] ?? t)].filter((v, i, a) => a.indexOf(v) === i).join(' · ')}</span>
               </div>
               <div className="ww-lightbox-actions">
-                <a href={FREE_EDITS_URL} className="ww-btn ww-btn-primary">{FREE_EDITS_LABEL}</a>
-                <a href={BOOK_CALL_URL} target="_blank" rel="noopener noreferrer" className="ww-btn">Book a call</a>
+                <a href={FREE_EDITS_URL} data-track="work_wall_cta_click" data-track-location="work_wall_lightbox_free_edits" className="ww-btn ww-btn-primary">{FREE_EDITS_LABEL}</a>
+                <a href={staticBookingUrl('work_wall_lightbox')} data-track="work_wall_cta_click" data-track-location="work_wall_lightbox" target="_blank" rel="noopener noreferrer" className="ww-btn">Book a call</a>
                 <button type="button" className="ww-btn" onClick={() => setOpen(null)}>Close</button>
               </div>
             </div>

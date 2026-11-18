@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { createLead } from '@/lib/asana';
 import { postToSlack, buildLeadMessage } from '@/lib/slack';
 import { rateLimit } from '@/lib/rateLimit';
+import { countryFromHeaders, formatCameFromLine, formatOriginNotes, sanitizeAttribution } from '@/lib/attribution';
 
 /**
  * Generic lead-capture endpoint.
@@ -13,7 +14,14 @@ import { rateLimit } from '@/lib/rateLimit';
  *   3. Returns { ok: true, asanaUrl } so the client can show success state
  *
  * Required body fields:  fullName, email, source
- * Optional body fields:  phone, company, serviceInterest, notes
+ * Optional body fields:  phone, company, serviceInterest, notes, attribution
+ *
+ * `attribution` is the object from getAttribution() in lib/attribution.ts:
+ * where the visitor first landed, the referring host, UTM values and the
+ * pages seen this visit. It is validated here (known keys, strings only,
+ * length caps) and printed as a "Came from" line in Slack and a short block
+ * in the Asana notes, together with the visitor's country from the platform's
+ * geo header. The IP address is never read, logged or stored by this route.
  *
  * Source values to use:
  *   "Contact form" | "Lead magnet" | "Cal.com" | "WhatsApp" | "DM" |
@@ -26,6 +34,10 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
     const { fullName, email, phone, company, serviceInterest, source, notes } = body ?? {};
+    const attribution = sanitizeAttribution(body?.attribution);
+    const country = countryFromHeaders(req.headers);
+    const cameFrom = formatCameFromLine(attribution, country);
+    const originNotes = formatOriginNotes(attribution, country);
 
     if (!fullName || !email || !source) {
       return NextResponse.json(
@@ -36,7 +48,7 @@ export async function POST(req: Request) {
 
     // 1. Asana card (Sales Pipeline · New Lead)
     const asanaTask = await createLead({
-      fullName, email, phone, company, serviceInterest, source, notes,
+      fullName, email, phone, company, serviceInterest, source, notes, originNotes,
     });
 
     // 2. Slack ping (#leads channel — falls back to firehose)
@@ -44,6 +56,7 @@ export async function POST(req: Request) {
       buildLeadMessage({
         fullName, email, source,
         notes: notes ?? `${serviceInterest ? `Interest: ${serviceInterest}` : ''}${company ? ` · Company: ${company}` : ''}`,
+        cameFrom,
         asanaTaskUrl: asanaTask?.permalink_url,
         title: source === 'free_edits_form' ? '🎬 Free edits request' : source === 'plan_intake' ? '📦 Plan request' : undefined,
       }),

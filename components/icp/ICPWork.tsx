@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { useParams } from 'next/navigation';
 import { previewMp4Src, type Orientation, type VideoEntry } from '@/lib/videos';
+import { trackWorkVideoOpen } from '@/lib/analytics';
 
 // Card sizing (mirrors OurWork proportions, slightly smaller for the ICP rail).
 const CARD_H = 360;
@@ -176,7 +177,7 @@ export default function ICPWork({ videos, accent }: { videos: VideoEntry[]; acce
                 key={`${video.url}-${i}`}
                 className="icp-vid-card"
                 style={{ width: cardWidth(orient), height: CARD_H, position: 'relative', flexShrink: 0, borderRadius: 16, overflow: 'hidden', cursor: 'pointer', boxShadow: '0 8px 30px rgba(12,12,11,0.10)' }}
-                onClick={() => openModal(video.url)}
+                onClick={() => { trackWorkVideoOpen(video.label, video.brand); openModal(video.url); }}
                 data-cursor-hover
               >
                 {previewSrc ? (

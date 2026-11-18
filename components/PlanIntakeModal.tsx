@@ -4,6 +4,8 @@ import { useEffect, useId, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { PRICING_CARDS } from '@/lib/pricing';
 import { planBookUrl, planSummary, type BookablePlanKey } from '@/lib/links';
+import { getAttribution } from '@/lib/attribution';
+import { trackPlanIntakeSubmit, trackPlanSelect } from '@/lib/analytics';
 
 /**
  * Plan intake: opened by the button on a pricing card.
@@ -191,6 +193,8 @@ export default function PlanIntakeModal({
       serviceInterest: planSummary(plan),
       company: answers.business,
       notes: [`Plan: ${planSummary(plan)}`, ...lines, `Page: ${window.location.pathname}`].join('\n'),
+      // Where this visitor first came from; /api/lead prints it on the lead.
+      attribution: getAttribution(),
     };
 
     // Logging the request is ours to get right, not the visitor's problem: if
@@ -220,6 +224,8 @@ export default function PlanIntakeModal({
     }
 
     setSaved(ok);
+    // Plan key and whether we saved it. Never the name, email or answers.
+    trackPlanIntakeSubmit(plan, ok);
     setBookUrl(planBookUrl(plan, { name: payload.fullName, email: payload.email, notes: lines.join('\n') }));
     setLoaded(false);
     setSlow(false);
@@ -286,7 +292,7 @@ export default function PlanIntakeModal({
                         name={id('plan')}
                         value={p.key}
                         checked={plan === p.key}
-                        onChange={() => setPlan(p.key)}
+                        onChange={() => { setPlan(p.key); trackPlanSelect(p.key, 'plan_intake_modal'); }}
                         className="pim-sr"
                       />
                       <span className="pim-plan-dot" aria-hidden="true" />
@@ -456,7 +462,7 @@ export default function PlanIntakeModal({
                   <div className="pim-spinner" aria-hidden="true" />
                   <span>Loading the calendar</span>
                   {slow && (
-                    <a className="pim-cal-link" href={bookUrl} target="_blank" rel="noopener noreferrer">
+                    <a className="pim-cal-link" href={bookUrl} data-track-location={`plan_intake_${plan}_new_tab`} target="_blank" rel="noopener noreferrer">
                       Taking a while? Open the calendar in a new tab
                     </a>
                   )}

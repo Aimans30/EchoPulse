@@ -279,7 +279,7 @@ export default function PricingPage() {
               ))}
             </ul>
             <div className="pr-card-cta">
-              <Link href={FREE_EDITS_URL} className="pr-free-btn">{FREE_SAMPLE.cta} <span aria-hidden="true">&rarr;</span></Link>
+              <Link href={FREE_EDITS_URL} data-track-location="pricing_page_free_card" className="pr-free-btn">{FREE_SAMPLE.cta} <span aria-hidden="true">&rarr;</span></Link>
               <p className="pr-reassure">A short form, or email the footage link. No card and no call are asked for at any point.</p>
             </div>
           </div>
@@ -522,6 +522,8 @@ export default function PricingPage() {
           .pr-proof-label { font-size: 13px; color: #6E6B63; line-height: 1.4; }
           .pr-proof-link { color: ${ACCENT}; font-weight: 700; font-size: 14px; text-decoration: none; }
           .pr-proof-link:hover { text-decoration: underline; }
+          /* Standalone link: a full 44px row on touch widths. */
+          @media (max-width: 760px) { .pr-proof-link { display: inline-flex; align-items: center; min-height: 44px; font-size: 15px; } }
 
           /* CTA */
           .pr-cta { padding-bottom: 128px !important; }
@@ -538,6 +540,16 @@ export default function PricingPage() {
             .pr-steps, .pr-not-list, .pr-fit-list { grid-template-columns: 1fr; }
             .pr-free-inner { padding: 32px 22px; }
             .pr-card-cta { align-items: stretch; }
+            /* The comparison table is 760px wide inside a 350px column, so it
+               scrolls sideways. On a phone the row labels scrolled away with
+               it and the plan columns lost their meaning. The label column
+               now stays pinned while the plans scroll underneath it. */
+            .pr-table { min-width: 700px; }
+            .pr-table thead th:first-child, .pr-table tbody th {
+              position: sticky; left: 0; z-index: 1; background: #F2EEE7;
+              width: 118px; min-width: 118px; padding-right: 12px;
+              box-shadow: 1px 0 0 rgba(12,12,11,0.10);
+            }
           }
         `}</style>
       </main>

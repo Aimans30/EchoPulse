@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
 import { services } from '@/lib/serviceData';
+import { BOOK_CALL_URL, FREE_EDITS_LABEL, FREE_EDITS_URL } from '@/lib/links';
 
 /**
  * /about — the founder entity page.
@@ -226,6 +227,15 @@ export default function AboutPage() {
               <a href="mailto:lakshya@echopulse.media">lakshya@echopulse.media</a>
             </li>
           </ul>
+
+          {/* Same ask as the closing block, where the reader has just met
+              the person: one button, one text link. */}
+          <div className="about-ask">
+            <Link href={FREE_EDITS_URL} className="about-cta-btn">{FREE_EDITS_LABEL}</Link>
+            <a href={BOOK_CALL_URL} className="about-ask-link" target="_blank" rel="noopener noreferrer">
+              Or book a free 15-minute call with Lakshya
+            </a>
+          </div>
         </div>
       </section>
 
@@ -304,19 +314,19 @@ export default function AboutPage() {
       <section className="about-cta">
         <h2 className="about-h2">Want to see the work before you commit?</h2>
         <p>
-          That is what the Pilot is for. Fourteen days, $299, real deliverables on your
-          brand, and you keep everything whether you continue or not.
+          Send footage you already have and get 2 edited videos back within 48 hours,
+          free. No card, no call, and the files are yours to keep.
         </p>
-        {/* Was href="/order". That page is the a-la-carte editing menu and has
-            no Pilot in it, so "Start the Pilot" landed the reader in a
-            different product at different prices. Points at the pricing
-            section, where the Pilot actually is. */}
-        <Link href="/#pricing" className="about-cta-btn">
-          Start the Pilot
-        </Link>
-        <p className="about-cta-alt">
-          Or <Link href="/blog">read the blog</Link> to see how we think first.
-        </p>
+        {/* Was "Start the Pilot" linking to /#pricing, a paid step as the only
+            ask on the page buyers open to check who is behind the studio. The
+            free sample is the lower-commitment first step; the call is the
+            text link. */}
+        <div className="about-ask">
+          <Link href={FREE_EDITS_URL} className="about-cta-btn">{FREE_EDITS_LABEL}</Link>
+          <a href={BOOK_CALL_URL} className="about-ask-link" target="_blank" rel="noopener noreferrer">
+            Or book a free 15-minute call with Lakshya
+          </a>
+        </div>
       </section>
 
       {/* Plain CSS, no JS. Everything above renders on the server. */}
@@ -467,8 +477,19 @@ export default function AboutPage() {
           padding-top: 64px !important; padding-bottom: 128px !important;
           border-top: 1px solid rgba(12,12,11,0.08);
         }
+        .about-ask {
+          display: flex; flex-direction: column; align-items: flex-start;
+          gap: 14px; margin-top: 24px;
+        }
+        .about-ask-link {
+          display: inline-flex; align-items: center; min-height: 44px;
+          color: #0C0C0B; font-size: 15px; font-weight: 600;
+          text-decoration: underline; text-decoration-color: #E8541A;
+          text-underline-offset: 3px;
+        }
+        .about-ask-link:hover { color: #E8541A; }
         .about-cta-btn {
-          display: inline-block; margin-top: 24px;
+          display: inline-block;
           background: #E8541A; color: #fff; text-decoration: none;
           font-weight: 700; font-size: 15px;
           padding: 15px 32px; border-radius: 999px;

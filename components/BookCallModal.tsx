@@ -1,21 +1,16 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { BOOK_CALL_URL } from '@/lib/links';
+import { useEffect, useRef, useState } from 'react';
+import { BOOK_CALL_URL, bookingUrl, staticBookingUrl } from '@/lib/links';
+import { lastBookingClick } from '@/lib/attribution';
+import { track } from '@/lib/analytics';
 
 /**
- * Cal.com URL for the modal. Carries UTM parameters so each booking in
- * Cal.com shows which page it came from (utm_content = the page path).
+ * Cal.com URLs come from bookingUrl() in lib/links.ts, the one builder every
+ * booking link uses. It adds the 15-minute slot and display settings (embed)
+ * and the visitor's first-touch source, landing page and the button they
+ * clicked, so the booking in Cal.com says where it came from.
  */
-function calUrl(base: string): string {
-  const sep = base.includes('?') ? '&' : '?';
-  const path = typeof window !== 'undefined' ? window.location.pathname : '/';
-  const utm = `utm_source=echopulse.media&utm_medium=booking_modal&utm_content=${encodeURIComponent(path)}`;
-  // duration=15 preselects the 15-minute slot. The Cal.com event offers
-  // several lengths and defaulted to 20, which contradicted every page that
-  // promises a 15-minute call.
-  return `${base}${sep}duration=15&theme=light&layout=month_view&${utm}`;
-}
 
 export default function BookCallModal() {
   const [open, setOpen] = useState(false);
@@ -28,9 +23,36 @@ export default function BookCallModal() {
   // seconds of waiting, offer the same calendar in a new tab instead of an
   // endless spinner.
   const [slow, setSlow] = useState(false);
+  // Built when the modal opens, so it names the button that opened it (the
+  // click every opener records through trackCallClick) and the page it was
+  // on. The iframe is loaded once and then kept, so a second open from
+  // another button reuses the first URL; the booking_confirmed event still
+  // names the latest button.
+  const [url, setUrl] = useState('');
+  const openedAt = useRef(0);
+  const wasOpen = useRef(false);
+  const loadedRef = useRef(false);
+
+  // Closed without the calendar ever appearing is a different failure from
+  // closed after looking at the slots, so the close event says which.
+  useEffect(() => {
+    if (open) { wasOpen.current = true; return; }
+    if (!wasOpen.current) return;
+    wasOpen.current = false;
+    track('book_call_modal_close', { calendar_loaded: loadedRef.current });
+  }, [open]);
 
   useEffect(() => {
-    (window as unknown as { openBookCallModal?: () => void; closeBookCallModal?: () => void }).openBookCallModal = () => { setMounted(true); setOpen(true); };
+    (window as unknown as { openBookCallModal?: () => void; closeBookCallModal?: () => void }).openBookCallModal = () => {
+      const click = lastBookingClick();
+      // Only trust a click from the last few seconds: an opener that forgot to
+      // track must not inherit the name of an older button.
+      const location = click && Date.now() - click.at < 5000 ? click.location : 'unknown';
+      setUrl((prev) => prev || bookingUrl({ location: `${location}_modal`, embed: true }));
+      openedAt.current = Date.now();
+      setMounted(true);
+      setOpen(true);
+    };
     (window as unknown as { openBookCallModal?: () => void; closeBookCallModal?: () => void }).closeBookCallModal = () => setOpen(false);
     return () => {
       try {
@@ -80,7 +102,8 @@ export default function BookCallModal() {
       try {
         const link = document.createElement('link');
         link.rel = 'prefetch';
-        link.href = calUrl(BOOK_CALL_URL);
+        // Warms the connection and the HTML only; the real URL is built on open.
+        link.href = staticBookingUrl('prefetch', `${BOOK_CALL_URL}?duration=15&theme=light&layout=month_view`);
         link.as = 'document';
         document.head.appendChild(link);
       } catch { /* noop */ }
@@ -179,7 +202,8 @@ export default function BookCallModal() {
               <span style={{ fontSize: '14px', color: '#4A4740', fontFamily: 'Inter, sans-serif' }}>Loading the calendar</span>
               {slow && (
                 <a
-                  href={calUrl(BOOK_CALL_URL)}
+                  href={url}
+                  data-track-location="book_modal_slow_fallback"
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{ fontSize: '14px', fontWeight: 700, color: '#0C0C0B', textDecoration: 'underline', textDecorationColor: '#E8541A', textUnderlineOffset: '4px', minHeight: '44px', display: 'inline-flex', alignItems: 'center' }}
@@ -191,8 +215,12 @@ export default function BookCallModal() {
           )}
           <iframe
             title="Book a call · EchoPulse"
-            src={calUrl(BOOK_CALL_URL)}
-            onLoad={() => setLoaded(true)}
+            src={url}
+            onLoad={() => {
+              if (!loaded) track('book_call_calendar_loaded', { seconds: Math.round((Date.now() - openedAt.current) / 1000) });
+              loadedRef.current = true;
+              setLoaded(true);
+            }}
             style={{ width: '100%', height: '100%', border: 0, display: 'block', colorScheme: 'light', opacity: loaded ? 1 : 0, transition: 'opacity 0.3s ease' }}
             allow="autoplay; fullscreen; clipboard-write"
             loading="eager"

@@ -161,6 +161,8 @@ export function buildLeadMessage(args: {
   email: string;
   source: string;
   notes?: string;
+  /** One line from formatCameFromLine (lib/attribution.ts): landing page, referrer, UTM, AI flag, country. */
+  cameFrom?: string;
   asanaTaskUrl?: string;
   /** Overrides the header, e.g. for the free-edits form. */
   title?: string;
@@ -175,7 +177,7 @@ export function buildLeadMessage(args: {
         type: 'section',
         text: {
           type: 'mrkdwn',
-          text: `*${args.fullName}*  ·  ${args.email}\n*Source:* ${args.source}${args.notes ? `\n${args.notes.includes('\n') ? args.notes.split('\n').map((l) => l.replace(/^([^:]{1,40}):/, '*$1:*')).join('\n') : `*Notes:* ${args.notes}`}` : ''}`.slice(0, 2900),
+          text: `*${args.fullName}*  ·  ${args.email}\n*Source:* ${args.source}${args.cameFrom ? `\n*Came from:* ${args.cameFrom.slice(0, 700)}` : ''}${args.notes ? `\n${args.notes.includes('\n') ? args.notes.split('\n').map((l) => l.replace(/^([^:]{1,40}):/, '*$1:*')).join('\n') : `*Notes:* ${args.notes}`}` : ''}`.slice(0, 2900),
         },
       },
       ...(args.asanaTaskUrl ? [{
