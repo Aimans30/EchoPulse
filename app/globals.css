@@ -536,12 +536,18 @@ a:active, button:active {
 
 /* Body text minimum size on phones — research says <16px causes iOS zoom */
 @media (max-width: 768px) {
-  /* Floor any tiny inline 9-12px utility/eyebrow text at 11px so it stays readable */
+  /* Floor any tiny inline 9-11.5px utility/eyebrow text at 12px so it stays
+     readable. Was an 11px floor covering only 9px and 10px; the Nov 2026
+     phone audit found inline 10.5px, 11px and 11.5px labels on most pages. */
   *[style*="fontSize:'9px'"],
   *[style*="font-size: 9px"],
+  *[style*="font-size: 9.5px"],
   *[style*="fontSize:'10px'"],
-  *[style*="font-size: 10px"] {
-    font-size: 11px !important;
+  *[style*="font-size: 10px"],
+  *[style*="font-size: 10.5px"],
+  *[style*="font-size: 11px"],
+  *[style*="font-size: 11.5px"] {
+    font-size: 12px !important;
   }
   /* Inputs at 16px+ to prevent iOS auto-zoom on focus */
   input, textarea, select {
@@ -843,3 +849,90 @@ img, video {
   }
 }
 
+
+/* ──────────────────────────────────────────────────────────
+   PHONE TYPE FLOOR (Nov 2026 phone audit)
+   On a 360 to 390px screen the site's uppercase labels rendered at 9.5px to
+   11.5px and a good deal of paragraph copy at 13px to 14.5px. Floors here:
+   12px for uppercase labels, tags and badges, 13px for captions and small
+   print, 15px for paragraph copy. Phones only; desktop sizes are untouched.
+
+   The rules live in one block instead of in thirty component files so the
+   floor can be reviewed, tuned or reverted in one place. Each selector is
+   prefixed with `html body` because several of the component rules it
+   overrides are themselves !important.
+   ────────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  /* Uppercase labels, eyebrows, tags, badges: 12px */
+  html body .mf-eyebrow,
+  html body .fl-eyebrow,
+  html body .hlp-eyebrow,
+  html body .fe-eyebrow,
+  html body .pr-eyebrow,
+  html body .pr-badge,
+  html body .fq-eyebrow,
+  html body .about-eyebrow,
+  html body .about-step-period,
+  html body .au-eyebrow,
+  html body .rs-eyebrow,
+  html body .rs-for,
+  html body .sl-eyebrow,
+  html body .sl-label,
+  html body .wi-eyebrow,
+  html body .pp-eyebrow,
+  html body .nf-eyebrow,
+  html body .nl-eyebrow,
+  html body .np-eyebrow,
+  html body .csi-tag,
+  html body .csi-badge,
+  html body .cs-status,
+  html body .cs-pair-tag,
+  html body .ba-tag,
+  html body .pricing-region,
+  html body .pms-badge,
+  html body .gd-eyebrow,
+  html body .ow-eyebrow,
+  html body .terms-label,
+  html body .site-footer h4 {
+    font-size: 12px !important;
+  }
+  /* 3px to 4px tracking at 12px wraps short labels; ease it slightly. */
+  html body .hlp-eyebrow,
+  html body .pr-eyebrow,
+  html body .fq-eyebrow,
+  html body .about-eyebrow,
+  html body .au-eyebrow,
+  html body .wi-eyebrow,
+  html body .pp-eyebrow,
+  html body .ow-eyebrow,
+  html body .site-footer h4 {
+    letter-spacing: 2.4px !important;
+  }
+
+  /* Captions, table headers, small print: 13px */
+  html body .cs-stat-label,
+  html body .cs-chart-caption,
+  html body .cs-root figcaption,
+  html body .cs-root th,
+  html body .np-page th,
+  html body .gd-more,
+  html body .gd-note {
+    font-size: 13px !important;
+  }
+
+  /* Paragraph copy: 15px */
+  html body .pr-reassure,
+  html body .sl-note,
+  html body .np-note,
+  html body .orderflow-sub,
+  html body .csi-standard-detail,
+  html body .cs-client-tag,
+  html body .cs-fail-desc,
+  html body .cs-work-summary,
+  html body .cs-problem-detail,
+  html body .cs-limit-detail,
+  html body .gd-excerpt,
+  html body .terms-body {
+    font-size: 15px !important;
+  }
+}

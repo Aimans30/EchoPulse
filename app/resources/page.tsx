@@ -94,6 +94,8 @@ export default function ResourcesPage() {
         .rs-for { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #6E6B63; }
         .rs-title { font-size: 22px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.2; overflow-wrap: break-word; }
         .rs-blurb { font-size: 15.5px; line-height: 1.6; color: #3E3D3A; }
+        /* padding-top needs !important here: globals.css forces a 56px top padding on every section under 768px, which pulled this hero's first line up underneath the fixed nav pill (nav bottom edge is at 84px). */
+        @media (max-width: 768px) { .rs-wrap { padding-top: 110px !important; } }
         @media (max-width: 640px) { .rs-wrap { padding: 110px 18px 72px; } .rs-card { padding: 20px; } }
       `}</style>
     </>

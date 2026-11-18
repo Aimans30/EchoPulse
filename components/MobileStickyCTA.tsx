@@ -7,8 +7,8 @@
  *  for attention. Felt like a brutal hard-sell stacked on top of the content.
  *
  *  New version: ONE clear primary action ("Book a strategy call") that opens
- *  the in-page BookCallModal. The Pilot reference becomes a tiny secondary
- *  hint underneath ("Or see the $299 14-day Pilot") — informative, not pushy.
+ *  the in-page BookCallModal. Underneath sits one quiet secondary link to the
+ *  free sample ("Or get 2 free edits", /free-edits), informative, not pushy.
  *  Smaller overall footprint, calmer presence.
  *
  *  Also: auto-hides when the user scrolls UP (means they're reading, not
@@ -19,9 +19,9 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { usePathname } from 'next/navigation';
-import { trackPilotClick, trackCallClick } from '@/lib/analytics';
-import { BOOK_CALL_LABEL } from '@/lib/links';
-import { useGeoPrice } from '@/lib/useGeoPrice';
+import Link from 'next/link';
+import { track, trackCallClick } from '@/lib/analytics';
+import { BOOK_CALL_LABEL, FREE_EDITS_LABEL, FREE_EDITS_URL } from '@/lib/links';
 
 const SCROLL_TRIGGER_PX = 600;
 const KEYBOARD_HEIGHT_THRESHOLD = 0.75;
@@ -37,7 +37,13 @@ const KEYBOARD_HEIGHT_THRESHOLD = 0.75;
  * then. On a phone the bar covers a meaningful share of the screen, so on the
  * one page type where the whole goal is reading, it costs more than it earns.
  */
-const SUPPRESSED_PREFIXES = ['/blog'];
+/*
+ * The form and checkout routes are suppressed for a different reason: the
+ * visitor is already doing the thing the bar asks for. At 390px the bar sat on
+ * top of the /free-edits "Continue" button while the form was being filled in,
+ * and its second line would link to the page the visitor is on.
+ */
+const SUPPRESSED_PREFIXES = ['/blog', '/free-edits', '/order', '/onboard', '/booked'];
 
 export default function MobileStickyCTA() {
   const pathname = usePathname();
@@ -54,7 +60,6 @@ export default function MobileStickyCTA() {
   const [barHeight, setBarHeight] = useState(0);
   const barRef = useRef<HTMLDivElement>(null);
   const lastY = useRef(0);
-  const { currency, prices } = useGeoPrice();
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -194,7 +199,7 @@ export default function MobileStickyCTA() {
           color: '#F2EEE7',
           border: 'none',
           borderRadius: '100px',
-          fontSize: '14.5px',
+          fontSize: '15px',
           fontWeight: 700,
           letterSpacing: '-0.15px',
           fontFamily: 'Inter, sans-serif',
@@ -210,41 +215,32 @@ export default function MobileStickyCTA() {
         <span aria-hidden="true" style={{ fontSize: '12px', opacity: 0.85 }}>→</span>
       </button>
 
-      {/* SECONDARY — tiny, quiet, optional. Reads like a helpful hint, not a pitch. */}
-      {/* href is the absolute `/#pricing` so this never dead-ends: only the
-          homepage and the ICP pages actually contain an `id="pricing"`, and on
-          a blog post or /about a bare `#pricing` scrolls nowhere and looks
-          broken. When the section IS on the current page we intercept and
-          smooth-scroll to it instead of doing a full navigation. */}
-      <a
-        href="/#pricing"
-        onClick={(e) => {
-          trackPilotClick('mobile_sticky_secondary');
-          const local = document.getElementById('pricing');
-          if (local) {
-            e.preventDefault();
-            local.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }
-        }}
+      {/* SECONDARY: the free sample, the lowest-friction ask on the site.
+          It was "Or see the $299 14-day Pilot" until Nov 2026, which pointed
+          a first-time visitor at the paid step. Label and URL come from
+          lib/links.ts so this never drifts from the hero and pricing CTAs.
+          A plain same-tab link to the internal /free-edits page. */}
+      <Link
+        href={FREE_EDITS_URL}
+        onClick={() => track('cta_free_edits_click', { location: 'mobile_sticky_secondary' })}
         style={{
-          fontSize: '11.5px',
+          fontSize: '13px',
           fontWeight: 500,
           color: '#6E6B63',
           textDecoration: 'none',
           letterSpacing: '0.1px',
-          // 8px of vertical padding turns an 11.5px line of text into a ~32px
-          // strip. globals.css exempts `span a` / `p a` from its 44px touch
-          // floor, and this link sits inside neither, but it is a real second
-          // action, so it gets a thumb-sized band of its own.
-          padding: '8px 12px',
-          minHeight: '32px',
+          // A real second action, so it gets a full 44px thumb band. The
+          // negative bottom margin keeps the bar's overall height where it was.
+          padding: '0 16px',
+          minHeight: '44px',
+          margin: '-6px 0 -6px',
           display: 'inline-flex',
           alignItems: 'center',
           touchAction: 'manipulation',
         }}
       >
-        Or see the <span style={{ color: '#E8541A', fontWeight: 700, marginLeft: 4 }}>{currency}{prices.pilot} 14-day Pilot</span>
-      </a>
+        Or <span style={{ color: '#C2410C', fontWeight: 700, marginLeft: 4 }}>{FREE_EDITS_LABEL.charAt(0).toLowerCase() + FREE_EDITS_LABEL.slice(1)}</span>
+      </Link>
     </div>
     </>
   );

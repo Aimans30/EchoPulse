@@ -29,7 +29,7 @@ export default function GuidesSection({
       className="guides-section"
     >
       <div style={{ maxWidth: 1180, margin: '0 auto' }}>
-        <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', color: '#E8541A', margin: '0 0 12px' }}>
+        <p className="gd-eyebrow" style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', color: '#E8541A', margin: '0 0 12px' }}>
           Read before you book
         </p>
         <h2 id="guides-heading" style={{ fontFamily: 'Inter, sans-serif', fontSize: 'clamp(26px, 3vw, 40px)', fontWeight: 900, letterSpacing: '-1.2px', lineHeight: 1.08, margin: '0 0 10px' }}>
@@ -64,16 +64,16 @@ export default function GuidesSection({
               >
                 <span style={{ display: 'block', fontSize: 15.5, fontWeight: 700, lineHeight: 1.3, marginBottom: 6 }}>{g.title}</span>
                 {g.excerpt ? (
-                  <span style={{ display: 'block', fontSize: 13, lineHeight: 1.5, color: muted }}>
+                  <span className="gd-excerpt" style={{ display: 'block', fontSize: 13, lineHeight: 1.5, color: muted }}>
                     {g.excerpt.length > 120 ? `${g.excerpt.slice(0, 117)}...` : g.excerpt}
                   </span>
                 ) : null}
-                <span style={{ display: 'inline-block', marginTop: 10, fontSize: 12, fontWeight: 700, color: '#E8541A' }}>Read the guide &rarr;</span>
+                <span className="gd-more" style={{ display: 'inline-block', marginTop: 10, fontSize: 12, fontWeight: 700, color: '#E8541A' }}>Read the guide &rarr;</span>
               </Link>
             </li>
           ))}
         </ul>
-        <p style={{ marginTop: 22, fontSize: 13, color: muted }}>
+        <p className="gd-note" style={{ marginTop: 22, fontSize: 13, color: muted }}>
           <Link href="/blog" style={{ color: fg, fontWeight: 600 }}>All guides</Link> are sourced, dated and written by the people who do the work.
         </p>
       </div>

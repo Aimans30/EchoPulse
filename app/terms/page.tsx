@@ -48,7 +48,7 @@ export default function TermsPage() {
           Back to EchoPulse
         </Link>
 
-        <div style={{
+        <div className="terms-label" style={{
           fontSize: '10px', fontWeight: 700, letterSpacing: '4px',
           textTransform: 'uppercase', color: 'rgba(232,84,26,0.85)',
           marginBottom: '12px',
@@ -254,8 +254,8 @@ export default function TermsPage() {
         </Section>
 
         <div style={{ marginTop: '60px', padding: '24px 26px', background: 'rgba(232,84,26,0.07)', border: '1px solid rgba(232,84,26,0.25)', borderRadius: '14px' }}>
-          <div style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', color: '#E8541A', marginBottom: '8px' }}>Acknowledgement</div>
-          <p style={{ fontSize: '13px', color: 'rgba(242,238,231,0.78)', lineHeight: 1.7, margin: 0 }}>
+          <div className="terms-label" style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', color: '#E8541A', marginBottom: '8px' }}>Acknowledgement</div>
+          <p className="terms-body" style={{ fontSize: '13px', color: 'rgba(242,238,231,0.78)', lineHeight: 1.7, margin: 0 }}>
             By placing an Order with EchoPulse, You confirm that You have read, understood, and accept these Terms of Service in full, and that You are entering into a binding legal contract on the terms set out above.
           </p>
         </div>
@@ -275,7 +275,7 @@ function Section({ n, title, children }: { n: string; title: string; children: R
         <span style={{ color: '#E8541A', fontSize: '13px', fontWeight: 800, letterSpacing: '1px' }}>{n}.</span>
         {title}
       </h2>
-      <div style={{ fontSize: '14px', color: 'rgba(242,238,231,0.72)', lineHeight: 1.75 }}>{children}</div>
+      <div className="terms-body" style={{ fontSize: '14px', color: 'rgba(242,238,231,0.72)', lineHeight: 1.75 }}>{children}</div>
     </section>
   );
 }

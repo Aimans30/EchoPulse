@@ -556,6 +556,7 @@ export default function OurWork() {
               initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
+              className="ow-eyebrow"
               style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '4px', textTransform: 'uppercase', color: '#B8B2A6', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '14px' }}
             >
               <span style={{ width: '22px', height: '1px', background: '#E8541A', display: 'block' }} />
@@ -756,23 +757,33 @@ export default function OurWork() {
           .work-arrow { display:none !important; }
 
           .work-tabs { padding: 0 14px !important; margin-bottom: 16px !important; }
+          /* The five tabs used to be squeezed into one row at 9.5px (8.5px
+             under 380px) with overflow hidden, which cut "Talking head" off
+             mid-word and left a 24px tap target. They now keep their natural
+             width at 12px, 44px tall, and the row scrolls sideways, the same
+             pattern the /work filter pills use. */
           .work-tabs .tab-bar {
             display: flex !important; width: 100% !important;
             max-width: 100% !important; box-sizing: border-box !important;
-            padding: 3px !important; gap: 1px !important;
-            overflow: hidden !important; border-radius: 10px !important;
+            padding: 3px !important; gap: 2px !important;
+            overflow-x: auto !important; overflow-y: hidden !important;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior-x: contain;
+            border-radius: 12px !important;
           }
           .tab-btn {
-            flex: 1 1 0 !important; min-width: 0 !important;
-            padding: 6px 2px !important; font-size: 9.5px !important;
-            letter-spacing: 0px !important; text-align: center !important;
-            white-space: nowrap !important; overflow: hidden !important;
-            border-radius: 7px !important;
+            flex: 0 0 auto !important;
+            padding: 0 14px !important; min-height: 44px !important;
+            font-size: 12px !important;
+            letter-spacing: 0.6px !important; text-align: center !important;
+            white-space: nowrap !important;
+            border-radius: 9px !important;
           }
-          .tab-pill-bg { border-radius: 7px !important; }
+          .tab-pill-bg { border-radius: 9px !important; }
           .tab-count   { display: none !important; }
 
           .work-track { padding: 0 16px !important; }
+          .vid-brand { font-size: 12px !important; }
           .vid-card                   { height: 180px !important; }
           .vid-card:not(.vid-card-h)  { width: calc(180px * 9 / 16) !important; }
           .vid-card-h                 { width: calc(180px * 16 / 9) !important; }
@@ -797,7 +808,6 @@ export default function OurWork() {
           #work { padding: 40px 0 36px !important; }
           .work-header h2           { font-size: 30px !important; }
           .work-header { margin-bottom: 16px !important; }
-          .tab-btn                  { font-size: 8.5px !important; }
           .vid-card                 { height: 168px !important; }
           .vid-card:not(.vid-card-h){ width: calc(168px * 9 / 16) !important; }
           .vid-card-h               { width: calc(168px * 16 / 9) !important; }

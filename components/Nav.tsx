@@ -170,7 +170,21 @@ export default function Nav({
   // testing on desktop at narrow widths.
   useEffect(() => {
     if (!mobileOpen) return;
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setMobileOpen(false); };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') { setMobileOpen(false); return; }
+      // Keep Tab inside the open menu (its links, its CTA and the toggle).
+      // The menu covers the whole screen, so without this a keyboard or
+      // switch-control user tabbed straight into page content hidden behind it.
+      if (e.key !== 'Tab') return;
+      const menu = document.getElementById('mobile-nav-menu');
+      const toggle = document.querySelector<HTMLElement>('.nav-hamburger');
+      if (!menu || !toggle) return;
+      const items = [toggle, ...Array.from(menu.querySelectorAll<HTMLElement>('a[href], button'))];
+      const i = items.indexOf(document.activeElement as HTMLElement);
+      const next = e.shiftKey ? (i <= 0 ? items.length - 1 : i - 1) : (i === -1 || i === items.length - 1 ? 0 : i + 1);
+      e.preventDefault();
+      items[next].focus();
+    };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [mobileOpen]);
@@ -309,6 +323,12 @@ export default function Nav({
             box-shadow: 0 6px 28px rgba(12,12,11,0.10), inset 0 1px 0 rgba(255,255,255,0.92) !important;
             justify-content: space-between !important;
           }
+          /* On a phone the pill sits over body copy for the whole scroll, and
+             at 60% white / 55% black the text passing underneath stayed
+             readable through it and tangled with the wordmark. Phones get a
+             more opaque fill; desktop keeps its lighter glass. */
+          .nav-pill { background: rgba(250,248,244,0.90) !important; }
+          .nav-pill.nav-on-dark { background: rgba(12,12,11,0.86) !important; }
           /* Hide the image logo on phone to free up space; text logo stays */
           .nav-pill > a[href="/"] > img { display: none !important; }
           .nav-pill > a[href="/"] > span { font-size: 15px !important; }
@@ -409,6 +429,7 @@ export default function Nav({
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
+            id="mobile-nav-menu"
             className="mobile-nav-menu"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -574,6 +595,8 @@ export default function Nav({
           className={`nav-hamburger${mobileOpen ? ' open' : ''}`}
           onClick={() => setMobileOpen(o => !o)}
           aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+          aria-expanded={mobileOpen}
+          aria-controls="mobile-nav-menu"
         >
           <span />
           <span />
