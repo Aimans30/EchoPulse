@@ -932,7 +932,7 @@ const RAW_PAGES: NichePageRaw[] = [
       },
       {
         q: 'Do you guarantee followers or leads?',
-        a: 'No. We guarantee what we control: the number of deliverables, a 48 hour turnaround per deliverable and re-dos until you would post it under your own name.',
+        a: 'No. We guarantee what we control: the number of deliverables, a 48 hour turnaround on short-form edits and re-dos until you would post it under your own name.',
       },
       {
         q: 'Am I locked in?',

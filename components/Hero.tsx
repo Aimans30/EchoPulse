@@ -23,7 +23,7 @@ import { trackPilotClick, trackCallClick } from '@/lib/analytics';
 // Both swapped for figures that are true and checkable. "7 services" is
 // correct and stays: lib/serviceData.ts defines seven.
 const BAND_STATS = [
-  { value: '48h',   label: 'turnaround per deliverable' },
+  { value: '48h',   label: 'turnaround on short-form edits' },
   { value: '3h',    label: 'reply window every workday' },
   { value: '2',     label: 'free edits to start, no card' },
   { value: '$299',  label: 'Pilot, keep everything made' },

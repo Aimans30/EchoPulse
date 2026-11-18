@@ -180,7 +180,7 @@ export const icps: IcpData[] = [
     stats: [
       { value: '73%', label: 'of homeowners prefer an agent who uses video (NAR, 2025)' },
       { value: '26%', label: 'of agents use video on every listing. That gap is your edge.' },
-      { value: '48 hr', label: 'standard edit turnaround per deliverable' },
+      { value: '48 hr', label: 'turnaround on short-form edits' },
       { value: '2', label: 'free edits to start, no card' },
     ],
     pipeline: {
@@ -212,7 +212,7 @@ export const icps: IcpData[] = [
         { value: '26%', label: 'of agents consistently use video on every listing. That gap is your edge.', source: 'NAR, Real Estate in a Digital Age, 2025' },
         // Replaces an inquiries-uplift figure attributed to NAR that could not
         // be traced to a NAR report. This one is ours and checkable.
-        { value: '48 hr', label: 'standard edit turnaround per deliverable', source: 'EchoPulse Media, every plan' },
+        { value: '48 hr', label: 'turnaround on short-form edits', source: 'EchoPulse Media, every plan' },
       ],
       split: {
         left: {
@@ -292,7 +292,7 @@ export const icps: IcpData[] = [
         '2 static or carousel posts (just listed, just sold, market update), captions ready',
         '1 long-form SEO blog (a neighborhood or market guide buyers search for)',
         'Content audit + 30-day listing-content plan',
-        '48-hour turnaround per deliverable, revised until you are happy',
+        '48-hour turnaround on short-form edits, revised until you are happy',
         'No retainer commitment. You keep everything made.',
       ],
       presence: [
@@ -445,7 +445,7 @@ export const icps: IcpData[] = [
         '2 LinkedIn posts or carousels in your voice, ready to post',
         '1 long-form SEO blog (category authority, sourced)',
         'Content audit + 30-day inbound plan',
-        '48-hour turnaround per deliverable, revised until you are happy',
+        '48-hour turnaround on short-form edits, revised until you are happy',
         'No retainer commitment. You keep everything made.',
       ],
       presence: [
@@ -514,7 +514,7 @@ export const icps: IcpData[] = [
     stats: [
       { value: 'Own it', label: 'an email list is yours, the algorithm is not' },
       { value: 'Evergreen', label: 'content fills the top of funnel without you filming daily' },
-      { value: '48 hr', label: 'standard edit turnaround per deliverable' },
+      { value: '48 hr', label: 'turnaround on short-form edits' },
       { value: '$299', label: 'Pilot, and you keep everything we make' },
     ],
     pipeline: {
@@ -608,7 +608,7 @@ export const icps: IcpData[] = [
         '2 authority posts or carousels, captions ready',
         '1 long-form SEO blog (a problem-aware article that feeds your funnel)',
         'Content audit + 30-day content plan',
-        '48-hour turnaround per deliverable, revised until you are happy',
+        '48-hour turnaround on short-form edits, revised until you are happy',
         'No retainer commitment. You keep everything made.',
       ],
       presence: [

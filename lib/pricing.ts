@@ -73,7 +73,7 @@ export const PILOT: Plan = {
     '2 static or carousel posts, captions ready',
     '1 long-form SEO blog (1,500 words, sourced)',
     'Content audit + 30-day plan',
-    '48-hour turnaround per deliverable, revised until you are happy',
+    '48-hour turnaround on short-form edits, revised until you are happy',
     'No retainer commitment. You keep everything made.',
   ],
   cta: 'Start the $299 Pilot',
@@ -161,7 +161,7 @@ export const PRICE_LADDER_SENTENCE =
 /** Promises that appear next to prices. Use these words, not variants. */
 export const PROMISES = {
   replies: 'Replies within 3 hours in the workday',
-  turnaround: '48-hour turnaround per deliverable',
+  turnaround: '48-hour turnaround on short-form edits',
   revisions: 'Re-done until you would ship it under your own name',
   ownership: 'You keep everything made, whether or not you continue',
   noContract: 'Month-to-month. No contract.',
