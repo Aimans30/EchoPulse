@@ -12,8 +12,9 @@ const MUSIC = ['Upbeat', 'Calm', 'No music', 'You decide'] as const;
 
 /** A row of pill choices. `multi` allows several; otherwise one (click again to clear). */
 function Chips({
-  legend, options, value, onChange, multi, name,
+  legend, options, value, onChange, multi, name, invalid,
 }: {
+  invalid?: boolean;
   legend: string;
   options: readonly string[];
   value: string[];
@@ -26,7 +27,7 @@ function Chips({
     else onChange(value.includes(v) ? [] : [v]);
   };
   return (
-    <fieldset className="fe-chips">
+    <fieldset className="fe-chips" aria-invalid={invalid ? true : undefined}>
       <legend>{legend}</legend>
       <div>
         {options.map((v) => (
@@ -182,15 +183,9 @@ export default function FreeEditsForm() {
         </div>
       </div>
 
-      <div className="fe-field">
-        <label htmlFor={id('business')}>What kind of business?</label>
-        <select id={id('business')} value={business} onChange={(e) => setBusiness(e.target.value)} required {...fieldProps('business')}>
-          <option value="" disabled>Choose one</option>
-          {BUSINESS_TYPES.map((b) => (
-            <option key={b} value={b}>{b}</option>
-          ))}
-        </select>
-        {errors.business && <p className="fe-err" id={id('business-err')}>{errors.business}</p>}
+      <div>
+        <Chips legend="What kind of business?" name={id('business')} options={BUSINESS_TYPES} value={business ? [business] : []} onChange={(v) => setBusiness(v[0] ?? '')} invalid={!!errors.business} />
+        {errors.business && <p className="fe-err" id={id('business-err')} style={{ marginTop: 8 }}>{errors.business}</p>}
       </div>
 
       <p className="fe-step"><span>2</span> Your footage</p>
@@ -245,17 +240,19 @@ export default function FreeEditsForm() {
 }
 
 const styles = `
-  .fe-card { background: #0C0C0B; color: #F2EEE7; border-radius: 22px; padding: 28px; display: flex; flex-direction: column; gap: 18px; font-family: Inter, sans-serif; min-width: 0; }
+  .fe-card { background: #0C0C0B; color: #F2EEE7; border-radius: 24px; padding: 32px; box-shadow: 0 30px 80px rgba(12,12,11,0.18); display: flex; flex-direction: column; gap: 18px; font-family: Inter, sans-serif; min-width: 0; }
   .fe-field { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
   .fe-field label { font-size: 14px; font-weight: 700; }
   .fe-opt { font-weight: 500; color: rgba(242,238,231,0.55); }
   .fe-field input, .fe-field select, .fe-field textarea {
     width: 100%; box-sizing: border-box; min-height: 44px; padding: 11px 14px; font: 400 16px/1.4 Inter, sans-serif;
-    color: #F2EEE7; background: rgba(255,255,255,0.06); border: 1px solid rgba(242,238,231,0.22); border-radius: 12px;
+    color: #F2EEE7; background: rgba(255,255,255,0.06); border: 1px solid rgba(242,238,231,0.22); border-radius: 12px; transition: border-color .15s, background .15s;
   }
   .fe-field select { appearance: none; background-image: linear-gradient(45deg, transparent 50%, #F2EEE7 50%), linear-gradient(135deg, #F2EEE7 50%, transparent 50%); background-position: calc(100% - 20px) 50%, calc(100% - 14px) 50%; background-size: 6px 6px, 6px 6px; background-repeat: no-repeat; padding-right: 40px; }
   .fe-field select option { color: #0C0C0B; background: #F2EEE7; }
   .fe-field textarea { resize: vertical; }
+  .fe-field input:hover, .fe-field textarea:hover { border-color: rgba(242,238,231,0.42); }
+  .fe-field input:focus, .fe-field textarea:focus { background: rgba(255,255,255,0.09); }
   .fe-field input::placeholder { color: rgba(242,238,231,0.4); }
   .fe-field [aria-invalid="true"] { border-color: #FF8A5C; }
   .fe-field input:focus-visible, .fe-field select:focus-visible, .fe-field textarea:focus-visible, .fe-btn:focus-visible, .fe-card a:focus-visible {
@@ -272,6 +269,8 @@ const styles = `
   .fe-chip { position: relative; display: inline-flex; align-items: center; min-height: 38px; padding: 8px 14px; border-radius: 100px; font-size: 14px; font-weight: 600; cursor: pointer; color: rgba(242,238,231,0.82); background: rgba(255,255,255,0.06); border: 1px solid rgba(242,238,231,0.22); transition: background .15s, color .15s, border-color .15s; }
   .fe-chip input { position: absolute; opacity: 0; width: 1px; height: 1px; min-height: 0; padding: 0; }
   .fe-chip.is-on { background: #F2EEE7; color: #0C0C0B; border-color: #F2EEE7; }
+  .fe-chips[aria-invalid="true"] .fe-chip { border-color: #FF8A5C; }
+  .fe-chip:hover { border-color: rgba(242,238,231,0.5); color: #F2EEE7; }
   .fe-chip:focus-within { outline: 3px solid #E8541A; outline-offset: 2px; }
   .fe-center { text-align: center; margin-top: -6px; }
   @media (max-width: 520px) { .fe-row { grid-template-columns: 1fr; } }
@@ -279,7 +278,8 @@ const styles = `
   .fe-err { margin: 0; font-size: 13.5px; line-height: 1.5; color: #FF8A5C; }
   .fe-err a { color: #F2EEE7; font-weight: 700; overflow-wrap: anywhere; }
   .fe-fail { padding: 12px 14px; border: 1px solid rgba(255,138,92,0.5); border-radius: 12px; }
-  .fe-btn { min-height: 48px; padding: 12px 26px; border: none; border-radius: 100px; background: #E8541A; color: #fff; font: 800 16px Inter, sans-serif; cursor: pointer; }
+  .fe-btn { min-height: 54px; transition: background .2s, transform .15s; padding: 12px 26px; border: none; border-radius: 100px; background: #E8541A; color: #fff; font: 800 16px Inter, sans-serif; cursor: pointer; }
+  .fe-btn:hover:not(:disabled) { background: #FF6A2B; transform: translateY(-1px); }
   .fe-btn:disabled { opacity: 0.65; cursor: progress; }
   .fe-success { margin: 0; font-size: 20px; font-weight: 800; line-height: 1.35; }
   @media (max-width: 480px) { .fe-card { padding: 22px 18px; border-radius: 18px; } }
