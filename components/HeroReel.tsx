@@ -135,8 +135,7 @@ function ReelFrame({
         position: 'absolute',
         overflow: 'hidden',
         background: '#0C0C0B',
-        border: '1px solid rgba(12,12,11,0.1)',
-        boxShadow: '0 18px 50px rgba(12,12,11,0.14)',
+        boxShadow: '0 24px 60px rgba(12,12,11,0.16), 0 0 0 1px rgba(12,12,11,0.06)',
         ...style,
       }}
     >
@@ -202,7 +201,7 @@ export default function HeroReel() {
   const [hover, setHover] = useState(false);
   const [hidden, setHidden] = useState(false);
   const [onScreen, setOnScreen] = useState(true);
-  const rootRef = useRef<HTMLAnchorElement>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
 
   // Do not burn through clips in a background tab or below the fold.
   useEffect(() => {
@@ -218,51 +217,148 @@ export default function HeroReel() {
   const hasWide = WIDE.length > 0;
 
   return (
-    <Link
+    <div
       ref={rootRef}
-      href="/work"
-      data-cursor-hover
-      aria-label={`See all ${ALL.length} edits on the work wall`}
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
       className="hero-reel"
-      style={{
-        position: 'relative',
-        display: 'block',
-        width: W,
-        height: hasWide ? WIDE_H + GAP + TALL_H : TALL_H,
-        textDecoration: 'none',
-      }}
+      style={{ position: 'relative', width: W, height: hasWide ? WIDE_H + GAP + TALL_H : TALL_H }}
     >
-      {hasWide && (
+      <Link
+        href="/work"
+        data-cursor-hover
+        aria-label={`See all ${ALL.length} edits on the work wall`}
+        onMouseEnter={() => setHover(true)}
+        onMouseLeave={() => setHover(false)}
+        style={{ position: 'absolute', inset: 0, display: 'block', textDecoration: 'none' }}
+      >
+        {hasWide && (
+          <ReelFrame
+            clips={WIDE}
+            offset={0}
+            running={running}
+            reduced={reduced}
+            render={wide}
+            labelAt="bottom"
+            style={{ left: 0, top: 0, width: W, height: WIDE_H, borderRadius: 24 }}
+          />
+        )}
         <ReelFrame
-          clips={WIDE}
-          offset={0}
+          clips={TALL_A}
+          offset={SLOT_MS / 3}
           running={running}
           reduced={reduced}
           render={wide}
-          labelAt="top"
-          style={{ left: 0, top: 0, width: W, height: WIDE_H, borderRadius: 20 }}
+          labelAt="bottom"
+          style={{ left: 0, bottom: 0, width: TALL_W, height: TALL_H, borderRadius: 24 }}
         />
-      )}
-      <ReelFrame
-        clips={TALL_A}
-        offset={SLOT_MS / 3}
-        running={running}
-        reduced={reduced}
-        render={wide}
-        labelAt="bottom"
-        style={{ left: 0, bottom: 0, width: TALL_W, height: TALL_H, borderRadius: 20 }}
-      />
-      <ReelFrame
-        clips={TALL_B}
-        offset={(SLOT_MS * 2) / 3}
-        running={running}
-        reduced={reduced}
-        render={wide}
-        labelAt="bottom"
-        style={{ right: 0, bottom: 0, width: TALL_W, height: TALL_H, borderRadius: 20 }}
-      />
-    </Link>
+        <ReelFrame
+          clips={TALL_B}
+          offset={(SLOT_MS * 2) / 3}
+          running={running}
+          reduced={reduced}
+          render={wide}
+          labelAt="bottom"
+          style={{ right: 0, bottom: 0, width: TALL_W, height: TALL_H, borderRadius: 24 }}
+        />
+      </Link>
+
+      {/* What sits around the edits: the plan before them, the path after
+          them, and the one result we can prove. Decorative for assistive
+          tech (the same facts are in the page copy), and click-through. */}
+      <div className="hr-float hr-plan" aria-hidden="true">
+        <span className="hr-kicker">This week, planned for you</span>
+        <ul>
+          {['Content plan', 'Scripts and hooks', 'Shot list', 'Edits and posts'].map((t, i) => (
+            <li key={t} style={{ ['--i' as string]: i }}>
+              <i />
+              {t}
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div className="hr-float hr-funnel" aria-hidden="true">
+        <span className="hr-kicker">Where the views go</span>
+        <div className="hr-steps">
+          <b>Video</b>
+          <b>Website</b>
+          <b>Booked call</b>
+          <em />
+        </div>
+      </div>
+
+      <div className="hr-float hr-growth" aria-hidden="true">
+        <span className="hr-kicker">MagicBNB, daily Google impressions</span>
+        <div className="hr-growth-row">
+          <strong>5.8 &rarr; 4,859</strong>
+          <svg viewBox="0 0 96 34" width="96" height="34">
+            <path d="M2 31 C 18 30, 26 28, 36 25 S 54 20, 62 15 S 80 8, 94 3" fill="none" stroke="#E8541A" strokeWidth="2.5" strokeLinecap="round" pathLength="1" />
+          </svg>
+        </div>
+        <span className="hr-note">April to November 2026, from Search Console</span>
+      </div>
+
+      <style>{`
+        .hr-float {
+          position: absolute; z-index: 3; pointer-events: none; font-family: Inter, sans-serif; color: #0C0C0B;
+          padding: 11px 13px; border-radius: 16px; background: rgba(255,255,255,0.86);
+          border: 1px solid rgba(255,255,255,0.95);
+          -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+          box-shadow: 0 16px 40px rgba(12,12,11,0.14), 0 2px 6px rgba(12,12,11,0.06);
+          animation: hrBob 7s ease-in-out infinite;
+        }
+        .hr-kicker { display: block; font-size: 9.5px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: #6E6B63; margin-bottom: 7px; white-space: nowrap; }
+        @keyframes hrBob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+
+        .hr-plan { left: -58px; top: 34px; animation-duration: 8s; }
+        .hr-plan ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+        .hr-plan li { display: flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 600; white-space: nowrap; }
+        .hr-plan i {
+          position: relative; flex: 0 0 auto; width: 15px; height: 15px; border-radius: 50%;
+          border: 1.5px solid rgba(12,12,11,0.25);
+          animation: hrTick 8s calc(var(--i) * 0.9s) infinite both;
+        }
+        .hr-plan i::after {
+          content: ''; position: absolute; left: 4px; top: 1.5px; width: 3.5px; height: 7px;
+          border: solid #fff; border-width: 0 1.8px 1.8px 0; transform: rotate(45deg);
+        }
+        @keyframes hrTick {
+          0%, 6% { background: transparent; border-color: rgba(12,12,11,0.25); transform: scale(1); }
+          10% { background: #E8541A; border-color: #E8541A; transform: scale(1.25); }
+          14%, 92% { background: #E8541A; border-color: #E8541A; transform: scale(1); }
+          100% { background: transparent; border-color: rgba(12,12,11,0.25); }
+        }
+
+        .hr-funnel { right: -46px; top: ${Math.round(WIDE_H * 0.78)}px; animation-duration: 9s; animation-delay: -3s; }
+        .hr-steps { position: relative; display: flex; align-items: center; gap: 18px; }
+        .hr-steps b { position: relative; z-index: 1; font-size: 11.5px; font-weight: 700; padding: 5px 9px; border-radius: 100px; background: #0C0C0B; color: #F2EEE7; white-space: nowrap; }
+        .hr-steps b:last-of-type { background: #E8541A; color: #fff; }
+        .hr-steps::before { content: ''; position: absolute; left: 8px; right: 8px; top: 50%; height: 1.5px; background: rgba(12,12,11,0.18); }
+        .hr-steps em {
+          position: absolute; top: 50%; left: 0; width: 7px; height: 7px; margin-top: -3.5px; border-radius: 50%;
+          background: #E8541A; box-shadow: 0 0 0 4px rgba(232,84,26,0.18); z-index: 0;
+          animation: hrFlow 3.2s cubic-bezier(.45,0,.2,1) infinite;
+        }
+        @keyframes hrFlow { 0% { left: 4%; opacity: 0; } 12% { opacity: 1; } 88% { opacity: 1; } 100% { left: 94%; opacity: 0; } }
+
+        .hr-growth { left: -40px; bottom: 54px; animation-duration: 7.5s; animation-delay: -1.5s; }
+        .hr-growth-row { display: flex; align-items: center; gap: 12px; }
+        .hr-growth strong { font-size: 19px; font-weight: 900; letter-spacing: -0.5px; white-space: nowrap; }
+        .hr-growth path { stroke-dasharray: 1; stroke-dashoffset: 1; animation: hrDraw 6s ease-out infinite; }
+        @keyframes hrDraw { 0% { stroke-dashoffset: 1; } 35%, 92% { stroke-dashoffset: 0; } 100% { stroke-dashoffset: 0; opacity: 0; } }
+        .hr-note { display: block; font-size: 10.5px; color: #6E6B63; margin-top: 4px; white-space: nowrap; }
+
+        @media (max-width: 1180px) {
+          .hr-plan { left: -12px; }
+          .hr-growth { left: -8px; }
+          .hr-funnel { right: -10px; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .hr-float, .hr-plan i, .hr-steps em, .hr-growth path { animation: none; }
+          .hr-plan i { background: #E8541A; border-color: #E8541A; }
+          .hr-growth path { stroke-dashoffset: 0; }
+          .hr-steps em { left: 94%; }
+        }
+      `}</style>
+    </div>
   );
 }
