@@ -136,6 +136,10 @@ export default function PrivacyPage() {
                 resource you asked for.
               </li>
               <li>
+                <strong>The free edits form.</strong> It saves your name and email when you pass the
+                first step, so we can follow up if you do not finish.
+              </li>
+              <li>
                 <strong>Booking a call.</strong> Cal.com collects your name, email, time zone and any
                 notes you add, and sends them to us. Cal.com has its own privacy policy for the
                 booking page itself.
@@ -156,6 +160,11 @@ export default function PrivacyPage() {
                 <strong>Technical data.</strong> Our hosting provider logs IP address, browser type
                 and the page requested for security and error tracking. See section 3 for analytics,
                 which is separate and optional.
+              </li>
+              <li>
+                <strong>Where you came from.</strong> The site stores the first page you landed on,
+                the referring site and any campaign tags in your browser. If you make an enquiry or
+                booking, we attach them to it, to understand which pages bring enquiries.
               </li>
             </ul>
             <p>

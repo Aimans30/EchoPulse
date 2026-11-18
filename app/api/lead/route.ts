@@ -46,19 +46,25 @@ export async function POST(req: Request) {
       );
     }
 
+    const started = source === 'free_edits_started';
+    const leadNotes = started
+      ? `Started, not finished: they passed step 1 of the free edits form but have not sent footage yet.${notes ? `\n${notes}` : ''}`
+      : notes;
+
     // 1. Asana card (Sales Pipeline · New Lead)
     const asanaTask = await createLead({
-      fullName, email, phone, company, serviceInterest, source, notes, originNotes,
+      fullName, email, phone, company, serviceInterest, source, notes: leadNotes, originNotes,
+      titleOverride: started ? `${fullName} · 2 free edits · started, not finished` : undefined,
     });
 
     // 2. Slack ping (#leads channel — falls back to firehose)
     await postToSlack(
       buildLeadMessage({
         fullName, email, source,
-        notes: notes ?? `${serviceInterest ? `Interest: ${serviceInterest}` : ''}${company ? ` · Company: ${company}` : ''}`,
+        notes: leadNotes ?? `${serviceInterest ? `Interest: ${serviceInterest}` : ''}${company ? ` · Company: ${company}` : ''}`,
         cameFrom,
         asanaTaskUrl: asanaTask?.permalink_url,
-        title: source === 'free_edits_form' ? '🎬 Free edits request' : source === 'plan_intake' ? '📦 Plan request' : undefined,
+        title: started ? '🟡 Free edits started (not finished)' : source === 'free_edits_form' ? '🎬 Free edits request' : source === 'plan_intake' ? '📦 Plan request' : undefined,
       }),
     );
 

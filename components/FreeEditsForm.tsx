@@ -1,7 +1,8 @@
 'use client';
 
-import { useId, useState } from 'react';
-import { trackLeadMagnetSubmit } from '@/lib/analytics';
+import { useId, useRef, useState } from 'react';
+import { track, trackFreeEditsSubmit } from '@/lib/analytics';
+import { getAttribution } from '@/lib/attribution';
 
 const BUSINESS_TYPES = ['Real estate', 'Coaching', 'Founder or SaaS', 'Home services', 'DTC', 'Other'] as const;
 const VIDEO_KINDS = ['Short reel', 'Talking head', 'Podcast clips', 'Listing tour', 'Ad creative', 'Not sure'] as const;
@@ -42,6 +43,7 @@ function Chips({
 }
 
 const SOURCE = 'free_edits_form';
+const STARTED_SOURCE = 'free_edits_started';
 const CONTACT_EMAIL = 'lakshya@echopulse.media';
 
 type Status = 'idle' | 'submitting' | 'sent' | 'error';
@@ -58,8 +60,19 @@ function isHttpUrl(v: string): boolean {
   }
 }
 
+/** Adds https:// to a bare domain or path. Returns '' when it still is not a link. */
+function normalizeUrl(v: string): string {
+  const t = v.trim();
+  if (!t) return '';
+  const withScheme = /^[a-z][a-z0-9+.-]*:\/\//i.test(t) ? t : `https://${t.replace(/^\/+/, '')}`;
+  if (!isHttpUrl(withScheme)) return '';
+  return new URL(withScheme).hostname.includes('.') ? withScheme : '';
+}
+
 export default function FreeEditsForm() {
   const uid = useId();
+  const startedSent = useRef(false);
+  const [noLink, setNoLink] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -83,8 +96,9 @@ export default function FreeEditsForm() {
     if (!name.trim()) e.name = 'Enter your name.';
     if (!email.trim()) e.email = 'Enter your email.';
     else if (!EMAIL_RE.test(email.trim())) e.email = 'Enter a valid email address.';
-    if (!footage.trim()) e.footage = 'Paste a link to your footage.';
-    else if (!isHttpUrl(footage.trim())) e.footage = 'Enter a full link starting with https://';
+    if (footage.trim()) {
+      if (!normalizeUrl(footage)) e.footage = 'That does not look like a link. Try drive.google.com/your-folder';
+    } else if (!noLink) e.footage = 'Paste a link to your footage, or tick the box below.';
     if (!business) e.business = 'Choose the closest match.';
     return e;
   };
@@ -96,7 +110,36 @@ export default function FreeEditsForm() {
     const all = validate();
     const here = Object.fromEntries(Object.entries(all).filter(([k]) => STEP_OF[k as keyof Errors] === step)) as Errors;
     setErrors(here);
-    if (Object.keys(here).length === 0) setStep((n) => Math.min(2, n + 1));
+    if (Object.keys(here).length > 0) return;
+    track('free_edits_step', { step: step + 1, source: SOURCE });
+    if (step === 0 && !startedSent.current) {
+      startedSent.current = true;
+      // Non-blocking: save the lead now so it is not lost if they stop here.
+      try {
+        const line = (label: string, v: string) => (v.trim() ? `${label}: ${v.trim()}` : null);
+        fetch('/api/lead', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          keepalive: true,
+          body: JSON.stringify({
+            fullName: name.trim(),
+            email: email.trim(),
+            phone: phone.trim() || undefined,
+            source: STARTED_SOURCE,
+            serviceInterest: '2 free edits',
+            company: business,
+            notes: [line('Business type', business), line('Website or social', profile), line('Phone or WhatsApp', phone)].filter(Boolean).join('\n'),
+            attribution: getAttribution(),
+          }),
+        }).catch(() => {});
+      } catch { /* never block the form */ }
+    }
+    setStep((n) => Math.min(2, n + 1));
+  };
+
+  const skipAndSend = () => {
+    track('free_edits_step', { step: 'skip', source: SOURCE });
+    void submit();
   };
 
   const onSubmit = async (ev: React.FormEvent) => {
@@ -104,6 +147,11 @@ export default function FreeEditsForm() {
     if (status === 'submitting') return;
     // Enter inside an earlier step moves forward instead of submitting.
     if (step < 2) { goNext(); return; }
+    void submit();
+  };
+
+  const submit = async () => {
+    if (status === 'submitting') return;
     const e = validate();
     setErrors(e);
     const bad = Object.keys(e) as Array<keyof Errors>;
@@ -115,7 +163,7 @@ export default function FreeEditsForm() {
     setStatus('submitting');
     const line = (label: string, v: string) => (v.trim() ? `${label}: ${v.trim()}` : null);
     const notes = [
-      `Footage: ${footage.trim()}`,
+      footage.trim() ? `Footage: ${normalizeUrl(footage)}` : 'Footage: no link yet. Email them where to send it.',
       `Business type: ${business}`,
       line('Website or social', profile),
       line('Phone or WhatsApp', phone),
@@ -142,10 +190,11 @@ export default function FreeEditsForm() {
           serviceInterest: '2 free edits',
           company: business,
           notes,
+          attribution: getAttribution(),
         }),
       });
       if (!res.ok) throw new Error('submit failed');
-      trackLeadMagnetSubmit(SOURCE);
+      trackFreeEditsSubmit(SOURCE);
       setStatus('sent');
     } catch {
       setStatus('error');
@@ -217,7 +266,11 @@ export default function FreeEditsForm() {
 
       <div className="fe-field">
         <label htmlFor={id('footage')}>Link to your footage</label>
-        <input id={id('footage')} name="footage_url" type="url" inputMode="url" placeholder="https://drive.google.com/..." value={footage} onChange={(e) => setFootage(e.target.value)} required {...fieldProps('footage')} />
+        <input id={id('footage')} name="footage_url" type="text" inputMode="url" autoCapitalize="none" autoCorrect="off" placeholder="https://drive.google.com/..." value={footage} onChange={(e) => setFootage(e.target.value)} required={!noLink} {...fieldProps('footage')} />
+        <label className="fe-check">
+          <input type="checkbox" checked={noLink} onChange={(e) => setNoLink(e.target.checked)} />
+          I do not have a link yet. Email me where to send it.
+        </label>
         <p className="fe-hint">Google Drive, Dropbox, WeTransfer or similar. Make sure the link is open to anyone with it.</p>
         {errors.footage && <p className="fe-err" id={id('footage-err')}>{errors.footage}</p>}
       </div>
@@ -270,9 +323,13 @@ export default function FreeEditsForm() {
           </button>
         )}
       </div>
-      <p className="fe-hint fe-center">
-        {step === 1 ? 'You can send from here: tap Continue, then Send. Step 3 is optional.' : 'No card, no call. Two edited videos back within 48 hours.'}
-      </p>
+      <p className="fe-hint fe-center">No card, no call. Two edited videos back within 48 hours.</p>
+      {step === 0 && <p className="fe-hint fe-center fe-small">We save your details at this step so we can follow up if you get stuck.</p>}
+      {step === 1 && (
+        <button type="button" className="fe-skip" onClick={skipAndSend} disabled={status === 'submitting'}>
+          Skip and send
+        </button>
+      )}
 
       {status === 'error' && (
         <p className="fe-err fe-fail" role="alert">
@@ -322,7 +379,9 @@ const styles = `
   .fe-back:hover { border-color: rgba(242,238,231,0.6); }
   .fe-back:focus-visible { outline: 3px solid #E8541A; outline-offset: 2px; }
   @media (prefers-reduced-motion: reduce) { .fe-pane { animation: none; } }
-  @media (max-width: 420px) { .fe-progress button { font-size: 11.5px; gap: 6px; } }
+  /* Phones: the step number sits above its label. Side by side, "Your footage"
+     and "Editing style" were cut off mid-word at 360px and needed 11.5px type. */
+  @media (max-width: 420px) { .fe-progress button { font-size: 12px; flex-direction: column; align-items: flex-start; gap: 6px; } }
   .fe-step { margin: 6px 0 -4px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px; font-size: 12px; font-weight: 800; letter-spacing: 1.6px; text-transform: uppercase; color: #F2EEE7; }
   .fe-step:not(:first-child) { padding-top: 20px; border-top: 1px solid rgba(242,238,231,0.12); }
   .fe-step span { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; background: #E8541A; color: #fff; font-size: 12px; letter-spacing: 0; }
@@ -337,6 +396,15 @@ const styles = `
   .fe-chips[aria-invalid="true"] .fe-chip { border-color: #FF8A5C; }
   .fe-chip:hover { border-color: rgba(242,238,231,0.5); color: #F2EEE7; }
   .fe-chip:focus-within { outline: 3px solid #E8541A; outline-offset: 2px; }
+  /* Touch screens: chips are the main input on steps 2 and 3, so they get a
+     full 44px target instead of the 36px desktop pill. */
+  @media (max-width: 640px) { .fe-chip { min-height: 44px; padding: 8px 15px; } }
+  .fe-check { display: flex; align-items: center; gap: 10px; min-height: 44px; font-size: 14px; font-weight: 500 !important; color: rgba(242,238,231,0.82); cursor: pointer; }
+  .fe-field .fe-check input { width: 20px; min-height: 20px; height: 20px; padding: 0; flex: 0 0 auto; accent-color: #E8541A; }
+  .fe-small { font-size: 12.5px; margin-top: -10px; }
+  .fe-skip { align-self: center; margin-top: -8px; min-height: 44px; padding: 0 12px; background: none; border: 0; color: rgba(242,238,231,0.6); font: 600 14px Inter, sans-serif; text-decoration: underline; cursor: pointer; }
+  .fe-skip:hover { color: #F2EEE7; }
+  .fe-skip:focus-visible { outline: 3px solid #E8541A; outline-offset: 2px; }
   .fe-center { text-align: center; margin-top: -6px; }
   @media (max-width: 520px) { .fe-row { grid-template-columns: 1fr; } }
   .fe-hint { margin: 0; font-size: 13px; line-height: 1.5; color: rgba(242,238,231,0.6); }

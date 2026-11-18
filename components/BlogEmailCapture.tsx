@@ -3,6 +3,7 @@
 import { useId, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { trackLeadMagnetSubmit } from '@/lib/analytics';
+import { getAttribution } from '@/lib/attribution';
 
 const SOURCE = 'blog_newsletter';
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -34,6 +35,7 @@ export default function BlogEmailCapture() {
           source: SOURCE,
           serviceInterest: 'Weekly email',
           notes: `Signed up on ${pathname}`,
+          attribution: getAttribution(),
         }),
       });
       if (!res.ok) throw new Error('submit failed');
