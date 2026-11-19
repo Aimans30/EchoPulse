@@ -204,6 +204,11 @@ export default function WorkWall({ clips }: { clips: WallClip[] }) {
     const cy = g.vh / 2;
     const reach = g.mod * 0.62;           // how far the lift and the light reach
     const hidden = new Uint8Array(list.length);
+    // React reuses tile elements across grids (keys repeat), and the previous
+    // loop may have hidden some of them. Start every tile visible so this
+    // loop's bookkeeping matches the DOM; otherwise a resize (rotating a
+    // phone, opening DevTools) leaves most of the wall blank.
+    for (const el of tileEls.current) if (el) el.style.visibility = '';
     const padX = g.vw * 0.08 + 40;        // the tilt exposes a little past the edges
     const padY = g.vh * 0.08 + 40;
     let raf = 0;
