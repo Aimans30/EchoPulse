@@ -34,6 +34,8 @@ import SectionNav, { type SectionNavItem } from './SectionNav';
 import { CASE_STUDY_CSS } from './caseStudyStyles';
 import ProductStory, { ProductHero } from './ProductStory';
 import { PRODUCT_CSS } from './productStyles';
+import AppStory, { AppHero, PartOfSystem, StoreLink } from './AppStory';
+import { APP_CSS } from './appStyles';
 
 /**
  * Case study detail page. A server component: the copy, the tables, the
@@ -147,11 +149,21 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
   const trackingScreens = tracking?.screens ?? [];
   const isRebuild = Boolean(study.comparison);
   const isProduct = Boolean(study.product);
+  const isApp = Boolean(study.app);
 
   const hasOpen = study.openProblems.length > 0;
   const callLine = study.callLine ?? BOOK_CALL_REASSURANCE;
   const product = study.product;
-  const sections: SectionNavItem[] = product
+  const sections: SectionNavItem[] = isApp
+    ? [
+        { id: 'glance', label: 'Key facts' },
+        { id: 'system', label: 'How it links' },
+        { id: 'tour', label: 'The app' },
+        { id: 'benefits', label: 'What it changes' },
+        { id: 'build', label: 'How we built it' },
+        { id: 'faq', label: 'FAQ' },
+      ]
+    : product
     ? [
         { id: 'glance', label: 'Key facts' },
         ...(product.about ? [{ id: 'about-client', label: 'The client' }] : []),
@@ -230,7 +242,9 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
 
   /* ── Hero visual, one per kind of study ───────────────────────────── */
   let heroVisual: React.ReactNode = null;
-  if (isProduct) {
+  if (isApp) {
+    heroVisual = <AppHero study={study} />;
+  } else if (isProduct) {
     heroVisual = <ProductHero study={study} />;
   } else if (study.chart && study.months && study.heroShot) {
     const floor = study.months.findIndex((m) => m.month.startsWith('April'));
@@ -314,7 +328,7 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
   }
 
   return (
-    <main id="main" className={`cs-root cs-kind-${isFounder ? 'founder' : isProduct ? 'product' : isRebuild ? 'rebuild' : 'measured'}`}>
+    <main id="main" className={`cs-root cs-kind-${isFounder ? 'founder' : isApp ? 'app' : isProduct ? 'product' : isRebuild ? 'rebuild' : 'measured'}`}>
       <noscript>
         <style>{`.cs-rise{opacity:1!important;transform:none!important}`}</style>
       </noscript>
@@ -327,7 +341,7 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
             <span aria-hidden="true">/</span>
             <Link href="/case-studies">Case studies</Link>
             <span aria-hidden="true">/</span>
-            <span aria-current="page">{study.client}</span>
+            <span aria-current="page">{study.crumbLabel ?? study.client}</span>
           </nav>
 
           <div className="cs-hero-grid">
@@ -351,6 +365,12 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
                   </Link>
                 </div>
                 <p className="cs-reassure">{callLine}</p>
+                {study.app && (
+                  <div className="wba-hero-store">
+                    <StoreLink app={study.app} />
+                    <span>Free, Android. The real listing.</span>
+                  </div>
+                )}
                 <p className="cs-hero-client">
                   <span className="cs-hero-client-name">{study.client}</span>
                   {clientLink}
@@ -456,6 +476,8 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
           </Rise>
         </div>
       </section>
+
+      <PartOfSystem study={study} />
 
       <SectionNav items={sections} />
 
@@ -658,8 +680,11 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
       {/* ── Software builds: the product, screen by screen ──────────────── */}
       {isProduct && <ProductStory study={study} />}
 
+      {/* ── Customer app builds: the app, screen by screen ──────────────── */}
+      {isApp && <AppStory study={study} />}
+
       {/* ── The situation ──────────────────────────────────────────────── */}
-      {!isProduct && (
+      {!isProduct && !isApp && (
       <section className="cs-section" id="situation">
         <div className="cs-container">
           <div className="cs-split cs-split-top">
@@ -762,7 +787,7 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
 
       {/* ── What we did, as a timeline (software builds render it inside
           ProductStory, under the stack) ───────────────────────────────── */}
-      {!isProduct && (
+      {!isProduct && !isApp && (
       <section className="cs-section" id="work">
         <div className="cs-container">
           <SectionHead
@@ -1203,6 +1228,12 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
                   <span aria-hidden="true"> &rarr;</span>
                 </Link>
               )}
+              {study.partOf && (
+                <Link href={study.partOf.href}>
+                  {study.partOf.linkLabel}
+                  <span aria-hidden="true"> &rarr;</span>
+                </Link>
+              )}
               <Link href="/case-studies">
                 All case studies<span aria-hidden="true"> &rarr;</span>
               </Link>
@@ -1212,7 +1243,8 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
       </section>
 
       <style>{CASE_STUDY_CSS}</style>
-      {isProduct && <style>{PRODUCT_CSS}</style>}
+      {(isProduct || isApp) && <style>{PRODUCT_CSS}</style>}
+      {(isApp || study.partOf) && <style>{APP_CSS}</style>}
     </main>
   );
 }

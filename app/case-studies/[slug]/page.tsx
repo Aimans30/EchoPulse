@@ -183,7 +183,7 @@ export default async function CaseStudyRoute({ params }: { params: Promise<{ slu
     itemListElement: [
       { '@type': 'ListItem', position: 1, name: 'EchoPulse Media', item: SITE_URL },
       { '@type': 'ListItem', position: 2, name: 'Case studies', item: `${SITE_URL}/case-studies` },
-      { '@type': 'ListItem', position: 3, name: study.kind === 'founder' ? 'Founder story' : `${study.client} case study`, item: url },
+      { '@type': 'ListItem', position: 3, name: study.kind === 'founder' ? 'Founder story' : `${study.crumbLabel ?? study.client} case study`, item: url },
     ],
   };
 

@@ -73,6 +73,20 @@ function Sparkline({ study }: { study: CaseStudy }) {
 }
 
 function Visual({ study }: { study: CaseStudy }) {
+  if (study.app) {
+    const [a, b, c] = study.app.heroScreens;
+    return (
+      <div className="csi-vis csi-vis-app">
+        {[a, b, c].map((m, i) =>
+          m ? (
+            <span key={m.src} className={`csi-app-phone csi-app-phone-${i}`}>
+              <Image src={m.src} alt={i === 1 ? m.alt : ''} width={m.width} height={m.height} sizes="(max-width: 1000px) 30vw, 150px" className="csi-img" />
+            </span>
+          ) : null,
+        )}
+      </div>
+    );
+  }
   if (study.heroShot) {
     return (
       <div className="csi-vis csi-vis-shot">
@@ -188,6 +202,7 @@ function StudyCard({ study, index }: { study: CaseStudy; index: number }) {
           </p>
         )}
         <p className="csi-sentence">{study.indexResult}</p>
+        {study.partOf && <p className="csi-pair">Part of one system with the {study.partOf.there.name.toLowerCase()} case study</p>}
         <span className="csi-cta">
           {founder ? 'Read the founder story' : 'Read the case study'}
           <span aria-hidden="true" className="csi-cta-arrow">
@@ -351,6 +366,22 @@ export default function CaseStudyIndex({ studies }: { studies: CaseStudy[] }) {
         .csi-grid[data-count="4"] .csi-vis { aspect-ratio: 16 / 10; }
         @media (max-width: 1000px) { .csi-grid[data-count="4"] { grid-template-columns: minmax(0, 1fr); gap: 24px; } }
         .csi-vis-founder .csi-img-portrait { object-position: center 22%; }
+        .csi-grid[data-count="5"] { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 26px; }
+        .csi-grid[data-count="5"] .csi-vis { aspect-ratio: 16 / 10; }
+        .csi-grid[data-count="5"] > .csi-cell:first-child { grid-column: 1 / -1; }
+        @media (min-width: 1001px) {
+          .csi-grid[data-count="5"] > .csi-cell:first-child .csi-card { flex-direction: row; }
+          .csi-grid[data-count="5"] > .csi-cell:first-child .csi-vis { flex: 0 0 56%; aspect-ratio: auto; min-height: 100%; }
+        }
+        @media (max-width: 1000px) { .csi-grid[data-count="5"] { grid-template-columns: minmax(0, 1fr); gap: 24px; } }
+        .csi-vis-app { background: #DDEFF3; display: flex; align-items: flex-end; justify-content: center; padding: 22px 22px 0; overflow: hidden; }
+        .csi-app-phone { position: relative; width: 30%; max-width: 150px; aspect-ratio: 1 / 2; border-radius: 18px 18px 0 0; overflow: hidden; border: 4px solid #111; border-bottom: 0; background: #fff; box-shadow: 0 20px 40px -18px rgba(12,12,11,0.5); transition: transform 0.6s var(--cs-ease); flex: none; }
+        .csi-app-phone .csi-img { width: 100%; height: 100%; object-fit: cover; object-position: top center; }
+        .csi-app-phone-0 { transform: translate(18%, 14%) rotate(-5deg); }
+        .csi-app-phone-1 { z-index: 2; width: 36%; }
+        .csi-app-phone-2 { transform: translate(-18%, 14%) rotate(5deg); }
+        .csi-card:hover .csi-app-phone-1 { transform: translateY(-4px); }
+        .csi-pair { margin: 10px 0 0; font-family: Inter, sans-serif; font-size: 13px; font-weight: 700; color: var(--csi-ink-orange); }
         .csi-still { position: absolute; right: 14px; bottom: 14px; width: 78px; aspect-ratio: 9 / 16; border-radius: 12px; overflow: hidden; border: 3px solid #111; box-shadow: 0 14px 30px rgba(0,0,0,0.45); transition: transform 0.6s var(--cs-ease); }
         .csi-card:hover .csi-still { transform: translateY(-4px) rotate(-2deg); }
 
@@ -427,7 +458,7 @@ export default function CaseStudyIndex({ studies }: { studies: CaseStudy[] }) {
         @media (prefers-reduced-motion: reduce) {
           .cs-rise, .cs-rise.is-in { opacity: 1 !important; transform: none !important; transition: none !important; }
           .csi-root * { transition: none !important; }
-          .csi-card:hover, .csi-card:focus-visible, .csi-btn:hover, .csi-card:hover .csi-img, .csi-card:hover .csi-spark, .csi-card:hover .csi-still, .csi-card:hover .csi-phone, .csi-card:hover .csi-cta-arrow { transform: none; }
+          .csi-card:hover .csi-app-phone-1, .csi-card:hover, .csi-card:focus-visible, .csi-btn:hover, .csi-card:hover .csi-img, .csi-card:hover .csi-spark, .csi-card:hover .csi-still, .csi-card:hover .csi-phone, .csi-card:hover .csi-cta-arrow { transform: none; }
         }
       `}</style>
     </main>

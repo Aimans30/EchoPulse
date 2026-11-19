@@ -363,10 +363,93 @@ export type CaseStudyBuild = {
   gets: { title: string; detail: string }[];
 };
 
+/**
+ * A customer-facing mobile app study (the Whites & Brights Android app).
+ * Rendered by AppStory when `study.app` is set, in place of the generic
+ * situation and work sections. Every line carries the ids of the sources it
+ * comes from, listed with read dates in `sources`.
+ */
+export type CaseStudyAppScreen = CaseStudyMedia & {
+  title: string;
+  /** What the customer sees and does on this screen. */
+  customer: string;
+  /** What it triggers in the business behind the screen. */
+  behind: string;
+  sources: string[];
+};
+
+export type CaseStudyApp = {
+  /** The real store listing. */
+  storeUrl: string;
+  storeLabel: string;
+  icon: CaseStudyMedia;
+  /** Two or three screens for the overlapping phones in the hero. */
+  heroScreens: CaseStudyMedia[];
+  heroCaption: string;
+  flow: {
+    heading: string;
+    intro: string;
+    steps: { where: string; title: string; detail: string; sources: string[] }[];
+    hq: { title: string; detail: string; sources: string[] };
+    catalogue: { title: string; detail: string; sources: string[] };
+  };
+  tour: {
+    intro: string;
+    /** The first-open screens, shown small in a row. */
+    intro3: CaseStudyAppScreen[];
+    screens: CaseStudyAppScreen[];
+  };
+  listing: {
+    heading: string;
+    intro: string;
+    name: string;
+    developer: string;
+    facts: { label: string; value: string }[];
+    whatsNew: string;
+    dataSafety: string[];
+    features: string[];
+    read: string;
+    note: string;
+  };
+  gains: {
+    customer: { title: string; detail: string; sources: string[] }[];
+    business: { title: string; detail: string; sources: string[] }[];
+  };
+  build: {
+    heading: string;
+    intro: string;
+    steps: { title: string; detail: string }[];
+    facts: { name: string; detail: string }[];
+    note: string;
+  };
+  buyerFit: NonNullable<CaseStudyProduct['buyerFit']> & { note: string };
+  working: NonNullable<CaseStudyProduct['working']>;
+  faq: { q: string; a: string }[];
+  sources: CaseStudySource[];
+  sourcesNote: string;
+};
+
 export type CaseStudy = {
   slug: string;
   /** Software builds only. See `CaseStudyProduct`. */
   product?: CaseStudyProduct;
+  /** Customer mobile app builds only. See `CaseStudyApp`. */
+  app?: CaseStudyApp;
+  /**
+   * Two studies that describe one system link to each other with a
+   * prominent "Part of one system" card under the answer block.
+   */
+  partOf?: {
+    heading: string;
+    body: string;
+    href: string;
+    linkLabel: string;
+    /** The two halves, in reading order: this page first. */
+    here: { name: string; detail: string };
+    there: { name: string; detail: string };
+  };
+  /** Visible breadcrumb and BreadcrumbList name, when `client` alone is ambiguous. */
+  crumbLabel?: string;
   /** Index card headline in place of the first hero metric. */
   indexLead?: CaseStudyMetric;
   /** Overrides the paragraph under the closing heading. */
@@ -1876,10 +1959,18 @@ const workingWithGod: CaseStudy = {
 const whitesBrights: CaseStudy = {
   slug: 'whites-and-brights-operating-system',
   shortName: 'Whites & Brights',
+  partOf: {
+    heading: 'The customer app that feeds this system has its own case study.',
+    body: 'Orders placed in the Whites & Brights Android app land in the store panel described below, in App orders, ready to be assigned a pickup driver. The app\'s case study walks through it screen by screen, from the Google Play listing.',
+    href: '/case-studies/whites-and-brights-customer-app',
+    linkLabel: 'Read the customer app case study',
+    here: { name: 'Operating system', detail: 'Counter, orders, drivers, HQ and Brighty' },
+    there: { name: 'Customer app', detail: 'Android, on Google Play: book, track, pay' },
+  },
   callLine: 'Tell Lakshya how your business runs today; he will tell you what he would build first.',
   credits: [
     { name: 'Lakshya Soni', role: 'Founder, EchoPulse Media. Product and engineering lead.', href: '/about/lakshya-soni', isAuthor: true },
-    { name: 'Shaurya', role: 'Partner and design lead, EchoPulse Media. Design and marketing creative.' },
+    { name: 'Shaurya', role: 'Partner and design lead, EchoPulse Media. Design and marketing creative. Later made a director of WNB Cleantech, the company behind Whites & Brights, in recognition of his work on the business.' },
   ],
   schemaMentions: [
     'Point of sale software',
@@ -1911,7 +2002,7 @@ const whitesBrights: CaseStudy = {
   keyFacts: [
     { label: 'Client', value: 'Whites & Brights (whitesandbrights.com), WNB Cleantech Pvt Ltd', href: 'https://whitesandbrights.com' },
     { label: 'Company', value: 'WNB Cleantech Pvt Ltd, a private company incorporated on 2 July 2025 and registered with the Registrar of Companies, Patna (CIN U96010BR2025PTC077191). Source: IndiaFilings company record and the client\'s site footer, read 19 November 2026.' },
-    { label: 'Built and run by', value: 'Lakshya Soni, founder of EchoPulse Media (product and engineering lead), with his partner Shaurya, EchoPulse\'s design lead (design and marketing creative).' },
+    { label: 'Built and run by', value: 'Lakshya Soni, founder of EchoPulse Media (product and engineering lead), with his partner Shaurya, EchoPulse\'s design lead (design and marketing creative). Disclosure: Shaurya, EchoPulse\'s design partner, was later made a director of WNB Cleantech, the company behind Whites & Brights, in recognition of his work on the business.' },
     { label: 'Industry', value: 'Premium laundry and dry cleaning, a multi-outlet chain with a head office, pickup and delivery riders, monthly plans and business (B2B) customers' },
     { label: 'Location', value: 'Patna, Bihar, India. Three outlets on the client\'s site: Sona Market (Danapur), Anandmai Colony (Phulwari Sharif) and R.K. Puram (Danapur)' },
     { label: 'Services', value: 'Laundry by the kilo, dry cleaning, steam ironing, shoe care, household items such as bedding, curtains and sofa covers, same-day express and monthly plans, with free doorstep pickup and delivery across Danapur and Phulwari Sharif and a 48-hour standard turnaround. Source: whitesandbrights.com, read 19 November 2026.' },
@@ -1937,6 +2028,7 @@ const whitesBrights: CaseStudy = {
       'Figures visible inside the product screenshots (takings, orders, Brighty usage) are sample data and are not quoted. Sample names, phone numbers and localities are blurred. The savings estimate is not broken down by line item, and no other result figure is published.',
     extra: [
       { label: 'Savings figure', value: 'More than ₹3 lakh (over US$3,000) saved in running costs and losses, by EchoPulse\'s estimate with the client. Basis: estimate of operating costs and losses avoided since launch, shared by the founder; the breakdown is not published.' },
+      { label: 'Disclosure', value: 'An EchoPulse partner is a director of the client company. Shaurya, EchoPulse\'s design partner, was later made a director of WNB Cleantech, the company behind Whites & Brights, in recognition of his work on the business.' },
       { label: 'Public facts about the client', value: 'Company record, services, hours, ratings, the app and the franchise programme are each taken from a public page, listed with its read date under "About Whites & Brights". Ratings are as shown on each outlet\'s Google Business Profile on 19 November 2026 and will change.' },
     ],
   },
@@ -2880,7 +2972,7 @@ const whitesBrights: CaseStudy = {
       note: 'Plans as of 19 November 2026. This section will be updated as work ships.',
     },
     faq: [
-      { q: 'Who built the Whites & Brights system?', a: 'EchoPulse Media built it: Lakshya Soni, EchoPulse\'s founder, as product and engineering lead, with his partner Shaurya, EchoPulse\'s design lead, on design and marketing creative. The system has 13 store screens, an HQ panel and Brighty, an in-browser assistant in Hindi, Hinglish and English. EchoPulse also built the website, whitesandbrights.com, and runs the brand\'s AI-led marketing.' },
+      { q: 'Who built the Whites & Brights system?', a: 'EchoPulse Media built it: Lakshya Soni, EchoPulse\'s founder, as product and engineering lead, with his partner Shaurya, EchoPulse\'s design lead, on design and marketing creative. The system has 13 store screens, an HQ panel and Brighty, an in-browser assistant in Hindi, Hinglish and English. EchoPulse also built the website, whitesandbrights.com, and runs the brand\'s AI-led marketing. Shaurya, EchoPulse\'s design partner, was later made a director of WNB Cleantech, the company behind Whites & Brights, in recognition of his work on the business.' },
       { q: 'What did the system save Whites & Brights?', a: 'More than ₹3 lakh (over US$3,000) in running costs and losses since launch, by EchoPulse\'s estimate with the client. The figure is an estimate of operating costs and losses avoided, shared by EchoPulse\'s founder; the breakdown is not published. The owners also say managing the outlets is no longer a daily headache, and ordering at the counter and between shops is simpler.' },
       { q: 'Can EchoPulse build a custom POS or CRM for my business?', a: 'Yes. The Whites & Brights system includes a point of sale, a customer directory with history and important dates, monthly plans, delivery lists and reports. EchoPulse builds the same kind of system around how your counters and branches work.' },
       { q: 'Does it work on phones?', a: 'Yes. It is one responsive web app for the shop PC and the phone. It opens in the browser, can be added to the home screen, and has large tap targets and a full-screen assistant.' },
@@ -2888,12 +2980,446 @@ const whitesBrights: CaseStudy = {
       { q: 'Can it handle multiple branches?', a: 'Yes. Every outlet works in its own store panel with its own order series, and row-level security keeps each outlet\'s data separate. Head office sees every outlet live in the HQ panel, with alerts and a side-by-side comparison.' },
       { q: 'Can EchoPulse run the marketing too?', a: 'Yes. For Whites & Brights, EchoPulse runs AI-generated video, animated explainers, Hindi and English posts, the website and branch launch content, all built from the same catalogue the counter uses and all pointing to WhatsApp.' },
       { q: 'What is EchoPulse building next for Whites & Brights?', a: 'Further builds and optimisation are planned with the client. The areas are growth of the customer app, more outlets on the same system, and onboarding franchise stores, which the brand\'s franchise page already offers with its own POS and management software. These are plans, not delivered work.' },
+      { q: 'Is there a customer app?', a: 'Yes. EchoPulse also built the Whites & Brights Android app on Google Play. Orders placed in it land in the store panel\'s App orders screen, ready to be assigned a pickup driver, and it reads the same catalogue and prices as the counter. It has its own case study: the Whites & Brights customer app.' },
       { q: 'How do I start?', a: 'Book a free 15-minute call. Tell Lakshya how your business runs today; he will tell you what he would build first. You then get a written scope, a fixed price and a delivery date before any work starts.' },
     ],
   },
 };
 
-export const caseStudies: CaseStudy[] = [magicbnb, whitesBrights, workingWithGod, founderStory];
+/**
+ * Whites & Brights customer app. The Android app EchoPulse built, and the
+ * customer side of the operating system above.
+ *
+ * Sources, all read 19 November 2026: the Google Play listing and its data
+ * safety page (com.whitesandbrights.app), the client's live site (homepage
+ * app section, FAQ, account deletion page), the brand's public Instagram
+ * franchise post, an App Store search, and the operating system study above,
+ * which carries the facts from EchoPulse's walkthrough document for the
+ * owner. No usage, order or revenue figure is claimed: the listing's
+ * downloads bracket is the only usage number and it is quoted as shown.
+ * The developer contact email, phone and address on the listing are not
+ * reproduced anywhere on the page.
+ */
+const PLAY_URL = 'https://play.google.com/store/apps/details?id=com.whitesandbrights.app';
+const PLAY_READ = '19 November 2026';
+
+const whitesBrightsApp: CaseStudy = {
+  slug: 'whites-and-brights-customer-app',
+  shortName: 'Whites & Brights app',
+  crumbLabel: 'Whites & Brights customer app',
+  callLine: 'Tell Lakshya how your customers order today; he will tell you whether an app is the right next step.',
+  credits: [
+    { name: 'Lakshya Soni', role: 'Founder, EchoPulse Media. Engineering lead.', href: '/about/lakshya-soni', isAuthor: true },
+    { name: 'Shaurya', role: 'Partner and design lead, EchoPulse Media. App design. Later made a director of WNB Cleantech, the company behind Whites & Brights, in recognition of his work on the business.' },
+  ],
+  schemaMentions: ['Mobile app', 'Android', 'Google Play', 'Online ordering', 'Pickup and delivery booking', 'Live order tracking'],
+  partOf: {
+    heading: 'This app is the customer side of one system.',
+    body: 'Every order placed in the app lands in the store panel EchoPulse built for Whites & Brights, ready to be assigned a pickup driver. The operating system case study covers that side: the counter, the HQ panel, Brighty, and the savings estimate made with the client.',
+    href: '/case-studies/whites-and-brights-operating-system',
+    linkLabel: 'Read the operating system case study',
+    here: { name: 'Customer app', detail: 'Android, on Google Play: book, track, pay' },
+    there: { name: 'Operating system', detail: 'Counter, orders, drivers, HQ and Brighty' },
+  },
+  heroLede:
+    'The Android app Whites & Brights customers use to book a doorstep pickup, follow their order and see the bill before it is collected. EchoPulse built it and wired it into the store system the outlets already run.',
+  indexTags: ['Android app', 'Google Play', 'Live tracking', 'Linked to the store panel'],
+  indexLead: { value: 'Live', label: 'on Google Play since 1 October 2026, with every order landing in the store panel' },
+  heroMedia: {
+    src: '/case-studies/wba-home.webp',
+    alt: 'The Whites & Brights app home screen: next free pickup tomorrow 8 to 10 AM, a search box, an "Expert care for every fabric" banner, service tiles and popular items.',
+    width: 720,
+    height: 1440,
+    caption: 'The Whites & Brights app home screen, from the Google Play listing, read 19 November 2026.',
+  },
+  resultLine:
+    'Result: a customer app live on Google Play whose orders land in the store panel ready for a pickup driver, on the same price list as the counter.',
+  answer: [
+    'EchoPulse Media built the Android customer app for Whites & Brights, a premium laundry and dry-cleaning chain in Patna, India, run by WNB Cleantech Pvt Ltd. Customers sign in with a WhatsApp code, choose items and a pickup slot, place the request and follow the order to their door; the app is live on Google Play as "Whites and Brights", version 1.3.1, updated 18 October 2026.',
+    'Each app order lands in the store panel of the operating system EchoPulse built for the chain, ready to be assigned a pickup driver, and the app, the counter and Brighty read the same catalogue and prices. Lakshya Soni, EchoPulse\'s founder, led the engineering; his partner Shaurya, EchoPulse\'s design lead, led the design.',
+    'The app was released on Google Play on 1 October 2026 and updated on 18 October 2026, and it is the customer channel of the same system the counters and head office run on.',
+  ],
+  keyFacts: [
+    { label: 'Client', value: 'Whites & Brights (whitesandbrights.com), WNB Cleantech Pvt Ltd, Patna, India', href: 'https://whitesandbrights.com' },
+    { label: 'The app', value: 'Whites and Brights, an Android app on Google Play (package com.whitesandbrights.app). Free, Android 7.0 and up.', href: PLAY_URL },
+    { label: 'Built by', value: 'EchoPulse Media: Lakshya Soni, founder (engineering lead), with his partner Shaurya, EchoPulse\'s design lead (app design). Disclosure: Shaurya, EchoPulse\'s design partner, was later made a director of WNB Cleantech, the company behind Whites & Brights, in recognition of his work on the business.' },
+    { label: 'Listing', value: `Offered by Whites and Brights; developer account WNB Cleantech Private Limited, Patna, Bihar. Category Lifestyle, rated for 3+. Released 1 October 2026, updated 18 October 2026, version 1.3.1. Source: Google Play, read ${PLAY_READ}.` },
+    { label: 'What customers do in it', value: 'Sign in with a phone number and a 6-digit WhatsApp code, choose a service and a pickup slot, save home and work addresses, track orders in real time, see past orders and invoices, apply offers and coupon codes, and pay cash on delivery.' },
+    { label: 'How it connects', value: 'App orders land in the store panel\'s App orders screen, ready to be assigned a pickup driver. Staff and customers can follow the rider on a map. The app, the counter and Brighty read the same catalogue and prices. HQ manages app customers and runs offers.' },
+    { label: 'Data safety', value: `As declared by the developer: no data shared with third parties; collects precise location and name, address and phone number; data encrypted in transit; deletion on request. Source: Google Play data safety, read ${PLAY_READ}.` },
+    { label: 'iPhone', value: `No App Store listing found for the brand or the developer on ${PLAY_READ}. The app is Android only.` },
+    { label: 'Stack', value: 'The app\'s own framework is not published here. It is connected to the same real-time back end as the store system (Supabase, with real-time updates), so an order shows in the store panel as it is placed.' },
+    { label: 'Result', value: 'A live customer app whose orders arrive in the store panel, structured and ready for a driver, on one price list shared with the counter.' },
+    { label: 'Data source', value: `The Google Play listing and data safety page, the client's live site (homepage, FAQ and account deletion page), the brand's public Instagram, an App Store search, and the operating system case study, all read ${PLAY_READ}.` },
+    { label: 'Last updated', value: PLAY_READ },
+  ],
+  indexResult:
+    'For Whites & Brights, a laundry chain in Patna, EchoPulse built the Android customer app on Google Play: customers book a pickup and track it, and every order lands in the store panel ready for a driver.',
+  measurement: {
+    tool: `The Google Play listing for com.whitesandbrights.app and its data safety page, loaded in a browser on ${PLAY_READ}; the client's live site, whitesandbrights.com (homepage app section, FAQ and account deletion page), read the same day; an App Store search for the brand and the developer; the brand's public Instagram posts; and the operating system case study, which carries the facts from EchoPulse's walkthrough document for the owner.`,
+    dateRanges: `Everything on this page was read on ${PLAY_READ}. The listing showed version 1.3.1, updated 18 October 2026, released 1 October 2026.`,
+    counted: 'Listing values exactly as Google Play showed them: version, dates, Android requirement, category, content rating, the data safety summary and the "What\'s new" text. The eight screenshots are the official listing screenshots, downloaded full size from Google Play and converted to WebP.',
+    notCounted: 'Prices visible inside the listing screenshots are the client\'s own as shown there.',
+    extra: [
+      { label: 'Disclosure', value: 'An EchoPulse partner is a director of the client company. Shaurya, EchoPulse\'s design partner, was later made a director of WNB Cleantech, the company behind Whites & Brights, in recognition of his work on the business.' },
+    ],
+  },
+  relatedService: { slug: 'apps-software', label: 'How the apps and software service works' },
+  fit: {
+    suits: [
+      'Customers book you by phone or WhatsApp, and someone types each order in again.',
+      'You collect from customers\' doors or deliver to them, and they ask where their order is.',
+      'You already run a store or order system, or plan one, and want app orders to land in it.',
+      'Your prices must match at the counter, in the app and in what staff quote.',
+    ],
+  },
+  client: 'Whites & Brights',
+  organizationName: 'Whites & Brights',
+  clientUrl: 'https://whitesandbrights.com',
+  clientTagline:
+    'Premium laundry and dry cleaning in Patna, India, run by WNB Cleantech Pvt Ltd. Three outlets, free doorstep pickup and delivery, and an Android customer app on Google Play.',
+  industry: 'Laundry and dry cleaning, customer app',
+  icpKey: 'business-owners',
+
+  metaTitle: 'Whites & Brights: The Customer App',
+  metaDescription:
+    'How EchoPulse built the Whites & Brights Android app: book a pickup, track it live, and every order lands in the store panel ready for a driver.',
+
+  eyebrow: 'Case study',
+  headline: 'Book a pickup in a tap.',
+  headlineAccent: 'The store already knows.',
+  summary:
+    'Whites & Brights is a premium laundry and dry-cleaning chain in Patna that collects from customers\' doors and delivers back. EchoPulse built its Android customer app, live on Google Play since 1 October 2026. A customer signs in with a WhatsApp code, picks items by the piece or by the kilo, chooses a pickup slot and places the request. The order lands in the store panel of the operating system EchoPulse also built, ready to be assigned a pickup driver, and staff and the customer can follow the rider on a map. The app, the counter and Brighty read the same catalogue and prices, and head office runs the offers the app applies.',
+  tldr: [
+    'What it is: the Whites & Brights Android app on Google Play, built by EchoPulse, version 1.3.1, updated 18 October 2026.',
+    'For the customer: sign in with WhatsApp, pick items and a pickup slot, track the order live, pay cash on delivery.',
+    'For the business: orders land in the store panel ready for a pickup driver, on the same price list as the counter and Brighty.',
+    'Platform: Android, on Google Play since 1 October 2026. Orders flow straight into the store panel the outlets already use.',
+  ],
+
+  windowLabel: 'Released 1 October 2026',
+  windowStartISO: '2026-10-01',
+  windowEndISO: '2026-11-19',
+  publishedISO: '2026-11-19',
+
+  services: ['Android app', 'App design', 'Ordering and pickup booking', 'Live order tracking', 'Store panel integration', 'Google Play release'],
+
+  heroMetrics: [
+    { value: '5', label: 'steps from sign-in to delivery', note: 'As the Google Play listing sets them out' },
+    { value: '2-hour', label: 'pickup slots, chosen in the app', note: 'From the listing screenshots' },
+    { value: '1', label: 'price list for the app, the counter and Brighty', note: 'From the operating system case study' },
+  ],
+
+  atAGlance: [
+    { label: 'Platform', value: 'Android 7.0 and up, on Google Play. No iPhone version.' },
+    { label: 'Linked to', value: 'The Whites & Brights store panel and HQ panel, built by EchoPulse' },
+  ],
+
+  situation: {
+    headline: 'Pickup orders came in by phone.',
+    body: ['Before the app channel, orders for a pickup came in by phone and had to be put into the system by hand.'],
+    failures: [
+      { title: 'Orders by phone', detail: 'App orders and stock requests came in by phone; now both arrive as lists to approve and assign.' },
+    ],
+  },
+
+  workstreams: [],
+  proof: [],
+
+  midCtaText:
+    'Taking orders on calls and WhatsApp and typing them in again? Tell Lakshya how your customers order today; he will tell you whether an app, a booking page or neither is the right next step.',
+  closeText:
+    'Tell Lakshya how your customers order and how the order reaches your team today. He will tell you what he would build first, and say plainly when WhatsApp and a booking page are enough.',
+  openProblemsAccent: 'and what comes next.',
+  openProblems: [],
+
+  notApplicable: [
+    {
+      title: 'There is no system behind the app',
+      detail: 'An app that only sends a message to staff brings back the re-typing it was meant to remove. This one works because its orders land in a store panel with drivers, statuses and one price list.',
+    },
+    {
+      title: 'You need iPhone on day one',
+      detail: 'This build is Android only, on Google Play. If most of your customers are on iPhone, plan for that from the start.',
+    },
+    {
+      title: 'A handful of orders a week',
+      detail: 'A WhatsApp number and a booking page may be all you need. We would say so on the call.',
+    },
+    {
+      title: 'Nobody to assign the pickups',
+      detail: 'The app puts the order in front of the store; someone still has to assign a driver. Without that person, the app makes a promise the shop cannot keep.',
+    },
+  ],
+
+  app: {
+    storeUrl: PLAY_URL,
+    storeLabel: 'Get it on Google Play',
+    icon: { src: '/case-studies/wba-icon.webp', alt: 'The Whites and Brights app icon.', width: 256, height: 256 },
+    heroScreens: [
+      {
+        src: '/case-studies/wba-schedule.webp',
+        alt: 'Schedule a pickup: a searchable list of items by the piece or by the kilo, with service filters, Express 1.6x tags, quantity steppers and a bar showing 2 items, ₹358 estimated total.',
+        width: 720,
+        height: 1440,
+      },
+      {
+        src: '/case-studies/wba-home.webp',
+        alt: 'The app home screen: next free pickup tomorrow 8 to 10 AM at the R.K. Puram outlet, a search box, a banner, service tiles and popular items.',
+        width: 720,
+        height: 1440,
+      },
+      {
+        src: '/case-studies/wba-review.webp',
+        alt: 'Review and schedule: the items, offers and savings with a coupon field, a bill summary with free pickup and delivery and cash on delivery, and a Place request button.',
+        width: 720,
+        height: 1440,
+      },
+    ],
+    heroCaption: `Official screenshots from the Google Play listing, read ${PLAY_READ}.`,
+    flow: {
+      heading: 'One order, from the customer\'s phone to the store and back to the door.',
+      intro:
+        'The app is not a separate shop window. It is the customer\'s side of the same system the outlets run, so an order placed on a phone is already in front of the store.',
+      steps: [
+        { where: 'Customer app', title: 'Request placed', detail: 'The customer picks items, a pickup slot and a saved address, and taps Place request.', sources: ['play', 'shots'] },
+        { where: 'Store panel', title: 'Lands in App orders', detail: 'The order appears in the store panel, ready to be assigned a pickup driver.', sources: ['os'] },
+        { where: 'Pickup driver', title: 'Driver assigned, rider on the map', detail: 'Staff assign a driver from one list. Staff and the customer can follow the rider on a map.', sources: ['os'] },
+        { where: 'Outlet and plant', title: 'Cleaned and tracked', detail: 'The order moves across the status board until it is ready, and the customer follows its status in the app.', sources: ['os', 'faq'] },
+        { where: 'Doorstep', title: 'Delivered back', detail: 'Fresh clothes come back to the door. Payment is cash on delivery, and past orders and invoices stay in the app.', sources: ['play', 'shots'] },
+      ],
+      hq: {
+        title: 'Head office, flowing back to the customer',
+        detail: 'HQ runs offers once and the app applies them through its Offers tab and coupon field. HQ also manages app customers, and sees app orders waiting for a driver as an alert for each outlet.',
+        sources: ['os', 'shots'],
+      },
+      catalogue: {
+        title: 'One catalogue and one price list, everywhere',
+        detail: 'The app, the counter and Brighty all read the same catalogue and prices. HQ edits a price once, in one place.',
+        sources: ['os'],
+      },
+    },
+    tour: {
+      intro: `The eight official screenshots from the Google Play listing, read ${PLAY_READ}, in the order a new customer meets them. For each: what the customer does, and what it triggers behind the scenes.`,
+      intro3: [
+        {
+          title: 'We come to your door',
+          src: '/case-studies/wba-onboard-pickup.webp',
+          alt: 'Onboarding screen one, Free pickup: "We come to your door", with an illustrated rider on a scooter. Pick a 2-hour slot and our rider collects your clothes.',
+          width: 720,
+          height: 1440,
+          customer: 'The first promise: pick a 2-hour slot and a rider collects the clothes.',
+          behind: 'That slot is what the store sees when the order lands, waiting for a driver.',
+          sources: ['shots', 'os'],
+        },
+        {
+          title: 'Cleaned right, every fabric',
+          src: '/case-studies/wba-onboard-care.webp',
+          alt: 'Onboarding screen two, Expert care: "Cleaned right, every fabric", with an illustrated washing machine. Wash and fold, dry clean, steam press, shoes and more, handled by the outlet team.',
+          width: 720,
+          height: 1440,
+          customer: 'Wash and fold, dry cleaning, steam press and shoes, handled by the outlet team.',
+          behind: 'The work is done by the same outlets that bill walk-in customers.',
+          sources: ['shots'],
+        },
+        {
+          title: 'Track it live',
+          src: '/case-studies/wba-onboard-tracking.webp',
+          alt: 'Onboarding screen three, Live tracking: "Track it live, get it fresh", with an illustrated map and route. Follow every step from pickup to delivery in the app.',
+          width: 720,
+          height: 1440,
+          customer: 'Follow every step from pickup to delivery, in the app.',
+          behind: 'Staff and the customer can follow the rider on a map.',
+          sources: ['shots', 'os'],
+        },
+      ],
+      screens: [
+        {
+          title: 'Sign in with WhatsApp',
+          src: '/case-studies/wba-login.webp',
+          alt: 'The sign-in screen: "Fresh clothes, delivered." A mobile number field with +91, a Continue button and the note that a 6-digit code is sent on WhatsApp.',
+          width: 720,
+          height: 1440,
+          customer: 'A mobile number and a 6-digit code sent on WhatsApp. No password to remember.',
+          behind: 'The phone number is the customer\'s account. HQ manages app customers from its own panel, and the account can be deleted from Profile in the app.',
+          sources: ['play', 'shots', 'os', 'delete'],
+        },
+        {
+          title: 'Home',
+          src: '/case-studies/wba-home.webp',
+          alt: 'The home screen: next free pickup tomorrow 8 to 10 AM at the R.K. Puram outlet, search, an "Expert care for every fabric" banner, service tiles, popular items and a round assistant button.',
+          width: 720,
+          height: 1440,
+          customer: 'The next free pickup slot sits at the top, with the nearest outlet. Search, services and popular items below.',
+          behind: 'The round button is Brighty. Version 1.3.1 made the Brighty assistant button always visible.',
+          sources: ['shots', 'play'],
+        },
+        {
+          title: 'Shop by service',
+          src: '/case-studies/wba-services.webp',
+          alt: 'Shop by service: eight tiles for wash and fold, wash and iron, dry clean, steam press, shoe care, home and linen, premium care and more services, then popular items priced per piece and an Express banner.',
+          width: 720,
+          height: 1440,
+          customer: 'Eight service tiles, popular items priced per piece, and an Express option for when it is needed tomorrow.',
+          behind: 'Every item and price comes from the same catalogue the counter bills from. HQ edits it once.',
+          sources: ['shots', 'os'],
+        },
+        {
+          title: 'Schedule a pickup',
+          src: '/case-studies/wba-schedule.webp',
+          alt: 'Schedule a pickup: items such as kurta, wash and iron per kg, wash and fold per kg and steam iron, with customer favourite tags, Express 1.6x labels, quantity and weight steppers, and a running total.',
+          width: 720,
+          height: 1440,
+          customer: 'Add items by the piece or by the kilo, filter by service, mark Express, and watch the running total.',
+          behind: 'The order arrives itemised, so nobody in the store re-types it from a phone call.',
+          sources: ['shots', 'os'],
+        },
+        {
+          title: 'Review and place the request',
+          src: '/case-studies/wba-review.webp',
+          alt: 'Review and schedule: your items, offers and savings with one discount per order, coins and a coupon code field, a bill summary with free pickup and delivery, cash on delivery, and a Place request button. The final price is confirmed at pickup.',
+          width: 720,
+          height: 1440,
+          customer: 'Items, one offer per order, coins and a coupon code, then a clear estimate. Pickup and delivery are free; payment is cash on delivery.',
+          behind: 'Place request sends the order to the store panel, ready for a pickup driver. The final price is confirmed at pickup after the team checks the items.',
+          sources: ['shots', 'os'],
+        },
+      ],
+    },
+    listing: {
+      heading: 'What the Google Play listing says',
+      intro: `Read on ${PLAY_READ}. Values exactly as Google Play showed them.`,
+      name: 'Whites and Brights',
+      developer: 'Whites and Brights · WNB Cleantech Private Limited, Patna',
+      facts: [
+        { label: 'Version', value: '1.3.1' },
+        { label: 'Updated', value: '18 Oct 2026' },
+        { label: 'Released', value: '1 Oct 2026' },
+        { label: 'Requires', value: 'Android 7.0 and up' },
+        { label: 'Rating', value: 'None shown' },
+        { label: 'Category', value: 'Lifestyle' },
+        { label: 'Content rating', value: 'Rated for 3+' },
+      ],
+      whatsNew: 'Fresh look and fixes: new logo, aligned buttons, and the Brighty assistant button is now always visible.',
+      dataSafety: [
+        'No data shared with third parties',
+        'Collects precise location, and name, address and phone number',
+        'Data is encrypted in transit',
+        'You can request that data be deleted',
+      ],
+      features: [
+        'Doorstep pickup and delivery at a time that suits the customer',
+        'Wash and fold, wash and iron, dry cleaning, steam ironing and household items',
+        'Log in with a phone number and a WhatsApp code',
+        'Save several addresses for home and work',
+        'Track orders in real time',
+        'View past orders and invoices',
+        'Updates on pickups and deliveries',
+      ],
+      read: PLAY_READ,
+      note: 'The listing describes Whites & Brights as a growing laundry brand serving customers through its own and franchise outlets. The developer\'s contact details on the listing are not reproduced here.',
+    },
+    gains: {
+      customer: [
+        { title: 'Ordering in a few taps', detail: 'Pick items by the piece or the kilo, choose a slot, place the request.', sources: ['play', 'shots'] },
+        { title: 'Pickup at the door, free', detail: 'A rider collects in the chosen 2-hour slot and brings it back; pickup and delivery show as free on the bill.', sources: ['shots'] },
+        { title: 'Tracking from pickup to delivery', detail: 'Order status live in the app, and the rider on a map.', sources: ['play', 'site', 'faq', 'os'] },
+        { title: 'Offers in the app', detail: 'An Offers tab, one discount per order, coins and coupon codes, applied at review.', sources: ['shots'] },
+        { title: 'The price before the pickup', detail: 'An estimate before placing the request, confirmed at pickup once the team checks the items. Past orders and invoices stay in the app.', sources: ['shots', 'play'] },
+      ],
+      business: [
+        { title: 'Orders arrive structured', detail: 'Items, quantities, slot and address come in together, in the store panel\'s App orders list.', sources: ['os', 'shots'] },
+        { title: 'No phone-call orders to re-type', detail: 'App orders used to come in by phone. Now they arrive as a list to assign.', sources: ['os'] },
+        { title: 'Drivers assigned from one list', detail: 'Each app order waits for a pickup driver in one place, and HQ sees any left waiting as an alert.', sources: ['os'] },
+        { title: 'One price list', detail: 'The app, the counter and Brighty read the same catalogue, so a customer sees the price the counter charges.', sources: ['os'] },
+        { title: 'Offers run from HQ', detail: 'Head office creates an offer once; the counter, Brighty and the app apply it.', sources: ['os'] },
+        { title: 'Part of the franchise offer', detail: 'The brand\'s franchise post lists the AI-enabled software and customer app among what a franchisee gets.', sources: ['ig'] },
+      ],
+    },
+    build: {
+      heading: 'Built as the customer side of the store system, not beside it.',
+      intro:
+        'The app was designed around what the store needs to receive, then made simple enough for a first-time customer to finish an order.',
+      steps: [
+        { title: 'Two ends of one flow', detail: 'The app and the store panel\'s App orders screen were built as two ends of the same order: the app sends what the store needs to act on, itemised, with a slot and an address, and the store assigns a pickup driver.' },
+        { title: 'Design for a first order', detail: 'Shaurya led the design: three illustrated welcome screens, a WhatsApp code instead of a password, service tiles, and a review screen that shows the estimate and how the final price is set.' },
+        { title: 'One back end with the counter', detail: 'Lakshya led the engineering. The app is connected to the same real-time back end as the store system, so it reads the same catalogue and prices and its orders show in the store panel as they are placed.' },
+        { title: 'Tried with the client', detail: 'The app was tested with the client before release, the same short-cycle way the store system was built with the owners.' },
+        { title: 'Released and kept current', detail: 'Released on Google Play on 1 October 2026, with a data safety declaration and an account deletion path in the app and on the client\'s site. Version 1.3.1 followed on 18 October 2026.' },
+      ],
+      facts: [
+        { name: 'Platform', detail: 'Android 7.0 and up, distributed on Google Play.' },
+        { name: 'Sign-in', detail: 'Phone number with a 6-digit code on WhatsApp.' },
+        { name: 'Back end', detail: 'The same real-time back end as the store system (Supabase, with real-time updates).' },
+        { name: 'Privacy', detail: 'No data shared with third parties, encrypted in transit, deletion on request, as declared on the listing.' },
+      ],
+      note: 'The app\'s own framework and libraries are not published on this page. What is stated is what the listing, the client\'s site and the store system\'s documentation support.',
+    },
+    buyerFit: {
+      heading: 'If customers book you by phone or WhatsApp, an app can be the front door.',
+      intro:
+        'Whites & Brights is a laundry, but the shape is common: a customer asks for something to be collected, delivered or done at a time, and a team has to pick it up from there.',
+      businesses: [
+        { title: 'Laundries and dry cleaners', detail: 'Pickup slots, items by the piece or the kilo, delivery back.' },
+        { title: 'Repair and service centres', detail: 'Pickups, job status and technicians on the road.' },
+        { title: 'Salons and clinics', detail: 'Bookings by slot, repeat customers and several branches.' },
+        { title: 'Home services', detail: 'A visit booked for a slot, someone assigned, the customer kept informed.' },
+        { title: 'Rental shops', detail: 'What is booked, when it goes out and when it comes back.' },
+        { title: 'Local food and grocery', detail: 'Orders for pickup or delivery from more than one outlet.' },
+      ],
+      signs: [
+        'Orders come in on calls and WhatsApp, and someone types them in again.',
+        'Customers ask "where is my order?" more than once a day.',
+        'Drivers or staff are assigned from memory or a group chat.',
+        'The price a customer is told is not always the price the counter charges.',
+        'You already run a store system, or are about to, and want orders to land in it.',
+      ],
+      note: 'Store app or installable web app? EchoPulse has shipped both for this client: the store system opens in the browser and installs to the home screen, and this customer app is on Google Play. Which one fits you is a question for the call.',
+    },
+    working: {
+      heading: 'Founder-led, scoped in writing, tested with your team.',
+      intro: 'Lakshya Soni, EchoPulse\'s founder, leads the build. This is the path every apps and software project follows.',
+      steps: [
+        { title: 'A free 15-minute call', detail: 'Tell Lakshya how your customers order today. He tells you what he would build first, and whether custom software is the right move at all.' },
+        { title: 'A written scope before any work', detail: 'You get a written scope, a fixed price and a delivery date. If off-the-shelf software would do the job, we say so.' },
+        { title: 'Working screens every week', detail: 'Real screens you can click through, tried by the people who will use them, with what slowed them down fixed in the next cycle.' },
+        { title: 'Launch with clean data', detail: 'The catalogue and prices are done alongside the code, so day one runs on correct data.' },
+        { title: 'Handover and support', detail: 'The code moves to your GitHub with documentation and team training, and every build includes 14 days of free fixes. After that, hire us per change, keep us on a small retainer, or use any developer.' },
+      ],
+      risks: [
+        { title: 'One back end, not two', detail: 'The app and the counter share one catalogue and one order list, so nothing is copied across by hand.' },
+        { title: 'Privacy declared', detail: 'For this app: no data shared with third parties, encrypted in transit, and a deletion path in the app and on the site.' },
+        { title: 'You own the code', detail: 'On every apps and software build, the code transfers to your GitHub on launch day.' },
+        { title: 'Fixed price, in writing', detail: 'A written scope, a fixed price and a delivery date before any work starts.' },
+      ],
+      source: { label: 'How the apps and software service works', href: '/services/apps-software' },
+    },
+    faq: [
+      { q: 'Who built the Whites & Brights app?', a: 'EchoPulse Media built it: Lakshya Soni, EchoPulse\'s founder, led the engineering, and his partner Shaurya, EchoPulse\'s design lead, led the design. EchoPulse also built the operating system the app\'s orders land in, and the website, whitesandbrights.com. Shaurya, EchoPulse\'s design partner, was later made a director of WNB Cleantech, the company behind Whites & Brights, in recognition of his work on the business.' },
+      { q: 'Where can customers download it?', a: 'On Google Play, as "Whites and Brights", for Android 7.0 and up. The client\'s site links to it from every page. No App Store listing was found on 19 November 2026, so there is no iPhone version.' },
+      { q: 'How does an app order reach the store?', a: 'It lands in the store panel\'s App orders screen, ready to be assigned a pickup driver. The app is connected to the same real-time back end as the store system, so nobody re-types it from a call.' },
+      { q: 'Can customers track the rider?', a: 'Yes. The listing says orders can be tracked in real time, the client\'s FAQ says every order can be followed live in the app, and in the store system staff and customers can follow the rider on a map.' },
+      { q: 'Does the app use the same prices as the counter?', a: 'Yes. The app, the counter and Brighty read the same catalogue and prices, and head office edits them in one place. In the app, the total is an estimate until the team checks the items at pickup.' },
+      { q: 'How do customers sign in?', a: 'With their mobile number and a 6-digit code sent on WhatsApp. They can delete the account from Profile in the app, or ask on WhatsApp after uninstalling.' },
+      { q: 'What data does the app collect?', a: 'As declared on Google Play: precise location, and name, address and phone number. No data is shared with third parties, data is encrypted in transit, and customers can request deletion.' },
+      { q: 'Can EchoPulse build an app like this for my business?', a: 'Yes, where it fits. The app works because its orders land in a store system with drivers, statuses and one price list. On the call, Lakshya will tell you whether a store app, an installable web app or just a booking page is the right first step.' },
+      { q: 'How do I start?', a: 'Book a free 15-minute call. Tell Lakshya how your customers order today; you then get a written scope, a fixed price and a delivery date before any work starts.' },
+    ],
+    sources: [
+      { id: 'play', label: 'Google Play: Whites and Brights (com.whitesandbrights.app)', href: PLAY_URL, read: PLAY_READ },
+      { id: 'shots', label: 'Google Play: the eight official listing screenshots', href: PLAY_URL, read: PLAY_READ },
+      { id: 'safety', label: 'Google Play: data safety for Whites and Brights', href: 'https://play.google.com/store/apps/datasafety?id=com.whitesandbrights.app', read: PLAY_READ },
+      { id: 'site', label: 'whitesandbrights.com: homepage, "The app, now live"', href: 'https://whitesandbrights.com', read: PLAY_READ },
+      { id: 'faq', label: 'whitesandbrights.com: FAQ, "How do I track my order?"', href: 'https://whitesandbrights.com/faq', read: PLAY_READ },
+      { id: 'delete', label: 'whitesandbrights.com: Delete your account', href: 'https://whitesandbrights.com/delete-account', read: PLAY_READ },
+      { id: 'ig', label: 'Instagram: franchise post listing the AI-enabled software and customer app', href: 'https://www.instagram.com/p/Df7boNhBuAV/', read: PLAY_READ },
+      { id: 'os', label: 'EchoPulse: the Whites & Brights operating system case study, from the walkthrough written for the owner', href: '/case-studies/whites-and-brights-operating-system', read: PLAY_READ },
+    ],
+    sourcesNote: 'Disclosure: an EchoPulse partner is a director of the client company. App Store: a search for the brand and for WNB Cleantech returned no listing on 19 November 2026. Of the brand\'s recent public Instagram posts, only the franchise post mentions the app.',
+  },
+};
+
+export const caseStudies: CaseStudy[] = [magicbnb, whitesBrights, whitesBrightsApp, workingWithGod, founderStory];
 
 const SITE_ORIGIN = 'https://echopulse.media';
 const MONTH_NAMES = [
