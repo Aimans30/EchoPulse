@@ -51,6 +51,8 @@ export const videos: VideoEntry[] = [
   { url: 'https://res.cloudinary.com/dqqd9rq8s/video/upload/v1782372139/2438_fn_z6wry7.mp4',                                    type: 'realestate', brand: 'Listing Reel', label: 'Property',                            icp: ['real-estate'] },
 
   // ─── New clips ───────────────────────────────────────────────────────────
+  // Real estate short: what a budget buys in Edmonton.
+  { url: 'https://res.cloudinary.com/dkzhqy2od/video/upload/v1795127895/vidssave.com_This_is_what_235K_gets_you_in_Edmonton_Canada_shorts_720P_w0dnl5.mp4', type: 'realestate', brand: 'Listing Reel', label: 'Market Short', orientation: 'vertical', icp: ['real-estate'] },
   // Business content reel that also fits real estate.
   { url: 'https://res.cloudinary.com/dkzhqy2od/video/upload/v1795126660/Full_video_qqft5a.mp4',                                  type: 'talking',  brand: 'Business Reel',  label: 'Business Content', orientation: 'vertical', icp: ['business-owners', 'real-estate'] },
   // DTC brand reel (LuxeGlow), also founder content.
