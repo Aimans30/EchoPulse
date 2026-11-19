@@ -51,6 +51,8 @@ export const videos: VideoEntry[] = [
   { url: 'https://res.cloudinary.com/dqqd9rq8s/video/upload/v1782372139/2438_fn_z6wry7.mp4',                                    type: 'realestate', brand: 'Listing Reel', label: 'Property',                            icp: ['real-estate'] },
 
   // ─── New clips ───────────────────────────────────────────────────────────
+  // UGC-style founder-led talking head (DTC, founders, business owners).
+  { url: 'https://res.cloudinary.com/dkzhqy2od/video/upload/v1795128950/ugc_sample_1_m8mnqj.mp4',                                type: 'talking',  brand: 'UGC Ad',         label: 'Founder-led Talking Head', orientation: 'vertical', icp: ['dtc', 'founders', 'business-owners'] },
   // Real estate short: townhome listing in Terwillegar, Edmonton.
   { url: 'https://res.cloudinary.com/dkzhqy2od/video/upload/v1795128789/vidssave.com_330K_Townhome_in_Terwillegar_shorts_720P_vxpsxj.mp4', type: 'realestate', brand: 'Listing Reel', label: 'Townhome Tour', orientation: 'vertical', icp: ['real-estate'] },
   // Real estate short: investment opportunity.
