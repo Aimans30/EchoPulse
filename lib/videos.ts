@@ -231,6 +231,11 @@ const YOUTUBE_SAMPLES: YouTubeSample[] = [
   { id: '9FL4FP3U2XE', start: 0, frame: '2', type: 'longform', brand: 'YouTube Long-form', label: 'Policy explainer with graphics', icp: ['founders', 'business-owners', 'coaches'] },
   // "Setting up my 10th Six Figure Airbnb listing p2", Geo Pedro (Short).
   { id: 'JjsDOq4rqM8', start: 0, frame: '0', vertical: true, type: 'talking', brand: 'YouTube Short', label: 'Founder story', icp: ['founders', 'business-owners'] },
+  // "How 2 Top-Producing Realtors Scaled To Over $4 Million in GCI | EP 1",
+  // Market Pulse real estate podcast on the Virtual Xposure channel. Full
+  // multi-camera episode edited by Lakshya Soni.
+  { id: 'OrmfrIxWhes', start: 0, frame: '0', type: 'podcast', brand: 'Real Estate Podcast', label: 'Multi-cam episode', icp: ['real-estate', 'founders'] },
+  { id: 'OrmfrIxWhes', start: 0, frame: '2', type: 'podcast', brand: 'Real Estate Podcast', label: 'Multi-cam edit', icp: ['real-estate', 'founders'] },
 ];
 
 export function youtubeWallClips(): WallClip[] {
