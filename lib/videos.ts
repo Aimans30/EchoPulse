@@ -51,6 +51,8 @@ export const videos: VideoEntry[] = [
   { url: 'https://res.cloudinary.com/dqqd9rq8s/video/upload/v1782372139/2438_fn_z6wry7.mp4',                                    type: 'realestate', brand: 'Listing Reel', label: 'Property',                            icp: ['real-estate'] },
 
   // ─── New clips ───────────────────────────────────────────────────────────
+  // Founder info reel with motion graphics (MagicBNB, Nov 2026).
+  { url: 'https://player.cloudinary.com/embed/?cloud_name=dkzhqy2od&public_id=MagicBnB_Profit_Reel_1_caarnr',                   type: 'talking',  brand: 'Founder Reel',   label: 'Motion Graphics', orientation: 'vertical', icp: ['founders', 'business-owners'] },
   // General vertical reel — shows across the home carousel ("All" + Talking).
   { url: 'https://res.cloudinary.com/du6yx2h01/video/upload/v1782821858/c20_xv9ahv.mp4',                                        type: 'talking',  brand: 'Founder Reel',   label: 'Talking Head', orientation: 'vertical', icp: ['founders', 'coaches', 'business-owners', 'dtc'] },
   // Talking-head reel that also fits real estate agents → tagged on both tabs
