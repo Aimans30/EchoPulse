@@ -153,7 +153,34 @@ function StudyCard({ study, wide }: { study: CaseStudy; wide: boolean }) {
   const eyebrow = study.labels?.eyebrowIndex ?? (founder ? study.eyebrow : study.client);
   return (
     <Link href={`/case-studies/${study.slug}`} className={`csi-card csi-study${wide ? ' is-wide' : ''}`}>
-      {visual && (
+      {study.comparison?.afterSrc ? (
+        // Website rebuilds: the new site and the old one side by side, so the
+        // card itself shows the before and after.
+        <div className="csi-media csi-split">
+          <div className="csi-split-half">
+            <Image
+              src={study.comparison.afterSrc}
+              alt={study.comparison.afterAlt ?? ''}
+              width={study.comparison.afterWidth ?? 1200}
+              height={study.comparison.afterHeight ?? 2500}
+              sizes={wide ? '(max-width: 900px) 50vw, 260px' : '(max-width: 900px) 50vw, 290px'}
+              style={{ objectPosition: 'top center' }}
+            />
+            <span className="csi-tag csi-tag-after">After</span>
+          </div>
+          <div className="csi-split-half csi-split-before">
+            <Image
+              src={study.comparison.beforeSrc}
+              alt={study.comparison.beforeAlt}
+              width={study.comparison.beforeWidth}
+              height={study.comparison.beforeHeight}
+              sizes={wide ? '(max-width: 900px) 50vw, 260px' : '(max-width: 900px) 50vw, 290px'}
+              style={{ objectPosition: 'top center' }}
+            />
+            <span className="csi-tag">Before</span>
+          </div>
+        </div>
+      ) : visual && (
         <div className="csi-media">
           <Image
             src={visual.src}
@@ -372,6 +399,12 @@ export default function CaseStudyIndex({ studies }: { studies: CaseStudy[] }) {
         .csi-media { position: relative; overflow: hidden; background: #1a1a18; aspect-ratio: 16 / 10; }
         .csi-media img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.6s cubic-bezier(0.16,1,0.3,1); }
         .csi-media-fill { border-radius: 18px; }
+        .csi-split { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; background: #0C0C0B; }
+        .csi-split-half { position: relative; overflow: hidden; min-height: 0; }
+        .csi-split-half img { position: absolute; inset: 0; }
+        .csi-split-before img { filter: saturate(0.75) brightness(0.92); }
+        .csi-card:hover .csi-split-before img { filter: none; }
+        .csi-tag-after { background: #E8541A; border-color: #E8541A; color: #fff; }
         .csi-tag { position: absolute; top: 14px; left: 14px; font-family: Inter, sans-serif; font-size: 10.5px; font-weight: 800; letter-spacing: 1.4px; text-transform: uppercase; padding: 6px 12px; border-radius: 100px; background: rgba(12,12,11,0.82); color: rgba(242,238,231,0.95); border: 1px solid rgba(242,238,231,0.24); }
 
         /* Grid of remaining studies */
