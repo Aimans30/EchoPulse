@@ -196,9 +196,13 @@ export default function Hero() {
         @media (hover: hover) and (pointer: fine) {
           .btn-p, .btn-o { cursor: none; }
         }
-        .hero-proof{margin:22px 0 0;max-width:520px;font-family:Inter,sans-serif;font-size:13.5px;line-height:1.6;color:#6E6B63;}
-        .hero-proof a{color:inherit;text-decoration:underline;text-decoration-color:rgba(232,84,26,0.55);text-underline-offset:3px;transition:color 0.2s;}
-        .hero-proof a:hover{color:#0C0C0B;}
+        .hero-proof{margin:24px 0 0;display:inline-flex;align-items:center;gap:12px;padding:8px 8px 8px 14px;border-radius:100px;background:#fff;border:1px solid rgba(12,12,11,0.08);box-shadow:0 6px 18px -10px rgba(12,12,11,0.25);font-family:Inter,sans-serif;font-size:13px;color:#4A4740;text-decoration:none;transition:border-color .2s, box-shadow .2s, transform .2s;max-width:100%;}
+        .hero-proof:hover{border-color:rgba(232,84,26,0.45);box-shadow:0 10px 24px -12px rgba(232,84,26,0.45);transform:translateY(-1px);}
+        .hero-proof-dot{width:8px;height:8px;border-radius:50%;background:#22c55e;box-shadow:0 0 0 4px rgba(34,197,94,0.15);flex:0 0 auto;}
+        .hero-proof-text{display:inline-flex;align-items:baseline;gap:6px;flex-wrap:wrap;line-height:1.35;}
+        .hero-proof-text strong{color:#0C0C0B;font-weight:700;}
+        .hero-proof-num{color:#E8541A;font-weight:800;letter-spacing:-0.01em;}
+        .hero-proof-cta{flex:0 0 auto;padding:6px 12px;border-radius:100px;background:#0C0C0B;color:#F2EEE7;font-weight:700;font-size:12px;white-space:nowrap;}
         .scroll-hint{position:absolute;bottom:24px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:6px;color:#A8A49B;font-size:9px;letter-spacing:3px;text-transform:uppercase;font-weight:600;}
         .scroll-line{width:1px;height:28px;background:linear-gradient(to bottom,#E8541A,transparent);animation:sline 1.8s ease-in-out infinite;}
         @keyframes sline{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
@@ -344,7 +348,7 @@ export default function Hero() {
             justify-content:center !important;
             gap:6px !important;
           }
-          .hero-proof{ margin:20px auto 0 !important; max-width:340px !important; font-size:14px !important; text-align:center !important; }
+          .hero-proof{ margin:20px auto 0 !important; display:flex !important; width:fit-content; max-width:100% !important; font-size:12.5px !important; text-align:left !important; }
           .scroll-hint{ display:none !important; }
           /* Hide the orbital entirely — replaced by mobile service grid below */
           .hero-right{ display:none !important; }
@@ -591,12 +595,15 @@ export default function Hero() {
 
             {/* The one published result, straight under the buttons on both
                 sizes. Figures are the ones on the case study page. */}
-            <p className="hero-proof">
-              <Link href="/case-studies/magicbnb-seo-aeo" data-cursor-hover>
-                MagicBNB went from 5.8 to 4,803 Google impressions a day in seven months. See the
-                Search Console export, including what is still not working.
-              </Link>
-            </p>
+            <Link href="/case-studies/magicbnb-seo-aeo" className="hero-proof" data-cursor-hover>
+              <span className="hero-proof-dot" aria-hidden="true" />
+              <span className="hero-proof-text">
+                <strong>MagicBNB</strong>
+                <span className="hero-proof-num">5.8 &rarr; 4,803</span>
+                <span>daily Google impressions in 7 months</span>
+              </span>
+              <span className="hero-proof-cta">Case study <span aria-hidden="true">&rarr;</span></span>
+            </Link>
 
           </div>
 
