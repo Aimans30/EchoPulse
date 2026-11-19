@@ -51,6 +51,8 @@ export const videos: VideoEntry[] = [
   { url: 'https://res.cloudinary.com/dqqd9rq8s/video/upload/v1782372139/2438_fn_z6wry7.mp4',                                    type: 'realestate', brand: 'Listing Reel', label: 'Property',                            icp: ['real-estate'] },
 
   // ─── New clips ───────────────────────────────────────────────────────────
+  // Real estate short: townhome listing in Terwillegar, Edmonton.
+  { url: 'https://res.cloudinary.com/dkzhqy2od/video/upload/v1795128789/vidssave.com_330K_Townhome_in_Terwillegar_shorts_720P_vxpsxj.mp4', type: 'realestate', brand: 'Listing Reel', label: 'Townhome Tour', orientation: 'vertical', icp: ['real-estate'] },
   // Real estate short: investment opportunity.
   { url: 'https://res.cloudinary.com/dkzhqy2od/video/upload/v1795127894/vidssave.com_This_Could_Be_The_BEST_Investment_Opportunity_of_the_Year_shorts_720P_knwqlg.mp4', type: 'realestate', brand: 'Agent Reel', label: 'Investment Short', orientation: 'vertical', icp: ['real-estate'] },
   // Real estate short: what a budget buys in Edmonton.
