@@ -3,6 +3,7 @@ import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
 import FreeEditsForm from '@/components/FreeEditsForm';
 import { FREE_SAMPLE } from '@/lib/pricing';
+import { FUNNEL_CSS, CHECK_PATH } from '@/components/icp/funnelStyles';
 
 const canonical = 'https://echopulse.media/free-edits';
 const DESCRIPTION =
@@ -60,47 +61,110 @@ export default function FreeEditsPage() {
     ],
   };
 
+  // How it works, in the order it happens. Every line is a fact already
+  // stated in FREE_SAMPLE (lib/pricing.ts) or in the form itself.
+  const steps = [
+    { t: 'Tell us who you are', d: 'Name, email and the kind of business you run.' },
+    { t: 'Share a link to your footage', d: 'Google Drive, Dropbox or WeTransfer. Add an editing style if you have one in mind.' },
+    { t: 'Get 2 edited videos back', d: 'Within 48 hours of receiving the footage. You keep the files whether or not you hire us.' },
+  ];
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(offerLd) }} />
       <Nav />
-      <main id="main" style={{ background: '#F2EEE7', color: '#0C0C0B' }}>
-        <div className="fe-page">
-          <div className="fe-copy">
-            <p className="fe-eyebrow">{FREE_SAMPLE.name}</p>
-            <h1>Get 2 free edits</h1>
-            <p className="fe-lead">{FREE_SAMPLE.tagline}</p>
-            <ul>
-              {FREE_SAMPLE.scope.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
+      <main id="main" className="fn fe-main">
+        <div className="fn-container fe-page">
+          <header className="fe-head">
+            <p className="fn-eyebrow" style={{ color: '#E8541A' }}>{FREE_SAMPLE.name}</p>
+            <h1 className="fn-h1 fe-h1">Get 2 free edits</h1>
+            <p className="fn-lead">{FREE_SAMPLE.tagline}</p>
+            <ul className="fn-proof" aria-label="The terms">
+              <li><Check />No card</li>
+              <li><Check />No call</li>
+              <li><Check />You keep the files</li>
             </ul>
-            <p className="fe-small">{FREE_SAMPLE.per}.</p>
+          </header>
+
+          <div className="fe-form">
+            <FreeEditsForm />
+          </div>
+
+          <div className="fe-info">
+            <div aria-labelledby="fe-get" role="group">
+              <h2 id="fe-get" className="fe-h2">What you get</h2>
+              <ul className="fe-list">
+                {FREE_SAMPLE.scope.map((item) => (
+                  <li key={item}><Check />{item}</li>
+                ))}
+              </ul>
+            </div>
+
+            <div aria-labelledby="fe-how" role="group">
+              <h2 id="fe-how" className="fe-h2">How it works</h2>
+              <ol className="fe-steps">
+                {steps.map((s, i) => (
+                  <li key={s.t}>
+                    <span className="fe-step-n" aria-hidden="true">{i + 1}</span>
+                    <div>
+                      <h3>{s.t}</h3>
+                      <p>{s.d}</p>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            </div>
+
             <p className="fe-alt">
               Prefer email? Send a link to your footage to{' '}
               <a href="mailto:lakshya@echopulse.media?subject=2%20free%20edits">lakshya@echopulse.media</a> with your
-              name and what kind of business you run. Same offer, same 48 hours.
+              name and what kind of business you run. Same offer, same 48 hours, {FREE_SAMPLE.per}.
             </p>
           </div>
-          <FreeEditsForm />
         </div>
       </main>
       <Footer />
 
+      <style>{FUNNEL_CSS}</style>
       <style>{`
-        .fe-page { max-width: 1080px; margin: 0 auto; padding: 150px 24px 96px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 560px); gap: 56px; align-items: start; font-family: Inter, sans-serif; }
-        .fe-copy { min-width: 0; }
-        .fe-eyebrow { font: 700 11px Inter, sans-serif; letter-spacing: 3px; text-transform: uppercase; color: #E8541A; margin: 0 0 14px; }
-        .fe-copy h1 { font: 900 clamp(38px, 6vw, 68px)/1.02 Inter, sans-serif; letter-spacing: -2px; margin: 0 0 18px; }
-        .fe-lead { font-size: 19px; line-height: 1.55; color: #3E3D3A; margin: 0 0 22px; }
-        .fe-copy ul { margin: 0 0 18px; padding: 0 0 0 20px; display: grid; gap: 10px; font-size: 16px; line-height: 1.55; color: #0C0C0B; }
-        .fe-small { font-size: 14px; color: #6E6B63; margin: 0; }
-        .fe-alt { margin: 22px 0 0; padding-top: 18px; border-top: 1px solid rgba(12,12,11,0.12); font-size: 14.5px; line-height: 1.6; color: #4A4740; max-width: 46ch; }
-        .fe-alt a { color: #0C0C0B; font-weight: 700; text-underline-offset: 3px; }
-        @media (min-width: 901px) { .fe-copy { position: sticky; top: 120px; } }
-        @media (max-width: 900px) { .fe-page { grid-template-columns: minmax(0, 1fr); gap: 32px; padding-top: 110px; } }
-        @media (max-width: 480px) { .fe-page { padding-left: 18px; padding-right: 18px; padding-bottom: 72px; } }
+        /* The form is the page. Desktop: what you get and how it works on the
+           left, the form on the right, both starting on the same top line.
+           Phones: the headline, then straight into the form, then the detail. */
+        .fe-main { background: #F2EEE7; }
+        .fe-page { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); grid-template-areas: "head form" "info form"; column-gap: 80px; row-gap: 48px; align-items: start; padding-top: 144px; padding-bottom: 128px; }
+        .fe-head { grid-area: head; }
+        .fe-form { grid-area: form; min-width: 0; }
+        .fe-info { grid-area: info; min-width: 0; display: flex; flex-direction: column; gap: 40px; }
+        .fe-h1 { margin-bottom: 16px; }
+        .fe-head .fn-proof { margin-top: 24px; }
+        .fe-h2 { font-size: 12px !important; line-height: 1.4 !important; font-weight: 800; letter-spacing: 0.12em !important; text-transform: uppercase; color: #6E6B63; margin: 0 0 16px; }
+        .fe-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+        .fe-list li { display: flex; gap: 12px; align-items: flex-start; font-size: 16px; line-height: 1.55; color: #0C0C0B; }
+        .fe-list svg { flex-shrink: 0; margin-top: 4px; color: #E8541A; }
+        .fe-steps { list-style: none; margin: 0; padding: 0; border-top: 1px solid rgba(12,12,11,0.12); }
+        .fe-steps li { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 16px; padding: 16px 0; border-bottom: 1px solid rgba(12,12,11,0.12); }
+        .fe-step-n { width: 32px; height: 32px; border-radius: 50%; background: #0C0C0B; color: #F2EEE7; font-size: 14px; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; }
+        .fe-steps h3 { margin: 4px 0 4px; font-size: 16px !important; line-height: 1.4 !important; font-weight: 800; letter-spacing: -0.01em; color: #0C0C0B; }
+        .fe-steps p { margin: 0; font-size: 15px; line-height: 1.55; color: #6E6B63; }
+        .fe-alt { margin: 0; font-size: 15px; line-height: 1.6; color: #4A4740; max-width: 46ch; }
+        .fe-alt a { color: #0C0C0B; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; overflow-wrap: anywhere; }
+        @media (max-width: 1024px) {
+          .fe-page { column-gap: 48px; }
+        }
+        @media (max-width: 900px) {
+          .fe-page { grid-template-columns: minmax(0, 1fr); grid-template-areas: "head" "form" "info"; row-gap: 32px; padding-top: 112px; padding-bottom: 96px; }
+          .fe-h1 { font-size: 36px; }
+          .fe-info { gap: 32px; }
+        }
       `}</style>
     </>
+  );
+}
+
+function Check() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d={CHECK_PATH} />
+    </svg>
   );
 }

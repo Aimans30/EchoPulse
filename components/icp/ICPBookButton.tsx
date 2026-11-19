@@ -15,6 +15,8 @@ export default function ICPBookButton({
   variant = 'solid',
   size = 'md',
   fullWidthMobile = false,
+  className,
+  plain = false,
 }: {
   label: string;
   location: string;
@@ -22,20 +24,47 @@ export default function ICPBookButton({
   variant?: 'solid' | 'light';
   size?: 'md' | 'lg';
   fullWidthMobile?: boolean;
+  /**
+   * When set, the inline look is dropped and this class styles the button.
+   * The funnel pages pass `fn-btn` so every primary ask on them shares one
+   * button; every other caller keeps the original inline style.
+   */
+  className?: string;
+  /** With className: render as a quiet text ask (no fill, no arrow). */
+  plain?: boolean;
 }) {
   const pad = size === 'lg' ? '17px 34px' : '14px 28px';
   const fontSize = size === 'lg' ? 15 : 13;
   const solid = variant === 'solid';
+  const onClick = () => {
+    trackCallClick(location);
+    (window as unknown as { openBookCallModal?: () => void }).openBookCallModal?.();
+  };
+  const arrow = (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
+  );
+
+  if (className) {
+    return (
+      <button
+        type="button"
+        data-cursor-hover
+        className={`icp-book-btn ${className}`}
+        onClick={onClick}
+        style={plain ? undefined : { background: accent }}
+      >
+        {label}
+        {plain ? null : arrow}
+      </button>
+    );
+  }
 
   return (
     <button
       type="button"
       data-cursor-hover
       className={`icp-book-btn${fullWidthMobile ? ' icp-book-btn-fw' : ''}`}
-      onClick={() => {
-        trackCallClick(location);
-        (window as unknown as { openBookCallModal?: () => void }).openBookCallModal?.();
-      }}
+      onClick={onClick}
       style={{
         background: solid ? accent : '#F2EEE7',
         color: solid ? '#fff' : '#0C0C0B',
@@ -64,7 +93,7 @@ export default function ICPBookButton({
       onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.transform = 'none'; }}
     >
       {label}
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
+      {arrow}
     </button>
   );
 }

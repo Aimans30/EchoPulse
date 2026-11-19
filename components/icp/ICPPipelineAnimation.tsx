@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { motion } from 'framer-motion';
 
 /**
@@ -40,6 +40,9 @@ export interface PipelineConfig {
 
 // Timeline (each ~= one beat):
 //  0 input · 1 studio · 2-5 outputs cascade · 6 result rises · 7 result peak · 8 hold
+const noopSubscribe = () => () => {};
+const prefersReduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
 const STAGES = 9;
 const STAGE_MS = 780;
 // Typed as a MUTABLE 4-tuple on purpose. `as const` would make it
@@ -58,7 +61,9 @@ export default function ICPPipelineAnimation({
   alt: string;
 }) {
   const [stage, setStage] = useState(0);
-  const [reduced, setReduced] = useState(false);
+  // Read during render (server snapshot: false) rather than set from an
+  // effect. Every stage check below already short-circuits on `reduced`.
+  const reduced = useSyncExternalStore(noopSubscribe, prefersReduced, () => false);
   // Starts true so the very first frames animate identically to before even
   // if the observer has not reported yet.
   const [inView, setInView] = useState(true);
@@ -87,16 +92,10 @@ export default function ICPPipelineAnimation({
   }, []);
 
   useEffect(() => {
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-    if (mq.matches) {
-      setReduced(true);
-      setStage(STAGES - 1);
-      return;
-    }
-    if (!inView) return;
+    if (reduced || !inView) return;
     const id = setInterval(() => setStage((s) => (s + 1) % STAGES), STAGE_MS);
     return () => clearInterval(id);
-  }, [inView]);
+  }, [inView, reduced]);
 
   const on = (from: number) => reduced || stage >= from;
   const shownOutputs = reduced ? 4 : Math.max(0, Math.min(4, stage - 1));
@@ -298,7 +297,10 @@ export default function ICPPipelineAnimation({
         .pa-art-line { height: 2px; border-radius: 2px; background: rgba(245,242,237,0.34); display: block; }
 
         @media (max-width: 480px) {
-          .pa-frame { max-width: 340px; padding: 18px 16px 16px; }
+          .pa-frame { max-width: 340px; padding: 16px; }
+          /* Phone floor: no label under 12px. */
+          .pa-input-copy em, .pa-out-copy em { font-size: 12px; }
+          .pa-out-copy strong { font-size: 13px; }
         }
       `}</style>
     </div>
@@ -320,7 +322,7 @@ function Rail({
       {!reduced && sending && (
         <motion.span
           className="pa-packet"
-          style={{ background: accent, boxShadow: `0 0 8px 1px ${accent}` }}
+          style={{ background: accent }}
           animate={{ y: [-9, 9], opacity: [0, 1, 1, 0] }}
           transition={{ duration: 0.8, repeat: Infinity, ease: 'easeInOut', times: [0, 0.2, 0.8, 1] }}
         />
@@ -373,7 +375,6 @@ function ResultChart({
             initial={false}
             animate={{ pathLength: level > 0 ? 1 : 0, opacity: level > 0 ? 1 : 0 }}
             transition={{ duration: reduced ? 0 : 0.9, ease: EASE }}
-            style={{ filter: `drop-shadow(0 0 4px ${accent}66)` }}
           />
         </svg>
         {/* the bars */}
@@ -435,6 +436,7 @@ function ResultChart({
         }
         .pa-result-label:first-child { text-align: left; }
         .pa-result-label:last-child { text-align: right; }
+        @media (max-width: 480px) { .pa-result-label { font-size: 12px; } }
       `}</style>
     </div>
   );
@@ -451,8 +453,7 @@ function Count({
   const raf = useRef(0);
 
   useEffect(() => {
-    if (target === null || reduced) return;
-    if (!live) { setN(0); return; }
+    if (target === null || reduced || !live) return;
     const start = performance.now();
     const dur = 520;
     const tick = (t: number) => {
@@ -474,7 +475,7 @@ function Count({
           digits are hidden from assistive tech, so the announcement is the
           real number regardless of where the animation happens to be. */}
       <span className="pa-sr">{value}</span>
-      <span aria-hidden="true">{target === null ? value : `${n}${suffix}`}</span>
+      <span aria-hidden="true">{target === null ? value : `${live || reduced ? n : 0}${suffix}`}</span>
     </span>
   );
 }

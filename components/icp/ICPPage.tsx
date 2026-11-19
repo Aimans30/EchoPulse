@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { Home, Rocket, GraduationCap, ShoppingBag, Briefcase, type LucideIcon } from 'lucide-react';
 import Nav, { type NavLink } from '@/components/Nav';
 import Footer from '@/components/Footer';
 import Pricing from '@/components/Pricing';
@@ -9,21 +8,16 @@ import type { Guide } from '@/lib/blogLinks';
 import { type IcpData, AGENCY_COMPARISON } from '@/lib/icpData';
 import { type VideoEntry } from '@/lib/videos';
 import { BOOK_CALL_LABEL_LONG, FREE_EDITS_LABEL, FREE_EDITS_URL } from '@/lib/links';
+import { PILOT, PROMISES } from '@/lib/pricing';
 import Reveal from './Reveal';
 import ICPBookButton from './ICPBookButton';
 import ICPFaq from './ICPFaq';
 import ICPWork from './ICPWork';
 import ICPHeroDevice from './ICPHeroDevice';
 import ICPAuthority from './ICPAuthority';
+import Prose, { sentences } from './Prose';
+import { FUNNEL_CSS, CHECK_PATH, ARROW_PATH } from './funnelStyles';
 import { PAGES_UPDATED_LABEL, PAGES_UPDATED_ISO } from '@/lib/siteMeta';
-
-const ICON_MAP: Record<IcpData['icon'], LucideIcon> = {
-  home: Home,
-  rocket: Rocket,
-  graduation: GraduationCap,
-  shopping: ShoppingBag,
-  briefcase: Briefcase,
-};
 
 const WEIGHT_LABEL: Record<IcpData['services'][number]['weight'], string> = {
   Core: 'Start here',
@@ -43,94 +37,110 @@ const ICP_NAV_LINKS: NavLink[] = [
 ];
 const ICP_SECTION_IDS = ['work', 'why', 'services', 'pricing', 'faq'];
 
-// Eyebrow badge: icon tile + uppercase label, matching the service-page voice.
-function Eyebrow({ label, accent, Icon, onDark = false }: { label: string; accent: string; Icon: LucideIcon; onDark?: boolean }) {
+// Facts only, each one already promised in the risk-reversal cards below and
+// in lib/pricing.ts. Sits under the hero ask so the reassurance is in view at
+// the moment of deciding, not five sections later.
+const HERO_PROOF = ['48-hour turnaround', 'Month to month', 'Founder reviews every piece'];
+
+/**
+ * The service grid is three columns. Five services used to leave two cards
+ * orphaned on the second row. The lead (Core) card now widens to fill the
+ * gap, so every row is full whatever the count.
+ */
+function serviceSpans(n: number): { cols: 2 | 3; wideFirst: boolean; wideLast: boolean } {
+  if (n === 4 || n === 2) return { cols: 2, wideFirst: false, wideLast: false };
+  if (n % 3 === 2) return { cols: 3, wideFirst: true, wideLast: false };
+  if (n % 3 === 1) return { cols: 3, wideFirst: true, wideLast: true };
+  return { cols: 3, wideFirst: false, wideLast: false };
+}
+
+function Icon({ d, size = 16 }: { d: string; size?: number }) {
   return (
-    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, marginBottom: 20, fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', color: onDark ? 'rgba(242,238,231,0.6)' : '#6E6B63' }}>
-      <span style={{ width: 30, height: 30, borderRadius: 9, background: `${accent}${onDark ? '22' : '14'}`, border: `1px solid ${accent}${onDark ? '44' : '33'}`, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
-        <Icon size={15} strokeWidth={1.7} color={accent} aria-hidden="true" />
-      </span>
-      {label}
-    </div>
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d={d} />
+    </svg>
   );
 }
 
 export default function ICPPage({ data, videos, guides = [] }: { data: IcpData; videos: VideoEntry[]; guides?: Guide[] }) {
   const accent = data.accentColor;
-  const Icon = ICON_MAP[data.icon];
   // One statistics block per page. Where the education section carries its own
-  // sourced figures, those are the ones shown and this band is skipped; it was
-  // rendering directly above them as a second copy.
+  // sourced figures, those are the ones shown and this band is skipped.
   const hasAuthorityStats = (data.authority.stats?.length ?? 0) > 0;
   const stats = hasAuthorityStats ? [] : data.stats.slice(0, 4);
-  // Describes the animated pipeline for screen readers and crawlers: what the
-  // client supplies, what EchoPulse produces, and how it compounds.
+  // Describes the animated pipeline for screen readers and crawlers.
   const deviceAlt = `How EchoPulse works for ${data.name.toLowerCase()}: ${data.pipeline.input.label.toLowerCase()}, and EchoPulse produces ${data.pipeline.outputs
     .map((o) => o.label.toLowerCase())
     .join(', ')}, driving ${data.pipeline.outcomes.join(', then ').toLowerCase()}.`;
+  const svc = serviceSpans(data.services.length);
+  // A hero sub of more than three sentences keeps its first two in the hero;
+  // the rest, word for word, joins the services intro where it describes
+  // what the plans include.
+  const subParts = sentences(data.heroSub);
+  const heroSub = subParts.length > 3 ? subParts.slice(0, 2).join(' ') : data.heroSub;
+  const subRest = subParts.length > 3 ? subParts.slice(2).join(' ') : '';
+
+  // Risk reversal. Prices and terms come from lib/pricing.ts.
+  const risk = [
+    { t: '2 free edits first', d: 'Send footage you already have and get 2 edited videos back within 48 hours. No card, no call. You keep them either way.', link: true },
+    { t: `${PILOT.priceLabel} Pilot, 14 days`, d: 'Real deliverables on your brand before any monthly plan. You keep everything we make, whether you continue or not.' },
+    { t: 'No contracts', d: 'Month to month after the Pilot, cancel with 14 days written notice. We have to earn the next month, every month.' },
+    { t: 'Redone until right', d: 'If a deliverable does not sound like you, we redo it at no charge until you would post it under your own name.' },
+    { t: '48-hour turnaround', d: 'Standard on short-form edits, with senior review before anything reaches you. Owner-operated, 3-hour replies in every workday.' },
+    // Naming the three people who touch the work is verifiable and already
+    // true, which is the strongest proof a studio without testimonials has.
+    { t: 'You know who does the work', d: 'Lakshya Soni runs the studio and signs off on every deliverable before it ships. Shaurya leads design, Aiman leads delivery. Three named people, not a rotating account team you have to re-brief.' },
+  ];
 
   return (
     <>
       <Nav links={ICP_NAV_LINKS} sectionIds={ICP_SECTION_IDS} observeCurrentPage />
 
-      {/* id="main" — target of the layout's skip-to-content link. */}
-      <main id="main" style={{ background: '#F2EEE7', color: '#0C0C0B' }}>
-        {/* ── 1. HERO (dark) — the page's single <h1> ── */}
-        <section className="icp-hero" data-dark-bg="true">
-          {/* Fades through the accent's OWN alpha (…22 → …00), not the CSS
-              `transparent` keyword. `transparent` resolves to transparent-black,
-              so a warm accent fading to it crosses grey and bands visibly on
-              dark backgrounds. Extra mid-stop keeps the falloff smooth. */}
-          <div aria-hidden="true" className="icp-hero-glow" style={{ background: `radial-gradient(ellipse 70% 60% at 75% 25%, ${accent}22 0%, ${accent}0d 38%, ${accent}00 68%)` }} />
-          <div className="icp-container icp-hero-grid">
-            <div>
-              {/* data.eyebrow was defined for all 5 ICPs in lib/icpData.ts and
-                  never rendered anywhere — dead data. It is the one string in
-                  the hero carrying the audience-plus-service phrase a buyer
-                  actually types ("For Real Estate Agents & Brokerages", "For
-                  Coaches & Course Creators"), while the H1 below is pure
-                  benefit copy with no keyword in it at all. Rendering it above
-                  the H1 gives the page its topical signal back and tells a
-                  visitor within one line whether this page is for them. */}
+      {/* id="main": target of the layout's skip-to-content link. */}
+      <main id="main" className="fn icp" style={{ ['--fn-accent' as string]: accent }}>
+        {/* ── 1. HERO (ink): one headline, one sub, one ask, the visual ── */}
+        <section className="icp-hero fn-ink" data-dark-bg="true">
+          <div aria-hidden="true" className="icp-hero-wash" style={{ background: `radial-gradient(ellipse 60% 55% at 78% 30%, ${accent}14 0%, ${accent}00 70%)` }} />
+          <div className="fn-container icp-hero-grid">
+            <div className="icp-hero-copy">
+              {/* The audience phrase a buyer actually types, above an H1 that is
+                  pure benefit copy. */}
               {data.eyebrow && (
-                <p className="icp-hero-eyebrow" style={{ color: accent }}>
+                <p className="fn-eyebrow icp-hero-eyebrow" style={{ color: accent }}>
                   {data.eyebrow}
                 </p>
               )}
-              <h1 className="icp-h1">
+              <h1 className="fn-h1 icp-h1">
                 {data.heroHeadline}
                 {data.heroHeadlineAccent && (
                   <> <span style={{ color: accent }}>{data.heroHeadlineAccent}</span></>
                 )}
               </h1>
-              <p className="icp-hero-sub">{data.heroSub}</p>
-              <div className="icp-hero-actions">
-                <ICPBookButton label={BOOK_CALL_LABEL_LONG} location="icp_hero" accent={accent} size="lg" fullWidthMobile />
-                <Link href={FREE_EDITS_URL} className="icp-hero-secondary">{FREE_EDITS_LABEL}</Link>
+              <p className="fn-lead icp-hero-sub">{heroSub}</p>
+              <div className="fn-actions icp-hero-actions">
+                <ICPBookButton label={BOOK_CALL_LABEL_LONG} location="icp_hero" accent={accent} className="fn-btn" />
               </div>
+              <p className="fn-alt-ask">
+                Not ready for a call? <Link href={FREE_EDITS_URL}>{FREE_EDITS_LABEL}</Link> first, no card needed.
+              </p>
+              <ul className="fn-proof" aria-label="What every plan includes">
+                {HERO_PROOF.map((p) => (
+                  <li key={p}><Icon d={CHECK_PATH} />{p}</li>
+                ))}
+              </ul>
             </div>
             <div className="icp-hero-visual">
               <ICPHeroDevice accent={accent} alt={deviceAlt} pipeline={data.pipeline} />
             </div>
           </div>
-          <div className="icp-container icp-byline-wrap">
-            <p className="icp-byline">
-              Written and reviewed by <Link href="/about/lakshya-soni">Lakshya Soni</Link>, founder. Last updated{' '}
-              <time dateTime={PAGES_UPDATED_ISO}>{PAGES_UPDATED_LABEL}</time>.
-            </p>
-          </div>
         </section>
 
-        {/* ── 2. WORK (dark) — directly under the hero. Real tagged clips, or a
-             labeled placeholder. Visitors arrive wanting to see the edits. ── */}
-        <section id="work" className="icp-section icp-section-dark icp-work-section" data-dark-bg="true">
-          <div className="icp-container">
+        {/* ── 2. WORK (ink), directly under the hero ── */}
+        <section id="work" className="fn-ink icp-work" data-dark-bg="true">
+          <div className="fn-container icp-work-head">
             <Reveal>
-              <div className="icp-eyebrow-line" style={{ color: 'rgba(242,238,231,0.55)' }}>
-                <span style={{ width: 22, height: 1, background: accent, display: 'block' }} />
-                Work in this space
-              </div>
-              <h2 className="icp-h2" style={{ color: '#F2EEE7' }}>
+              <p className="fn-eyebrow">Work in this space</p>
+              <h2 className="fn-h2">
                 Edits we cut for <span style={{ color: accent }}>{data.name.toLowerCase()}</span>.
               </h2>
             </Reveal>
@@ -138,19 +148,10 @@ export default function ICPPage({ data, videos, guides = [] }: { data: IcpData; 
           {videos.length > 0 ? (
             <ICPWork videos={videos} accent={accent} />
           ) : (
-            <div className="icp-container">
-              {/* This placeholder previously read "Sample work for this segment
-                  is being produced. Book a call and we will walk you through
-                  the closest examples." Every single buyer in a 10-person panel
-                  stopped here. Telling someone the proof exists but they have
-                  to book a call to see it is the worst possible trade: it asks
-                  for commitment before giving evidence.
-
-                  There IS one real, permissioned proof asset: a published case
-                  study carrying a genuine Google Search Console export, shared
-                  with the client's written consent. Almost nothing on the site
-                  linked to it. Naming the gap honestly and handing over the one
-                  real thing beats asking them to take it on faith. */}
+            <div className="fn-container">
+              {/* Telling someone proof exists but they must book a call to see
+                  it asks for commitment before giving evidence. Name the gap
+                  and hand over the one real, permissioned case study. */}
               <div className="icp-work-placeholder">
                 We have not published work for this segment yet, and we are not going to
                 dress up someone else&apos;s as if we had.{' '}
@@ -164,7 +165,7 @@ export default function ICPPage({ data, videos, guides = [] }: { data: IcpData; 
             </div>
           )}
           {data.resource && (
-            <div className="icp-container icp-work-resource-wrap">
+            <div className="fn-container">
               <p className="icp-work-resource">
                 {data.resource.text}{' '}
                 <Link href={data.resource.href} style={{ color: accent }}>{data.resource.linkLabel}</Link>
@@ -173,111 +174,101 @@ export default function ICPPage({ data, videos, guides = [] }: { data: IcpData; 
           )}
         </section>
 
-
-        {/* ── 3. WHY NOW (light) ── */}
-        <section id="why" className="icp-section icp-section-light">
-          <div className="icp-container icp-narrow">
-            <Reveal>
-              <Eyebrow label="Why this matters in 2026" accent={accent} Icon={Icon} />
-              <h2 className="icp-h2">
+        {/* ── 3. WHY NOW (cream): heading left, short paragraphs right ── */}
+        <section id="why" className="fn-section fn-cream">
+          <div className="fn-container fn-split">
+            <Reveal className="fn-split-sticky">
+              <p className="fn-eyebrow" style={{ color: accent }}>Why this matters in 2026</p>
+              <h2 className="fn-h2">
                 {data.whyNow.headline}{' '}
                 <span style={{ color: accent }}>{data.whyNow.headlineAccent}</span>
               </h2>
             </Reveal>
-            <div className="icp-why-body">
-              {data.whyNow.body.map((para, i) => (
-                <Reveal key={i} as="span" delay={0.05 * i}>
-                  <p className="icp-why-p">{para}</p>
-                </Reveal>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ── 4. THE MARKET REALITY (dark) — big stat blocks. Only where the
-             education section below has no figures of its own. ── */}
-        {stats.length > 0 && (
-        <section className="icp-section icp-section-dark" data-dark-bg="true">
-          <div className="icp-container">
-            <Reveal>
-              <div className="icp-eyebrow-line" style={{ color: 'rgba(242,238,231,0.55)' }}>
-                <span style={{ width: 22, height: 1, background: accent, display: 'block' }} />
-                The market reality
-              </div>
-              <h2 className="icp-h2" style={{ color: '#F2EEE7', maxWidth: 900 }}>
-                The numbers are already <span style={{ color: accent }}>on your side.</span>
-              </h2>
+            <Reveal delay={0.05}>
+              <Prose paragraphs={data.whyNow.body} />
             </Reveal>
-            <div className={`icp-stat-grid icp-stat-grid-${stats.length}`}>
-              {stats.map((s, i) => (
-                <Reveal key={s.label} delay={0.06 * i}>
-                  <div className="icp-stat-block">
-                    <div className="icp-stat-num" style={{ color: accent }}>{s.value}</div>
-                    <div className="icp-stat-meaning">{s.label}</div>
-                  </div>
-                </Reveal>
-              ))}
-            </div>
-            <p className="icp-stat-note">
-              These are industry figures showing the opportunity in your market. They are not results EchoPulse Media is claiming for a specific client.
-            </p>
           </div>
         </section>
-        )}
 
-        {/* ── 3b. THE EDUCATION (light) — why this matters to THEM, with the
-             psychology sequence: reframe → sourced evidence → both-sides
-             completeness → handed conclusion. Sits before the services so the
-             reader wants the thing before we show them the thing. ── */}
-        <ICPAuthority data={data.authority} accent={accent} />
-
-        {/* Optional founder-background block (real estate only, data-driven). */}
-        {data.founderStory && (
-          <section className="icp-founder-story icp-section-light" aria-labelledby="icp-founder-story-h">
-            <div className="icp-container icp-narrow">
-              <div className="icp-founder-card" style={{ borderLeft: `3px solid ${accent}` }}>
-                <h2 id="icp-founder-story-h" className="icp-founder-h">{data.founderStory.heading}</h2>
-                <p className="icp-founder-p">{data.founderStory.body}</p>
-                <Link href={data.founderStory.href} className="icp-founder-link" style={{ color: accent }}>
-                  {data.founderStory.linkLabel}
-                </Link>
-              </div>
+        {/* ── 4. MARKET FIGURES (ink), only where the education section has
+             no sourced figures of its own ── */}
+        {stats.length > 0 && (
+          <section className="fn-section fn-ink" data-dark-bg="true">
+            <div className="fn-container">
+              <Reveal className="fn-head">
+                <p className="fn-eyebrow">The market reality</p>
+                <h2 className="fn-h2">
+                  The numbers are already <span style={{ color: accent }}>on your side.</span>
+                </h2>
+              </Reveal>
+              <Reveal>
+                <div className={`icp-stat-grid icp-stat-grid-${stats.length}`}>
+                  {stats.map((s) => (
+                    <div key={s.label} className="icp-stat-block">
+                      <div className="icp-stat-num" style={{ color: accent }}>{s.value}</div>
+                      <div className="icp-stat-meaning">{s.label}</div>
+                    </div>
+                  ))}
+                </div>
+              </Reveal>
+              <p className="fn-small icp-stat-note">
+                These are industry figures showing the opportunity in your market. They are not results EchoPulse Media is claiming for a specific client.
+              </p>
             </div>
           </section>
         )}
 
-        {/* ── 4. THE SOLUTION (light) — services in priority order ── */}
-        <section id="services" className="icp-section icp-section-light" style={{ paddingTop: 0 }}>
-          <div className="icp-container">
-            <Reveal>
-              <Eyebrow label="What we run for you" accent={accent} Icon={Icon} />
-              <h2 className="icp-h2">One team. <span style={{ color: accent }}>Every channel you need.</span></h2>
-              <p className="icp-lead">{data.starterStack}</p>
+        {/* ── 5. EDUCATION (paper): reframe, sourced evidence, both sides,
+             handed conclusion. The founder background closes it where one
+             exists. ── */}
+        <ICPAuthority
+          data={data.authority}
+          accent={accent}
+          footer={
+            data.founderStory ? (
+              <div className="icp-founder">
+                <div>
+                  <p className="fn-eyebrow" style={{ color: accent }}>Who edits your work</p>
+                  <h3 className="fn-h3 icp-founder-h">{data.founderStory.heading}</h3>
+                </div>
+                <div>
+                  <p className="fn-body icp-founder-p">{data.founderStory.body}</p>
+                  <Link href={data.founderStory.href} className="fn-textlink">
+                    {data.founderStory.linkLabel}
+                  </Link>
+                </div>
+              </div>
+            ) : null
+          }
+        />
+
+        {/* ── 6. SERVICES (cream), in priority order ── */}
+        <section id="services" className="fn-section fn-cream">
+          <div className="fn-container">
+            <Reveal className="fn-head">
+              <p className="fn-eyebrow" style={{ color: accent }}>What we run for you</p>
+              <h2 className="fn-h2">One team. <span style={{ color: accent }}>Every channel you need.</span></h2>
+              <p className="fn-lead">{subRest ? `${subRest} ` : ''}{data.starterStack}</p>
             </Reveal>
-            <div className="icp-svc-grid">
-              {data.services.map((svc, i) => {
-                const core = svc.weight === 'Core';
+            <div className={`fn-grid fn-grid-${svc.cols}`}>
+              {data.services.map((s, i) => {
+                const core = s.weight === 'Core';
+                const wide = (svc.wideFirst && i === 0) || (svc.wideLast && i === data.services.length - 1);
                 return (
-                  <Reveal key={svc.slug} delay={Math.min(i * 0.05, 0.3)}>
+                  <Reveal key={s.slug} delay={Math.min(i * 0.05, 0.25)} className={wide ? 'fn-span-2' : undefined}>
                     <a
-                      href={`/services/${svc.slug}`}
-                      className={`icp-svc-card${core ? ' icp-svc-core' : ''}`}
-                      style={core ? { borderColor: `${accent}40`, background: `${accent}08` } : undefined}
+                      href={`/services/${s.slug}`}
+                      className="fn-card icp-svc-card"
+                      style={core ? { borderColor: `${accent}55`, background: `${accent}0a` } : undefined}
                     >
-                      <div className="icp-svc-head">
-                        <h3 className="icp-svc-name">{svc.name}</h3>
-                        <span className="icp-svc-weight" style={{ color: core ? accent : '#9a958c', borderColor: core ? `${accent}40` : 'rgba(12,12,11,0.12)' }}>
-                          {WEIGHT_LABEL[svc.weight]}
-                        </span>
-                      </div>
-                      <p className="icp-svc-why">{svc.why}</p>
-                      {/* No "See the service →" push. These pages exist to book
-                          the call, not to fan traffic out to service pages —
-                          the card itself still links for whoever wants depth,
-                          but the visible affordance is informational. */}
-                      <span className="icp-svc-link" style={{ color: '#9a958c' }}>
-                        What each plan includes is below
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" aria-hidden="true"><path d="M20 6L9 17l-5-5" /></svg>
+                      <span className="icp-svc-weight" style={{ color: core ? accent : '#6E6B63', borderColor: core ? `${accent}55` : 'rgba(12,12,11,0.14)' }}>
+                        {WEIGHT_LABEL[s.weight]}
+                      </span>
+                      <h3 className="fn-h3">{s.name}</h3>
+                      <p>{s.why}</p>
+                      <span className="icp-svc-link">
+                        How it works
+                        <Icon d={ARROW_PATH} size={14} />
                       </span>
                     </a>
                   </Reveal>
@@ -287,62 +278,57 @@ export default function ICPPage({ data, videos, guides = [] }: { data: IcpData; 
           </div>
         </section>
 
-        {/* ── 5. WHAT YOU GET (dark) — deliverables ── */}
-        <section className="icp-section icp-section-dark" data-dark-bg="true">
-          <div className="icp-container">
-            <Reveal>
-              <div className="icp-eyebrow-line" style={{ color: 'rgba(242,238,231,0.55)' }}>
-                <span style={{ width: 22, height: 1, background: accent, display: 'block' }} />
-                What paying us actually buys
-              </div>
-              {/* Was "Outcomes with receipts." Two separate buyers, a 52-year-old
-                  agent and a 48-year-old HVAC owner, flagged the same thing:
-                  "receipts" is slang that reads wrong to the demographic, and
-                  more importantly the section that follows contains no receipts
-                  at all, only benefit blurbs. Promising evidence and then not
-                  producing it is worse than not promising it. */}
-              <h2 className="icp-h2" style={{ color: '#F2EEE7' }}>What each piece of work <span style={{ color: accent }}>is there to do.</span></h2>
+        {/* ── 7. WHAT YOU GET (ink), closed by the mid-page ask ── */}
+        <section className="fn-section fn-ink" data-dark-bg="true">
+          <div className="fn-container">
+            <Reveal className="fn-head">
+              <p className="fn-eyebrow">What paying us actually buys</p>
+              <h2 className="fn-h2">What each piece of work <span style={{ color: accent }}>is there to do.</span></h2>
             </Reveal>
-            <div className="icp-deliv-list">
+            <ol className="fn-rows">
               {data.deliverables.map((d, i) => (
-                <Reveal key={d.title} delay={Math.min(i * 0.05, 0.3)}>
-                  <div className="icp-deliv-row">
-                    <div className="icp-deliv-num" style={{ color: accent }}>{`0${i + 1}`}</div>
-                    <h3 className="icp-deliv-title">{d.title}</h3>
-                    <p className="icp-deliv-desc">{d.desc}</p>
-                  </div>
+                <Reveal as="li" key={d.title} delay={Math.min(i * 0.04, 0.2)}>
+                  <span className="fn-num" style={{ color: accent }}>{String(i + 1).padStart(2, '0')}</span>
+                  <h3 className="fn-h3" style={{ color: '#F2EEE7' }}>{d.title}</h3>
+                  <p>{d.desc}</p>
                 </Reveal>
               ))}
-            </div>
+            </ol>
+            <Reveal>
+              <div className="icp-mid-ask">
+                <p className="icp-mid-ask-text">
+                  <strong>Want this running for you?</strong> 15 minutes with the founder, who tells you the first three things he would fix.
+                </p>
+                <ICPBookButton label={BOOK_CALL_LABEL_LONG} location="icp_mid" accent={accent} className="fn-btn" />
+              </div>
+            </Reveal>
           </div>
         </section>
 
-        {/* ── 6. COMPARISON (light) — EchoPulse vs generic agency ── */}
-        <section className="icp-section icp-section-light">
-          <div className="icp-container">
-            <Reveal>
-              <Eyebrow label="EchoPulse Media vs a generic agency" accent={accent} Icon={Icon} />
-              <h2 className="icp-h2">The honest difference, <span style={{ color: accent }}>line by line.</span></h2>
+        {/* ── 8. COMPARISON (cream) ── */}
+        <section className="fn-section fn-cream">
+          <div className="fn-container">
+            <Reveal className="fn-head">
+              <p className="fn-eyebrow" style={{ color: accent }}>EchoPulse Media vs a generic agency</p>
+              <h2 className="fn-h2">The honest difference, <span style={{ color: accent }}>line by line.</span></h2>
             </Reveal>
             <Reveal>
-              <div className="icp-cmp">
-                <div className="icp-cmp-row icp-cmp-head">
-                  <div className="icp-cmp-feature">What matters</div>
-                  <div className="icp-cmp-us" style={{ color: accent }}>
-                    <span className="icp-cmp-dot" style={{ background: accent }} /> EchoPulse Media
-                  </div>
-                  <div className="icp-cmp-them">Generic agency</div>
+              <div className="fn-cmp" role="table" aria-label="EchoPulse Media compared with a generic agency">
+                <div className="fn-cmp-row fn-cmp-head" role="row">
+                  <div role="columnheader">What matters</div>
+                  <div role="columnheader" style={{ color: accent }}>EchoPulse Media</div>
+                  <div role="columnheader">Generic agency</div>
                 </div>
                 {AGENCY_COMPARISON.map((row) => (
-                  <div key={row.feature} className="icp-cmp-row">
-                    <div className="icp-cmp-feature">{row.feature}</div>
-                    <div className="icp-cmp-us">
-                      <span className="icp-cmp-check" style={{ color: accent }} aria-hidden="true">✓</span>
-                      {row.us}
+                  <div key={row.feature} className="fn-cmp-row" role="row">
+                    <div className="fn-cmp-feature" role="rowheader">{row.feature}</div>
+                    <div role="cell">
+                      <span className="fn-cmp-mark" style={{ color: accent }} aria-hidden="true">✓</span>
+                      <span><span className="icp-sr">EchoPulse Media: </span>{row.us}</span>
                     </div>
-                    <div className="icp-cmp-them">
-                      <span className="icp-cmp-x" aria-hidden="true">✕</span>
-                      {row.them}
+                    <div className="fn-cmp-them" role="cell">
+                      <span className="fn-cmp-mark" style={{ color: '#B3412E' }} aria-hidden="true">✕</span>
+                      <span><span className="icp-sr">Generic agency: </span>{row.them}</span>
                     </div>
                   </div>
                 ))}
@@ -351,40 +337,23 @@ export default function ICPPage({ data, videos, guides = [] }: { data: IcpData; 
           </div>
         </section>
 
-        {/* ── 7b. RISK REVERSAL (light) — the strongest close available without
-             published client metrics. Loss-aversion runs the decision at this
-             point in the page, so every line removes a specific downside:
-             money (small pilot, keep the work), lock-in (month to month),
-             quality (redo until right), attention (owner-operated, 48h). ── */}
-        <section className="icp-section icp-section-light" style={{ paddingTop: 0 }}>
-          <div className="icp-container">
-            <Reveal>
-              <Eyebrow label="Why trying us is safe" accent={accent} Icon={Icon} />
-              <h2 className="icp-h2">Built so the risk sits <span style={{ color: accent }}>on our side.</span></h2>
+        {/* ── 9. RISK REVERSAL (paper): six cards, two full rows of three ── */}
+        <section className="fn-section fn-paper">
+          <div className="fn-container">
+            <Reveal className="fn-head">
+              <p className="fn-eyebrow" style={{ color: accent }}>Why trying us is safe</p>
+              <h2 className="fn-h2">Built so the risk sits <span style={{ color: accent }}>on our side.</span></h2>
             </Reveal>
-            <div className="icp-risk-grid">
-              {[
-                { t: '2 free edits first', d: 'Send footage you already have and get 2 edited videos back within 48 hours. No card, no call. You keep them either way.' },
-                { t: '$299 Pilot, 14 days', d: 'Real deliverables on your brand before any monthly plan. You keep everything we make, whether you continue or not.' },
-                { t: 'No contracts', d: 'Month to month after the Pilot, cancel with 14 days written notice. We have to earn the next month, every month.' },
-                { t: 'Redone until right', d: 'If a deliverable does not sound like you, we redo it at no charge until you would post it under your own name.' },
-                { t: '48-hour turnaround', d: 'Standard on short-form edits, with senior review before anything reaches you. Owner-operated, 3-hour replies in every workday.' },
-                // Added on the conversion thesis that a studio with no
-                // testimonials should make claims that require checking rather
-                // than trust. Naming the three people who actually touch the
-                // work is the strongest proof available here: it is verifiable,
-                // it is already true, and it was previously buried in FAQ
-                // question nine where almost nobody reached it.
-                { t: 'You know who does the work', d: 'Lakshya Soni runs the studio and signs off on every deliverable before it ships. Shaurya leads design, Aiman leads delivery. Three named people, not a rotating account team you have to re-brief.' },
-              ].map((item, i) => (
+            <div className="fn-grid fn-grid-3">
+              {risk.map((item, i) => (
                 <Reveal key={item.t} delay={Math.min(i * 0.05, 0.2)}>
-                  <div className="icp-risk-card">
-                    <span className="icp-risk-num" style={{ color: accent }}>{`0${i + 1}`}</span>
-                    <h3 className="icp-risk-title">{item.t}</h3>
-                    <p className="icp-risk-desc">{item.d}</p>
-                    {i === 0 && (
-                      <Link href={FREE_EDITS_URL} style={{ display: 'inline-block', marginTop: 14, fontSize: 14, fontWeight: 700, color: accent, textDecoration: 'underline', textUnderlineOffset: 3 }}>
-                        {FREE_EDITS_LABEL} →
+                  <div className="fn-card">
+                    <span className="fn-num" style={{ color: accent }}>{String(i + 1).padStart(2, '0')}</span>
+                    <h3 className="fn-h3">{item.t}</h3>
+                    <p>{item.d}</p>
+                    {item.link && (
+                      <Link href={FREE_EDITS_URL} className="fn-textlink icp-risk-link">
+                        {FREE_EDITS_LABEL}
                       </Link>
                     )}
                   </div>
@@ -394,14 +363,12 @@ export default function ICPPage({ data, videos, guides = [] }: { data: IcpData; 
           </div>
         </section>
 
-        {/* ── 8. PRICING (light) — reuse the homepage Pricing component, with
-             this segment's tailored feature copy. Falls back to default copy
-             when the segment supplies no pricingCopy (e.g. dtc, business-owners). ── */}
+        {/* ── 10. PRICING: the shared pricing component, segment copy ── */}
         <section id="pricing" className="icp-pricing-wrap">
           <Pricing pricingCopy={data.pricingCopy} />
         </section>
 
-        {/* ── 8b. GUIDES (dark) — links into the blog for this audience ── */}
+        {/* ── 11. GUIDES (ink) ── */}
         <GuidesSection
           dark
           heading={`Guides for ${data.name.toLowerCase()}`}
@@ -409,54 +376,39 @@ export default function ICPPage({ data, videos, guides = [] }: { data: IcpData; 
           guides={guides}
         />
 
-        {/* ── 9. FAQ (light) ── */}
-        <section id="faq" className="icp-section icp-section-light">
-          <div className="icp-container">
-            <Reveal>
-              <Eyebrow label="Questions, answered" accent={accent} Icon={Icon} />
-              <h2 className="icp-h2" style={{ marginBottom: 36 }}>The things buyers ask <span style={{ color: accent }}>before signing.</span></h2>
+        {/* ── 12. FAQ (cream): heading left, answers right ── */}
+        <section id="faq" className="fn-section fn-cream">
+          <div className="fn-container fn-split">
+            <Reveal className="fn-split-sticky">
+              <p className="fn-eyebrow" style={{ color: accent }}>Questions, answered</p>
+              <h2 className="fn-h2">The things buyers ask <span style={{ color: accent }}>before signing.</span></h2>
             </Reveal>
             <ICPFaq faq={data.faq} accent={accent} />
           </div>
         </section>
 
-        {/* ── 9b. BY SERVICE — links to the /[icp]/[service] pages for this audience ── */}
+        {/* ── 13. BY SERVICE ── */}
         <NicheLinks mode="icp" value={data.key} />
 
-        {/* ── 10. FINAL CTA (dark) ── */}
-        <section
-          className="icp-section icp-section-dark"
-          data-dark-bg="true"
-          style={{ paddingBottom: 120, position: 'relative', overflow: 'hidden' }}
-        >
-          {/* The glow lives on the SECTION, not inside the CTA card. Inside the
-              card it was clipped by the card's bounds/radius, which drew a
-              visible rectangle against the identical dark section behind it.
-              At section level it spans the full viewport width and fades into
-              the section's own background with no edge to clip against. */}
-          <div
-            aria-hidden="true"
-            style={{
-              position: 'absolute',
-              inset: 0,
-              background: `radial-gradient(ellipse 60% 55% at 50% 55%, ${accent}1e 0%, ${accent}0a 50%, ${accent}00 100%)`,
-              pointerEvents: 'none',
-            }}
-          />
-          <div className="icp-container" style={{ position: 'relative', zIndex: 1 }}>
+        {/* ── 14. FINAL ASK (ink) ── */}
+        <section className="fn-section fn-ink icp-final" data-dark-bg="true">
+          <div aria-hidden="true" className="icp-hero-wash" style={{ background: `radial-gradient(ellipse 55% 60% at 50% 45%, ${accent}12 0%, ${accent}00 70%)` }} />
+          <div className="fn-container fn-final">
             <Reveal>
-              <div className="icp-final" style={{ background: 'transparent' }}>
-                <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
-                  <h2 className="icp-final-h">Ready to stop doing it all yourself?</h2>
-                  <p className="icp-final-p">
-                    15 minutes with Lakshya, the founder. He looks at your site and your last few posts and tells you the first three things he would fix. No pitch.
-                  </p>
-                  <div style={{ marginTop: 12 }}>
-                    <ICPBookButton label={BOOK_CALL_LABEL_LONG} location="icp_final" accent={accent} size="lg" />
-                  </div>
-                  <span className="icp-final-note">Start with 2 free edited videos, then a $299 14-day Pilot. See the work before you commit.</span>
-                </div>
+              <h2 className="fn-h2">Ready to stop doing it all yourself?</h2>
+              <p className="fn-lead">
+                15 minutes with Lakshya, the founder. He looks at your site and your last few posts and tells you the first three things he would fix. No pitch.
+              </p>
+              <div className="fn-actions">
+                <ICPBookButton label={BOOK_CALL_LABEL_LONG} location="icp_final" accent={accent} className="fn-btn" />
               </div>
+              <p className="fn-alt-ask">
+                Start with <Link href={FREE_EDITS_URL}>2 free edited videos</Link>, then a {PILOT.priceLabel} 14-day Pilot. {PROMISES.noContract}
+              </p>
+              <p className="fn-byline">
+                Written and reviewed by <Link href="/about/lakshya-soni">Lakshya Soni</Link>, founder. Last updated{' '}
+                <time dateTime={PAGES_UPDATED_ISO}>{PAGES_UPDATED_LABEL}</time>.
+              </p>
             </Reveal>
           </div>
         </section>
@@ -464,200 +416,94 @@ export default function ICPPage({ data, videos, guides = [] }: { data: IcpData; 
 
       <Footer />
 
+      <style>{FUNNEL_CSS}</style>
       <style>{`
-        /* Layout */
-        .icp-container { max-width: 1180px; margin: 0 auto; padding: 0 56px; }
-        .icp-narrow { max-width: 860px; }
-        .icp-section { padding: 104px 0; scroll-margin-top: 96px; }
-        .icp-section-light { background: #F2EEE7; color: #0C0C0B; }
-        .icp-section-dark { background: #0C0C0B; color: #F2EEE7; }
-
-        /* Shared headings */
-        .icp-h2 { font-family: Inter, sans-serif; font-weight: 900; font-size: clamp(32px, 4.4vw, 60px); letter-spacing: -2px; line-height: 1.0; margin: 0; }
-        .icp-lead { font-size: 15px; line-height: 1.65; color: #6E6B63; max-width: 640px; margin: 18px 0 0; }
-        .icp-eyebrow-line { display: inline-flex; align-items: center; gap: 14px; font-size: 10px; font-weight: 600; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 18px; }
-
-        /* Byline + founder story */
-        .icp-byline-wrap { position: relative; z-index: 1; margin-top: 40px; }
-        .icp-byline { font-family: Inter, sans-serif; font-size: 12.5px; line-height: 1.5; color: rgba(242,238,231,0.55); margin: 0; overflow-wrap: anywhere; }
-        .icp-byline a { color: rgba(242,238,231,0.8); text-decoration: underline; text-underline-offset: 3px; }
-        .icp-founder-story { padding: 0 0 56px; }
-        .icp-founder-card { padding: 4px 0 4px 22px; }
-        .icp-founder-h { font-family: Inter, sans-serif; font-weight: 800; font-size: clamp(19px, 2.4vw, 24px); letter-spacing: -0.5px; line-height: 1.2; margin: 0 0 10px; }
-        .icp-founder-p { font-size: 15px; line-height: 1.65; color: #6E6B63; margin: 0 0 12px; }
-        .icp-founder-link { font-family: Inter, sans-serif; font-size: 14px; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+        .icp-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
         /* Hero */
-        .icp-hero { position: relative; overflow: hidden; background: #0C0C0B; color: #F2EEE7; padding: 132px 0 96px; scroll-margin-top: 96px; }
-        .icp-hero-glow { position: absolute; inset: 0; pointer-events: none; }
-        .icp-hero-grid { position: relative; z-index: 1; display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 56px; align-items: center; }
-        .icp-hero-eyebrow { font-family: Inter, sans-serif; font-size: 12px; font-weight: 800; letter-spacing: 2.4px; text-transform: uppercase; margin: 0 0 16px; }
-        .icp-h1 { font-family: Inter, sans-serif; font-weight: 900; font-size: clamp(38px, 5.6vw, 76px); letter-spacing: -3px; line-height: 0.98; margin: 0 0 24px; }
-        .icp-hero-sub { font-size: clamp(16px, 1.6vw, 20px); line-height: 1.6; color: rgba(242,238,231,0.66); max-width: 560px; margin: 0 0 32px; }
-        .icp-hero-actions { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
-        .icp-hero-secondary { color: #F2EEE7; text-decoration: none; font-size: 13px; font-weight: 700; padding: 15px 26px; border-radius: 100px; border: 1px solid rgba(255,255,255,0.18); font-family: Inter, sans-serif; transition: border-color 0.2s, background 0.2s; }
-        .icp-hero-secondary:hover { border-color: rgba(255,255,255,0.4); background: rgba(255,255,255,0.05); }
+        .icp-hero { position: relative; overflow: hidden; padding: 152px 0 64px; }
+        .icp-hero-wash { position: absolute; inset: 0; pointer-events: none; }
+        .icp-hero-grid { position: relative; z-index: 1; display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 64px; align-items: center; }
+        .icp-h1 { max-width: 15ch; }
+        .icp-hero-sub { margin-bottom: 40px; max-width: 34em; }
+        .icp-hero-visual { width: 100%; max-width: 400px; justify-self: end; }
 
-        /* Why now */
-        .icp-why-body { margin-top: 32px; display: flex; flex-direction: column; gap: 4px; }
-        .icp-why-p { font-size: clamp(16px, 1.5vw, 19px); line-height: 1.7; color: #3E3D3A; margin: 0 0 20px; }
+        /* Work strip, continuing the hero's dark field */
+        .icp-work { padding: 64px 0 96px; scroll-margin-top: 96px; }
+        .icp-work-head { margin-bottom: 40px; }
+        .icp-work .icp-rail { padding-left: max(56px, calc((100vw - 1088px) / 2)) !important; padding-right: max(56px, calc((100vw - 1088px) / 2)) !important; }
+        .icp-work-resource { margin: 16px 0 0; text-align: center; font-size: 15px; line-height: 1.6; color: rgba(242,238,231,0.66); }
+        .icp-work-resource a { font-weight: 700; text-decoration: underline; text-underline-offset: 4px; display: inline-flex; min-height: 44px; align-items: center; }
+        .icp-work-placeholder { border: 1px dashed rgba(242,238,231,0.25); border-radius: 16px; padding: 48px 32px; text-align: center; color: rgba(242,238,231,0.66); font-size: 16px; line-height: 1.65; max-width: 720px; margin: 0 auto; }
 
         /* Stats */
-        .icp-stat-grid { display: grid; gap: 1px; background: rgba(255,255,255,0.10); border: 1px solid rgba(255,255,255,0.10); border-radius: 20px; overflow: hidden; margin-top: 48px; }
+        .icp-stat-grid { display: grid; gap: 1px; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.12); border-radius: 16px; overflow: hidden; }
         .icp-stat-grid-4 { grid-template-columns: repeat(4, 1fr); }
         .icp-stat-grid-3 { grid-template-columns: repeat(3, 1fr); }
         .icp-stat-grid-2 { grid-template-columns: repeat(2, 1fr); }
-        .icp-stat-block { background: #0C0C0B; padding: 40px 30px; height: 100%; }
-        .icp-stat-num { font-family: Inter, sans-serif; font-size: clamp(40px, 5vw, 64px); font-weight: 900; letter-spacing: -2.5px; line-height: 0.95; margin-bottom: 16px; }
-        .icp-stat-meaning { font-size: 13.5px; line-height: 1.55; color: rgba(242,238,231,0.6); }
-        .icp-stat-note { font-size: 12px; color: rgba(242,238,231,0.4); margin: 20px 2px 0; font-style: italic; max-width: 720px; }
+        .icp-stat-block { background: #0C0C0B; padding: 40px 32px; height: 100%; }
+        .icp-stat-num { font-size: clamp(40px, 4.4vw, 56px); font-weight: 900; letter-spacing: -0.04em; line-height: 1; margin-bottom: 16px; }
+        .icp-stat-meaning { font-size: 15px; line-height: 1.55; color: rgba(242,238,231,0.66); }
+        .icp-stat-note { margin: 24px 0 0; font-style: italic; max-width: 720px; }
+
+        /* Founder background, closing the education section */
+        .icp-founder { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 24px 80px; margin-top: 80px; padding-top: 48px; border-top: 1px solid rgba(12,12,11,0.12); }
+        .icp-founder-h { font-size: 24px; margin: 0; max-width: 20ch; }
+        .icp-founder-p { margin: 0 0 8px; }
 
         /* Services */
-        .icp-svc-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 44px; }
-        .icp-svc-card { display: flex; flex-direction: column; text-decoration: none; color: inherit; border-radius: 18px; padding: 26px 26px 22px; border: 1px solid rgba(12,12,11,0.08); background: rgba(255,255,255,0.55); transition: transform 0.3s cubic-bezier(0.16,1,0.3,1), box-shadow 0.3s; min-height: 200px; }
-        .icp-svc-card:hover { transform: translateY(-5px); box-shadow: 0 18px 44px rgba(12,12,11,0.1); }
-        .icp-svc-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
-        .icp-svc-name { font-family: Inter, sans-serif; font-size: 17px; font-weight: 800; letter-spacing: -0.4px; line-height: 1.25; margin: 0; }
-        .icp-svc-weight { flex-shrink: 0; font-size: 9px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; padding: 4px 9px; border-radius: 100px; border: 1px solid; white-space: nowrap; }
-        .icp-svc-why { font-size: 13.5px; line-height: 1.6; color: #6E6B63; margin: 0 0 18px; flex: 1; }
-        .icp-svc-link { display: inline-flex; align-items: center; gap: 5px; font-size: 12.5px; font-weight: 700; margin-top: auto; }
+        .icp-svc-card { min-height: 240px; }
+        .icp-svc-weight { align-self: flex-start; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 4px 12px; border-radius: 999px; border: 1px solid; margin-bottom: 24px; white-space: nowrap; }
+        .icp-svc-card p { flex: 1; margin-bottom: 24px; }
+        .icp-svc-link { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 700; color: #0C0C0B; }
 
-        /* Deliverables */
-        .icp-deliv-list { margin-top: 44px; border-top: 1px solid rgba(255,255,255,0.10); }
-        .icp-deliv-row { display: grid; grid-template-columns: 70px 1.1fr 1.6fr; gap: 28px; padding: 26px 0; border-bottom: 1px solid rgba(255,255,255,0.10); align-items: baseline; }
-        .icp-deliv-num { font-family: Inter, sans-serif; font-size: 20px; font-weight: 300; }
-        .icp-deliv-title { font-family: Inter, sans-serif; font-size: clamp(17px, 1.7vw, 22px); font-weight: 800; letter-spacing: -0.5px; color: #F2EEE7; margin: 0; }
-        .icp-deliv-desc { font-size: 14px; line-height: 1.65; color: rgba(242,238,231,0.6); margin: 0; }
+        /* Mid-page ask */
+        .icp-mid-ask { margin-top: 56px; padding: 32px 40px; border-radius: 16px; border: 1px solid rgba(242,238,231,0.14); background: rgba(255,255,255,0.035); display: flex; align-items: center; justify-content: space-between; gap: 24px 40px; flex-wrap: wrap; }
+        .icp-mid-ask-text { margin: 0; font-size: 17px; line-height: 1.55; color: rgba(242,238,231,0.72); max-width: 52ch; }
+        .icp-mid-ask-text strong { color: #F2EEE7; display: block; font-size: 20px; margin-bottom: 4px; letter-spacing: -0.01em; }
 
-        /* Comparison */
-        .icp-cmp { margin-top: 44px; border: 1px solid rgba(12,12,11,0.1); border-radius: 20px; overflow: hidden; background: rgba(255,255,255,0.5); }
-        .icp-cmp-row { display: grid; grid-template-columns: 1.2fr 1.3fr 1.3fr; border-bottom: 1px solid rgba(12,12,11,0.08); }
-        .icp-cmp-row:last-child { border-bottom: none; }
-        .icp-cmp-head { background: rgba(12,12,11,0.03); }
-        .icp-cmp-head > div { font-size: 11px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; padding: 16px 22px; }
-        .icp-cmp-feature { padding: 18px 22px; font-size: 13.5px; font-weight: 700; color: #0C0C0B; }
-        .icp-cmp-us { padding: 18px 22px; font-size: 13.5px; color: #0C0C0B; border-left: 1px solid rgba(12,12,11,0.08); display: flex; gap: 9px; align-items: flex-start; }
-        .icp-cmp-them { padding: 18px 22px; font-size: 13.5px; color: #8b8780; border-left: 1px solid rgba(12,12,11,0.08); display: flex; gap: 9px; align-items: flex-start; }
-        .icp-cmp-head .icp-cmp-us { padding: 16px 22px; align-items: center; }
-        .icp-cmp-check { font-weight: 900; flex-shrink: 0; }
-        .icp-cmp-x { color: #c0392b; opacity: 0.55; font-weight: 900; flex-shrink: 0; }
-        .icp-cmp-dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; margin-right: 6px; }
-
-        /* Work */
-        /* Sits directly under the dark hero, so it does not need a full
-           section's top padding on top of the hero's bottom padding. */
-        .icp-work-section { padding-top: 24px; }
-        .icp-work-section .icp-container { margin-bottom: 40px; }
-        .icp-work-section .icp-work-resource-wrap { margin: 28px auto 0; }
-        .icp-work-resource { font-family: Inter, sans-serif; font-size: 14.5px; line-height: 1.6; color: rgba(242,238,231,0.66); margin: 0; }
-        .icp-work-resource a { font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
-        .icp-work-placeholder { border: 1px dashed rgba(242,238,231,0.25); border-radius: 18px; padding: 48px 32px; text-align: center; color: rgba(242,238,231,0.6); font-size: 15px; line-height: 1.6; max-width: 720px; margin: 0 auto; }
-
-        /* Risk reversal */
-        /* Six columns, each card spanning two: three across the top row, the
-           remaining two centred underneath. This grid held four cards until a
-           fifth was added (the one naming Lakshya, Shaurya and Aiman, which is
-           the strongest trust signal on the page), and repeat(4, 1fr) left that
-           fifth card alone in a row at a quarter width. repeat(5, 1fr) would fit
-           it but squeezes every card to about 227px. The nth-child rule below is
-           scoped with :nth-last-child(2) so it only fires when there are exactly
-           five cards; add or remove one and the layout falls back cleanly. */
-        .icp-risk-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 16px; margin-top: 44px; }
-        .icp-risk-grid > * { grid-column: span 2; }
-        .icp-risk-grid > *:nth-child(4):nth-last-child(2) { grid-column: 2 / span 2; }
-        .icp-risk-card { border: 1px solid rgba(12,12,11,0.10); border-radius: 18px; background: rgba(255,255,255,0.55); padding: 26px 24px; height: 100%; }
-        .icp-risk-num { font-family: Inter, sans-serif; font-size: 13px; font-weight: 800; letter-spacing: 1px; }
-        .icp-risk-title { font-family: Inter, sans-serif; font-size: 17px; font-weight: 800; letter-spacing: -0.4px; margin: 10px 0 10px; }
-        .icp-risk-desc { font-size: 13.5px; line-height: 1.62; color: #6E6B63; margin: 0; }
-
-        /* Pricing wrap — the homepage Pricing brings its own section padding */
+        .icp-risk-link { margin-top: 16px; }
         .icp-pricing-wrap { scroll-margin-top: 96px; background: #F2EEE7; }
+        .icp-final { overflow: hidden; }
+        .icp-final .fn-container { position: relative; z-index: 1; }
 
-        /* Final CTA */
-        .icp-final { position: relative; overflow: hidden; border-radius: 28px; padding: 72px 48px; text-align: center; color: #F2EEE7; }
-        .icp-final-h { font-family: Inter, sans-serif; font-size: clamp(28px, 3.6vw, 48px); font-weight: 900; letter-spacing: -1.6px; line-height: 1.05; margin: 0; max-width: 18ch; }
-        .icp-final-p { font-size: 16px; line-height: 1.65; color: rgba(242,238,231,0.6); margin: 0; max-width: 560px; }
-        .icp-final-note { font-size: 12.5px; color: rgba(242,238,231,0.4); }
-
-        /* The site swaps the system cursor for a custom dot, and these three
-           surfaces hid the system one to make room for it. Cursor.tsx does not
-           mount that dot on a coarse pointer, so an ungated \`cursor: none\`
-           left touch and hybrid users with no affordance on the exact controls
-           these outreach pages exist to get tapped. */
+        /* The site swaps the system cursor for a custom dot only on a fine
+           pointer; touch keeps its affordance. */
         @media (hover: hover) and (pointer: fine) {
           .icp-book-btn, .icp-faq-card, .icp-svc-card { cursor: none; }
         }
 
-        /* Responsive */
-        @media (max-width: 1000px) {
-          .icp-hero-grid { grid-template-columns: 1fr; gap: 40px; }
-          .icp-hero-visual { max-width: 340px; }
-          .icp-svc-grid { grid-template-columns: repeat(2, 1fr); }
-          .icp-risk-grid { grid-template-columns: repeat(2, 1fr); }
-          .icp-risk-grid > *, .icp-risk-grid > *:nth-child(4):nth-last-child(2) { grid-column: auto; }
+        @media (max-width: 1024px) {
+          .icp-hero { padding: 136px 0 56px; }
+          .icp-hero-grid { grid-template-columns: minmax(0, 1fr); gap: 48px; }
+          .icp-hero-visual { justify-self: start; max-width: 380px; }
           .icp-stat-grid-4 { grid-template-columns: repeat(2, 1fr); }
-          .icp-cmp-row { grid-template-columns: 1fr 1fr; }
-          .icp-cmp-feature { grid-column: 1 / -1; border-bottom: 1px solid rgba(12,12,11,0.06); background: rgba(12,12,11,0.02); }
-          .icp-cmp-head .icp-cmp-feature { display: none; }
-          .icp-deliv-row { grid-template-columns: 44px 1fr; }
-          .icp-deliv-desc { grid-column: 2; }
+          .icp-founder { grid-template-columns: minmax(0, 1fr); }
+          .icp-work .icp-rail { padding-left: 40px !important; padding-right: 40px !important; }
         }
-        @media (max-width: 640px) {
-          .icp-container { padding: 0 20px; }
-          .icp-section { padding: 64px 0; }
-          .icp-hero { padding: 104px 0 64px; }
-          .icp-byline-wrap { margin-top: 28px; }
-          .icp-founder-story { padding-bottom: 40px; }
-          .icp-founder-card { padding-left: 16px; }
-          .icp-hero-eyebrow { font-size: 10.5px; letter-spacing: 1.8px; margin-bottom: 12px; }
-          .icp-h1 { font-size: 34px; letter-spacing: -1.6px; }
-          /* The animation used to be display:none on phones — indefensible for
-             an outreach page where most cold clicks ARE on phones. The visual
-             that explains the entire offer must be the thing mobile visitors
-             see right after the headline. Centered, slightly narrower, after
-             the copy in source order so the CTA stays above it. */
-          .icp-hero-visual { display: block; max-width: 320px; margin: 8px auto 0; }
-          .icp-hero-sub { font-size: 15.5px; }
-          .icp-hero-actions { flex-direction: column; align-items: stretch; }
-          /* The fullWidthMobile prop on ICPBookButton set this class but
-             nothing ever defined it. The stretch above happened to widen the
-             button anyway; stating it means the prop does what its name says. */
-          .icp-book-btn-fw { width: 100%; }
-          .icp-hero-secondary { text-align: center; padding: 16px 26px; }
-          /* 26px of side padding on a 320px content column costs a fifth of
-             the measure. The 22px block padding, which is what makes the row a
-             comfortable tap target, is untouched. */
-          .icp-faq-card { padding: 22px 20px !important; }
-          .icp-svc-grid { grid-template-columns: 1fr; }
-          .icp-risk-grid { grid-template-columns: 1fr; gap: 12px; }
-          .icp-risk-card { padding: 22px 20px; }
+        @media (max-width: 768px) {
+          /* globals.css forces section padding on phones; the hero states its
+             own so the eyebrow clears the fixed nav pill. */
+          .icp-hero { padding: 112px 0 48px !important; }
+          .icp-work { padding: 48px 0 72px !important; }
+          .icp-h1 { font-size: 36px; letter-spacing: -0.03em !important; line-height: 1.04 !important; }
+          .icp-hero-sub { margin-bottom: 32px; }
+          .icp-hero-visual { justify-self: center; max-width: 340px; }
+          .fn-proof { margin-top: 24px; flex-direction: column; gap: 8px; }
+          .icp-work .icp-rail { padding-left: 24px !important; padding-right: 24px !important; }
+          .icp-work-head { margin-bottom: 32px; }
           .icp-stat-grid-2, .icp-stat-grid-3, .icp-stat-grid-4 { grid-template-columns: 1fr 1fr; }
-          .icp-stat-block { padding: 26px 18px; }
-          .icp-cmp-row { grid-template-columns: 1fr; }
-          .icp-cmp-us { border-left: none; }
-          .icp-cmp-them { border-left: none; border-top: 1px dashed rgba(12,12,11,0.08); }
-          .icp-final { padding: 48px 24px; }
-
-          /* Phone legibility pass (Nov 2026). Desktop sizes are untouched.
-             1. globals.css forces a 56px top padding on every section under
-                768px, which slid the hero eyebrow underneath the fixed nav
-                pill (its bottom edge is at 84px). The hero states its own. */
-          .icp-hero { padding-top: 104px !important; }
-          /* 2. Labels were 9px to 11px and paragraph copy 13.5px to 14px. */
-          .icp-hero-eyebrow { font-size: 12px; letter-spacing: 1.4px; }
-          .icp-eyebrow-line { font-size: 12px; letter-spacing: 3px; }
-          .icp-svc-weight { font-size: 11.5px; letter-spacing: 0.6px; }
-          .icp-stat-meaning { font-size: 14.5px; }
-          .icp-stat-note { font-size: 13px; }
-          .icp-svc-why, .icp-deliv-desc, .icp-risk-desc { font-size: 15px; }
-          .icp-cmp-feature, .icp-cmp-us, .icp-cmp-them { font-size: 15px; }
-          .icp-cmp-head > div, .icp-cmp-head .icp-cmp-us, .icp-cmp-head .icp-cmp-them { font-size: 12px; }
-          .icp-final-note { font-size: 13px; }
-          /* 3. A lone third stat left an empty grey cell beside it in the
-                two-column grid. It now spans the row. */
           .icp-stat-grid > *:last-child:nth-child(odd) { grid-column: 1 / -1; }
-          /* 4. Standalone link, so it gets a thumb-sized row. */
-          .icp-founder-link { display: inline-flex; align-items: center; min-height: 44px; }
+          .icp-stat-block { padding: 24px 16px; }
+          .icp-stat-meaning { font-size: 15px; }
+          .icp-founder { margin-top: 56px; padding-top: 40px; }
+          .icp-svc-card { min-height: 0; }
+          .icp-mid-ask { padding: 24px; margin-top: 40px; }
+          .icp-mid-ask .fn-btn { width: 100%; }
+        }
+        @media (max-width: 374px) {
+          .icp-h1 { font-size: 32px; }
+          .icp-work .icp-rail { padding-left: 16px !important; padding-right: 16px !important; }
         }
       `}</style>
     </>

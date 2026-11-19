@@ -1,6 +1,9 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
+
+const noopSubscribe = () => () => {};
+const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /**
  * Reveal — lightweight scroll-in wrapper for the ICP pages.
@@ -25,31 +28,33 @@ export default function Reveal({
   style?: React.CSSProperties;
 }) {
   const ref = useRef<HTMLElement | null>(null);
-  const [shown, setShown] = useState(false);
-  const [reduced, setReduced] = useState(false);
+  const [seen, setSeen] = useState(false);
+  // Read during render (server snapshot: false), so reduced-motion visitors
+  // get the content immediately without a state update inside an effect.
+  const reduced = useSyncExternalStore(noopSubscribe, reducedMotion, () => false);
+  const shown = seen || reduced;
 
   useEffect(() => {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      setReduced(true);
-      setShown(true);
-      return;
-    }
+    if (reduced) return;
     const el = ref.current;
     if (!el) return;
     const obs = new IntersectionObserver(
       (entries) => {
         entries.forEach((e) => {
           if (e.isIntersecting) {
-            setShown(true);
+            setSeen(true);
             obs.disconnect();
           }
         });
       },
-      { threshold: 0.15, rootMargin: '0px 0px -40px 0px' },
+      // threshold 0 with a bottom inset, not a ratio: a ratio of 0.15 can
+      // never be reached by a block taller than about six viewports, which
+      // left long lists invisible on phones.
+      { threshold: 0, rootMargin: '0px 0px -8% 0px' },
     );
     obs.observe(el);
     return () => obs.disconnect();
-  }, []);
+  }, [reduced]);
 
   const T = Tag as React.ElementType;
   return (
@@ -59,8 +64,8 @@ export default function Reveal({
       style={{
         ...style,
         opacity: shown ? 1 : 0,
-        transform: shown || reduced ? 'none' : 'translateY(20px)',
-        transition: reduced ? 'none' : `opacity 0.6s ease ${delay}s, transform 0.6s cubic-bezier(0.16,1,0.3,1) ${delay}s`,
+        transform: shown || reduced ? 'none' : 'translateY(16px)',
+        transition: reduced ? 'none' : `opacity 0.5s ease ${delay}s, transform 0.5s cubic-bezier(0.16,1,0.3,1) ${delay}s`,
         willChange: shown ? 'auto' : 'opacity, transform',
       }}
     >

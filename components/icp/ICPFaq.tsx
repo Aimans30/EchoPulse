@@ -32,24 +32,14 @@ export default function ICPFaq({ faq, accent }: { faq: { q: string; a: string }[
   const [open, setOpen] = useState<number | null>(0);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, maxWidth: 860, margin: '0 auto' }}>
+    <div className="icp-faq" style={{ borderTop: '1px solid rgba(12,12,11,0.12)' }}>
       {faq.map((item, i) => {
         const isOpen = open === i;
         const panelId = `icp-faq-panel-${i}`;
         const buttonId = `icp-faq-button-${i}`;
 
         return (
-          <div
-            key={item.q}
-            className="icp-faq-card"
-            style={{
-              background: isOpen ? `${accent}0d` : 'rgba(255,255,255,0.55)',
-              border: `1px solid ${isOpen ? `${accent}30` : 'rgba(12,12,11,0.06)'}`,
-              borderRadius: 18,
-              overflow: 'hidden',
-              transition: 'background 0.3s, border-color 0.3s',
-            }}
-          >
+          <div key={item.q} className="icp-faq-card" style={{ borderBottom: '1px solid rgba(12,12,11,0.12)' }}>
             <h3 style={{ margin: 0 }}>
               <button
                 type="button"
@@ -63,17 +53,17 @@ export default function ICPFaq({ faq, accent }: { faq: { q: string; a: string }[
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
-                  gap: 20,
-                  // Matches the old card padding, so the tap row stays ~66px.
-                  padding: '22px 26px',
+                  gap: 24,
+                  minHeight: 64,
+                  padding: '20px 0',
                   background: 'transparent',
                   border: 'none',
                   textAlign: 'left',
                   font: 'inherit',
                   fontFamily: 'Inter, sans-serif',
-                  fontSize: 16,
+                  fontSize: 18,
                   fontWeight: 700,
-                  letterSpacing: '-0.2px',
+                  letterSpacing: '-0.01em',
                   color: '#0C0C0B',
                   lineHeight: 1.4,
                   cursor: 'pointer',
@@ -85,20 +75,20 @@ export default function ICPFaq({ faq, accent }: { faq: { q: string; a: string }[
                   aria-hidden="true"
                   style={{
                     flexShrink: 0,
-                    width: 30,
-                    height: 30,
+                    width: 32,
+                    height: 32,
                     borderRadius: '50%',
-                    border: `1px solid ${isOpen ? accent : 'rgba(12,12,11,0.12)'}`,
+                    border: `1px solid ${isOpen ? accent : 'rgba(12,12,11,0.14)'}`,
                     background: isOpen ? accent : 'transparent',
                     position: 'relative',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    transition: 'all 0.3s',
+                    transition: 'background-color 0.2s, border-color 0.2s',
                   }}
                 >
-                  <span style={{ position: 'absolute', width: 11, height: 1.8, background: isOpen ? '#fff' : '#0C0C0B', borderRadius: 2 }} />
-                  <span style={{ position: 'absolute', width: 11, height: 1.8, background: isOpen ? '#fff' : '#0C0C0B', borderRadius: 2, transform: isOpen ? 'rotate(0deg)' : 'rotate(90deg)', transition: 'transform 0.3s' }} />
+                  <span style={{ position: 'absolute', width: 12, height: 2, background: isOpen ? '#fff' : '#0C0C0B', borderRadius: 2 }} />
+                  <span style={{ position: 'absolute', width: 12, height: 2, background: isOpen ? '#fff' : '#0C0C0B', borderRadius: 2, transform: isOpen ? 'rotate(0deg)' : 'rotate(90deg)', transition: 'transform 0.3s' }} />
                 </span>
               </button>
             </h3>
@@ -115,13 +105,19 @@ export default function ICPFaq({ faq, accent }: { faq: { q: string; a: string }[
               transition={{ duration: DUR.sm, ease: EASE.out }}
               style={{ overflow: 'hidden' }}
             >
-              <p style={{ margin: '0 26px 22px', fontSize: 14.5, lineHeight: 1.7, color: '#6E6B63' }}>
+              <p style={{ margin: 0, padding: '0 56px 24px 0', fontSize: 16, lineHeight: 1.7, color: '#3E3D3A', maxWidth: '68ch' }}>
                 {item.a}
               </p>
             </motion.div>
           </div>
         );
       })}
+      <style>{`
+        @media (max-width: 768px) {
+          .icp-faq button { font-size: 17px !important; }
+          .icp-faq p { padding-right: 0 !important; }
+        }
+      `}</style>
     </div>
   );
 }

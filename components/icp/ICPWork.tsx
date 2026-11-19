@@ -40,7 +40,6 @@ function VideoModal({ src, onClose }: { src: string; onClose: () => void }) {
         {src.includes('player.cloudinary.com/embed') ? (
           <iframe title="Work sample" src={src} allow="autoplay; fullscreen; picture-in-picture" allowFullScreen style={{ width: '100%', height: '100%', border: 0 }} />
         ) : (
-          // eslint-disable-next-line jsx-a11y/media-has-caption
           <video src={src} controls autoPlay playsInline style={{ width: '100%', height: '100%', display: 'block' }} />
         )}
       </div>
@@ -183,18 +182,17 @@ export default function ICPWork({ videos, accent }: { videos: VideoEntry[]; acce
               <div
                 key={`${video.url}-${i}`}
                 className="icp-vid-card"
-                style={{ width: cardWidth(orient), height: CARD_H, position: 'relative', flexShrink: 0, borderRadius: 16, overflow: 'hidden', cursor: 'pointer', boxShadow: '0 8px 30px rgba(12,12,11,0.10)' }}
+                style={{ width: cardWidth(orient), height: CARD_H, position: 'relative', flexShrink: 0, borderRadius: 16, overflow: 'hidden', cursor: 'pointer', boxShadow: '0 8px 24px rgba(0,0,0,0.28)' }}
                 onClick={() => { trackWorkVideoOpen(video.label, video.brand); openModal(video.url); }}
                 data-cursor-hover
               >
                 {previewSrc ? (
-                  // eslint-disable-next-line jsx-a11y/media-has-caption
-                  <video src={previewSrc} muted loop playsInline autoPlay preload="metadata" onLoadedMetadata={(e) => handleMeta(video.url, e.currentTarget)} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', background: '#0C0C0B' }} />
+                          <video src={previewSrc} muted loop playsInline autoPlay preload="metadata" onLoadedMetadata={(e) => handleMeta(video.url, e.currentTarget)} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', background: '#0C0C0B' }} />
                 ) : (
                   <div style={{ position: 'absolute', inset: 0, background: '#0C0C0B' }} />
                 )}
                 <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 45%)', pointerEvents: 'none' }} />
-                <div style={{ position: 'absolute', top: 10, left: 10, background: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(10px)', padding: '4px 10px', borderRadius: 6, fontSize: 10, fontWeight: 700, color: '#0C0C0B', pointerEvents: 'none' }}>
+                <div style={{ position: 'absolute', top: 10, left: 10, background: 'rgba(255,255,255,0.9)', padding: '4px 10px', borderRadius: 6, fontSize: 12, fontWeight: 700, color: '#0C0C0B', pointerEvents: 'none' }}>
                   {video.brand}
                 </div>
               </div>
@@ -221,11 +219,14 @@ export default function ICPWork({ videos, accent }: { videos: VideoEntry[]; acce
            last card on desktop-class touch devices. Momentum scrolling still
            works, and the partially visible next card is the affordance. */
         .icp-rail-outer::-webkit-scrollbar { display: none; }
-        .icp-work-all { margin: 28px 0 0; padding: 0 56px; text-align: center; }
+        .icp-work-all { margin: 24px 0 0; padding: 0 56px; text-align: center; }
+        @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+          .icp-vid-card { transition: transform .3s cubic-bezier(.16,1,.3,1); }
+          .icp-vid-card:hover { transform: translateY(-4px); }
+        }
         .icp-work-all a { display: inline-flex; align-items: center; min-height: 44px; color: ${accent}; font-size: 15px; font-weight: 700; text-decoration: underline; text-underline-offset: 4px; }
         @media (max-width: 640px) {
-          .icp-rail { padding-left: 18px !important; padding-right: 18px !important; }
-          .icp-work-all { padding: 0 18px; }
+          .icp-work-all { padding: 0 24px; }
           /* globals.css pins EVERY open dialog to \`width: min(95vw, 420px)\`
              and a 9/14 aspect-ratio on phones. That rule was written for the
              booking modal but catches this fixed inset:0 video overlay too,
