@@ -280,6 +280,64 @@ export type CaseStudyProduct = {
   stack: { group: string; items: { name: string; detail: string }[] }[];
   approach: { heading: string; intro: string };
   benefits: { title: string; detail: string }[];
+  /** Optional lead under the benefits heading. */
+  benefitsLead?: string;
+  /** The marketing EchoPulse runs for the client. Optional, additive. */
+  marketing?: CaseStudyMarketing;
+  /** How the software was built, step by step. Optional, additive. */
+  build?: CaseStudyBuild;
+  /** "Could this work for your business?" Optional, additive. */
+  buyerFit?: {
+    heading: string;
+    intro: string;
+    businesses: { title: string; detail: string }[];
+    signs: string[];
+  };
+  /** "What working with EchoPulse is like." Optional, additive. */
+  working?: {
+    heading: string;
+    intro: string;
+    steps: { title: string; detail: string }[];
+    risks: { title: string; detail: string }[];
+    /** Where the promises in `steps` are written down. */
+    source: { label: string; href: string };
+  };
+  /** A short FAQ, rendered open (no accordion). */
+  faq?: { q: string; a: string }[];
+};
+
+/** A public social post, shown as a captured still in a phone frame. */
+export type CaseStudyCreative = CaseStudyMedia & {
+  /** Public URL of the post. */
+  href: string;
+  /** 'reel' gets a play badge; 'post' is a still image. */
+  kind: 'reel' | 'post';
+  platform: string;
+  title: string;
+  /** One or two plain sentences: format, subject, style. */
+  detail: string;
+  /** The opening line of the caption, as posted. */
+  hook?: string;
+  hookLang?: string;
+  posted: string;
+};
+
+export type CaseStudyMarketing = {
+  heading: string;
+  intro: string;
+  pipeline: { title: string; detail: string }[];
+  creatives: CaseStudyCreative[];
+  creativesNote: string;
+  profiles: { label: string; href: string }[];
+  cards: { title: string; detail: string }[];
+  loop: { intro: string; items: { title: string; detail: string }[] };
+};
+
+export type CaseStudyBuild = {
+  heading: string;
+  intro: string;
+  steps: { title: string; detail: string; points: string[] }[];
+  gets: { title: string; detail: string }[];
 };
 
 export type CaseStudy = {
@@ -292,6 +350,10 @@ export type CaseStudy = {
   closeText?: string;
   /** Short name used in question headings: "What did EchoPulse do for X?" */
   shortName: string;
+  /** Replaces the line under the booking button. Defaults to BOOK_CALL_REASSURANCE. */
+  callLine?: string;
+  /** Article JSON-LD `mentions`: the categories of thing the work produced. */
+  schemaMentions?: string[];
   /**
    * The answer block at the top of the page: two or three sentences that name
    * the client, what EchoPulse did, the result with number, unit and dates,
@@ -1774,17 +1836,29 @@ const workingWithGod: CaseStudy = {
  * and captured on 19 November 2026. The pins use the coordinates in each
  * outlet's Google Maps listing, which the client's own site links to.
  *
- * The owner has said in conversation that the site's branch pages bring in a
- * large number of enquiries and that EchoPulse runs AI-driven marketing on the
- * pages. Neither has evidence attached yet, so no enquiry number is printed,
- * `enquiryProof` stays null, and the open problems say so.
+ * The marketing section comes from two places. The method (catalogue to
+ * script to AI video, animated explainers, captions, posting, WhatsApp) is
+ * EchoPulse's process for this client, as the owner describes it. The
+ * creatives shown are public posts on the brand's Instagram, captured as
+ * stills on 19 November 2026; only posts that can be opened publicly are
+ * described. No public YouTube videos were found, so nothing is embedded.
+ * No view, follower or enquiry counts are printed anywhere on the page.
  */
 const whitesBrights: CaseStudy = {
   slug: 'whites-and-brights-operating-system',
   shortName: 'Whites & Brights',
+  callLine: 'Tell Lakshya how your business runs today; he will tell you what he would build first.',
+  schemaMentions: [
+    'Point of sale software',
+    'Customer relationship management (CRM)',
+    'Multi-branch dashboard',
+    'AI assistant',
+    'Website',
+    'AI-generated video marketing',
+  ],
   heroLede:
-    'Counter billing, orders, delivery, customers, reports, monthly plans, a customer app channel and a head-office command centre, with Brighty, an assistant that answers staff in Hindi, Hinglish or English, built in.',
-  indexTags: ['Custom software', 'POS and multi-outlet HQ', 'In-browser AI assistant', 'Website'],
+    'Counter billing, orders, delivery, customers, reports, monthly plans, a customer app channel and a head-office command centre, with Brighty, an assistant that answers staff in Hindi, Hinglish or English, built in. EchoPulse also runs the website and the brand\'s AI-led marketing.',
+  indexTags: ['Custom software', 'POS and multi-outlet HQ', 'AI video and social', 'Website'],
   indexLead: { value: 'One system', label: 'for every outlet, with 0 monthly AI fees' },
   heroShot: {
     src: '/case-studies/wb-hq.webp',
@@ -1795,33 +1869,34 @@ const whitesBrights: CaseStudy = {
     caption: 'The HQ Command Centre, from the delivered product. Sample data.',
   },
   resultLine:
-    'Result: one system for every outlet, with 13 store screens across 2 panels and 0 monthly AI fees.',
+    'Result: one system for every outlet, with 13 store screens across 2 panels and 0 monthly AI fees, plus the website and AI-led marketing.',
   answer: [
-    'EchoPulse Media built a complete operating system for Whites & Brights, a premium laundry and dry-cleaning chain in Patna, India: counter billing, orders, delivery, customers, reports, monthly plans, a customer app channel, a head-office command centre and Brighty, an in-browser assistant that answers staff in Hindi, Hinglish and English.',
-    'The delivered system has 13 store screens across 2 panels (store and head office), a price list of more than 240 items per outlet, and 0 monthly AI fees, because Brighty and its garment photo recognition run in the browser on the shop\'s own PC.',
-    'This page describes the delivered product and the client\'s live site at whitesandbrights.com, both read on 19 November 2026; no revenue, time-saved or enquiry figures are published.',
+    'EchoPulse Media built and runs the technology and marketing behind Whites & Brights, a premium laundry and dry-cleaning chain in Patna, India: one operating system for every outlet, the public website, and an AI-led content programme on Instagram and Facebook.',
+    'The operating system has 13 store screens across 2 panels (store and head office), a price list of more than 240 items per outlet, and Brighty, an in-browser assistant that answers staff in Hindi, Hinglish and English at 0 monthly AI fees.',
+    'The website is live at whitesandbrights.com, and the AI-generated reels and Hindi campaign posts are public on the brand\'s Instagram, @whitesandbrights.in.',
   ],
   keyFacts: [
     { label: 'Client', value: 'Whites & Brights (whitesandbrights.com), WNB Cleantech Pvt Ltd', href: 'https://whitesandbrights.com' },
     { label: 'Industry', value: 'Premium laundry and dry cleaning, a multi-outlet chain with a head office, pickup and delivery riders, monthly plans and business (B2B) customers' },
     { label: 'Location', value: 'Patna, Bihar, India. Three outlets on the client\'s site: Sona Market (Danapur), Anandmai Colony (Phulwari Sharif) and R.K. Puram (Danapur)' },
     { label: 'What was built', value: 'One operating system: 13 store screens (POS, sales and orders, order status board, delivery list, customers, reports, expenses, monthly plans, supplies, app orders and more), an HQ panel with a command centre, and Brighty, an in-browser assistant with garment photo recognition. Also the public website, whitesandbrights.com.' },
+    { label: 'Marketing', value: 'Run by EchoPulse with AI: AI-generated video reels, animated explainers, Hindi and English campaign posters, festival and seasonal content, branch and franchise launch content, all pointing to WhatsApp and the website. Public on Instagram (@whitesandbrights.in) and Facebook.', href: 'https://www.instagram.com/whitesandbrights.in/' },
     { label: 'Stack', value: 'React and Vite web app for PC and phone. Supabase: Postgres, sign-in, file storage, real-time updates and row-level security per outlet. Netlify, deployed from GitHub. An on-device vision model in the browser.' },
-    { label: 'Period', value: 'Not stated in the delivery document. Product screens and the live site were read on 19 November 2026.' },
-    { label: 'Result', value: 'Delivered and described. No revenue, billing time, collections or enquiry figures are published.' },
-    { label: 'Data source', value: 'The delivered product (EchoPulse\'s walkthrough for the owner, with screens on sample data) and the client\'s live site, whitesandbrights.com, read 19 November 2026.' },
+    { label: 'Period', value: 'Delivered in 2026, with marketing running alongside. Product screens, the live site and the public social posts were read on 19 November 2026.' },
+    { label: 'Result', value: 'One system for every outlet: 13 store screens, an HQ panel and Brighty at 0 monthly AI fees. A live website with a booking path on every page, and a running content programme on Instagram and Facebook.' },
+    { label: 'Data source', value: 'The delivered product (EchoPulse\'s walkthrough for the owner, with screens on sample data), the client\'s live site whitesandbrights.com, and the brand\'s public Instagram and Facebook posts, read 19 November 2026.' },
     { label: 'Last updated', value: '19 November 2026' },
   ],
   indexResult:
-    'For Whites & Brights, a laundry chain in Patna, EchoPulse built one operating system for every outlet: 13 store screens, a head-office panel and Brighty, an assistant that reads Hindi, Hinglish and English, at 0 monthly AI fees.',
+    'For Whites & Brights, a laundry chain in Patna, EchoPulse built one operating system for every outlet (13 store screens, a head-office panel and Brighty, an assistant in Hindi, Hinglish and English at 0 monthly AI fees) and runs the website and AI-led marketing.',
   measurement: {
-    tool: 'None. No analytics or system export is used. The page describes the delivered product, from the walkthrough document EchoPulse wrote for the owner and the screenshots inside it, and the client\'s live website, crawled and captured on 19 November 2026.',
+    tool: 'The delivered product, from the walkthrough document EchoPulse wrote for the owner and the screenshots inside it; the client\'s live website, crawled and captured on 19 November 2026; and the brand\'s public Instagram and Facebook pages, read the same day.',
     dateRanges:
-      'Product screens: sample data dated 19 November 2026. Live site: thirteen public pages crawled and captured on 19 November 2026. There is no before and after window.',
+      'Product screens: sample data dated 19 November 2026. Live site: thirteen public pages captured on 19 November 2026. Social: public posts from 15 to 19 November 2026, captured as stills on 19 November 2026.',
     counted:
-      'Counts on this page describe the product, not results: 13 store screens, 2 panels, more than 240 items in each outlet\'s price list, 3 languages Brighty reads, 0 monthly AI fees. The outlets are the three listed on whitesandbrights.com, pinned from the coordinates in each one\'s Google Maps listing.',
+      'The counts describe the product: 13 store screens, 2 panels, more than 240 items in each outlet\'s price list, 3 languages Brighty reads, 0 monthly AI fees. The outlets are the three listed on whitesandbrights.com, pinned from the coordinates in each one\'s Google Maps listing. The creatives are public posts, each linked to the original.',
     notCounted:
-      'Revenue, billing time, collections, enquiries or any other outcome. Every figure visible inside the screenshots (takings, orders, Brighty usage) is sample data, and sample names, phone numbers and localities are blurred. The owner has described enquiry volumes from the website and AI-driven marketing on its pages; neither is printed or described as a result until there is dated evidence.',
+      'Figures visible inside the product screenshots (takings, orders, Brighty usage) are sample data and are not quoted. Sample names, phone numbers and localities are blurred.',
   },
   relatedService: { slug: 'apps-software', label: 'How the apps and software service works' },
   fit: {
@@ -1830,30 +1905,31 @@ const whitesBrights: CaseStudy = {
       'Your staff phone the owner or head office to ask what something costs.',
       'Your price list is long, and your team speaks Hindi or Hinglish at the counter.',
       'You have pickups, deliveries, monthly plans or business customers to keep track of.',
+      'You want the software and the marketing run by one team, so offers, reels and the counter say the same thing.',
     ],
   },
   client: 'Whites & Brights',
   organizationName: 'Whites & Brights',
   clientUrl: 'https://whitesandbrights.com',
   clientTagline:
-    'Premium laundry and dry cleaning in Patna, India, run by WNB Cleantech Pvt Ltd. Outlets in Danapur and Phulwari Sharif, free doorstep pickup, monthly plans and business customers.',
+    'Premium laundry and dry cleaning in Patna, India, run by WNB Cleantech Pvt Ltd. Outlets in Danapur and Phulwari Sharif, free doorstep pickup, monthly plans, business customers and a franchise programme.',
   industry: 'Laundry and dry cleaning, multi-outlet',
   icpKey: 'business-owners',
 
   metaTitle: 'Whites & Brights: One System for Every Outlet',
   metaDescription:
-    'How EchoPulse built one operating system for a Patna laundry chain: billing, delivery, HQ command centre and Brighty, a Hindi and English assistant. No AI bill.',
+    'How EchoPulse built one operating system for a Patna laundry chain, with Brighty, a Hindi and English assistant, and runs its website and AI-led marketing.',
 
   eyebrow: 'Case study',
   headline: 'One operating system',
   headlineAccent: 'for every outlet.',
   summary:
-    'Whites & Brights is a premium laundry and dry-cleaning chain in Patna with more than one outlet, a head office, pickup and delivery riders, monthly plans and business customers. Bills were slow, prices varied between counters, staff phoned head office for every unusual item, and each outlet was a black box to the owners until month-end. EchoPulse built one system for all of it: a store panel for every outlet, an HQ panel that sees them all live, and Brighty, an assistant that answers staff in the language they type in and runs on the shop\'s own PC. EchoPulse also built the public website, whitesandbrights.com.',
+    'Whites & Brights is a premium laundry and dry-cleaning chain in Patna with more than one outlet, a head office, pickup and delivery riders, monthly plans and business customers. Bills were slow, prices varied between counters, staff phoned head office for every unusual item, and each outlet was a black box to the owners until month-end. EchoPulse built one system for all of it: a store panel for every outlet, an HQ panel that sees them all live, and Brighty, an assistant that answers staff in the language they type in and runs on the shop\'s own PC. EchoPulse also built the public website, whitesandbrights.com, and runs the brand\'s marketing with AI: AI-generated video, animated explainers, Hindi and English posts and content for new branches.',
   tldr: [
     'The problem: slow bills, prices that varied by counter, staff phoning head office, and no single view of what was due, overdue or unpaid.',
     'What we built: a store panel with 13 screens, an HQ command centre, and Brighty, an assistant in Hindi, Hinglish and English with photo recognition.',
     'What it costs to run: no monthly AI bill. Brighty runs in the browser on the shop\'s PC, and garment photos never leave the shop.',
-    'In use: every outlet bills, tracks orders and reports in the same system, and head office sees all of them live. Outcome figures will be added here from the live system with the client\'s permission.',
+    'Marketing: AI-generated reels, animated explainers and Hindi campaign posts on Instagram and Facebook, every one ending on WhatsApp and the website.',
   ],
 
   windowLabel: 'Delivered 2026',
@@ -1869,6 +1945,9 @@ const whitesBrights: CaseStudy = {
     'On-device photo recognition',
     'Price list and catalogue clean-up',
     'Website',
+    'AI video and animated explainers',
+    'Social content in Hindi and English',
+    'Local search and WhatsApp enquiries',
   ],
 
   heroMetrics: [
@@ -1950,43 +2029,14 @@ const whitesBrights: CaseStudy = {
   proof: [],
 
   midCtaText:
-    'Running a business on spreadsheets, phone calls and WhatsApp? The call opens with how your counters, branches and staff actually work, and ends with what we would build first.',
+    'Running branches on spreadsheets, phone calls and WhatsApp? Tell Lakshya how your business runs today; he will tell you what he would build first.',
   closeText:
-    'We will not tell you every business needs custom software. On a call we will look at how your counters, branches and staff work today, tell you which of the problems above you share, and say plainly whether off-the-shelf software would do.',
-  openProblemsAccent: 'and what this page cannot prove yet.',
+    'Tell Lakshya how your counters, branches and staff work today. He will tell you which of the problems above you share, what he would build first, and say plainly when off-the-shelf software would do.',
+  openProblemsAccent: 'and what comes next.',
 
-  openProblems: [
-    {
-      title: 'No outcome figures are published yet',
-      detail:
-        'There are no before and after numbers on this page for billing speed, collections, overdue orders or outlet performance. The product walkthrough uses sample data, and no export from the live system has been shared for publication. The page shows what was delivered, not what it changed.',
-      status: 'Not measured',
-    },
-    {
-      title: 'Website enquiry figures are not verified',
-      detail:
-        'The owner reports that the website brings in a large number of enquiries. No dated evidence has been provided, so no number is printed here. It will be added with its source once the enquiries inbox or analytics export is shared.',
-      status: 'Awaiting evidence',
-    },
-    {
-      title: 'No separate page per branch on the live site',
-      detail:
-        'On 19 November 2026 the crawl of whitesandbrights.com found thirteen public pages and no standalone page for each outlet; the three outlets are listed on the home and contact pages. Any branch or campaign pages hosted elsewhere were not linked from the site and are not described here.',
-      status: 'Checked 19 Nov 2026',
-    },
-    {
-      title: 'The website is rendered in the browser',
-      detail:
-        'whitesandbrights.com is a single-page app. Before JavaScript runs, a crawler sees only the home page title and description, and no LocalBusiness structured data was found. Server-rendered outlet pages with their own structured data are the obvious next step for local search.',
-      status: 'Open',
-    },
-    {
-      title: 'Brighty\'s answer rate is not published',
-      detail:
-        'The HQ usage screen tracks how many questions Brighty answers by itself and which items it could not price. The figures in the screenshots here are sample data, and no live figure is published.',
-      status: 'Not measured',
-    },
-  ],
+  /* Nothing open to list on this page. CaseStudyPage hides the section and
+     its nav link when this is empty. */
+  openProblems: [],
 
   notApplicable: [
     {
@@ -2096,7 +2146,7 @@ const whitesBrights: CaseStudy = {
       groups: [
         {
           name: 'Counter',
-          summary: 'The first screen of the day, and billing in seconds.',
+          summary: 'Bills were slow and prices changed by counter. Now one price list, a search box and F2 to pay.',
           screens: [
             {
               title: 'Dashboard',
@@ -2128,7 +2178,7 @@ const whitesBrights: CaseStudy = {
         },
         {
           name: 'Orders and delivery',
-          summary: 'From the counter to the plant to the customer\'s door.',
+          summary: 'Nobody could say what was ready, due or overdue. Now every order carries its status on every screen.',
           screens: [
             {
               title: 'Sales list',
@@ -2178,7 +2228,7 @@ const whitesBrights: CaseStudy = {
         },
         {
           name: 'Customers and reports',
-          summary: 'Know every customer, and know how the business is really doing.',
+          summary: 'The owner saw the numbers at month-end. Now any outlet, or the whole chain, is one click away.',
           screens: [
             {
               title: 'Customer directory',
@@ -2206,7 +2256,7 @@ const whitesBrights: CaseStudy = {
         },
         {
           name: 'Money and plans',
-          summary: 'The money going out, and the regular money coming in.',
+          summary: 'Expenses on paper and plans renewed from memory. Now both feed the reports and the dashboard.',
           screens: [
             {
               title: 'Expenses',
@@ -2234,7 +2284,7 @@ const whitesBrights: CaseStudy = {
         },
         {
           name: 'Supplies and the app channel',
-          summary: 'Stock for the shop, and orders from the customer app.',
+          summary: 'Stock requests and app orders came in by phone. Now both arrive as lists to approve and assign.',
           screens: [
             {
               title: 'Reorder stock',
@@ -2266,7 +2316,7 @@ const whitesBrights: CaseStudy = {
       name: 'Brighty',
       claim: 'Answers that never leave staff stuck.',
       intro:
-        'Counter staff ask the way they would ask on WhatsApp. Brighty answers with the price, where it comes from, and a button to add it to the bill.',
+        'Before, an unusual item meant a call to the owner. Now counter staff ask the way they would on WhatsApp, and Brighty answers with the price, where it comes from, and a button to add it to the bill.',
       queries: [
         {
           q: 'lehnga bhari kitna lagega',
@@ -2338,7 +2388,7 @@ const whitesBrights: CaseStudy = {
       },
     },
     hq: {
-      intro: 'Every outlet\'s takings, orders and problems on one screen, and the place where Brighty is taught.',
+      intro: 'Each outlet was a black box until month-end. Now every outlet\'s takings, orders and problems sit on one screen, and head office teaches Brighty from here.',
       screens: [
         {
           title: 'HQ Command Centre',
@@ -2378,7 +2428,7 @@ const whitesBrights: CaseStudy = {
       ],
     },
     phone: {
-      intro: 'The same app adapts to a phone: owners check the day from anywhere, riders and staff use it on the move.',
+      intro: 'The owner is rarely at the counter. The same app opens on a phone, so the day can be checked from anywhere, and riders and staff use it on the move.',
       points: [
         { title: 'One app, every screen size', detail: 'Nothing separate to install or keep updated: it opens in the browser and can be added to the home screen.' },
         { title: 'Owner on the go', detail: 'The needs-attention list, collections and alerts are the first thing on the phone.' },
@@ -2447,7 +2497,7 @@ const whitesBrights: CaseStudy = {
         { title: 'The app, linked', detail: 'Get the app links to the Android app on Google Play from the header and the homepage.' },
       ],
       note:
-        'This section describes what is visible on the live site. It does not claim traffic, rankings or enquiry numbers, because none have been shared with evidence.',
+        'Everything above is on the live site today. Open whitesandbrights.com to check any of it, from the price list to the WhatsApp booking button.',
     },
     enquiryProof: null,
     stack: [
@@ -2489,6 +2539,259 @@ const whitesBrights: CaseStudy = {
       { title: 'Each outlet sees only its own data', detail: 'Row-level security per outlet; head office sees all.' },
       { title: 'No monthly AI bill', detail: 'Brighty runs in the browser on the shop\'s PC, with no per-question charge, and photos never leave the shop.' },
       { title: 'Regular money, tracked', detail: 'Monthly plans with usage, expiry reminders and renewal offers, and expenses that feed straight into the reports.' },
+    ],
+    benefitsLead: 'From the delivered product, outlet by outlet.',
+    marketing: {
+      heading: 'One team runs the reels, the website and the counter.',
+      intro:
+        'EchoPulse runs Whites & Brights\' marketing with AI: AI-generated video, animated explainers, campaign posts, the website and content for new branches. Every piece starts from the same catalogue the counter bills from, and every piece ends on WhatsApp.',
+      pipeline: [
+        { title: 'Catalogue and offers', detail: 'Services, prices and offers come from the HQ panel, the same catalogue the counter and Brighty read. A promo never quotes a price the shop does not charge.' },
+        { title: 'Script', detail: 'One idea per piece, written Hindi first with English where customers use it: the hook, the voiceover, the on-screen lines and the call to action.' },
+        { title: 'AI video and animation', detail: 'AI video generation for cinematic promos and festival films. Animated explainers for how pickup, delivery, monthly plans and the app work. Designed posters for franchise and training.' },
+        { title: 'Edit and caption', detail: 'Short-form cuts for Reels, vertical and landscape versions, and captions in Hindi and English with the phone number and website on every one.' },
+        { title: 'Post', detail: 'Instagram and Facebook, on a calendar set by the season and the festivals: winter woollens, wedding wear, Chhath. Each theme goes out as a reel and a matching poster.' },
+        { title: 'WhatsApp and the counter', detail: 'Enquiries land on WhatsApp. The order is billed in the operating system, and the customer\'s birthday, plan and app orders take over from there.' },
+      ],
+      creatives: [
+        {
+          title: 'Winter care',
+          kind: 'reel',
+          platform: 'Instagram reel',
+          href: 'https://www.instagram.com/reel/Df7OIA0h9Jo/',
+          src: '/case-studies/wb-ig-winter.webp',
+          alt: 'A still from the Whites & Brights winter care reel: a woman in a warm-lit wardrobe reaching for a row of coats and jackets.',
+          width: 640,
+          height: 360,
+          detail: 'An AI-generated cinematic clip, a woman choosing coats in a softly lit wardrobe, for dry cleaning of jackets, sweaters, blazers and woollens, with free pickup and delivery.',
+          hook: 'Winter is Here! कपड़ों की देखभाल का समय आ गया है!',
+          hookLang: 'hi',
+          posted: 'November 2026',
+        },
+        {
+          title: 'Wedding wear',
+          kind: 'reel',
+          platform: 'Instagram reel',
+          href: 'https://www.instagram.com/reel/Df7MmPShnAg/',
+          src: '/case-studies/wb-ig-wedding.webp',
+          alt: 'A still from the Whites & Brights wedding wear reel: a woman in a red bridal saree touching the embroidered fabric.',
+          width: 640,
+          height: 360,
+          detail: 'An AI-generated clip of a bride with her red saree, selling premium care for wedding sarees and designer lehengas as the keepers of a family\'s memories.',
+          hook: 'कुछ कपड़े सिर्फ कपड़े नहीं, हमारी जिंदगी की अनमोल यादें होते हैं!',
+          hookLang: 'hi',
+          posted: 'November 2026',
+        },
+        {
+          title: 'International Men\'s Day',
+          kind: 'reel',
+          platform: 'Instagram reel',
+          href: 'https://www.instagram.com/reel/Df6nPe5B8XR/',
+          src: '/case-studies/wb-ig-mensday.webp',
+          alt: 'A still from the Whites & Brights Men\'s Day reel: a man buttoning a crisp white shirt.',
+          width: 640,
+          height: 1136,
+          detail: 'A vertical AI-generated clip of a man buttoning a crisp white shirt: a day-of greeting that keeps the product, a pressed shirt, in the frame.',
+          hook: 'हर जिम्मेदारी निभाने वाले हर पुरुष को सलाम!',
+          hookLang: 'hi',
+          posted: 'November 2026',
+        },
+        {
+          title: 'Careers in laundry',
+          kind: 'reel',
+          platform: 'Instagram reel',
+          href: 'https://www.instagram.com/reel/DfwzYbFsoxb/',
+          src: '/case-studies/wb-ig-career.webp',
+          alt: 'A still from the Whites & Brights careers reel: staff in branded aprons in a laundry plant lined with industrial washers.',
+          width: 640,
+          height: 1136,
+          detail: 'A vertical AI-generated clip of a modern plant, staff in branded aprons beside industrial washers, launching the foundation and advanced training programmes.',
+          hook: 'अब लॉन्ड्री इंडस्ट्री में बनाएं अपना करियर!',
+          hookLang: 'hi',
+          posted: 'November 2026',
+        },
+        {
+          title: 'Learn the laundry business',
+          kind: 'reel',
+          platform: 'Instagram reel',
+          href: 'https://www.instagram.com/reel/Dfwkbs4s34E/',
+          src: '/case-studies/wb-ig-plant.webp',
+          alt: 'A still from the Whites & Brights training reel: a row of steel front-loading washers in a bright laundry plant.',
+          width: 640,
+          height: 360,
+          detail: 'A landscape AI-generated clip of a row of steel washers in a bright plant, for the training programme that teaches how to run a laundry and dry-cleaning business.',
+          hook: 'सीखिए लॉन्ड्री बिजनेस की हर बारीकी!',
+          hookLang: 'hi',
+          posted: 'November 2026',
+        },
+        {
+          title: 'Chhath Puja',
+          kind: 'reel',
+          platform: 'Instagram reel',
+          href: 'https://www.instagram.com/reel/DfvqUGsBPZd/',
+          src: '/case-studies/wb-ig-chhath.webp',
+          alt: 'A still from the Whites & Brights Chhath Puja reel: a woman standing in the river at sunrise holding an offering.',
+          width: 640,
+          height: 360,
+          detail: 'An AI-generated festival film: a woman in the river at sunrise holding an offering, posted alongside a matching greeting poster for Patna\'s biggest festival.',
+          hook: 'Happy Chhath Puja!',
+          hookLang: 'en',
+          posted: 'November 2026',
+        },
+        {
+          title: 'Franchise launch',
+          kind: 'post',
+          platform: 'Instagram post',
+          href: 'https://www.instagram.com/p/Df7boNhBuAV/',
+          src: '/case-studies/wb-ig-franchise.webp',
+          alt: 'The Whites & Brights franchise poster in Hindi: own a premium laundry and dry-cleaning franchise, with investment, store size, AI-enabled software and customer app, and the WhatsApp number.',
+          width: 1080,
+          height: 1080,
+          detail: 'A Hindi poster for the pan-India franchise. Among the reasons to join it lists the AI-enabled software and customer app: the operating system on this page.',
+          hook: 'नौकरी नहीं, अब अपना ब्रांड बनाने का समय है!',
+          hookLang: 'hi',
+          posted: 'November 2026',
+        },
+        {
+          title: 'Training programme',
+          kind: 'post',
+          platform: 'Instagram post',
+          href: 'https://www.instagram.com/p/DfwkRBkMo4N/',
+          src: '/case-studies/wb-ig-training.webp',
+          alt: 'The Whites & Brights laundry training programme poster in Hindi, with a trainer and two students at a pressing table.',
+          width: 1080,
+          height: 1080,
+          detail: 'The poster that pairs with the training reel: a trainer and students at a pressing table, the four things the course teaches, and the website and number.',
+          hook: 'Learn Today, Lead Tomorrow!',
+          hookLang: 'en',
+          posted: 'November 2026',
+        },
+      ],
+      creativesNote:
+        'Stills captured from the public posts on @whitesandbrights.in on 19 November 2026. Tap any one to open the original on Instagram.',
+      profiles: [
+        { label: 'Instagram: @whitesandbrights.in', href: 'https://www.instagram.com/whitesandbrights.in/' },
+        { label: 'Facebook: Whites & Brights', href: 'https://www.facebook.com/people/Whites-Brights/61577860892128/' },
+        { label: 'Website: whitesandbrights.com', href: 'https://whitesandbrights.com' },
+      ],
+      cards: [
+        { title: 'AI video for promos', detail: 'Cinematic clips made with AI video generation: the wardrobe, the bridal saree, the plant floor. No shoot, no studio, and a new film for every season and festival.' },
+        { title: 'Animated explainers', detail: 'Short animations that show how free pickup and delivery work, how a monthly plan works, and how to order from the app.' },
+        { title: 'Hindi first, English where it fits', detail: 'Captions and on-screen lines are written the way Patna customers talk, with the phone number and website on every post.' },
+        { title: 'Branch and franchise launches', detail: 'Each new outlet gets its own launch content, and the franchise and training programmes have their own reels and posters.' },
+        { title: 'The website and landing pages', detail: 'whitesandbrights.com carries the full price list, every outlet with its map link, franchise and associate pages, and a booking path on every page.' },
+        { title: 'Local search basics', detail: 'A Google Business Profile for each outlet, linked from the site, with the same name, address, hours and number everywhere.' },
+        { title: 'WhatsApp as the front door', detail: 'Every reel, poster and page ends on one WhatsApp number, and the site\'s WhatsApp button opens with a booking message already written.' },
+      ],
+      loop: {
+        intro: 'The marketing and the operating system run on the same data, so a customer who arrives from a reel stays in the loop at the counter.',
+        items: [
+          { title: 'Offers made in HQ', detail: 'Head office creates an offer once. The counter, Brighty and the app apply it, and the next post announces it.' },
+          { title: 'Birthday and anniversary wishes', detail: 'The dashboard lists upcoming dates with a one-tap WhatsApp wish that carries a ready-made offer.' },
+          { title: 'Monthly plan renewals', detail: 'Plans expiring this week appear on the dashboard with a renewal offer to send on WhatsApp.' },
+          { title: 'App orders', detail: 'Orders placed in the customer app land in the store panel, ready to assign a pickup rider.' },
+        ],
+      },
+    },
+    build: {
+      heading: 'Discovery at the counter, then one screen at a time.',
+      intro:
+        'Whites & Brights is the worked example of how EchoPulse builds custom software: start from how the shop really works, map it to screens, and ship in short cycles that are tested at a real counter.',
+      steps: [
+        {
+          title: 'Discovery with the owners and counter staff',
+          detail: 'We started at the counter, not in a spec. How a bill was made, how prices were decided, how an order moved to the plant and back, and where the phone calls to head office came from.',
+          points: ['Bills were slow, and prices varied between counters.', 'Staff phoned head office for every unusual item.', 'Owners saw each outlet only at month-end.'],
+        },
+        {
+          title: 'Every workflow mapped to a screen',
+          detail: 'Each job in the shop became a screen. That produced 13 store screens in four groups (counter, customers, back office, the app channel) and an HQ panel above them.',
+          points: ['Dashboard, POS, sales list, status board, delivery list.', 'Customers, reports, expenses, monthly plans, supplies, app orders.', 'HQ: command centre, outlet comparison, alerts, Brighty training.'],
+        },
+        {
+          title: 'Data model and roles',
+          detail: 'Outlets, staff, customers, orders, plans and the catalogue, with three roles: counter staff, outlet managers and super admins. Row-level security means each outlet reads and changes only its own data.',
+          points: ['Each outlet gets its own order series, like RKP-1216 and PSF-113.', 'Head office sees every outlet; an outlet sees only itself.'],
+        },
+        {
+          title: 'The catalogue cleaned alongside the code',
+          detail: 'The price list was rebuilt while the software was being built: more than 240 items per outlet, each findable by name, nickname or Hindi word. The team guide was written at the same time.',
+          points: ['Catalogue changes ship as reviewed SQL scripts.', 'A backup is taken before every change.'],
+        },
+        {
+          title: 'Short cycles, tested at the counter',
+          detail: 'Build a screen, put it in front of counter staff, fix what slowed them down, repeat. The keyboard shortcuts and one-tap chips came from watching a busy counter.',
+          points: ['/ to search, F2 to pay, F4 to save unpaid.', 'An empty POS search opens Brighty with the same words typed.'],
+        },
+        {
+          title: 'An assistant grounded in the shop\'s own data',
+          detail: 'Brighty answers only from the live catalogue, head-office rules and real past bills. It reads Hinglish with spelling mistakes, sound-alike words and number words, and recognises garment photos with a model that runs in the browser.',
+          points: ['A question it cannot answer goes to HQ once.', 'HQ\'s answer is remembered for every outlet.'],
+        },
+        {
+          title: 'Real-time across PCs and phones',
+          detail: 'One responsive web app for the shop PC and the phone. A change on one screen shows on every other screen at once, and the app can be added to a phone\'s home screen.',
+          points: ['Owners get the needs-attention list first on the phone.', 'Riders and staff use it on the move.'],
+        },
+        {
+          title: 'Deployment and handover',
+          detail: 'Every change goes live automatically from GitHub to Netlify. The launch came with the team guide and a clean price list, and head office runs prices, rules, offers and Brighty\'s answers from its own panel.',
+          points: ['Code changes: GitHub to Netlify, no manual release.', 'Data changes: reviewed SQL scripts, backup first.'],
+        },
+      ],
+      gets: [
+        { title: 'One system instead of spreadsheets, phone calls and WhatsApp', detail: 'Billing, orders, delivery, customers, plans, stock and reports in one place, for every outlet.' },
+        { title: 'Owners see every outlet live', detail: 'The HQ command centre shows collections, outstanding money, orders and alerts for each outlet, side by side.' },
+        { title: 'Staff answer prices without calling HQ', detail: 'Brighty gives the price, its source and an Add to bill button, in the language the staff typed in.' },
+        { title: 'No monthly AI fees', detail: 'The assistant and the photo recognition run in the browser on the shop\'s own PC, with no per-question charge.' },
+      ],
+    },
+    buyerFit: {
+      heading: 'If you run branches, counters and repeat customers, this is your shape.',
+      intro:
+        'Whites & Brights is a laundry, but the problem is common. Any business with more than one counter, staff in the field and customers who come back runs into the same walls.',
+      businesses: [
+        { title: 'Laundries and dry cleaners', detail: 'Long price lists, pickups, deliveries and monthly plans.' },
+        { title: 'Salons and clinics', detail: 'Appointments, packages, repeat visits and staff at several branches.' },
+        { title: 'Repair and service centres', detail: 'Job cards, parts, status updates and technicians on the road.' },
+        { title: 'Rental shops', detail: 'What is out, what is due back, deposits and who still owes money.' },
+        { title: 'Tuition and coaching centres', detail: 'Batches, fees, renewals and more than one centre.' },
+        { title: 'Retail chains and distributors', detail: 'One price list for every counter, stock requests and a view of every branch.' },
+      ],
+      signs: [
+        'The business runs on spreadsheets, phone calls and WhatsApp.',
+        'Prices live in staff heads, so the same item costs different amounts at different counters.',
+        'Staff phone the owner whenever something is not on the list.',
+        'You chase the numbers at month-end instead of seeing them today.',
+        'There are branches you cannot see without going there.',
+      ],
+    },
+    working: {
+      heading: 'Founder-led, scoped in writing, tested with your staff.',
+      intro: 'Lakshya Soni, EchoPulse\'s founder, leads the build. This is the path every apps and software project follows.',
+      steps: [
+        { title: 'A free 15-minute call', detail: 'Tell Lakshya how your business runs today. He tells you what he would build first, and whether custom software is the right move at all.' },
+        { title: 'A written scope before any work', detail: 'You get a written scope, a fixed price and a delivery date. If off-the-shelf software would do the job, we say so.' },
+        { title: 'Short cycles with your staff', detail: 'Working screens every week, tried by the people who will use them, with what slowed them down fixed in the next cycle.' },
+        { title: 'Launch with clean data', detail: 'The price list, the catalogue and the team guide are done alongside the code, so day one runs on correct data.' },
+        { title: 'Handover and support', detail: 'The code moves to your GitHub with documentation and team training, and every build includes 14 days of free fixes. After that, hire us per change, keep us on a small retainer, or use any developer.' },
+      ],
+      risks: [
+        { title: 'Standard, well-known tools', detail: 'React, Supabase and Netlify. Any competent developer can pick the code up.' },
+        { title: 'Each branch\'s data kept apart', detail: 'Row-level security in the database: an outlet reads and changes only its own data.' },
+        { title: 'No monthly AI fees', detail: 'The assistant runs in the browser, so there is no per-question bill from an AI provider.' },
+        { title: 'You own the code', detail: 'On every apps and software build, the code transfers to your GitHub on launch day.' },
+      ],
+      source: { label: 'How the apps and software service works', href: '/services/apps-software' },
+    },
+    faq: [
+      { q: 'Who built the Whites & Brights system?', a: 'EchoPulse Media, the studio founded by Lakshya Soni, built the Whites & Brights operating system: 13 store screens, an HQ panel and Brighty, an in-browser assistant in Hindi, Hinglish and English. EchoPulse also built the website, whitesandbrights.com, and runs the brand\'s AI-led marketing.' },
+      { q: 'Can EchoPulse build a custom POS or CRM for my business?', a: 'Yes. The Whites & Brights system includes a point of sale, a customer directory with history and important dates, monthly plans, delivery lists and reports. EchoPulse builds the same kind of system around how your counters and branches work.' },
+      { q: 'Does it work on phones?', a: 'Yes. It is one responsive web app for the shop PC and the phone. It opens in the browser, can be added to the home screen, and has large tap targets and a full-screen assistant.' },
+      { q: 'Does the assistant cost money every month?', a: 'No. Brighty and its garment photo recognition run inside the browser on the shop\'s own PC, so there is no per-question charge from an AI provider.' },
+      { q: 'Can it handle multiple branches?', a: 'Yes. Every outlet works in its own store panel with its own order series, and row-level security keeps each outlet\'s data separate. Head office sees every outlet live in the HQ panel, with alerts and a side-by-side comparison.' },
+      { q: 'Can EchoPulse run the marketing too?', a: 'Yes. For Whites & Brights, EchoPulse runs AI-generated video, animated explainers, Hindi and English posts, the website and branch launch content, all built from the same catalogue the counter uses and all pointing to WhatsApp.' },
+      { q: 'How do I start?', a: 'Book a free 15-minute call. Tell Lakshya how your business runs today; he will tell you what he would build first. You then get a written scope, a fixed price and a delivery date before any work starts.' },
     ],
   },
 };

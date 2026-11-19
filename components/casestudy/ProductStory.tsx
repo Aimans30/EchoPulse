@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import { Sparkles } from 'lucide-react';
-import type { CaseStudy, CaseStudyProduct, CaseStudyScreen } from '@/lib/caseStudyData';
+import type { CaseStudy, CaseStudyCreative, CaseStudyProduct, CaseStudyScreen } from '@/lib/caseStudyData';
 import { Rise } from './motion';
 import { BrowserFrame, PhoneFrame, Shot } from './Frames';
 import Parallax from './Parallax';
@@ -145,12 +145,60 @@ function OutletMap({ o }: { o: CaseStudyProduct['outlets'] }) {
   );
 }
 
+/** A public post as a captured still inside a phone, styled like the feed. */
+function CreativeCard({ c, handle }: { c: CaseStudyCreative; handle: string }) {
+  const shape = c.height > c.width * 1.2 ? 'tall' : c.width > c.height * 1.2 ? 'wide' : 'square';
+  return (
+    <figure className="wb-cr">
+      <a className="wb-cr-link" href={c.href} target="_blank" rel="noopener" aria-label={`${c.title}: open the ${c.platform.toLowerCase()} on Instagram`}>
+        <PhoneFrame className="wb-cr-phone">
+          <div className={`wb-ig wb-ig-${shape}`}>
+            <p className="wb-ig-top" aria-hidden="true">
+              <i />
+              <span>{handle}</span>
+            </p>
+            <div className="wb-ig-media">
+              <Image src={c.src} alt={c.alt} width={c.width} height={c.height} sizes="(max-width: 760px) 60vw, 240px" />
+              {c.kind === 'reel' && (
+                <span className="wb-ig-play" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="18" height="18">
+                    <path d="M8 5.5v13l11-6.5z" fill="currentColor" />
+                  </svg>
+                </span>
+              )}
+            </div>
+            {c.hook && (
+              <p className="wb-ig-cap" lang={c.hookLang}>
+                {c.hook}
+              </p>
+            )}
+          </div>
+        </PhoneFrame>
+      </a>
+      <figcaption>
+        <p className="wb-cr-meta">
+          {c.platform} · {c.posted}
+        </p>
+        <h4 className="wb-cr-title">{c.title}</h4>
+        <p className="wb-cr-detail">{c.detail}</p>
+        <a className="wb-cr-open" href={c.href} target="_blank" rel="noopener">
+          Open on Instagram <span aria-hidden="true">&rarr;</span>
+        </a>
+      </figcaption>
+    </figure>
+  );
+}
+
 export default function ProductStory({ study }: { study: CaseStudy }) {
   const p = study.product;
   if (!p) return null;
   const a = p.assistant;
   const w = p.website;
   const who = study.shortName;
+  const m = p.marketing;
+  const b = p.build;
+  const fit = p.buyerFit;
+  const wk = p.working;
 
   return (
     <>
@@ -226,7 +274,7 @@ export default function ProductStory({ study }: { study: CaseStudy }) {
       {/* ── Screenshot tour ──────────────────────────────────────────── */}
       <section className="cs-section cs-tone-paper" id="tour">
         <div className="cs-container">
-          <Head kicker="The store panel" question="What does each outlet work in all day?" claim="The screens each outlet uses, grouped the way the shop works.">
+          <Head kicker="The store panel" question="What does each outlet work in all day?" claim="Every job in the shop, from the first bill to the last delivery, on one screen each.">
             <p className="cs-lead">{p.tour.intro}</p>
           </Head>
           <div className="wb-tour">
@@ -256,7 +304,7 @@ export default function ProductStory({ study }: { study: CaseStudy }) {
       {/* ── Brighty ──────────────────────────────────────────────────── */}
       <section className="cs-section cs-tone-ink" id="assistant">
         <div className="cs-container">
-          <Head kicker={a.name} question={`What does ${a.name} do for counter staff?`} claim={a.claim} light>
+          <Head kicker={a.name} question={`What does ${a.name} do for counter staff?`} claim="Staff ask Brighty, not the owner." light>
             <p className="cs-lead cs-lead-light">{a.intro}</p>
           </Head>
 
@@ -494,35 +542,151 @@ export default function ProductStory({ study }: { study: CaseStudy }) {
         </div>
       </section>
 
-      {/* ── Technology and how we worked ─────────────────────────────── */}
-      <section className="cs-section" id="stack">
-        <div className="cs-container">
-          <Head kicker="How we built it" question="What is it built on?" claim="Proven parts, and one unusual one: the assistant runs in the browser." />
-          <ul className="wb-stack">
-            {p.stack.map((g, gi) => (
-              <Rise as="li" key={g.group} className="wb-stack-group" delay={Math.min(gi * 0.07, 0.21)}>
-                <p className="wb-stack-h">{g.group}</p>
-                <dl className="wb-stack-list">
-                  {g.items.map((it) => (
-                    <div key={it.name}>
-                      <dt>{it.name}</dt>
-                      <dd>{it.detail}</dd>
-                    </div>
-                  ))}
-                </dl>
-              </Rise>
-            ))}
-          </ul>
+      {/* ── Marketing ────────────────────────────────────────────────── */}
+      {m && (
+        <section className="cs-section cs-tone-ink" id="marketing">
+          <div className="cs-container">
+            <Head kicker="Marketing" question={`How does EchoPulse run marketing for ${who}?`} claim={m.heading} light>
+              <p className="cs-lead cs-lead-light">{m.intro}</p>
+            </Head>
 
-          <div className="cs-sub cs-anchor" id="work">
-            <Rise className="cs-head">
-              <p className="cs-kicker">How we worked</p>
-              <h3 className="cs-h3">{`How did EchoPulse work with ${who}?`}</h3>
-              <p className="cs-claim cs-claim-sm">{p.approach.heading}</p>
-              <p className="cs-lead">{p.approach.intro}</p>
+            <Rise className="wb-pipe">
+              <ol className="wb-pipe-list" aria-label="The content pipeline">
+                {m.pipeline.map((st, i) => (
+                  <li key={st.title} className="wb-pipe-step">
+                    <span className="wb-pipe-num">{pad(i + 1)}</span>
+                    <h3 className="wb-pipe-title">{st.title}</h3>
+                    <p className="wb-pipe-detail">{st.detail}</p>
+                  </li>
+                ))}
+              </ol>
             </Rise>
-            <WorkTimeline items={study.workstreams} />
+
+            <div className="cs-sub">
+              <Rise>
+                <h3 className="cs-h3 cs-h3-light">The creatives, as posted</h3>
+                <p className="cs-lead cs-lead-light">AI-generated reels and Hindi campaign posters from the brand&apos;s public Instagram. Each theme goes out as a reel and a matching post.</p>
+              </Rise>
+              <ul className="wb-rail wb-crs">
+                {m.creatives.map((c, i) => (
+                  <Rise as="li" key={c.href} delay={Math.min(i * 0.05, 0.25)}>
+                    <CreativeCard c={c} handle="whitesandbrights.in" />
+                  </Rise>
+                ))}
+              </ul>
+              <p className="wb-swipe-hint" aria-hidden="true">
+                Swipe for more creatives.
+              </p>
+              <p className="wb-cr-note">{m.creativesNote}</p>
+              <ul className="wb-cr-profiles">
+                {m.profiles.map((pr) => (
+                  <li key={pr.href}>
+                    <a href={pr.href} target="_blank" rel="noopener">
+                      {pr.label} <span aria-hidden="true">&rarr;</span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="cs-sub">
+              <Rise>
+                <h3 className="cs-h3 cs-h3-light">What the marketing covers</h3>
+              </Rise>
+              <ol className="wb-caps wb-mk">
+                {m.cards.map((c, i) => (
+                  <Rise as="li" key={c.title} className="wb-cap" delay={Math.min(i * 0.04, 0.2)}>
+                    <span className="wb-cap-num">{pad(i + 1)}</span>
+                    <h4 className="wb-cap-title">{c.title}</h4>
+                    <p className="wb-cap-detail">{c.detail}</p>
+                  </Rise>
+                ))}
+              </ol>
+            </div>
+
+            <Rise className="wb-loop">
+              <div className="wb-loop-head">
+                <h3 className="wb-loop-title">Where marketing meets the operating system</h3>
+                <p className="wb-loop-intro">{m.loop.intro}</p>
+              </div>
+              <ul className="wb-loop-list">
+                {m.loop.items.map((it) => (
+                  <li key={it.title}>
+                    <strong>{it.title}.</strong> {it.detail}
+                  </li>
+                ))}
+              </ul>
+            </Rise>
           </div>
+        </section>
+      )}
+
+      {/* ── How we build custom software ─────────────────────────────── */}
+      <section className="cs-section" id="build">
+        <div className="cs-container cs-anchor" id="work">
+          <Head kicker="How we build custom software" question={`How did EchoPulse build the ${who} system?`} claim={b?.heading ?? p.approach.heading}>
+            <p className="cs-lead">{b?.intro ?? p.approach.intro}</p>
+          </Head>
+          {b ? (
+            <ol className="wb-steps">
+              {b.steps.map((st, i) => (
+                <Rise as="li" key={st.title} className="wb-step" delay={Math.min(i * 0.03, 0.12)}>
+                  <span className="wb-step-num" aria-hidden="true">
+                    {pad(i + 1)}
+                  </span>
+                  <div className="wb-step-body">
+                    <h3 className="wb-step-title">{st.title}</h3>
+                    <p className="wb-step-detail">{st.detail}</p>
+                    <ul className="wb-screen-points">
+                      {st.points.map((pt) => (
+                        <li key={pt.slice(0, 40)}>{pt}</li>
+                      ))}
+                    </ul>
+                  </div>
+                </Rise>
+              ))}
+            </ol>
+          ) : (
+            <WorkTimeline items={study.workstreams} />
+          )}
+
+          <div className="cs-sub cs-anchor" id="stack">
+            <Rise>
+              <h3 className="cs-h3">What it is built on</h3>
+              <p className="cs-lead">Proven parts, and one unusual one: the assistant runs in the browser.</p>
+            </Rise>
+            <ul className="wb-stack">
+              {p.stack.map((g, gi) => (
+                <Rise as="li" key={g.group} className="wb-stack-group" delay={Math.min(gi * 0.07, 0.21)}>
+                  <p className="wb-stack-h">{g.group}</p>
+                  <dl className="wb-stack-list">
+                    {g.items.map((it) => (
+                      <div key={it.name}>
+                        <dt>{it.name}</dt>
+                        <dd>{it.detail}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                </Rise>
+              ))}
+            </ul>
+          </div>
+
+          {b && (
+            <div className="cs-sub">
+              <Rise>
+                <h3 className="cs-h3">What a business gets</h3>
+              </Rise>
+              <ul className="wb-gets">
+                {b.gets.map((g, i) => (
+                  <Rise as="li" key={g.title} className="wb-get" delay={Math.min(i * 0.05, 0.2)}>
+                    <h4 className="wb-get-title">{g.title}</h4>
+                    <p className="wb-get-detail">{g.detail}</p>
+                  </Rise>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       </section>
 
@@ -530,19 +694,104 @@ export default function ProductStory({ study }: { study: CaseStudy }) {
       <section className="cs-section cs-tone-ink" id="benefits">
         <div className="cs-container">
           <Head kicker="What it changes" question={`What does ${who} get from it?`} claim="What the delivered product does, in the shop's terms." light>
-            <p className="cs-lead cs-lead-light">From the delivered product. No percentages or savings are claimed, because none have been measured yet.</p>
+            {p.benefitsLead && <p className="cs-lead cs-lead-light">{p.benefitsLead}</p>}
           </Head>
           <ol className="wb-benefits">
-            {p.benefits.map((b, i) => (
-              <Rise as="li" key={b.title} className="wb-benefit" delay={Math.min(i * 0.04, 0.2)}>
+            {p.benefits.map((bn, i) => (
+              <Rise as="li" key={bn.title} className="wb-benefit" delay={Math.min(i * 0.04, 0.2)}>
                 <span className="wb-benefit-num">{pad(i + 1)}</span>
-                <h3 className="wb-benefit-title">{b.title}</h3>
-                <p className="wb-benefit-detail">{b.detail}</p>
+                <h3 className="wb-benefit-title">{bn.title}</h3>
+                <p className="wb-benefit-detail">{bn.detail}</p>
               </Rise>
             ))}
           </ol>
         </div>
       </section>
+
+      {/* ── Could this work for your business? ───────────────────────── */}
+      {fit && (
+        <section className="cs-section cs-tone-paper" id="your-business">
+          <div className="cs-container">
+            <Head kicker="Your business" question="Could this work for your business?" claim={fit.heading}>
+              <p className="cs-lead">{fit.intro}</p>
+            </Head>
+            <div className="wb-fit">
+              <ul className="wb-fit-biz">
+                {fit.businesses.map((bz, i) => (
+                  <Rise as="li" key={bz.title} className="wb-fit-card" delay={Math.min(i * 0.04, 0.2)}>
+                    <h3 className="wb-fit-title">{bz.title}</h3>
+                    <p className="wb-fit-detail">{bz.detail}</p>
+                  </Rise>
+                ))}
+              </ul>
+              <Rise className="wb-signs">
+                <h3 className="wb-signs-title">Signs you need it</h3>
+                <ul>
+                  {fit.signs.map((sg) => (
+                    <li key={sg.slice(0, 40)}>{sg}</li>
+                  ))}
+                </ul>
+              </Rise>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ── What working with EchoPulse is like ──────────────────────── */}
+      {wk && (
+        <section className="cs-section" id="working">
+          <div className="cs-container">
+            <Head kicker="Working with us" question="What is working with EchoPulse like?" claim={wk.heading}>
+              <p className="cs-lead">{wk.intro}</p>
+            </Head>
+            <ol className="wb-work">
+              {wk.steps.map((st, i) => (
+                <Rise as="li" key={st.title} className="wb-work-step" delay={Math.min(i * 0.05, 0.2)}>
+                  <span className="wb-work-num">{pad(i + 1)}</span>
+                  <h3 className="wb-work-title">{st.title}</h3>
+                  <p className="wb-work-detail">{st.detail}</p>
+                </Rise>
+              ))}
+            </ol>
+            <div className="cs-sub">
+              <Rise>
+                <h3 className="cs-h3">Why it is a safe bet</h3>
+              </Rise>
+              <ul className="wb-gets wb-risks">
+                {wk.risks.map((r, i) => (
+                  <Rise as="li" key={r.title} className="wb-get" delay={Math.min(i * 0.05, 0.2)}>
+                    <h4 className="wb-get-title">{r.title}</h4>
+                    <p className="wb-get-detail">{r.detail}</p>
+                  </Rise>
+                ))}
+              </ul>
+              <p className="cs-factlinks">
+                <a href={wk.source.href}>
+                  {wk.source.label}
+                  <span aria-hidden="true"> &rarr;</span>
+                </a>
+              </p>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ── FAQ (always open, plain HTML) ─────────────────────────────── */}
+      {p.faq && p.faq.length > 0 && (
+        <section className="cs-section cs-tone-paper" id="faq">
+          <div className="cs-container">
+            <Head kicker="FAQ" question={`Questions about the ${who} project`} />
+            <dl className="wb-faq">
+              {p.faq.map((f) => (
+                <Rise key={f.q} className="wb-faq-item">
+                  <dt>{f.q}</dt>
+                  <dd>{f.a}</dd>
+                </Rise>
+              ))}
+            </dl>
+          </div>
+        </section>
+      )}
     </>
   );
 }

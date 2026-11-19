@@ -185,6 +185,129 @@ export const PRODUCT_CSS = `
 .wb-benefit-title { font-family: Inter, sans-serif; font-size: 17px; font-weight: 800; letter-spacing: -0.015em; line-height: 1.3; color: var(--cream); margin: 12px 0 8px; }
 .wb-benefit-detail { font-size: 14.5px; line-height: 1.62; color: rgba(242,238,231,0.72); margin: 0; }
 
+/* Marketing: pipeline */
+.wb-pipe-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; counter-reset: none; }
+.wb-pipe-step { position: relative; min-width: 0; padding: 22px 18px 22px; border-radius: 18px; border: 1px solid rgba(242,238,231,0.14); background: rgba(242,238,231,0.03); }
+.wb-pipe-step:last-child { border-color: rgba(232,84,26,0.5); background: radial-gradient(90% 120% at 0% 0%, rgba(232,84,26,0.16), transparent 70%), rgba(242,238,231,0.02); }
+.wb-pipe-step:not(:last-child)::after { content: ""; position: absolute; top: 34px; right: -11px; width: 10px; height: 10px; border-top: 2px solid var(--orange); border-right: 2px solid var(--orange); transform: rotate(45deg); z-index: 1; }
+.wb-pipe-num { display: inline-grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: var(--orange); color: #0C0C0B; font: 800 12px/1 Inter, sans-serif; }
+.wb-pipe-title { font-family: Inter, sans-serif; font-size: 16.5px; font-weight: 800; letter-spacing: -0.015em; line-height: 1.3; color: var(--cream); margin: 14px 0 8px; }
+.wb-pipe-detail { font-size: 14px; line-height: 1.6; color: rgba(242,238,231,0.72); margin: 0; }
+
+/* Marketing: creatives in phones */
+.wb-crs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 44px 22px; margin-top: 8px; }
+.wb-cr { margin: 0; }
+.wb-cr-link { display: block; max-width: 240px; margin: 0 auto; border-radius: 30px; transition: transform 0.45s cubic-bezier(0.16,1,0.3,1); }
+.wb-cr-link:hover { transform: translate3d(0, -4px, 0); }
+.wb-cr-link:focus-visible { outline: 2px solid var(--orange); outline-offset: 4px; }
+.wb-ig { position: absolute; inset: 0; background: #000; color: #fff; display: grid; }
+.wb-ig-media { position: absolute; inset: 0; display: grid; place-items: center; }
+.cs-phone-screen .wb-ig-media img { width: 100%; height: auto; object-fit: contain; }
+.cs-phone-screen .wb-ig-tall .wb-ig-media img { height: 100%; object-fit: cover; object-position: center; }
+.wb-ig-top { position: absolute; z-index: 2; top: 0; left: 0; right: 0; margin: 0; padding: 22px 12px 18px; display: flex; align-items: center; gap: 7px; font: 700 12px/1 Inter, sans-serif; background: linear-gradient(rgba(0,0,0,0.55), transparent); }
+.wb-ig-top i { width: 20px; height: 20px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 2px #E1306C; flex: none; }
+.wb-ig-play { position: absolute; z-index: 2; left: 50%; top: 50%; width: 44px; height: 44px; margin: -22px 0 0 -22px; border-radius: 50%; display: grid; place-items: center; background: rgba(0,0,0,0.45); border: 1.5px solid rgba(255,255,255,0.85); color: #fff; }
+.wb-ig-play svg { margin-left: 2px; }
+.wb-ig-cap { position: absolute; z-index: 2; left: 0; right: 0; bottom: 0; margin: 0; padding: 26px 12px 16px; font: 600 12px/1.45 Inter, sans-serif; background: linear-gradient(transparent, rgba(0,0,0,0.75)); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.wb-cr figcaption { max-width: 300px; margin: 0 auto; text-align: left; }
+.wb-cr-meta { margin: 18px 0 0; font: 800 12px/1.3 Inter, sans-serif; letter-spacing: 0.08em; text-transform: uppercase; color: var(--orange); }
+.wb-cr-title { font-family: Inter, sans-serif; font-size: 17px; font-weight: 800; letter-spacing: -0.015em; color: var(--cream); margin: 8px 0 6px; }
+.wb-cr-detail { font-size: 14px; line-height: 1.6; color: rgba(242,238,231,0.72); margin: 0; }
+.wb-cr-open { display: inline-flex; align-items: center; gap: 0.3em; min-height: 44px; font: 700 14px Inter, sans-serif; color: var(--orange); text-decoration: none; }
+.wb-cr-open:hover { text-decoration: underline; text-underline-offset: 4px; }
+.wb-cr-note { font-size: 13px; line-height: 1.7; color: rgba(242,238,231,0.6); margin: 28px 0 0; max-width: 80ch; }
+.wb-cr-profiles { list-style: none; margin: 6px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0 28px; }
+.wb-cr-profiles a { display: inline-flex; align-items: center; gap: 0.3em; min-height: 44px; font: 700 14px Inter, sans-serif; color: var(--orange); text-decoration: none; }
+.wb-cr-profiles a:hover { text-decoration: underline; text-underline-offset: 4px; }
+.wb-mk { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.wb-loop { margin-top: 72px; display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); gap: 24px 48px; padding: 36px 40px; border-radius: 26px; border: 1px solid rgba(232,84,26,0.45); background: radial-gradient(80% 140% at 0% 0%, rgba(232,84,26,0.16), transparent 60%), rgba(242,238,231,0.02); }
+.wb-loop-title { font-family: Inter, sans-serif; font-size: 24px; font-weight: 800; letter-spacing: -0.025em; line-height: 1.2; color: var(--cream); margin: 0 0 12px; }
+.wb-loop-intro { font-size: 15.5px; line-height: 1.66; color: rgba(242,238,231,0.78); margin: 0; }
+.wb-loop-list { list-style: none; margin: 0; padding: 0; display: grid; border-top: 1px solid var(--cs-dline); }
+.wb-loop-list li { padding: 13px 0; border-bottom: 1px solid var(--cs-dline); font-size: 15px; line-height: 1.6; color: rgba(242,238,231,0.74); }
+.wb-loop-list strong { color: var(--cream); font-family: Inter, sans-serif; }
+
+/* How we build: vertical timeline */
+.wb-steps { list-style: none; margin: 0; padding: 0; position: relative; display: grid; gap: 0; }
+.wb-steps::before { content: ""; position: absolute; left: 21px; top: 22px; bottom: 22px; width: 2px; background: linear-gradient(var(--orange), rgba(232,84,26,0.15)); }
+.wb-step { position: relative; display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 24px; padding: 0 0 36px; }
+.wb-step:last-child { padding-bottom: 0; }
+.wb-step-num { position: relative; z-index: 1; width: 44px; height: 44px; border-radius: 50%; background: var(--black); color: var(--orange); display: grid; place-items: center; font: 800 13px/1 ui-monospace, monospace; box-shadow: 0 0 0 6px var(--cream); }
+.wb-step-body { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); gap: 8px 40px; padding: 4px 0 30px; border-bottom: 1px solid var(--cs-line); }
+.wb-step:last-child .wb-step-body { border-bottom: 0; padding-bottom: 0; }
+.wb-step-title { grid-column: 1 / -1; font-family: Inter, sans-serif; font-size: 21px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.25; margin: 6px 0 4px; }
+.wb-step-detail { font-size: 15.5px; line-height: 1.7; color: var(--grey); margin: 0; }
+.wb-step-body .wb-screen-points { align-content: start; }
+.wb-gets { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+.wb-get { position: relative; background: var(--cs-card); border: 1px solid var(--cs-line); border-radius: 18px; padding: 22px 20px 22px; min-width: 0; }
+.wb-get::before { content: ""; display: block; width: 26px; height: 26px; border-radius: 50%; background: rgba(232,84,26,0.12) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 12.5l4 4 8-9' fill='none' stroke='%23B23A0C' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 16px no-repeat; margin-bottom: 14px; }
+.wb-get-title { font-family: Inter, sans-serif; font-size: 16.5px; font-weight: 800; letter-spacing: -0.015em; line-height: 1.3; margin: 0 0 8px; }
+.wb-get-detail { font-size: 14.5px; line-height: 1.6; color: var(--grey); margin: 0; }
+
+/* Could this work for your business? */
+.wb-fit { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+.wb-fit-biz { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.wb-fit-card { background: var(--cs-card); border: 1px solid var(--cs-line); border-radius: 18px; padding: 20px; min-width: 0; }
+.wb-fit-title { font-family: Inter, sans-serif; font-size: 17px; font-weight: 800; letter-spacing: -0.015em; margin: 0 0 6px; }
+.wb-fit-detail { font-size: 14.5px; line-height: 1.6; color: var(--grey); margin: 0; }
+.wb-signs { background: var(--black); color: var(--cream); border-radius: 22px; padding: 28px 26px; }
+.wb-signs-title { font-family: Inter, sans-serif; font-size: 20px; font-weight: 800; letter-spacing: -0.02em; margin: 0 0 14px; }
+.wb-signs ul { list-style: none; margin: 0; padding: 0; display: grid; }
+.wb-signs li { position: relative; padding: 12px 0 12px 30px; border-top: 1px solid var(--cs-dline); font-size: 15px; line-height: 1.55; color: rgba(242,238,231,0.82); }
+.wb-signs li::before { content: ""; position: absolute; left: 0; top: 15px; width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--orange); }
+
+/* Working with EchoPulse */
+.wb-work { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px; position: relative; }
+.wb-work-step { position: relative; min-width: 0; padding: 0 0 0; }
+.wb-work-num { position: relative; z-index: 1; display: inline-grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: var(--orange); color: #0C0C0B; font: 800 13px/1 Inter, sans-serif; }
+.wb-work-step:not(:last-child)::after { content: ""; position: absolute; top: 19px; left: 48px; right: -6px; height: 2px; background: linear-gradient(90deg, var(--orange), rgba(232,84,26,0.15)); }
+.wb-work-title { font-family: Inter, sans-serif; font-size: 17px; font-weight: 800; letter-spacing: -0.015em; line-height: 1.3; margin: 16px 0 8px; }
+.wb-work-detail { font-size: 14.5px; line-height: 1.62; color: var(--grey); margin: 0; }
+
+/* FAQ */
+.wb-faq { margin: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 40px; border-top: 1px solid var(--cs-line); }
+.wb-faq-item { padding: 22px 0; border-bottom: 1px solid var(--cs-line); min-width: 0; }
+.wb-faq dt { font-family: Inter, sans-serif; font-size: 17px; font-weight: 800; letter-spacing: -0.015em; line-height: 1.35; margin: 0 0 8px; }
+.wb-faq dd { margin: 0; font-size: 15px; line-height: 1.68; color: var(--grey); }
+
+@media (max-width: 1000px) {
+  .wb-pipe-list { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .wb-pipe-step:nth-child(3)::after { display: none; }
+  .wb-crs { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .wb-mk { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .wb-loop { grid-template-columns: minmax(0, 1fr); padding: 30px 28px; }
+  .wb-step-body { grid-template-columns: minmax(0, 1fr); }
+  .wb-gets { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .wb-fit { grid-template-columns: minmax(0, 1fr); }
+  .wb-work { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .wb-work-step { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 4px 18px; padding-bottom: 26px; }
+  .wb-work-step:not(:last-child)::after { top: 46px; bottom: 4px; left: 19px; right: auto; width: 2px; height: auto; background: linear-gradient(var(--orange), rgba(232,84,26,0.15)); }
+  .wb-work-title { margin: 8px 0 6px; }
+  .wb-work-detail { grid-column: 2; }
+  .wb-faq { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 760px) {
+  .wb-pipe-list { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .wb-pipe-step { display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 4px 14px; padding: 18px 16px; }
+  .wb-pipe-title { margin: 4px 0 4px; }
+  .wb-pipe-detail { grid-column: 2; }
+  .wb-pipe-step:not(:last-child)::after { display: block; top: auto; bottom: -9px; right: auto; left: 26px; transform: rotate(135deg); }
+  .wb-pipe-step:nth-child(3)::after { display: block; }
+  .wb-rail.wb-crs { grid-auto-columns: 64%; gap: 18px; }
+  .wb-cr-link { max-width: none; }
+  .wb-mk { grid-template-columns: minmax(0, 1fr); }
+  .wb-loop { padding: 26px 20px; margin-top: 56px; border-radius: 22px; }
+  .wb-loop-title { font-size: 21px; }
+  .wb-steps::before { left: 17px; }
+  .wb-step { grid-template-columns: 36px minmax(0, 1fr); gap: 14px; padding-bottom: 28px; }
+  .wb-step-num { width: 36px; height: 36px; font-size: 12px; }
+  .wb-step-title { font-size: 18.5px; margin-top: 4px; }
+  .wb-step-body { padding-bottom: 24px; }
+  .wb-gets { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .wb-fit-biz { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .wb-signs { padding: 24px 20px; }
+}
+
 /* ── Responsive ── */
 @media (max-width: 1000px) {
   .wb-challenge { grid-template-columns: minmax(0, 1fr); }
@@ -247,6 +370,6 @@ export const PRODUCT_CSS = `
 }
 @media (prefers-reduced-motion: reduce) {
   .wb-sys-wires i { transform: none !important; }
-  .wb-screen-link:hover { transform: none; }
+  .wb-screen-link:hover, .wb-cr-link:hover { transform: none; }
 }
 `;

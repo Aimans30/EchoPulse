@@ -148,14 +148,20 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
   const isRebuild = Boolean(study.comparison);
   const isProduct = Boolean(study.product);
 
-  const sections: SectionNavItem[] = isProduct
+  const hasOpen = study.openProblems.length > 0;
+  const callLine = study.callLine ?? BOOK_CALL_REASSURANCE;
+  const product = study.product;
+  const sections: SectionNavItem[] = product
     ? [
         { id: 'glance', label: 'Key facts' },
-        { id: 'outlets', label: 'Outlets' },
+        ...(product.marketing ? [] : [{ id: 'outlets', label: 'Outlets' }]),
         { id: 'tour', label: 'The product' },
         { id: 'assistant', label: 'Brighty' },
-        { id: 'website', label: 'Website' },
-        { id: 'open', label: openKicker },
+        ...(product.marketing ? [{ id: 'marketing', label: 'Marketing' }] : [{ id: 'website', label: 'Website' }]),
+        ...(product.build ? [{ id: 'build', label: 'How we build' }] : []),
+        ...(product.buyerFit ? [{ id: 'your-business', label: 'Your business' }] : []),
+        ...(product.faq?.length ? [{ id: 'faq', label: 'FAQ' }] : []),
+        ...(hasOpen ? [{ id: 'open', label: openKicker }] : []),
       ]
     : [
     { id: 'glance', label: 'Key facts' },
@@ -342,7 +348,7 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
                     See prices
                   </Link>
                 </div>
-                <p className="cs-reassure">{BOOK_CALL_REASSURANCE}</p>
+                <p className="cs-reassure">{callLine}</p>
                 <p className="cs-hero-client">
                   <span className="cs-hero-client-name">{study.client}</span>
                   {clientLink}
@@ -932,6 +938,7 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
                 </tbody>
               </table>
             </div>
+            {hasOpen && (
             <div className="cs-sub cs-sub-tight">
               <h3 className="cs-h3">{isFounder ? 'Limits stated on this page' : 'Open problems that affect these numbers'}</h3>
               <ul className="cs-openlist">
@@ -947,6 +954,7 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
                 </a>
               </p>
             </div>
+            )}
           </Rise>
         </div>
       </section>
@@ -980,7 +988,8 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
         </div>
       </section>
 
-      {/* ── Still broken ───────────────────────────────────────────────── */}
+      {/* ── Still broken (hidden when a study has nothing open) ─────────── */}
+      {hasOpen && (
       <section className="cs-section cs-section-dark" id="open">
         <div className="cs-container">
           <SectionHead
@@ -1014,6 +1023,7 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
           </ol>
         </div>
       </section>
+      )}
 
       {/* ── Limits ─────────────────────────────────────────────────────── */}
       <section className="cs-section" id="scope">
@@ -1152,7 +1162,7 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
                 See prices
               </Link>
             </div>
-            <p className="cs-reassure">{BOOK_CALL_REASSURANCE}</p>
+            <p className="cs-reassure">{callLine}</p>
             <div className="cs-closelinks">
               {study.relatedService && (
                 <Link href={`/services/${study.relatedService.slug}`}>

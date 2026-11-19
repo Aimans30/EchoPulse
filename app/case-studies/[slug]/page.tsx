@@ -148,6 +148,11 @@ export default async function CaseStudyRoute({ params }: { params: Promise<{ slu
         ? { '@type': 'Person', '@id': `${SITE_URL}/#founder`, name: CASE_STUDY_AUTHOR.name, url: CASE_STUDY_AUTHOR.url }
         : clientLd,
     ...(datasetLd ? { citation: { '@id': datasetId } } : {}),
+    // What the work produced, as plain named things. Only where the study
+    // lists them.
+    ...(study.schemaMentions?.length
+      ? { mentions: study.schemaMentions.map((name) => ({ '@type': 'Thing', name })) }
+      : {}),
     url,
     ...(heroImage
       ? {
