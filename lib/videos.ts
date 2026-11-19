@@ -51,6 +51,8 @@ export const videos: VideoEntry[] = [
   { url: 'https://res.cloudinary.com/dqqd9rq8s/video/upload/v1782372139/2438_fn_z6wry7.mp4',                                    type: 'realestate', brand: 'Listing Reel', label: 'Property',                            icp: ['real-estate'] },
 
   // ─── New clips ───────────────────────────────────────────────────────────
+  // Podcast trailer clip for Instagram, cut from a client episode (DTC).
+  { url: 'https://player.cloudinary.com/embed/?cloud_name=dkzhqy2od&public_id=EP5_ig_trailer_rosazz',                             type: 'podcast',  brand: 'Podcast Clip',   label: 'Episode Trailer', orientation: 'vertical', icp: ['dtc', 'founders'] },
   // Founder info reel with motion graphics (MagicBNB, Nov 2026).
   { url: 'https://player.cloudinary.com/embed/?cloud_name=dkzhqy2od&public_id=MagicBnB_Profit_Reel_1_caarnr',                   type: 'talking',  brand: 'Founder Reel',   label: 'Motion Graphics', orientation: 'vertical', icp: ['founders', 'business-owners'] },
   // General vertical reel — shows across the home carousel ("All" + Talking).
