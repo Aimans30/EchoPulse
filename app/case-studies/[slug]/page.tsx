@@ -113,6 +113,7 @@ export default async function CaseStudyRoute({ params }: { params: Promise<{ slu
       }
     : null;
 
+  const contributors = (study.credits ?? []).filter((c) => !c.isAuthor);
   const articleLd = {
     '@context': 'https://schema.org',
     '@type': 'Article',
@@ -132,6 +133,17 @@ export default async function CaseStudyRoute({ params }: { params: Promise<{ slu
       name: CASE_STUDY_AUTHOR.name,
       url: CASE_STUDY_AUTHOR.url,
     },
+    // Anyone credited on the page besides the author, as contributor Persons.
+    ...(contributors.length
+      ? {
+          contributor: contributors.map((c) => ({
+            '@type': 'Person',
+            name: c.name,
+            jobTitle: c.role,
+            worksFor: { '@id': `${SITE_URL}/#organization` },
+          })),
+        }
+      : {}),
     publisher: {
       '@type': 'Organization',
       '@id': `${SITE_URL}/#organization`,

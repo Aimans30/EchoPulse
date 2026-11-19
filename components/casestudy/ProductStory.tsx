@@ -200,8 +200,95 @@ export default function ProductStory({ study }: { study: CaseStudy }) {
   const fit = p.buyerFit;
   const wk = p.working;
 
+  const ab = p.about;
+  const res = p.result;
+  const nx = p.next;
+  const srcIndex = new Map((ab?.sources ?? []).map((src, i) => [src.id, i + 1]));
+
   return (
     <>
+      {/* ── About the client: public facts, each with its source ──────── */}
+      {ab && (
+        <section className="cs-section" id="about-client">
+          <div className="cs-container">
+            <Head kicker="The client" question={ab.heading}>
+              <p className="cs-lead">{ab.intro}</p>
+            </Head>
+            <div className="wb-about">
+              <Rise className="wb-about-panel">
+                <dl className="wb-about-facts">
+                  {ab.facts.map((f) => (
+                    <div className="wb-about-row" key={f.label}>
+                      <dt>{f.label}</dt>
+                      <dd>
+                        {f.value}
+                        {f.sources.length > 0 && (
+                          <span className="wb-about-refs">
+                            {f.sources.map((id) => {
+                              const n = srcIndex.get(id);
+                              return n ? (
+                                <a key={id} href={`#wb-src-${id}`} className="wb-about-ref" aria-label={`Source ${n}`}>
+                                  {n}
+                                </a>
+                              ) : null;
+                            })}
+                          </span>
+                        )}
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+              </Rise>
+              <Rise className="wb-about-side" delay={0.08}>
+                {res && (
+                  <div className="wb-result">
+                    <p className="wb-result-k">The result</p>
+                    <p className="wb-result-fig">{res.figure}</p>
+                    <p className="wb-result-label">{res.label}</p>
+                    <ul className="wb-result-lines">
+                      {res.lines.map((l) => (
+                        <li key={l}>{l}</li>
+                      ))}
+                    </ul>
+                    <p className="wb-result-basis">
+                      <a href="#measured">How this was measured</a>: {res.basis}
+                    </p>
+                  </div>
+                )}
+                {ab.contact && ab.contact.length > 0 && (
+                  <div className="wb-about-contact">
+                    <p className="wb-about-contact-k">Contact {who}</p>
+                    <ul>
+                      {ab.contact.map((c) => (
+                        <li key={c.href}>
+                          <a href={c.href} {...(c.href.startsWith('http') ? { target: '_blank', rel: 'noopener' } : {})}>
+                            {c.label}
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </Rise>
+            </div>
+            <Rise className="wb-sources">
+              <h3 className="wb-sources-title">Sources</h3>
+              <ol className="wb-sources-list">
+                {ab.sources.map((src) => (
+                  <li key={src.id} id={`wb-src-${src.id}`}>
+                    <a href={src.href} target="_blank" rel="noopener">
+                      {src.label}
+                    </a>
+                    <span className="wb-sources-read">, read {src.read}</span>
+                  </li>
+                ))}
+              </ol>
+              {ab.note && <p className="wb-sources-note">{ab.note}</p>}
+            </Rise>
+          </div>
+        </section>
+      )}
+
       {/* ── The client and the challenge ─────────────────────────────── */}
       <section className="cs-section cs-tone-paper" id="situation">
         <div className="cs-container">
@@ -707,6 +794,27 @@ export default function ProductStory({ study }: { study: CaseStudy }) {
           </ol>
         </div>
       </section>
+
+      {/* ── What we are building next (plans, framed as plans) ─────────── */}
+      {nx && (
+        <section className="cs-section" id="next">
+          <div className="cs-container">
+            <Head kicker="What we are building next" question={`What is EchoPulse building next for ${who}?`} claim={nx.heading}>
+              <p className="cs-lead">{nx.intro}</p>
+            </Head>
+            <ul className="wb-gets wb-next">
+              {nx.areas.map((ar, i) => (
+                <Rise as="li" key={ar.title} className="wb-get wb-next-card" delay={Math.min(i * 0.05, 0.2)}>
+                  <span className="wb-next-tag">Planned</span>
+                  <h3 className="wb-get-title">{ar.title}</h3>
+                  <p className="wb-get-detail">{ar.detail}</p>
+                </Rise>
+              ))}
+            </ul>
+            <p className="wb-next-note">{nx.note}</p>
+          </div>
+        </section>
+      )}
 
       {/* ── Could this work for your business? ───────────────────────── */}
       {fit && (

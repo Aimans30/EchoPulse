@@ -154,11 +154,13 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
   const sections: SectionNavItem[] = product
     ? [
         { id: 'glance', label: 'Key facts' },
+        ...(product.about ? [{ id: 'about-client', label: 'The client' }] : []),
         ...(product.marketing ? [] : [{ id: 'outlets', label: 'Outlets' }]),
         { id: 'tour', label: 'The product' },
         { id: 'assistant', label: 'Brighty' },
         ...(product.marketing ? [{ id: 'marketing', label: 'Marketing' }] : [{ id: 'website', label: 'Website' }]),
         ...(product.build ? [{ id: 'build', label: 'How we build' }] : []),
+        ...(product.next ? [{ id: 'next', label: 'Next' }] : []),
         ...(product.buyerFit ? [{ id: 'your-business', label: 'Your business' }] : []),
         ...(product.faq?.length ? [{ id: 'faq', label: 'FAQ' }] : []),
         ...(hasOpen ? [{ id: 'open', label: openKicker }] : []),
@@ -411,6 +413,25 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
                   </span>
                 )}
               </p>
+              {study.credits && study.credits.length > 0 && (
+                <div className="cs-builtby">
+                  <p className="cs-builtby-k">Built and run by</p>
+                  <ul className="cs-builtby-list">
+                    {study.credits.map((c) => (
+                      <li key={c.name}>
+                        {c.href ? (
+                          <Link className="cs-builtby-name" href={c.href} rel={c.isAuthor ? 'author' : undefined}>
+                            {c.name}
+                          </Link>
+                        ) : (
+                          <span className="cs-builtby-name">{c.name}</span>
+                        )}
+                        <span className="cs-builtby-role">{c.role}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
           </Rise>
           <Rise className="cs-short-side" delay={0.08}>
@@ -935,6 +956,12 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
                     <th scope="row">What is not counted</th>
                     <td>{study.measurement.notCounted}</td>
                   </tr>
+                  {study.measurement.extra?.map((r) => (
+                    <tr key={r.label}>
+                      <th scope="row">{r.label}</th>
+                      <td>{r.value}</td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>

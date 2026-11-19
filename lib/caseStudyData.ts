@@ -167,6 +167,8 @@ export type CaseStudyMeasurement = {
   dateRanges: string;
   counted: string;
   notCounted: string;
+  /** Extra rows after the four fixed ones, e.g. the basis of a stated estimate. */
+  extra?: { label: string; value: string }[];
 };
 
 /**
@@ -304,6 +306,27 @@ export type CaseStudyProduct = {
   };
   /** A short FAQ, rendered open (no accordion). */
   faq?: { q: string; a: string }[];
+  /**
+   * "About the client": public facts, each tied to the sources listed under
+   * it by id. Optional, additive. Only facts readable on a public page.
+   */
+  about?: CaseStudyAbout;
+  /** The headline result with its basis, plus short qualitative lines. */
+  result?: { figure: string; label: string; basis: string; lines: string[] };
+  /** "What we are building next": plans, clearly framed as plans. */
+  next?: { heading: string; intro: string; areas: { title: string; detail: string }[]; note: string };
+};
+
+export type CaseStudySource = { id: string; label: string; href: string; read: string };
+
+export type CaseStudyAbout = {
+  heading: string;
+  intro: string;
+  facts: { label: string; value: string; sources: string[] }[];
+  /** The client's own business line, shown only when it is clearly that. */
+  contact?: { label: string; href: string }[];
+  sources: CaseStudySource[];
+  note?: string;
 };
 
 /** A public social post, shown as a captured still in a phone frame. */
@@ -352,6 +375,12 @@ export type CaseStudy = {
   shortName: string;
   /** Replaces the line under the booking button. Defaults to BOOK_CALL_REASSURANCE. */
   callLine?: string;
+  /**
+   * Who built and ran the work, printed as a "Built by" block under the
+   * answer byline. The page author stays CASE_STUDY_AUTHOR; anyone else here
+   * is emitted as a schema.org contributor Person.
+   */
+  credits?: { name: string; role: string; href?: string; isAuthor?: boolean }[];
   /** Article JSON-LD `mentions`: the categories of thing the work produced. */
   schemaMentions?: string[];
   /**
@@ -1848,6 +1877,10 @@ const whitesBrights: CaseStudy = {
   slug: 'whites-and-brights-operating-system',
   shortName: 'Whites & Brights',
   callLine: 'Tell Lakshya how your business runs today; he will tell you what he would build first.',
+  credits: [
+    { name: 'Lakshya Soni', role: 'Founder, EchoPulse Media. Product and engineering lead.', href: '/about/lakshya-soni', isAuthor: true },
+    { name: 'Shaurya', role: 'Partner and design lead, EchoPulse Media. Design and marketing creative.' },
+  ],
   schemaMentions: [
     'Point of sale software',
     'Customer relationship management (CRM)',
@@ -1859,7 +1892,7 @@ const whitesBrights: CaseStudy = {
   heroLede:
     'Counter billing, orders, delivery, customers, reports, monthly plans, a customer app channel and a head-office command centre, with Brighty, an assistant that answers staff in Hindi, Hinglish or English, built in. EchoPulse also runs the website and the brand\'s AI-led marketing.',
   indexTags: ['Custom software', 'POS and multi-outlet HQ', 'AI video and social', 'Website'],
-  indexLead: { value: 'One system', label: 'for every outlet, with 0 monthly AI fees' },
+  indexLead: { value: '₹3 lakh+', label: 'saved in running costs and losses, by EchoPulse\'s estimate with the client' },
   heroShot: {
     src: '/case-studies/wb-hq.webp',
     alt: 'The Whites & Brights HQ Command Centre: outlets, collections, outstanding money and orders for the month, an alerts list per outlet, and a side-by-side outlet comparison. Sample data.',
@@ -1869,34 +1902,43 @@ const whitesBrights: CaseStudy = {
     caption: 'The HQ Command Centre, from the delivered product. Sample data.',
   },
   resultLine:
-    'Result: one system for every outlet, with 13 store screens across 2 panels and 0 monthly AI fees, plus the website and AI-led marketing.',
+    'Result: more than ₹3 lakh (over US$3,000) saved in running costs and losses since launch, by EchoPulse\'s estimate with the client.',
   answer: [
-    'EchoPulse Media built and runs the technology and marketing behind Whites & Brights, a premium laundry and dry-cleaning chain in Patna, India: one operating system for every outlet, the public website, and an AI-led content programme on Instagram and Facebook.',
-    'The operating system has 13 store screens across 2 panels (store and head office), a price list of more than 240 items per outlet, and Brighty, an in-browser assistant that answers staff in Hindi, Hinglish and English at 0 monthly AI fees.',
-    'The website is live at whitesandbrights.com, and the AI-generated reels and Hindi campaign posts are public on the brand\'s Instagram, @whitesandbrights.in.',
+    'EchoPulse Media built and runs the technology and marketing behind Whites & Brights, a premium laundry and dry-cleaning chain in Patna, India, run by WNB Cleantech Pvt Ltd: one operating system for every outlet, the public website, and an AI-led content programme on Instagram and Facebook. Lakshya Soni, EchoPulse\'s founder, led the product and engineering; his partner Shaurya, EchoPulse\'s design lead, led the design and marketing creative.',
+    'The result: more than ₹3 lakh (over US$3,000) saved in running costs and losses since launch, by EchoPulse\'s estimate with the client. Managing the outlets is no longer a daily headache for the owners, and ordering at the counter and between shops is simpler.',
+    'The operating system has 13 store screens across 2 panels (store and head office), a price list of more than 240 items per outlet, and Brighty, an in-browser assistant that answers staff in Hindi, Hinglish and English at 0 monthly AI fees. The website is live at whitesandbrights.com, and the reels and posts are public on Instagram, @whitesandbrights.in.',
   ],
   keyFacts: [
     { label: 'Client', value: 'Whites & Brights (whitesandbrights.com), WNB Cleantech Pvt Ltd', href: 'https://whitesandbrights.com' },
+    { label: 'Company', value: 'WNB Cleantech Pvt Ltd, a private company incorporated on 2 July 2025 and registered with the Registrar of Companies, Patna (CIN U96010BR2025PTC077191). Source: IndiaFilings company record and the client\'s site footer, read 19 November 2026.' },
+    { label: 'Built and run by', value: 'Lakshya Soni, founder of EchoPulse Media (product and engineering lead), with his partner Shaurya, EchoPulse\'s design lead (design and marketing creative).' },
     { label: 'Industry', value: 'Premium laundry and dry cleaning, a multi-outlet chain with a head office, pickup and delivery riders, monthly plans and business (B2B) customers' },
     { label: 'Location', value: 'Patna, Bihar, India. Three outlets on the client\'s site: Sona Market (Danapur), Anandmai Colony (Phulwari Sharif) and R.K. Puram (Danapur)' },
+    { label: 'Services', value: 'Laundry by the kilo, dry cleaning, steam ironing, shoe care, household items such as bedding, curtains and sofa covers, same-day express and monthly plans, with free doorstep pickup and delivery across Danapur and Phulwari Sharif and a 48-hour standard turnaround. Source: whitesandbrights.com, read 19 November 2026.' },
+    { label: 'Hours and ratings', value: 'Outlets open at 9 am and close at 7 pm (Sona Market) or 9 pm (R.K. Puram, Anandmai Colony). Google ratings: 4.9 Sona Market, 4.8 R.K. Puram, 5.0 Anandmai Colony. Source: each outlet\'s Google Business Profile and whitesandbrights.com, read 19 November 2026.' },
+    { label: 'Franchise', value: 'A franchise programme in three formats (Smart Point, Prime Franchise and a Signature laundry hub with collection centres) and an associate programme for new areas. The franchise page lists the brand\'s own POS and management software among the support. Source: whitesandbrights.com/franchise, read 19 November 2026.', href: 'https://whitesandbrights.com/franchise' },
     { label: 'What was built', value: 'One operating system: 13 store screens (POS, sales and orders, order status board, delivery list, customers, reports, expenses, monthly plans, supplies, app orders and more), an HQ panel with a command centre, and Brighty, an in-browser assistant with garment photo recognition. Also the public website, whitesandbrights.com.' },
     { label: 'Marketing', value: 'Run by EchoPulse with AI: AI-generated video reels, animated explainers, Hindi and English campaign posters, festival and seasonal content, branch and franchise launch content, all pointing to WhatsApp and the website. Public on Instagram (@whitesandbrights.in) and Facebook.', href: 'https://www.instagram.com/whitesandbrights.in/' },
     { label: 'Stack', value: 'React and Vite web app for PC and phone. Supabase: Postgres, sign-in, file storage, real-time updates and row-level security per outlet. Netlify, deployed from GitHub. An on-device vision model in the browser.' },
     { label: 'Period', value: 'Delivered in 2026, with marketing running alongside. Product screens, the live site and the public social posts were read on 19 November 2026.' },
-    { label: 'Result', value: 'One system for every outlet: 13 store screens, an HQ panel and Brighty at 0 monthly AI fees. A live website with a booking path on every page, and a running content programme on Instagram and Facebook.' },
-    { label: 'Data source', value: 'The delivered product (EchoPulse\'s walkthrough for the owner, with screens on sample data), the client\'s live site whitesandbrights.com, and the brand\'s public Instagram and Facebook posts, read 19 November 2026.' },
+    { label: 'Result', value: 'More than ₹3 lakh (over US$3,000) saved in running costs and losses since launch, by EchoPulse\'s estimate with the client. Managing the outlets is no longer a daily headache for the owners, and ordering at the counter and between shops is simpler. Also delivered: one system for every outlet (13 store screens, an HQ panel and Brighty at 0 monthly AI fees), a live website with a booking path on every page, and a running content programme on Instagram and Facebook.' },
+    { label: 'Data source', value: 'The delivered product (EchoPulse\'s walkthrough for the owner, with screens on sample data), the savings estimate shared by the founder, the client\'s live site whitesandbrights.com, the outlets\' Google Business Profiles, the app\'s Google Play listing, the IndiaFilings company record, and the brand\'s public Instagram and Facebook posts, read 19 November 2026.' },
     { label: 'Last updated', value: '19 November 2026' },
   ],
   indexResult:
-    'For Whites & Brights, a laundry chain in Patna, EchoPulse built one operating system for every outlet (13 store screens, a head-office panel and Brighty, an assistant in Hindi, Hinglish and English at 0 monthly AI fees) and runs the website and AI-led marketing.',
+    'For Whites & Brights, a laundry chain in Patna, EchoPulse built one operating system for every outlet and runs the website and AI-led marketing: more than ₹3 lakh (over US$3,000) saved in running costs and losses, by EchoPulse\'s estimate with the client.',
   measurement: {
-    tool: 'The delivered product, from the walkthrough document EchoPulse wrote for the owner and the screenshots inside it; the client\'s live website, crawled and captured on 19 November 2026; and the brand\'s public Instagram and Facebook pages, read the same day.',
+    tool: 'The delivered product, from the walkthrough document EchoPulse wrote for the owner and the screenshots inside it; the savings estimate shared by Lakshya Soni, EchoPulse\'s founder, on 19 November 2026; the client\'s live website, crawled and captured on 19 November 2026; and the outlets\' Google Business Profiles, the app\'s Google Play listing, the IndiaFilings company record and the brand\'s public Instagram and Facebook pages, read the same day.',
     dateRanges:
       'Product screens: sample data dated 19 November 2026. Live site: thirteen public pages captured on 19 November 2026. Social: public posts from 15 to 19 November 2026, captured as stills on 19 November 2026.',
     counted:
       'The counts describe the product: 13 store screens, 2 panels, more than 240 items in each outlet\'s price list, 3 languages Brighty reads, 0 monthly AI fees. The outlets are the three listed on whitesandbrights.com, pinned from the coordinates in each one\'s Google Maps listing. The creatives are public posts, each linked to the original.',
     notCounted:
-      'Figures visible inside the product screenshots (takings, orders, Brighty usage) are sample data and are not quoted. Sample names, phone numbers and localities are blurred.',
+      'Figures visible inside the product screenshots (takings, orders, Brighty usage) are sample data and are not quoted. Sample names, phone numbers and localities are blurred. The savings estimate is not broken down by line item, and no other result figure is published.',
+    extra: [
+      { label: 'Savings figure', value: 'More than ₹3 lakh (over US$3,000) saved in running costs and losses, by EchoPulse\'s estimate with the client. Basis: estimate of operating costs and losses avoided since launch, shared by the founder; the breakdown is not published.' },
+      { label: 'Public facts about the client', value: 'Company record, services, hours, ratings, the app and the franchise programme are each taken from a public page, listed with its read date under "About Whites & Brights". Ratings are as shown on each outlet\'s Google Business Profile on 19 November 2026 and will change.' },
+    ],
   },
   relatedService: { slug: 'apps-software', label: 'How the apps and software service works' },
   fit: {
@@ -1918,14 +1960,15 @@ const whitesBrights: CaseStudy = {
 
   metaTitle: 'Whites & Brights: One System for Every Outlet',
   metaDescription:
-    'How EchoPulse built one operating system for a Patna laundry chain, with Brighty, a Hindi and English assistant, and runs its website and AI-led marketing.',
+    'How EchoPulse built one operating system for a Patna laundry chain, saving over ₹3 lakh by its estimate with the client, and runs its website and AI-led marketing.',
 
   eyebrow: 'Case study',
   headline: 'One operating system',
   headlineAccent: 'for every outlet.',
   summary:
-    'Whites & Brights is a premium laundry and dry-cleaning chain in Patna with more than one outlet, a head office, pickup and delivery riders, monthly plans and business customers. Bills were slow, prices varied between counters, staff phoned head office for every unusual item, and each outlet was a black box to the owners until month-end. EchoPulse built one system for all of it: a store panel for every outlet, an HQ panel that sees them all live, and Brighty, an assistant that answers staff in the language they type in and runs on the shop\'s own PC. EchoPulse also built the public website, whitesandbrights.com, and runs the brand\'s marketing with AI: AI-generated video, animated explainers, Hindi and English posts and content for new branches.',
+    'Whites & Brights is a premium laundry and dry-cleaning chain in Patna with more than one outlet, a head office, pickup and delivery riders, monthly plans and business customers. Bills were slow, prices varied between counters, staff phoned head office for every unusual item, and each outlet was a black box to the owners until month-end. EchoPulse built one system for all of it: a store panel for every outlet, an HQ panel that sees them all live, and Brighty, an assistant that answers staff in the language they type in and runs on the shop\'s own PC. EchoPulse also built the public website, whitesandbrights.com, and runs the brand\'s marketing with AI: AI-generated video, animated explainers, Hindi and English posts and content for new branches. By EchoPulse\'s estimate with the client, the system has saved more than ₹3 lakh (over US$3,000) in running costs and losses since launch.',
   tldr: [
+    'The result: more than ₹3 lakh (over US$3,000) saved in running costs and losses, by EchoPulse\'s estimate with the client. Managing the outlets is no longer a daily headache for the owners.',
     'The problem: slow bills, prices that varied by counter, staff phoning head office, and no single view of what was due, overdue or unpaid.',
     'What we built: a store panel with 13 screens, an HQ command centre, and Brighty, an assistant in Hindi, Hinglish and English with photo recognition.',
     'What it costs to run: no monthly AI bill. Brighty runs in the browser on the shop\'s PC, and garment photos never leave the shop.',
@@ -1951,6 +1994,7 @@ const whitesBrights: CaseStudy = {
   ],
 
   heroMetrics: [
+    { value: '₹3 lakh+', label: 'saved in running costs and losses', note: 'Over US$3,000, by EchoPulse\'s estimate with the client' },
     { value: '13', label: 'store screens', note: 'From the dashboard to app orders' },
     { value: '2', label: 'panels: store and HQ', note: 'Each outlet in its own store panel' },
     { value: '240+', label: 'items in each outlet\'s price list', note: 'Searchable by name, nickname or Hindi word' },
@@ -2784,13 +2828,66 @@ const whitesBrights: CaseStudy = {
       ],
       source: { label: 'How the apps and software service works', href: '/services/apps-software' },
     },
+    result: {
+      figure: '₹3 lakh+',
+      label: 'saved in running costs and losses since launch, by EchoPulse\'s estimate with the client (over US$3,000)',
+      basis: 'Estimate of operating costs and losses avoided since launch, shared by the founder; the breakdown is not published.',
+      lines: [
+        'Managing the outlets is no longer a daily headache for the owners.',
+        'Ordering at the counter and between shops is simpler.',
+      ],
+    },
+    about: {
+      heading: 'About Whites & Brights',
+      intro: 'What anyone can check about the client today, each line tied to the public page it comes from.',
+      facts: [
+        { label: 'Company', value: 'WNB Cleantech Pvt Ltd, a private company incorporated on 2 July 2025, registered with the Registrar of Companies, Patna.', sources: ['indiafilings', 'site'] },
+        { label: 'Services', value: 'Laundry by the kilo, dry cleaning, steam ironing, shoe care, household items such as bedding, curtains and sofa covers, same-day express and monthly plans.', sources: ['services', 'play'] },
+        { label: 'Pickup and delivery', value: 'Free doorstep pickup and delivery across Danapur and Phulwari Sharif, with a 48-hour standard turnaround.', sources: ['site'] },
+        { label: 'Outlets and hours', value: 'Three outlets: Sona Market and R.K. Puram in Danapur, and Anandmai Colony in Phulwari Sharif. Each opens at 9 am; Sona Market closes at 7 pm, the other two at 9 pm.', sources: ['site', 'gbp', 'gbp2', 'gbp3'] },
+        { label: 'Google ratings', value: '4.9 at Sona Market, 4.8 at R.K. Puram and 5.0 at Anandmai Colony, as shown on each outlet\'s Google Business Profile.', sources: ['gbp', 'gbp2', 'gbp3'] },
+        { label: 'Customer app', value: 'An Android app on Google Play, published by WNB Cleantech, to book a pickup and track orders. The listing describes a brand serving customers through its own and franchise outlets.', sources: ['play'] },
+        { label: 'Franchise and associates', value: 'A franchise programme in three formats (Smart Point, Prime Franchise and a Signature laundry hub with collection centres), with the brand\'s own POS and management software listed among the support, and an associate programme for new areas.', sources: ['franchise', 'associate'] },
+        { label: 'Community', value: 'Do Roti, the brand\'s CSR initiative: weekly food drives for homeless and hungry people in Patna.', sources: ['csr'] },
+      ],
+      contact: [
+        { label: 'Call the business line', href: 'tel:+918709319450' },
+        { label: 'WhatsApp Whites & Brights', href: 'https://wa.me/918709319450' },
+      ],
+      sources: [
+        { id: 'site', label: 'whitesandbrights.com', href: 'https://whitesandbrights.com', read: '19 November 2026' },
+        { id: 'services', label: 'whitesandbrights.com: Services and prices', href: 'https://whitesandbrights.com/services', read: '19 November 2026' },
+        { id: 'franchise', label: 'whitesandbrights.com: Franchise', href: 'https://whitesandbrights.com/franchise', read: '19 November 2026' },
+        { id: 'associate', label: 'whitesandbrights.com: Become an associate', href: 'https://whitesandbrights.com/associate', read: '19 November 2026' },
+        { id: 'csr', label: 'whitesandbrights.com: CSR, Do Roti', href: 'https://whitesandbrights.com/csr', read: '19 November 2026' },
+        { id: 'gbp', label: 'Google Maps: Sona Market listing', href: 'https://maps.app.goo.gl/Q2hPJ1jRe2eEW4D66', read: '19 November 2026' },
+        { id: 'gbp2', label: 'Google Maps: R.K. Puram listing', href: 'https://maps.app.goo.gl/1zTQ136dYz3fJzeLA', read: '19 November 2026' },
+        { id: 'gbp3', label: 'Google Maps: Anandmai Colony listing', href: 'https://maps.app.goo.gl/Bpq5nYxFDE7kg3Vy8', read: '19 November 2026' },
+        { id: 'play', label: 'Google Play: Whites and Brights app', href: 'https://play.google.com/store/apps/details?id=com.whitesandbrights.app', read: '19 November 2026' },
+        { id: 'indiafilings', label: 'IndiaFilings: WNB Cleantech Private Limited', href: 'https://www.indiafilings.com/search/wnb-cleantech-private-limited-cin-U96010BR2025PTC077191', read: '19 November 2026' },
+      ],
+      note: 'whitesandbrights.com is built by EchoPulse; the facts quoted from it are the client\'s own. The phone and WhatsApp links are the business line printed on the client\'s site and Google listings.',
+    },
+    next: {
+      heading: 'More builds and optimisation are planned with the client.',
+      intro: 'EchoPulse is planning further builds and optimisation for Whites & Brights. Below are the areas we are working on with the client. They are plans, not delivered work, and no dates are promised.',
+      areas: [
+        { title: 'Growing the customer app', detail: 'More customers booking and tracking through the app that is already live on Google Play and already feeds the store panel.' },
+        { title: 'More outlets on one system', detail: 'Each new outlet gets its own store panel and joins the same HQ view, so growth does not bring back the black box.' },
+        { title: 'Onboarding franchise stores', detail: 'The franchise page offers franchisees the brand\'s own POS and management software. The work is making a new franchise store quick to bring onto it.' },
+        { title: 'Tuning what is live', detail: 'Screens, Brighty and the marketing, adjusted to how staff and customers actually use them.' },
+      ],
+      note: 'Plans as of 19 November 2026. This section will be updated as work ships.',
+    },
     faq: [
-      { q: 'Who built the Whites & Brights system?', a: 'EchoPulse Media, the studio founded by Lakshya Soni, built the Whites & Brights operating system: 13 store screens, an HQ panel and Brighty, an in-browser assistant in Hindi, Hinglish and English. EchoPulse also built the website, whitesandbrights.com, and runs the brand\'s AI-led marketing.' },
+      { q: 'Who built the Whites & Brights system?', a: 'EchoPulse Media built it: Lakshya Soni, EchoPulse\'s founder, as product and engineering lead, with his partner Shaurya, EchoPulse\'s design lead, on design and marketing creative. The system has 13 store screens, an HQ panel and Brighty, an in-browser assistant in Hindi, Hinglish and English. EchoPulse also built the website, whitesandbrights.com, and runs the brand\'s AI-led marketing.' },
+      { q: 'What did the system save Whites & Brights?', a: 'More than ₹3 lakh (over US$3,000) in running costs and losses since launch, by EchoPulse\'s estimate with the client. The figure is an estimate of operating costs and losses avoided, shared by EchoPulse\'s founder; the breakdown is not published. The owners also say managing the outlets is no longer a daily headache, and ordering at the counter and between shops is simpler.' },
       { q: 'Can EchoPulse build a custom POS or CRM for my business?', a: 'Yes. The Whites & Brights system includes a point of sale, a customer directory with history and important dates, monthly plans, delivery lists and reports. EchoPulse builds the same kind of system around how your counters and branches work.' },
       { q: 'Does it work on phones?', a: 'Yes. It is one responsive web app for the shop PC and the phone. It opens in the browser, can be added to the home screen, and has large tap targets and a full-screen assistant.' },
       { q: 'Does the assistant cost money every month?', a: 'No. Brighty and its garment photo recognition run inside the browser on the shop\'s own PC, so there is no per-question charge from an AI provider.' },
       { q: 'Can it handle multiple branches?', a: 'Yes. Every outlet works in its own store panel with its own order series, and row-level security keeps each outlet\'s data separate. Head office sees every outlet live in the HQ panel, with alerts and a side-by-side comparison.' },
       { q: 'Can EchoPulse run the marketing too?', a: 'Yes. For Whites & Brights, EchoPulse runs AI-generated video, animated explainers, Hindi and English posts, the website and branch launch content, all built from the same catalogue the counter uses and all pointing to WhatsApp.' },
+      { q: 'What is EchoPulse building next for Whites & Brights?', a: 'Further builds and optimisation are planned with the client. The areas are growth of the customer app, more outlets on the same system, and onboarding franchise stores, which the brand\'s franchise page already offers with its own POS and management software. These are plans, not delivered work.' },
       { q: 'How do I start?', a: 'Book a free 15-minute call. Tell Lakshya how your business runs today; he will tell you what he would build first. You then get a written scope, a fixed price and a delivery date before any work starts.' },
     ],
   },
