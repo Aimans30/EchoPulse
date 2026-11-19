@@ -51,6 +51,8 @@ export const videos: VideoEntry[] = [
   { url: 'https://res.cloudinary.com/dqqd9rq8s/video/upload/v1782372139/2438_fn_z6wry7.mp4',                                    type: 'realestate', brand: 'Listing Reel', label: 'Property',                            icp: ['real-estate'] },
 
   // ─── New clips ───────────────────────────────────────────────────────────
+  // Real estate short: investment opportunity.
+  { url: 'https://res.cloudinary.com/dkzhqy2od/video/upload/v1795127894/vidssave.com_This_Could_Be_The_BEST_Investment_Opportunity_of_the_Year_shorts_720P_knwqlg.mp4', type: 'realestate', brand: 'Agent Reel', label: 'Investment Short', orientation: 'vertical', icp: ['real-estate'] },
   // Real estate short: what a budget buys in Edmonton.
   { url: 'https://res.cloudinary.com/dkzhqy2od/video/upload/v1795127895/vidssave.com_This_is_what_235K_gets_you_in_Edmonton_Canada_shorts_720P_w0dnl5.mp4', type: 'realestate', brand: 'Listing Reel', label: 'Market Short', orientation: 'vertical', icp: ['real-estate'] },
   // Business content reel that also fits real estate.
