@@ -2283,9 +2283,10 @@ function AutomationActivityFeed({ accent }: { accent: string }) {
           }}
         >
           {[
-            { value: stats.leads, label: 'Leads caught', color: accent },
-            { value: stats.booked, label: 'Booked this week', color: success },
-            { value: `${stats.hours}h`, label: 'Time saved', color: claude },
+            // Illustrative mock-up values, labelled as such: not client data.
+            { value: stats.leads, label: 'Leads (example)', color: accent },
+            { value: stats.booked, label: 'Booked (example)', color: success },
+            { value: `${stats.hours}h`, label: 'Saved (example)', color: claude },
           ].map((s, i) => (
             <motion.div
               key={i}
