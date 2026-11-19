@@ -1,8 +1,9 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { BOOK_CALL_LABEL_LONG, BOOK_CALL_REASSURANCE } from '@/lib/links';
-import { trackCallClick } from '@/lib/analytics';
+import Link from 'next/link';
+import { BOOK_CALL_LABEL, BOOK_CALL_REASSURANCE, FREE_EDITS_URL } from '@/lib/links';
+import { trackCallClick, trackPilotClick } from '@/lib/analytics';
 
 /**
  * CTABanner — clean dark card on its own.
@@ -124,7 +125,6 @@ export default function CTABanner() {
             type="button"
             className="cta-banner-btn"
             data-cursor-hover
-            aria-label={BOOK_CALL_LABEL_LONG}
             onClick={() => {
               trackCallClick('cta_banner');
               (window as unknown as { openBookCallModal?: () => void }).openBookCallModal?.();
@@ -153,7 +153,7 @@ export default function CTABanner() {
               ((e.currentTarget as HTMLElement).style.background = '#E8541A')
             }
           >
-            {BOOK_CALL_LABEL_LONG}
+            {BOOK_CALL_LABEL}
           </motion.button>
           <span
             style={{
@@ -169,14 +169,27 @@ export default function CTABanner() {
                 safe. */}
             {BOOK_CALL_REASSURANCE}
           </span>
+          {/* One primary ask: the free sample is a quiet text link under the
+              button, not a second button beside it. Tracked as
+              free_edits_click (track() maps *_free_edits locations). */}
+          <Link
+            href={FREE_EDITS_URL}
+            className="cta-banner-alt"
+            data-cursor-hover
+            onClick={() => trackPilotClick('cta_banner_free_edits')}
+          >
+            Or start with 2 free edits, no card
+          </Link>
         </motion.div>
       </motion.div>
 
       <style>{`
         .cta-banner-btn { cursor: pointer; }
+        .cta-banner-alt { display: inline-flex; align-items: center; justify-content: center; font-family: Inter, sans-serif; font-size: 14px; font-weight: 500; color: rgba(242,238,231,0.72); text-decoration: underline; text-decoration-color: rgba(242,238,231,0.3); text-underline-offset: 3px; transition: color .2s, text-decoration-color .2s; }
+        .cta-banner-alt:hover { color: #F2EEE7; text-decoration-color: #E8541A; }
         /* The native cursor is only worth hiding where the custom one runs. */
         @media (hover: hover) and (pointer: fine) {
-          .cta-banner-btn { cursor: none; }
+          .cta-banner-btn, .cta-banner-alt { cursor: none; }
         }
 
         @media (max-width: 900px) {

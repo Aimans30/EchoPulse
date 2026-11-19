@@ -272,3 +272,45 @@ export function youtubeWallClips(): WallClip[] {
     };
   });
 }
+
+// ─── Homepage hero segments ─────────────────────────────────────────────────
+// The hero's "raw to ready" frame plays three short trimmed segments, one per
+// kind of client: a founder talking head, a podcast clip and a listing tour.
+// Each is cut on Cloudinary (so_ = start, du_ = length) to 4.6 to 4.8 s, so a
+// segment is a sharp 720px file of roughly 0.3 to 0.6 MB rather than the
+// whole reel. Start points skip burned-in titles, cutaways and anything that
+// shows an address. `still` is the frame used as the poster, the LCP image and
+// the finished state for reduced motion and Save-Data.
+export type HeroSegment = {
+  id: 'founder' | 'podcast' | 'listing';
+  cloud: string;
+  publicId: string;
+  /** Start of the segment inside the source clip, seconds. */
+  start: number;
+  /** Segment length, seconds. */
+  duration: number;
+  /** Source time of the still frame, seconds. */
+  still: number;
+};
+
+export const heroSegments: readonly HeroSegment[] = [
+  // Founder talking head, 9.75 to 14.35 s (between a film-still cutaway and a b-roll insert).
+  { id: 'founder', cloud: 'du6yx2h01', publicId: 'patern_intrupt_sdrd8w', start: 9.75, duration: 4.6, still: 10.9 },
+  // Podcast, headphones and mic, one speaker, 2.6 to 7.3 s.
+  { id: 'podcast', cloud: 'du6yx2h01', publicId: '17_feb_xngenr', start: 2.6, duration: 4.7, still: 5.2 },
+  // Listing interior, kitchen to dining, no address on screen, 14.6 to 19.4 s.
+  { id: 'listing', cloud: 'dqqd9rq8s', publicId: 'v1782372139/2438_fn_z6wry7', start: 14.6, duration: 4.8, still: 17.2 },
+];
+
+/**
+ * Cloudinary URL for a hero segment: the trimmed silent MP4 (`video`) or its
+ * still frame (`still`, format negotiated by Cloudinary, so AVIF or WebP where
+ * the browser accepts it).
+ */
+export function heroSegmentSrc(seg: HeroSegment, kind: 'video' | 'still' = 'video', width = 720): string {
+  const base = `https://res.cloudinary.com/${seg.cloud}/video/upload`;
+  if (kind === 'still') {
+    return `${base}/so_${seg.still.toFixed(1)},c_scale,w_${width},q_auto:good,f_auto/${seg.publicId}.jpg`;
+  }
+  return `${base}/so_${seg.start},du_${seg.duration},c_scale,w_${width},q_auto:good,f_mp4,ac_none/${seg.publicId}.mp4`;
+}
