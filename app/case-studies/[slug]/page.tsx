@@ -1,7 +1,14 @@
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
-import { caseStudies, getCaseStudy, heroImageFor } from '@/lib/caseStudyData';
+import {
+  caseStudies,
+  getCaseStudy,
+  heroImageFor,
+  CASE_STUDY_AUTHOR,
+  CASE_STUDY_PUBLISHER,
+} from '@/lib/caseStudyData';
 import CaseStudyPage from '@/components/casestudy/CaseStudyPage';
+import Nav from '@/components/Nav';
 
 const SITE_URL = 'https://echopulse.media';
 
@@ -76,7 +83,7 @@ export default async function CaseStudyRoute({ params }: { params: Promise<{ slu
   const clientLd = {
     '@type': 'Organization',
     '@id': clientId,
-    name: study.client,
+    name: study.organizationName ?? study.client,
     url: study.clientUrl,
     sameAs: [study.clientUrl],
     description: study.clientTagline,
@@ -96,7 +103,10 @@ export default async function CaseStudyRoute({ params }: { params: Promise<{ slu
         measurementTechnique: study.dataset.measurementTechnique,
         variableMeasured: study.dataset.variableMeasured,
         about: { '@id': clientId },
-        creator: { '@id': `${SITE_URL}/#organization` },
+        creator: { '@type': 'Organization', '@id': `${SITE_URL}/#organization`, name: CASE_STUDY_PUBLISHER, url: SITE_URL },
+        datePublished: study.publishedISO,
+        dateModified: study.updatedISO ?? study.publishedISO,
+        mainEntityOfPage: { '@type': 'WebPage', '@id': url },
         isAccessibleForFree: true,
         license: 'https://echopulse.media/terms',
         url,
@@ -111,13 +121,32 @@ export default async function CaseStudyRoute({ params }: { params: Promise<{ slu
     description: study.metaDescription,
     datePublished: study.publishedISO,
     dateModified: study.updatedISO ?? study.publishedISO,
-    author: { '@id': `${SITE_URL}/#organization` },
-    publisher: { '@id': `${SITE_URL}/#organization` },
+    // The same two or three sentences printed in the answer block at the top
+    // of the page, so the markup describes text a reader can see.
+    abstract: study.answer.join(' '),
+    // Named and typed inline, with the @id of the nodes the root layout
+    // already declares, so this block is complete if it is read on its own.
+    author: {
+      '@type': 'Person',
+      '@id': `${SITE_URL}/#founder`,
+      name: CASE_STUDY_AUTHOR.name,
+      url: CASE_STUDY_AUTHOR.url,
+    },
+    publisher: {
+      '@type': 'Organization',
+      '@id': `${SITE_URL}/#organization`,
+      name: CASE_STUDY_PUBLISHER,
+      url: SITE_URL,
+    },
+    isPartOf: { '@id': `${SITE_URL}/#website` },
     mainEntityOfPage: { '@type': 'WebPage', '@id': url },
     // A founder story is about a person, and that Person node already exists
     // in the root layout. Pointing at it avoids declaring the founder as an
     // Organization.
-    about: study.kind === 'founder' ? { '@id': `${SITE_URL}/#founder` } : clientLd,
+    about:
+      study.kind === 'founder'
+        ? { '@type': 'Person', '@id': `${SITE_URL}/#founder`, name: CASE_STUDY_AUTHOR.name, url: CASE_STUDY_AUTHOR.url }
+        : clientLd,
     ...(datasetLd ? { citation: { '@id': datasetId } } : {}),
     url,
     ...(heroImage
@@ -148,6 +177,7 @@ export default async function CaseStudyRoute({ params }: { params: Promise<{ slu
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(datasetLd) }} />
       )}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
+      <Nav />
       <CaseStudyPage study={study} />
     </>
   );

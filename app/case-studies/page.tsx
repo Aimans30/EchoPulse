@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { caseStudies } from '@/lib/caseStudyData';
 import CaseStudyIndex from '@/components/casestudy/CaseStudyIndex';
+import Nav from '@/components/Nav';
 
 const SITE_URL = 'https://echopulse.media';
 const canonical = `${SITE_URL}/case-studies`;
@@ -49,6 +50,8 @@ export default function CaseStudiesRoute() {
         position: i + 1,
         url: `${canonical}/${c.slug}`,
         name: `${c.client}: ${c.headline} ${c.headlineAccent}`.trim(),
+        // The same one-sentence result printed on the card for this study.
+        description: c.indexResult,
       })),
     },
   };
@@ -66,6 +69,7 @@ export default function CaseStudiesRoute() {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
+      <Nav />
       <CaseStudyIndex studies={caseStudies} />
     </>
   );

@@ -119,6 +119,7 @@ function Featured({ study }: { study: CaseStudy }) {
         <h2 className="csi-title csi-title-lg">
           {study.headline} <span className="csi-accent">{study.headlineAccent}</span>
         </h2>
+        <p className="csi-result">{study.indexResult}</p>
         <Metrics study={study} />
         <Chips items={study.services} />
         <Cta study={study} />
@@ -177,6 +178,7 @@ function StudyCard({ study, wide }: { study: CaseStudy; wide: boolean }) {
         <h2 className="csi-title">
           {study.headline} <span className="csi-accent">{study.headlineAccent}</span>
         </h2>
+        <p className="csi-result">{study.indexResult}</p>
         <Metrics study={study} />
         <Chips items={study.services} />
         <Cta study={study} />
@@ -191,8 +193,8 @@ export default function CaseStudyIndex({ studies }: { studies: CaseStudy[] }) {
   const lead = studies[0]?.heroMetrics[0];
 
   return (
-    <main className="csi-root">
-      <section className="csi-hero">
+    <main id="main" className="csi-root">
+      <section className="csi-hero" data-dark-bg="true">
         <div className="csi-container">
           <nav className="csi-crumb" aria-label="Breadcrumb">
             <Link href="/">Home</Link>
@@ -281,8 +283,8 @@ export default function CaseStudyIndex({ studies }: { studies: CaseStudy[] }) {
               Your site, read the same way <span className="csi-accent">on a 15 minute call.</span>
             </h2>
             <p className="csi-sub csi-sub-tight">
-              We open your Search Console, tell you what is structurally stopping the site from ranking, and
-              leave you with a 30 day plan. You keep the plan whether or not you hire us.
+              We open your site and, where you have it, your Search Console, tell you what is structurally
+              holding it back, and leave you with a 30 day plan. You keep the plan whether or not you hire us.
             </p>
             <a
               className="csi-btn"
@@ -295,6 +297,11 @@ export default function CaseStudyIndex({ studies }: { studies: CaseStudy[] }) {
               {BOOK_CALL_LABEL}
             </a>
             <p className="csi-reassure">{BOOK_CALL_REASSURANCE}</p>
+            <p className="csi-reassure">
+              <Link className="csi-textlink" href="/pricing">
+                See prices
+              </Link>
+            </p>
           </Reveal>
         </div>
       </section>
@@ -305,7 +312,7 @@ export default function CaseStudyIndex({ studies }: { studies: CaseStudy[] }) {
         .csi-accent { color: var(--orange); }
 
         /* Hero */
-        .csi-hero { background: var(--black); color: var(--cream); padding: 40px 0 72px; }
+        .csi-hero { background: var(--black); color: var(--cream); padding: 108px 0 72px; }
         .csi-crumb { display: flex; gap: 10px; align-items: center; font-family: Inter, sans-serif; font-size: 13px; color: rgba(242,238,231,0.6); margin-bottom: 44px; }
         .csi-crumb a { color: rgba(242,238,231,0.78); text-decoration: none; }
         .csi-crumb a:hover { color: var(--orange); }
@@ -338,6 +345,7 @@ export default function CaseStudyIndex({ studies }: { studies: CaseStudy[] }) {
         .csi-title { font-family: Inter, sans-serif; font-size: clamp(22px, 2.3vw, 27px); font-weight: 800; letter-spacing: -0.9px; line-height: 1.16; margin: 18px 0 0; }
         .csi-title-lg { font-size: clamp(28px, 3.3vw, 42px); letter-spacing: -1.4px; line-height: 1.1; margin: 28px 0 0; }
 
+        .csi-result { font-size: 14.5px; line-height: 1.62; color: rgba(242,238,231,0.82); margin: 16px 0 0; max-width: 62ch; }
         .csi-metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin: 26px 0 0; padding: 22px 0 0; border-top: 1px solid rgba(242,238,231,0.14); }
         .csi-metric { min-width: 0; }
         .csi-metric-value { font-family: Inter, sans-serif; font-size: clamp(18px, 1.9vw, 24px); font-weight: 800; letter-spacing: -0.8px; line-height: 1.1; color: var(--orange); margin: 0 0 8px; overflow-wrap: anywhere; }
@@ -396,6 +404,8 @@ export default function CaseStudyIndex({ studies }: { studies: CaseStudy[] }) {
         .csi-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(232,84,26,0.34); }
         .csi-btn:focus-visible { outline: 3px solid var(--cream); outline-offset: 4px; }
         .csi-reassure { font-size: 13.5px; color: rgba(242,238,231,0.64); margin: 14px 0 0; }
+        .csi-textlink { color: var(--cream); font-weight: 700; text-decoration: underline; text-underline-offset: 4px; }
+        .csi-textlink:hover { color: var(--orange); }
 
         @media (max-width: 1000px) {
           .csi-featured { grid-template-columns: 1fr; gap: 32px; padding: 34px; }
@@ -411,7 +421,7 @@ export default function CaseStudyIndex({ studies }: { studies: CaseStudy[] }) {
         }
         @media (max-width: 760px) {
           .csi-container { padding: 0 20px; }
-          .csi-hero { padding: 28px 0 52px; }
+          .csi-root .csi-hero { padding: 100px 0 52px !important; }
           .csi-section { padding: 52px 0; }
           .csi-close { padding: 64px 0; }
           .csi-h1 { letter-spacing: -1.3px; max-width: none; }

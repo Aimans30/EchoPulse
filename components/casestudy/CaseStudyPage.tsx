@@ -1,8 +1,16 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import type { CaseStudy } from "@/lib/caseStudyData";
+import {
+  type CaseStudy,
+  CASE_STUDY_AUTHOR,
+  CASE_STUDY_PUBLISHER,
+  canonicalFor,
+  citationFor,
+  formatISODate,
+} from "@/lib/caseStudyData";
 import { getIcp } from "@/lib/icpData";
 import {
   staticBookingUrl,
@@ -11,7 +19,7 @@ import {
   FREE_EDITS_LABEL,
   FREE_EDITS_URL,
 } from "@/lib/links";
-import { GROWTH } from "@/lib/pricing";
+import { GROWTH, PILOT, PRESENCE } from "@/lib/pricing";
 import Reveal from "@/components/icp/Reveal";
 import ImpressionChart from "./ImpressionChart";
 import BeforeAfter from "./BeforeAfter";
@@ -81,6 +89,44 @@ const parseCount = (s: string) => {
 
 const ORIGIN = "https://echopulse.media";
 
+/** At-a-glance rows that the Key facts table already states. Not repeated. */
+const GLANCE_COVERED = new Set([
+  "Client",
+  "Who",
+  "Industry",
+  "Starting point",
+  "Date window",
+  "Measured result",
+  "How measured",
+  "Last updated",
+]);
+
+/**
+ * Copy button for the citation. The citation text itself is rendered by the
+ * page as plain server HTML; this only copies it. Fails silently where the
+ * clipboard API is unavailable, because the text is selectable either way.
+ */
+function CopyCitation({ text }: { text: string }) {
+  const [copied, setCopied] = useState(false);
+  return (
+    <button
+      type="button"
+      className="cs-copy"
+      onClick={async () => {
+        try {
+          await navigator.clipboard.writeText(text);
+          setCopied(true);
+          window.setTimeout(() => setCopied(false), 2000);
+        } catch {
+          /* clipboard blocked: the text is on the page to select by hand */
+        }
+      }}
+    >
+      <span aria-live="polite">{copied ? "Copied" : "Copy citation"}</span>
+    </button>
+  );
+}
+
 export default function CaseStudyPage({ study }: { study: CaseStudy }) {
   const icp = getIcp(study.icpKey);
   const labels = study.labels ?? {};
@@ -95,8 +141,6 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
   const workKicker = labels.workKicker ?? "What we did";
   const openKicker = labels.openProblemsKicker ?? "Open problems";
   const limitsKicker = labels.limitsKicker ?? "Scope";
-  const limitsHeading =
-    labels.limitsHeading ?? "When this approach is the wrong one.";
 
   const hasNumbers = Boolean(
     (study.bars && study.bars.length) || study.months || study.funnel,
@@ -107,17 +151,69 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
   const tldr = (study.tldr ?? []).map(splitLead);
   const heroMetricCount = study.heroMetrics.length;
 
+  const tracking = study.tracking;
+  const trackingScreens = tracking?.screens ?? [];
+
   const sections: SectionNavItem[] = [
-    { id: "glance", label: "At a glance" },
+    { id: "glance", label: "Key facts" },
     { id: "situation", label: situationKicker },
     { id: "work", label: workKicker },
     ...(hasNumbers ? [{ id: "numbers", label: "The numbers" }] : []),
+    ...(tracking ? [{ id: "tracking", label: "Tracking" }] : []),
     ...(study.pairs ? [{ id: "pages", label: "Before and after" }] : []),
     ...(study.gallery ? [{ id: "screens", label: "Screens" }] : []),
     ...(study.proof.length > 0 ? [{ id: "export", label: "The export" }] : []),
+    { id: "measured", label: "How measured" },
     { id: "open", label: openKicker },
     { id: "scope", label: limitsKicker },
+    { id: "fit", label: "Right for you?" },
   ];
+
+  /**
+   * QUESTION HEADINGS
+   *
+   * Every section H2 is the question a buyer, or an answer engine on a buyer's
+   * behalf, would actually ask. The original editorial headline is kept
+   * directly underneath as the first line of the answer. The ids are stable
+   * anchors: do not rename them, other pages and llms.txt link to them.
+   */
+  const who = study.shortName;
+  const q = isFounder
+    ? {
+        situation: `Where did ${who} work before EchoPulse?`,
+        work: "What did he edit for those agents?",
+        numbers: "What are the numbers?",
+        pages: "What changed on each page?",
+        screens: "Which pages are new?",
+        exportQ: "Where is the source export?",
+        measured: "How was this measured?",
+        open: "What does this page not claim?",
+        scope: "What does EchoPulse do differently?",
+        fit: "Is EchoPulse right for you?",
+      }
+    : {
+        situation: `What was wrong at ${who} before the work started?`,
+        work: `What did EchoPulse do for ${who}?`,
+        numbers: `What were the results for ${who}?`,
+        pages: "What changed on each page?",
+        screens: "Which pages are new?",
+        exportQ: "Where is the source export?",
+        measured: "How was this measured?",
+        open: "What is still not working?",
+        scope: "When is this approach the wrong one?",
+        fit: "Is this right for you?",
+      };
+
+  const canonical = canonicalFor(study);
+  const citation = citationFor(study);
+  const published = formatISODate(study.publishedISO);
+  const updatedISO = study.updatedISO ?? study.publishedISO;
+  const wasUpdated = updatedISO !== study.publishedISO;
+  const glanceRest = study.atAGlance.filter(
+    (row) => !GLANCE_COVERED.has(row.label),
+  );
+  const notFor =
+    study.fit.notFor ?? study.notApplicable.map((n) => n.title);
 
   const clientLink = internalLink ? (
     <Link className="cs-verify" href={internalHref}>
@@ -137,9 +233,9 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
   );
 
   return (
-    <main className="cs-root">
+    <main id="main" className="cs-root">
       {/* ── Hero ───────────────────────────────────────────────────────── */}
-      <section className="cs-hero">
+      <section className="cs-hero" data-dark-bg="true">
         <div className="cs-container">
           <nav className="cs-crumb" aria-label="Breadcrumb">
             <Link href="/">Home</Link>
@@ -157,7 +253,34 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
                   {study.headline}{" "}
                   <span className="cs-accent">{study.headlineAccent}</span>
                 </h1>
-                <p className="cs-summary">{study.summary}</p>
+                {/* The answer block. Two or three sentences that can be
+                    quoted alone: client, what was done, the result with its
+                    unit and dates, and the source. Plain server HTML. */}
+                <div className="cs-answer" id="answer">
+                  <p className="cs-answer-result">{study.resultLine}</p>
+                  <p className="cs-answer-text">{study.answer.join(" ")}</p>
+                  <p className="cs-byline">
+                    <span>
+                      By{" "}
+                      <Link href={CASE_STUDY_AUTHOR.path} rel="author">
+                        {CASE_STUDY_AUTHOR.name}
+                      </Link>
+                      , {CASE_STUDY_PUBLISHER}
+                    </span>
+                    <span>
+                      Published{" "}
+                      <time dateTime={study.publishedISO}>{published}</time>
+                    </span>
+                    {wasUpdated && (
+                      <span>
+                        Updated{" "}
+                        <time dateTime={updatedISO}>
+                          {formatISODate(updatedISO)}
+                        </time>
+                      </span>
+                    )}
+                  </p>
+                </div>
               </Reveal>
 
               <Reveal delay={0.08}>
@@ -191,6 +314,11 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
                     {BOOK_CALL_LABEL}
                   </a>
                   <p className="cs-reassure">{BOOK_CALL_REASSURANCE}</p>
+                  {study.slug !== "magicbnb-seo-aeo" && (
+                    <Link className="cs-textlink cs-textlink-light" href="/pricing">
+                      See prices
+                    </Link>
+                  )}
                   {study.slug === "magicbnb-seo-aeo" ? (
                     <p className="cs-reassure">
                       This is the search work in the Growth plan, {GROWTH.priceLabel} a month, month-to-month.{" "}
@@ -282,22 +410,75 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
         <div className="cs-container">
           <Reveal>
             <div className="cs-section-head">
-              <h2 className="cs-h2">At a glance</h2>
-              {!isFounder && (
-                <p className="cs-lead">
-                  The whole engagement in one table, including how every number
-                  on this page was measured.
-                </p>
-              )}
+              <h2 className="cs-h2">Key facts</h2>
+              <p className="cs-body">{study.summary}</p>
             </div>
-            <dl className="cs-glance">
-              {study.atAGlance.map((row) => (
-                <div className="cs-glance-row" key={row.label}>
-                  <dt>{row.label}</dt>
-                  <dd>{row.value}</dd>
-                </div>
-              ))}
-            </dl>
+            <div className="cs-table-scroll">
+              <table className="cs-table cs-facts">
+                <caption className="cs-sr">
+                  Key facts: {study.client}
+                </caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Fact</th>
+                    <th scope="col">Detail</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {study.keyFacts.map((row) => (
+                    <tr key={row.label}>
+                      <th scope="row">{row.label}</th>
+                      <td>
+                        {row.href ? (
+                          row.href.startsWith(ORIGIN) ? (
+                            <Link href={row.href.slice(ORIGIN.length) || "/"}>
+                              {row.value}
+                            </Link>
+                          ) : (
+                            <a href={row.href} target="_blank" rel="noopener">
+                              {row.value}
+                            </a>
+                          )
+                        ) : (
+                          row.value
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p className="cs-factlinks">
+              {study.relatedService && (
+                <Link href={`/services/${study.relatedService.slug}`}>
+                  {study.relatedService.label}
+                  <span aria-hidden="true"> &rarr;</span>
+                </Link>
+              )}
+              <a href="#measured">
+                How this was measured
+                <span aria-hidden="true"> &rarr;</span>
+              </a>
+              <a href="#cite">
+                Cite this page
+                <span aria-hidden="true"> &rarr;</span>
+              </a>
+            </p>
+            {glanceRest.length > 0 && (
+              <div className="cs-sub" id="engagement">
+                <h3 className="cs-h3">
+                  {isFounder ? "More detail" : "The engagement in detail"}
+                </h3>
+                <dl className="cs-glance">
+                  {glanceRest.map((row) => (
+                    <div className="cs-glance-row" key={row.label}>
+                      <dt>{row.label}</dt>
+                      <dd>{row.value}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
+            )}
           </Reveal>
         </div>
       </section>
@@ -308,7 +489,8 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
           <Reveal>
             <div className="cs-section-head" style={{ marginBottom: 0 }}>
               <p className="cs-kicker">{situationKicker}</p>
-              <h2 className="cs-h2">{study.situation.headline}</h2>
+              <h2 className="cs-h2">{q.situation}</h2>
+              <p className="cs-claim">{study.situation.headline}</p>
               {study.situation.body.map((p) => (
                 <p className="cs-body" key={p.slice(0, 40)}>
                   {p}
@@ -335,7 +517,8 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
           <Reveal>
             <div className="cs-section-head">
               <p className="cs-kicker">{workKicker}</p>
-              <h2 className="cs-h2">
+              <h2 className="cs-h2">{q.work}</h2>
+              <p className="cs-claim">
                 {labels.workHeading ?? (
                   <>
                     {capital(numberWord(study.workstreams.length))} workstreams,{" "}
@@ -344,7 +527,7 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
                     </span>
                   </>
                 )}
-              </h2>
+              </p>
               {!isFounder && (
                 <p className="cs-lead">
                   Each of these is a service you can buy on its own. They are
@@ -364,7 +547,9 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
           <div className="cs-container">
             <Reveal>
               <div className="cs-section-head" style={{ marginBottom: 28 }}>
-                <h2 className="cs-h2">The numbers</h2>
+                <p className="cs-kicker">The numbers</p>
+                <h2 className="cs-h2">{q.numbers}</h2>
+                <p className="cs-lead">{study.resultLine}</p>
               </div>
             </Reveal>
 
@@ -381,15 +566,22 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
             {study.months && (
               <Reveal>
                 <div
+                  id="timeline"
                   className={
-                    study.bars && study.bars.length > 0 ? "cs-sub" : undefined
+                    study.bars && study.bars.length > 0
+                      ? "cs-sub cs-anchor"
+                      : "cs-anchor"
                   }
                 >
                   <p className="cs-kicker">The curve, month by month</p>
-                  <h3 className="cs-h3">
+                  <h3 className="cs-h3">How long did it take?</h3>
+                  {study.timelineAnswer && (
+                    <p className="cs-body">{study.timelineAnswer}</p>
+                  )}
+                  <p className="cs-claim cs-claim-sm">
                     Every month in the window, including the two that produced
                     nothing.
-                  </h3>
+                  </p>
                   <div className="cs-table-scroll">
                     <table className="cs-table">
                       <thead>
@@ -439,8 +631,9 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
 
             {study.funnel && (
               <Reveal>
-                <div className="cs-sub">
-                  <h3 className="cs-h3">The rest of the funnel</h3>
+                <div className="cs-sub cs-anchor" id="funnel">
+                  <p className="cs-kicker">The rest of the funnel</p>
+                  <h3 className="cs-h3">Did sessions and clicks grow too?</h3>
                   <p className="cs-body">{study.funnel.intro}</p>
                   <div className="cs-table-scroll">
                     <table className="cs-table">
@@ -486,6 +679,112 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
         </section>
       )}
 
+      {/* ── Tracking system ────────────────────────────────────────────────
+          Only where one was built. The capability table is a real table so
+          the source, the thing tracked and the decision stay together when
+          the block is lifted. `screens` renders only when captures exist. */}
+      {tracking && (
+        <section className="cs-section cs-tone-cream" id="tracking">
+          <div className="cs-container">
+            <Reveal>
+              <div className="cs-section-head">
+                <p className="cs-kicker">Tracking</p>
+                <h2 className="cs-h2">{tracking.heading}</h2>
+                <p className="cs-claim">{tracking.claim}</p>
+                {tracking.body.map((p) => (
+                  <p className="cs-body" key={p.slice(0, 40)}>
+                    {p}
+                  </p>
+                ))}
+              </div>
+            </Reveal>
+            <Reveal>
+              <div className="cs-table-scroll">
+                <table className="cs-table cs-track">
+                  <caption className="cs-sr">
+                    What the {who} dashboard tracks and the decision each
+                    source drives
+                  </caption>
+                  <thead>
+                    <tr>
+                      <th scope="col">Source</th>
+                      <th scope="col">What is tracked</th>
+                      <th scope="col">Decision it drives</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {tracking.rows.map((r) => (
+                      <tr key={r.source}>
+                        <th scope="row">{r.source}</th>
+                        <td>{r.tracked}</td>
+                        <td>{r.decision}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <p className="cs-fineprint">{tracking.notPublished}</p>
+            </Reveal>
+
+            <Reveal>
+              <div className="cs-sub">
+                <h3 className="cs-h3">{tracking.whyHeading}</h3>
+                <ul className="cs-why-grid">
+                  {tracking.why.map((w) => (
+                    <li className="cs-why" key={w.title}>
+                      <h4 className="cs-why-title">{w.title}</h4>
+                      <p className="cs-why-detail">{w.detail}</p>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </Reveal>
+
+            <div className="cs-track-split cs-sub">
+              <Reveal>
+                <h3 className="cs-h3">What a client gets from it</h3>
+                <ul className="cs-work-points">
+                  {tracking.clientGets.map((c) => (
+                    <li key={c.slice(0, 40)}>{c}</li>
+                  ))}
+                </ul>
+              </Reveal>
+              {tracking.examples.length > 0 && (
+                <Reveal delay={0.06}>
+                  <h3 className="cs-h3">Decisions the data drove</h3>
+                  <ul className="cs-work-points">
+                    {tracking.examples.map((e) => (
+                      <li key={e.title}>
+                        <strong>{e.title}.</strong> {e.detail}
+                      </li>
+                    ))}
+                  </ul>
+                </Reveal>
+              )}
+            </div>
+
+            {trackingScreens.length > 0 && (
+              <ul className="cs-gallery cs-sub">
+                {trackingScreens.map((g) => (
+                  <li key={g.src}>
+                    <figure className="cs-gal">
+                      <Image
+                        src={g.src}
+                        alt={g.alt}
+                        width={g.width}
+                        height={g.height}
+                        sizes="(max-width: 760px) 50vw, 360px"
+                      />
+                      {g.caption && <figcaption>{g.caption}</figcaption>}
+                    </figure>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </section>
+      )}
+
       {/* ── Page-by-page before and after ──────────────────────────────── */}
       {study.pairs && (
         <section className="cs-section cs-tone-cream" id="pages">
@@ -493,7 +792,8 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
             <Reveal>
               <div className="cs-section-head">
                 <p className="cs-kicker">Before and after</p>
-                <h2 className="cs-h2">{study.pairs.heading}</h2>
+                <h2 className="cs-h2">{q.pages}</h2>
+                <p className="cs-claim">{study.pairs.heading}</p>
                 <p className="cs-lead">{study.pairs.intro}</p>
               </div>
             </Reveal>
@@ -537,7 +837,8 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
             <Reveal>
               <div className="cs-section-head">
                 <p className="cs-kicker">The rest of it</p>
-                <h2 className="cs-h2">{study.gallery.heading}</h2>
+                <h2 className="cs-h2">{q.screens}</h2>
+                <p className="cs-claim">{study.gallery.heading}</p>
                 <p className="cs-lead">{study.gallery.intro}</p>
               </div>
             </Reveal>
@@ -572,7 +873,8 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
             <Reveal>
               <div className="cs-section-head">
                 <p className="cs-kicker">The export</p>
-                <h2 className="cs-h2">The screen this all came from.</h2>
+                <h2 className="cs-h2">{q.exportQ}</h2>
+                <p className="cs-claim">The screen this all came from.</p>
               </div>
             </Reveal>
             {study.proof.map((p) => (
@@ -601,6 +903,67 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
         </section>
       )}
 
+      {/* ── How this was measured ──────────────────────────────────────────
+          Tool, exact date ranges, what is and is not counted, and the open
+          problems that bear on the numbers. Present on every study, including
+          the ones where the honest answer is that nothing was measured. */}
+      <section className="cs-section cs-tone-paper" id="measured">
+        <div className="cs-container">
+          <Reveal>
+            <div className="cs-section-head">
+              <p className="cs-kicker">Method</p>
+              <h2 className="cs-h2">{q.measured}</h2>
+            </div>
+            <div className="cs-table-scroll">
+              <table className="cs-table cs-facts">
+                <caption className="cs-sr">
+                  How the figures on this page were measured
+                </caption>
+                <tbody>
+                  <tr>
+                    <th scope="row">Tool</th>
+                    <td>{study.measurement.tool}</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Date ranges</th>
+                    <td>{study.measurement.dateRanges}</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">What is counted</th>
+                    <td>{study.measurement.counted}</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">What is not counted</th>
+                    <td>{study.measurement.notCounted}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div className="cs-sub">
+              <h3 className="cs-h3">
+                {isFounder
+                  ? "Limits stated on this page"
+                  : "Open problems that affect these numbers"}
+              </h3>
+              <ul className="cs-work-points">
+                {study.openProblems.map((p) => (
+                  <li key={p.title}>
+                    {p.title}{" "}
+                    <span className="cs-openstatus">{p.status}</span>
+                  </li>
+                ))}
+              </ul>
+              <p className="cs-factlinks">
+                <a href="#open">
+                  Read each one in full
+                  <span aria-hidden="true"> &rarr;</span>
+                </a>
+              </p>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
       {/* ── Mid-page CTA ───────────────────────────────────────────────────
           Own section because the proof block is conditional and the ask is
           not. For the founder story the free edits link leads. */}
@@ -610,18 +973,8 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
             <div className="cs-midcta">
               <p className="cs-midcta-text">{study.midCtaText}</p>
               <div className="cs-midcta-actions">
-                {isFounder && (
-                  <a
-                    className="cs-btn cs-btn-primary"
-                    href={FREE_EDITS_URL}
-                    data-track="case_study_cta_click"
-                    data-track-location="case_study_mid_free_edits"
-                  >
-                    {FREE_EDITS_LABEL}
-                  </a>
-                )}
                 <a
-                  className={`cs-btn ${isFounder ? "cs-btn-ghost" : "cs-btn-primary"}`}
+                  className="cs-btn cs-btn-primary"
                   href={staticBookingUrl("case_study_mid")}
                   data-track="case_study_cta_click"
                   data-track-location="case_study_mid"
@@ -630,6 +983,19 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
                 >
                   {BOOK_CALL_LABEL}
                 </a>
+                {isFounder && (
+                  <a
+                    className="cs-textlink cs-textlink-light"
+                    href={FREE_EDITS_URL}
+                    data-track="case_study_cta_click"
+                    data-track-location="case_study_mid_free_edits"
+                  >
+                    {FREE_EDITS_LABEL}
+                  </a>
+                )}
+                <Link className="cs-textlink cs-textlink-light" href="/pricing">
+                  See prices
+                </Link>
               </div>
             </div>
           </Reveal>
@@ -642,8 +1008,11 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
           <Reveal>
             <div className="cs-section-head">
               <p className="cs-kicker">{openKicker}</p>
-              <h2 className="cs-h2 cs-h2-light">
-                {labels.openProblemsHeading ?? (
+              <h2 className="cs-h2 cs-h2-light">{q.open}</h2>
+              <p className="cs-claim">
+                {isFounder ? (
+                  capital(study.openProblemsAccent)
+                ) : (
                   <>
                     What is still broken,{" "}
                     <span className="cs-accent">
@@ -651,7 +1020,7 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
                     </span>
                   </>
                 )}
-              </h2>
+              </p>
               {!isFounder && (
                 <p className="cs-lead cs-lead-light">
                   A case study that reports only wins is an advertisement. This
@@ -683,7 +1052,10 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
           <Reveal>
             <div className="cs-section-head">
               <p className="cs-kicker">{limitsKicker}</p>
-              <h2 className="cs-h2">{limitsHeading}</h2>
+              <h2 className="cs-h2">{q.scope}</h2>
+              {labels.limitsHeading && (
+                <p className="cs-claim">{labels.limitsHeading}</p>
+              )}
               {!isFounder && (
                 <p className="cs-lead">
                   {capital(numberWord(study.notApplicable.length))} situations
@@ -706,6 +1078,116 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
         </div>
       </section>
 
+      {/* ── Cite, and who EchoPulse is ─────────────────────────────────────
+          The citation line is plain server HTML; the button only copies it.
+          The three sentences beside it say who the publisher is, what it
+          sells and who it is for, in the same words as public/llms.txt, so a
+          summary of this page can describe the studio correctly. */}
+      <section className="cs-cite-section">
+        <div className="cs-container">
+          <div className="cs-cite-grid">
+            <div className="cs-cite" id="cite">
+              <h2 className="cs-cite-h">
+                {isFounder ? "Cite this page" : "Cite this case study"}
+              </h2>
+              <p className="cs-cite-text">{citation}</p>
+              <dl className="cs-cite-meta">
+                <div>
+                  <dt>Author</dt>
+                  <dd>
+                    <Link href={CASE_STUDY_AUTHOR.path}>
+                      {CASE_STUDY_AUTHOR.name}
+                    </Link>
+                  </dd>
+                </div>
+                <div>
+                  <dt>Publisher</dt>
+                  <dd>{CASE_STUDY_PUBLISHER}</dd>
+                </div>
+                <div>
+                  <dt>Published</dt>
+                  <dd>
+                    <time dateTime={study.publishedISO}>{published}</time>
+                  </dd>
+                </div>
+                <div>
+                  <dt>Updated</dt>
+                  <dd>
+                    <time dateTime={updatedISO}>
+                      {formatISODate(updatedISO)}
+                    </time>
+                  </dd>
+                </div>
+                <div>
+                  <dt>URL</dt>
+                  <dd>{canonical}</dd>
+                </div>
+              </dl>
+              <CopyCitation text={citation} />
+            </div>
+            <div className="cs-cite" id="about-echopulse">
+              <h2 className="cs-cite-h">Who is EchoPulse Media?</h2>
+              <p className="cs-cite-text">
+                EchoPulse Media (echopulse.media) is a small, owner-operated,
+                done-for-you content and website studio founded in 2025 by
+                Lakshya Soni.
+              </p>
+              <p className="cs-cite-text">
+                It sells a free sample of 2 edited videos, a {PILOT.priceLabel}{" "}
+                Pilot ({PILOT.per}), Presence Engine at {PRESENCE.priceLabel} a
+                month and Growth at {GROWTH.priceLabel} a month, both
+                month-to-month, and quotes bigger scopes on a call.
+              </p>
+              <p className="cs-cite-text">
+                It is for founders, coaches, real estate agents, home-service
+                owners and DTC brands in the United States, United Kingdom,
+                Canada, Australia and Western Europe.
+              </p>
+              <p className="cs-factlinks">
+                <Link href="/what-is-echopulse-media">
+                  What is EchoPulse Media
+                  <span aria-hidden="true"> &rarr;</span>
+                </Link>
+                <Link href="/pricing">
+                  See prices
+                  <span aria-hidden="true"> &rarr;</span>
+                </Link>
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Is this right for you ──────────────────────────────────────── */}
+      <section className="cs-section cs-tone-paper" id="fit">
+        <div className="cs-container">
+          <Reveal>
+            <div className="cs-section-head">
+              <p className="cs-kicker">Fit</p>
+              <h2 className="cs-h2">{q.fit}</h2>
+            </div>
+            <div className="cs-fit">
+              <div className="cs-fit-col cs-fit-yes">
+                <h3 className="cs-fit-h">It suits you if</h3>
+                <ul>
+                  {study.fit.suits.map((x) => (
+                    <li key={x.slice(0, 40)}>{x}</li>
+                  ))}
+                </ul>
+              </div>
+              <div className="cs-fit-col cs-fit-no">
+                <h3 className="cs-fit-h">It does not suit you if</h3>
+                <ul>
+                  {notFor.map((x) => (
+                    <li key={x.slice(0, 40)}>{x}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
       {/* ── Close ──────────────────────────────────────────────────────── */}
       <section className="cs-close" id="book-call">
         <div className="cs-container">
@@ -723,9 +1205,10 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
                 <p className="cs-lead cs-lead-light">
                   We are not going to tell you this happens every time, because
                   we have published it once. What we will do on a call is look
-                  at your Search Console, tell you which of the{" "}
-                  {numberWord(study.situation.failures.length)} failures above
-                  your site has, and give you the 30 day plan either way.
+                  at your {study.chart ? "Search Console" : "site"}, tell you
+                  which of the {numberWord(study.situation.failures.length)}{" "}
+                  problems above it has, and give you the 30 day plan either
+                  way.
                 </p>
               </>
             )}
@@ -741,8 +1224,17 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
                 {BOOK_CALL_LABEL}
               </a>
               <p className="cs-reassure">{BOOK_CALL_REASSURANCE}</p>
+              <Link className="cs-textlink cs-textlink-light" href="/pricing">
+                See prices
+              </Link>
             </div>
             <div className="cs-closelinks">
+              {study.relatedService && (
+                <Link href={`/services/${study.relatedService.slug}`}>
+                  {study.relatedService.label}
+                  <span aria-hidden="true"> &rarr;</span>
+                </Link>
+              )}
               {icp && (
                 <Link href={`/${icp.key}`}>
                   Content and funnels for {icp.name.toLowerCase()}
