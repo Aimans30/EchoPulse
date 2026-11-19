@@ -53,7 +53,7 @@ export const FAQ_GROUPS: FaqGroup[] = [
       {
         home: 0,
         q: 'How much does a content agency cost per month?',
-        a: `Ours runs ${PRESENCE_PRICE} a month for the Presence Engine (8 to 9 edited videos, 8 posts, a weekly call and your website looked after) or ${GROWTH_PRICE} a month for Growth, both month to month with 14 days notice to cancel. Most content agencies price one of three ways: per deliverable (cheapest headline, most expensive in practice once revisions stack up), per hour (you pay for their inefficiency), or a flat monthly retainer covering a defined output, which is what we do. Before either, you can run the ${PILOT_PRICE} 14-day Pilot: ${PILOT_INCLUDES}. You keep everything whether you continue or not, so you are comparing actual output, not sales decks.`,
+        a: `Ours is ${PRESENCE_PRICE} a month for the Presence Engine (8 to 9 edited videos, 8 posts, a weekly call and your website looked after) or ${GROWTH_PRICE} a month for Growth, month to month. Most agencies charge per deliverable, per hour or a flat retainer; we use a flat retainer for a defined output, so you know the bill. You can start with 2 free edits or the ${PILOT_PRICE} 14-day Pilot and keep everything either way.`,
         link: { href: '/pricing', label: 'See every price and what each plan includes' },
       },
       {

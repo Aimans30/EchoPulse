@@ -285,7 +285,7 @@ export default function Footer() {
           © 2026 EchoPulse Media. All rights reserved.
         </p>
         <p style={{ fontSize: '13px', color: '#A8A49B', margin: 0 }}>
-          Done-for-you marketing. For serious businesses.
+          Your growth partner: content, websites, software and AI.
         </p>
       </div>
 

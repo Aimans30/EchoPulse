@@ -112,7 +112,7 @@ export default function Services() {
       `}</style>
       <div className="sv-wrap">
         <div className="sv-head">
-          <h2 id="sv-heading" className="sv-h2">Eight services. Three people do the work.</h2>
+          <h2 id="sv-heading" className="sv-h2">Eight services. One team that does the work.</h2>
           <p className="sv-lede">Lakshya handles strategy, editing, writing and builds. Shaurya designs. Aiman runs delivery. Each row says what you receive and which plan includes it.</p>
         </div>
         <ul className="sv-list" ref={listRef}>
