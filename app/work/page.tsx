@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import WorkWall from '@/components/WorkWall';
-import { wallClips } from '@/lib/videos';
+import { wallClips, youtubeWallClips } from '@/lib/videos';
 
 const SITE_URL = 'https://echopulse.media';
 const canonical = `${SITE_URL}/work`;
@@ -29,7 +29,7 @@ const TYPE_LABEL: Record<string, string> = {
 };
 
 export default function WorkPage() {
-  const clips = wallClips();
+  const clips = [...wallClips(), ...youtubeWallClips()];
 
   // The wall is canvas-like and useless to a crawler, so the same clips are
   // declared as VideoObjects and listed as plain links underneath it.
@@ -52,7 +52,7 @@ export default function WorkPage() {
           name: `${c.brand}: ${c.label}`,
           description: `${c.brand} (${c.types.map((t) => TYPE_LABEL[t] ?? t).join(', ')}) edited by EchoPulse Media.`,
           thumbnailUrl: c.poster,
-          contentUrl: c.full,
+          ...(c.youtube ? { embedUrl: c.full.split('?')[0], url: c.youtube.watchUrl } : { contentUrl: c.full }),
           uploadDate: '2026-11-12',
         },
       })),
@@ -72,7 +72,7 @@ export default function WorkPage() {
           <ul>
             {clips.map((c) => (
               <li key={c.id}>
-                <a href={c.full}>
+                <a href={c.youtube ? c.youtube.watchUrl : c.full}>
                   {c.brand}: {c.label}
                 </a>{' '}
                 <span>{c.types.map((t) => TYPE_LABEL[t] ?? t).join(', ')}</span>

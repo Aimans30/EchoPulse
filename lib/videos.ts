@@ -136,6 +136,13 @@ export type WallClip = {
   posterSm: string;
   preview: string;
   full: string;
+  /**
+   * Set for samples hosted on a client's YouTube channel. Those tiles show a
+   * still frame (no hover preview) and open YouTube's own player, so every
+   * play counts as a view and watch time on the client's channel. The video
+   * is never downloaded or re-hosted.
+   */
+  youtube?: { id: string; start: number; watchUrl: string };
 };
 
 export function wallClips(): WallClip[] {
@@ -166,4 +173,61 @@ export function wallClips(): WallClip[] {
     });
   }
   return [...byId.values()];
+}
+
+/**
+ * Work samples published on clients' YouTube channels. Each entry is one
+ * section of a video: the tile shows a frame YouTube itself generates for that
+ * point (frame "0" is the custom thumbnail, "1", "2", "3" are at 25, 50 and
+ * 75 percent of the running time) and opens the YouTube player at `start`.
+ * Only shown on /work, because the other sections that use wallClips() play
+ * hover previews that YouTube samples do not have.
+ */
+type YouTubeSample = {
+  id: string;
+  start: number;
+  frame: '0' | '1' | '2' | '3';
+  vertical?: boolean;
+  type: string;
+  brand: string;
+  label: string;
+  icp: IcpKey[];
+};
+
+const YOUTUBE_SAMPLES: YouTubeSample[] = [
+  // "Why Normal Airbnb Pricing Breaks During Big Events" (8:17), Geo Pedro.
+  { id: 'yyRL4NTlwrw', start: 0, frame: '0', type: 'longform', brand: 'YouTube Long-form', label: 'Event pricing explainer', icp: ['founders', 'business-owners', 'coaches'] },
+  { id: 'yyRL4NTlwrw', start: 248, frame: '2', type: 'longform', brand: 'YouTube Long-form', label: 'Motion graphics: LA 2028', icp: ['founders', 'business-owners'] },
+  // "Airbnb changed two policies on October 20..." Geo Pedro. Running time
+  // not known here, so the graphic frame opens the video from the start.
+  { id: '9FL4FP3U2XE', start: 0, frame: '2', type: 'longform', brand: 'YouTube Long-form', label: 'Policy explainer with graphics', icp: ['founders', 'business-owners', 'coaches'] },
+  // "Setting up my 10th Six Figure Airbnb listing p2", Geo Pedro (Short).
+  { id: 'JjsDOq4rqM8', start: 0, frame: '0', vertical: true, type: 'talking', brand: 'YouTube Short', label: 'Founder story', icp: ['founders', 'business-owners'] },
+];
+
+export function youtubeWallClips(): WallClip[] {
+  return YOUTUBE_SAMPLES.map((y) => {
+    const img = y.vertical
+      ? `https://i.ytimg.com/vi/${y.id}/${y.frame === '0' ? 'oardefault' : `oar${y.frame}`}.jpg`
+      : `https://i.ytimg.com/vi/${y.id}/${y.frame === '0' ? 'maxresdefault' : `maxres${y.frame}`}.jpg`;
+    const imgSm = y.vertical
+      ? img
+      : `https://i.ytimg.com/vi/${y.id}/${y.frame === '0' ? 'sddefault' : `sd${y.frame}`}.jpg`;
+    const watchUrl = y.vertical
+      ? `https://www.youtube.com/shorts/${y.id}`
+      : `https://www.youtube.com/watch?v=${y.id}${y.start ? `&t=${y.start}s` : ''}`;
+    return {
+      id: `yt/${y.id}/${y.start}/${y.frame}`,
+      brand: y.brand,
+      label: y.label,
+      types: [y.type],
+      icps: [...y.icp],
+      orientation: y.vertical ? 'vertical' : 'horizontal',
+      poster: img,
+      posterSm: imgSm,
+      preview: '',
+      full: `https://www.youtube.com/embed/${y.id}?autoplay=1&rel=0&playsinline=1${y.start ? `&start=${y.start}` : ''}`,
+      youtube: { id: y.id, start: y.start, watchUrl },
+    };
+  });
 }

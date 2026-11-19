@@ -499,7 +499,8 @@ export default function WorkWall({ clips }: { clips: WallClip[] }) {
                 <span className="ww-in">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={t.clip.poster} srcSet={`${t.clip.posterSm} 320w, ${t.clip.poster} 520w`} sizes="(max-width: 640px) 160px, 390px" alt="" decoding="async" draggable={false} />
-                  <video
+                  {t.clip.youtube && <span className="ww-yt" aria-hidden="true">YouTube</span>}
+                  {t.clip.preview && <video
                     ref={(el) => { videoEls.current[i] = el; }}
                     data-src={t.clip.preview}
                     muted
@@ -509,7 +510,7 @@ export default function WorkWall({ clips }: { clips: WallClip[] }) {
                     onPlaying={(e) => { e.currentTarget.dataset.ready = '1'; }}
                     tabIndex={-1}
                     aria-hidden="true"
-                  />
+                  />}
                 </span>
               </button>
             ))}
@@ -572,7 +573,20 @@ export default function WorkWall({ clips }: { clips: WallClip[] }) {
       {open && (
         <div className="ww-lightbox" role="dialog" aria-modal="true" aria-label={`${open.brand}: ${open.label}`} onClick={() => setOpen(null)}>
           <div className="ww-lightbox-inner" onClick={(e) => e.stopPropagation()}>
-            <video src={open.full} poster={open.poster} controls autoPlay playsInline className="ww-lightbox-video" />
+            {open.youtube ? (
+              // YouTube's own player, so plays count as views and watch time
+              // on the client's channel. Nothing is re-hosted.
+              <iframe
+                src={open.full}
+                title={`${open.brand}: ${open.label}`}
+                className={`ww-lightbox-yt${open.orientation === 'vertical' ? ' is-vertical' : ''}`}
+                allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+                allowFullScreen
+                referrerPolicy="strict-origin-when-cross-origin"
+              />
+            ) : (
+              <video src={open.full} poster={open.poster} controls autoPlay playsInline className="ww-lightbox-video" />
+            )}
             <div className="ww-lightbox-bar">
               <div>
                 <strong>{open.brand}</strong>
@@ -733,6 +747,13 @@ export default function WorkWall({ clips }: { clips: WallClip[] }) {
         }
         .ww-lightbox-inner { max-width: min(1100px, 100%); max-height: 100%; display: flex; flex-direction: column; gap: 12px; }
         .ww-lightbox-video { max-width: 100%; max-height: calc(100vh - 150px); border-radius: 14px; background: #000; align-self: center; }
+        .ww-lightbox-yt { display: block; border: 0; border-radius: 14px; background: #000; align-self: center; aspect-ratio: 16 / 9; width: min(1100px, 100%, calc((100vh - 150px) * 16 / 9)); }
+        .ww-lightbox-yt.is-vertical { aspect-ratio: 9 / 16; width: min(100%, calc((100vh - 150px) * 9 / 16)); }
+        .ww-yt {
+          position: absolute; left: 10px; top: 10px; z-index: 2; padding: 4px 8px; border-radius: 100px;
+          background: rgba(12,12,11,0.72); color: #F2EEE7; font: 700 10.5px Inter, sans-serif; letter-spacing: 0.02em;
+          pointer-events: none;
+        }
         .ww-lightbox-bar {
           display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between;
           color: #F2EEE7; font-family: Inter, sans-serif;
