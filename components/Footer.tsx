@@ -73,7 +73,7 @@ export default function Footer() {
           Echo<span style={{ color: '#E8541A' }}>Pulse</span>
         </Link>
         <p style={{ fontSize: '14px', color: '#6E6B63', lineHeight: 1.7, marginBottom: '28px', margin: '0 0 28px' }}>
-          Done-for-you marketing for serious businesses. Video, content, ads, websites, automations, and custom software for founders, coaches, business owners, and real estate agents. One team, one bill.
+          A growth partner for founders and businesses. Content and personal brand, websites and funnels, custom software and CRMs, AI and automation, and search visibility. One team, one bill.
         </p>
         <div style={{ display: 'flex', gap: '10px' }}>
           {[

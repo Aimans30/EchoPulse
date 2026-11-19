@@ -147,7 +147,7 @@ const structuredData = {
       description:
         // Opens with the same sentence as public/llms.txt so every machine
         // reader gets one definition of the company. No results claims here.
-        "EchoPulse Media is a small, owner-operated content and website studio founded in 2025 by Lakshya Soni. It makes video edits, social posts, blogs, ad creative, websites, automations and custom software for founders, coaches, business owners and real estate agents. One team, one bill, every channel.",
+        "EchoPulse Media is a small, owner-operated growth partner founded in 2025 by Lakshya Soni. It makes the content that builds the founder and the brand, builds websites, funnels and custom software including CRMs, sets up AI and automations, and handles search and AI visibility, for founders and businesses of every kind. One team, one bill.",
       foundingDate: "2025",
       founder: { "@id": "https://echopulse.media/#founder" },
       // Where we operate FROM (Bhopal, India) vs which markets we SELL INTO
@@ -225,7 +225,7 @@ const structuredData = {
       name: "EchoPulse Media",
       alternateName: "EchoPulse",
       description:
-        "EchoPulse Media is a small, owner-operated content and website studio founded in 2025 by Lakshya Soni. Video, content, ads, websites and custom software for founders, coaches, business owners and real estate agents.",
+        "EchoPulse Media is a small, owner-operated growth partner founded in 2025 by Lakshya Soni. Content, websites, custom software and CRMs, AI automation and search visibility for founders and businesses of every kind.",
       publisher: { "@id": "https://echopulse.media/#organization" },
       inLanguage: "en",
     },
