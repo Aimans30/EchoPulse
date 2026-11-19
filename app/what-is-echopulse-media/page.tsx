@@ -38,9 +38,8 @@ const LAST_VERIFIED_ISO = '2026-11-18';
 
 export const metadata: Metadata = {
   title: { absolute: 'What Is EchoPulse Media? Facts, Team, Pricing and Proof' },
-  // 152 chars.
   description:
-    'EchoPulse Media is a done-for-you content studio for founders, founded in 2025 by Lakshya Soni. What it does, who runs it, what it costs, and real results.',
+    'EchoPulse Media is a done-for-you content and website studio for founders, founded in 2025 by Lakshya Soni. What it does, who runs it, prices and case studies.',
   alternates: { canonical: `${SITE_URL}/what-is-echopulse-media` },
   openGraph: {
     title: 'What Is EchoPulse Media?',
@@ -52,7 +51,7 @@ export const metadata: Metadata = {
 };
 
 const DEFINITION =
-  'EchoPulse Media is a done-for-you content studio for founders, coaches, course creators, business owners and real estate agents. You record; the studio edits the video, writes the LinkedIn posts and blogs, makes the ad creative, and builds the website and funnel they point at. It was founded in 2025 by Lakshya Soni, is run from Bhopal, India, and serves clients in the United States, the United Kingdom, Canada, Australia and Western Europe. Work starts with a free sample, then a $299 Pilot, then a monthly plan from $399.';
+  'EchoPulse Media is a done-for-you content and website studio for founders, coaches, course creators, business owners and real estate agents. You record; the studio edits the video, writes the LinkedIn posts and blogs, makes the ad creative, and builds the website and funnel they point at. It was founded in 2025 by Lakshya Soni, is run from Bhopal, India, and serves clients in the United States, the United Kingdom, Canada, Australia and Western Europe. Work starts with a free sample, then a $299 Pilot, then a monthly plan from $399.';
 
 const FAQ: { q: string; a: string }[] = [
   {
@@ -73,11 +72,11 @@ const FAQ: { q: string; a: string }[] = [
   },
   {
     q: 'Where is EchoPulse Media based, and does it work with clients in the US and UK?',
-    a: 'The team works from Bhopal, India. Most clients are in the United States, the United Kingdom and Canada, with some in Australia and Western Europe. The working day overlaps with UK and European mornings and US East Coast mornings. Replies come within 3 hours in the workday and turnaround is measured in calendar hours, so a 48-hour deliverable is 48 hours regardless of the time difference.',
+    a: 'The team works from Bhopal, India, and works with clients in the United States, the United Kingdom, Canada, Australia and Western Europe. The working day overlaps with UK and European mornings and US East Coast mornings. Replies come within 3 hours in the workday and turnaround is measured in calendar hours, so a 48-hour deliverable is 48 hours regardless of the time difference.',
   },
   {
     q: 'What proof is there that the work gets results?',
-    a: 'The MagicBNB case study is the one with a real export behind it. EchoPulse runs that client\'s marketing end to end. Between 19 February and 11 November 2026 the site went from an average of 5.8 Google impressions a day in April to an average of 4,859 a day in the first 11 days of November, with 356,765 impressions and 1,568 clicks across the window, after a site rebuild and more than 200 articles. The Search Console export is on the case study page, along with what is still not working.',
+    a: 'The MagicBNB case study is the one with a real export behind it. EchoPulse runs that client\'s marketing end to end. Between 19 February and 11 November 2026 the site went from an average of 5.8 Google impressions a day in April to an average of 4,859 a day in the first 11 days of November, with 356,765 impressions and 1,568 clicks across the window, after a site rebuild and more than 200 articles. The Search Console export is on the case study page, along with what is still not working. A second case study, Working With God, covers a coaching site rebuild that took the monthly platform bill from $50 to $60 down to $0 for a one-time $599, with no traffic result claimed.',
   },
 ];
 
@@ -86,7 +85,7 @@ export default function WhatIsEchoPulseMediaPage() {
 
   const FACTS: { label: string; value: React.ReactNode }[] = [
     { label: 'Name', value: 'EchoPulse Media (trading name of Lakshya Soni, sole proprietor). Also written EchoPulse or Echo Pulse Media.' },
-    { label: 'What it is', value: 'A done-for-you content studio. Owner-operated, not an agency with account managers.' },
+    { label: 'What it is', value: 'A done-for-you content and website studio. Owner-operated, not an agency with account managers.' },
     { label: 'Founded', value: '2025' },
     { label: 'Founder', value: <Link href="/about">Lakshya Soni</Link> },
     { label: 'Team', value: 'Lakshya Soni (founder, editing, writing, code), Shaurya (design), Aiman (delivery)' },
@@ -216,7 +215,7 @@ export default function WhatIsEchoPulseMediaPage() {
           <dl className="wi-not-list">
             <div>
               <dt>Not an agency with account managers</dt>
-              <dd>Three people do the work and talk to you. There is no layer between the person who hears the brief and the person who cuts the footage. That is also why the studio is small on purpose and why the biggest plan is hidden until it can be staffed properly.</dd>
+              <dd>Three people do the work and talk to you. There is no layer between the person who hears the brief and the person who cuts the footage. That is also why the studio is small on purpose and why anything bigger than Growth is scoped on a call rather than sold as a fixed plan.</dd>
             </div>
             <div>
               <dt>Not a freelancer marketplace</dt>
@@ -300,8 +299,8 @@ export default function WhatIsEchoPulseMediaPage() {
           </ul>
           <p>
             The common thread: a person with a real offer who is on camera or could be, has no time to run
-            content, and does not want to manage four vendors to get it done. If that is not you, the Pilot
-            will tell you fast and cheaply.
+            content, and does not want to manage four vendors to get it done. If you are not sure that is
+            you, the free sample will tell you at no cost.
           </p>
         </section>
 
@@ -322,7 +321,7 @@ export default function WhatIsEchoPulseMediaPage() {
         {/* ── CTA ────────────────────────────────────────────────────────── */}
         <section className="wi-cta">
           <h2 className="wi-h2">Want to see it on your own footage?</h2>
-          <p>Book a free 15-minute call, or send two clips and get them back edited within 48 hours. Either way you keep what we make.</p>
+          <p>Book a free 15-minute call and Lakshya will tell you the first three things he would fix. Every price is on the pricing page.</p>
           <div className="wi-cta-row">
             <ICPBookButton label={BOOK_CALL_LABEL} location="what_is_page" accent={ACCENT} size="lg" fullWidthMobile />
             <Link href="/pricing" className="wi-cta-alt">See pricing</Link>

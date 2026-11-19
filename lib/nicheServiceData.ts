@@ -290,11 +290,12 @@ const RAW_PAGES: NichePageRaw[] = [
       heading: 'What we can and cannot show',
       paragraphs: [
         'EchoPulse has no published agent-site result, so none appears here. The founder, Lakshya Soni, edited listing tours for more than 200 Canadian agents at a previous company. That was video, not websites, and those agents were that company\'s clients, not ours.',
-        'The one published rebuild is MagicBNB, a software company. Its new site went live on 5 May 2026. On 4 May it earned 13 Google impressions and on 5 May, 209. Daily impressions averaged 5.8 in April and 4,859 in early November, but that covers 219 articles and ads too, so the site alone does not explain it.',
+        'There are two published site rebuilds, neither for an agent. MagicBNB, a software company, put its new site live on 5 May 2026. On 4 May it earned 13 Google impressions and on 5 May, 209. Daily impressions averaged 5.8 in April and 4,859 in early November, but that covers 219 articles and ads too, so the site alone does not explain it. Working With God, an executive coaching practice, moved off a shared GoDaddy site to its own, and its monthly platform bill went from $50 to $60 down to $0 for a one-time $599. No traffic result is claimed for it.',
       ],
       links: [
         { href: '/case-studies/founder-200-real-estate-agents', label: 'Read the founder story' },
         { href: '/case-studies/magicbnb-seo-aeo', label: 'Read the MagicBNB case study' },
+        { href: '/case-studies/working-with-god-rebuild', label: 'Read the Working With God case study' },
       ],
       showClips: true,
       clipsNote: 'Listing videos we have edited, the kind that sit on a listing page.',
@@ -697,9 +698,13 @@ const RAW_PAGES: NichePageRaw[] = [
       heading: 'What we can and cannot show',
       paragraphs: [
         'EchoPulse has no published coach funnel result, so there is no opt-in rate here.',
-        'The one published build is MagicBNB, a software company: a site rebuild on Next.js, then conversion tracking. GA4 recorded 18 conversions in 90 days from 6,435 sessions. The study treats that as proof the tracking works, and says the gap between traffic and trials is still open.',
+        'The closest published build is Working With God, an executive coaching practice. Its site was split off a shared GoDaddy site into its own, and the monthly platform bill went from $50 to $60 down to $0 for a one-time $599. No traffic or conversion result is claimed, because no baseline carried over.',
+        'The other is MagicBNB, a software company: a site rebuild on Next.js, then conversion tracking. GA4 recorded 18 conversions in 90 days from 6,435 sessions. The study treats that as proof the tracking works, and says the gap between traffic and trials is still open.',
       ],
-      links: [{ href: '/case-studies/magicbnb-seo-aeo', label: 'Read the MagicBNB case study' }],
+      links: [
+        { href: '/case-studies/working-with-god-rebuild', label: 'Read the Working With God case study' },
+        { href: '/case-studies/magicbnb-seo-aeo', label: 'Read the MagicBNB case study' },
+      ],
       showClips: false,
     },
     notFit: [
@@ -1414,12 +1419,16 @@ const RAW_PAGES: NichePageRaw[] = [
     },
     ladderNote: 'A stand-alone build is quoted on a call. The plans are for owners who also want content every month.',
     proof: {
-      heading: 'The one published site rebuild',
+      heading: 'The two published site rebuilds',
       paragraphs: [
         'The rebuilt site for MagicBNB, a software company, went live on 5 May 2026. On 4 May it earned 13 Google impressions and on 5 May, 209. Daily impressions averaged 5.8 in April and 4,859 in the first 11 days of November.',
         'That is the result of the whole system, 219 articles and ads included, and the study says the site alone does not explain it. It also lists what is not working yet, such as a click-through rate under half a percent.',
+        'Working With God, an executive coaching practice, moved off a shared GoDaddy site to its own. Its monthly platform bill went from $50 to $60 down to $0 for a one-time $599. No traffic result is claimed for it.',
       ],
-      links: [{ href: '/case-studies/magicbnb-seo-aeo', label: 'Read the MagicBNB case study' }],
+      links: [
+        { href: '/case-studies/magicbnb-seo-aeo', label: 'Read the MagicBNB case study' },
+        { href: '/case-studies/working-with-god-rebuild', label: 'Read the Working With God case study' },
+      ],
       showClips: false,
     },
     notFit: [

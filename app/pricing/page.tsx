@@ -37,10 +37,9 @@ const SITE_URL = 'https://echopulse.media';
 const ACCENT = '#E8541A';
 
 export const metadata: Metadata = {
-  title: { absolute: 'EchoPulse Media Pricing: $299 Pilot, $399 and $1,997 a Month' },
-  // 147 chars.
+  title: { absolute: 'EchoPulse Media Pricing: $299 Pilot, $399 or $1,997 a Month' },
   description:
-    'Every EchoPulse Media price on one page. Free sample, $299 14-day Pilot, $399 a month Presence Engine, $1,997 a month Growth. Month-to-month, USD.',
+    'Every EchoPulse Media price for founders, coaches and business owners: 2 free edits, a $299 14-day Pilot, $399 a month Presence Engine, $1,997 a month Growth.',
   alternates: { canonical: `${SITE_URL}/pricing` },
   openGraph: {
     title: 'EchoPulse Media Pricing: $299 Pilot, $399 and $1,997 a Month',
@@ -78,7 +77,7 @@ const NOT_INCLUDED: { title: string; body: string }[] = [
   { title: 'Ad spend', body: 'We make the creative. The media budget is paid by you, directly to Meta, Google or TikTok. We never hold or mark up ad money.' },
   { title: 'Filming on location', body: 'We send shot lists and get on a call while you film. We do not fly a crew to you. If you need one, we can recommend local videographers and we will brief them.' },
   { title: 'Paid tools and licences', body: 'Your domain, hosting, email platform, CRM, scheduling tool, premium fonts and any stock footage beyond the standard libraries are billed to you at cost by the vendor.' },
-  { title: 'Community management', body: 'Replying to comments and DMs on your behalf is not in any plan. Automations that route them to you are, on Growth.' },
+  { title: 'Community management', body: 'Replying to comments and DMs on your behalf is not in any plan. Automations that route them to you are scoped separately on a call.' },
   { title: 'Long-form editing on Pilot and Presence', body: 'Those plans cover short-form. Long-form edits are in Growth, or can be ordered one at a time from the order page.' },
   { title: 'Custom software', body: 'Apps and software builds are quoted separately after a scoping call. Growth clients get 20% off the quote.' },
   { title: 'Results', body: 'We guarantee the output, the turnaround and the revisions. We do not guarantee leads, followers or sales, because too much of that sits with your offer and your market. Anyone who guarantees those is guessing.' },
@@ -86,7 +85,7 @@ const NOT_INCLUDED: { title: string; body: string }[] = [
 
 /** Which ICP each plan usually suits, with a link to that audience page. */
 const FIT: { icpKey: string; plan: string; why: string }[] = [
-  { icpKey: 'founders', plan: `${PRESENCE.name} or ${GROWTH.name}`, why: 'Founders usually start on Presence Engine for a weekly video and post cadence, and move to Growth when blogs and ad creative need to run alongside.' },
+  { icpKey: 'founders', plan: `${PRESENCE.name} or ${GROWTH.name}`, why: 'Presence Engine covers a weekly video and post cadence. Growth adds blogs and ad creative when those need to run alongside.' },
   { icpKey: 'coaches', plan: `${PILOT.name}, then ${PRESENCE.name}`, why: 'Coaches have recorded sessions and workshops already. The Pilot turns one into six edited clips in 14 days, and Presence keeps that going every week.' },
   { icpKey: 'real-estate', plan: PRESENCE.name, why: 'Listing tours, walkthroughs and agent intros on a weekly rhythm, plus the Google Business Profile and site work that gets you found locally.' },
   { icpKey: 'business-owners', plan: PRESENCE.name, why: 'One person you can call every week who runs your content and keeps your website current, at a price that does not need a marketing budget line.' },
@@ -222,7 +221,10 @@ export default function PricingPage() {
             Four steps, one price each.
             <span className="accent"> Nothing hidden.</span>
           </h1>
-          <p className="pr-lede">{PRICE_LADDER_SENTENCE}</p>
+          <p className="pr-lede">
+            EchoPulse Media is a done-for-you content and website studio for founders, coaches, real
+            estate agents and business owners. {PRICE_LADDER_SENTENCE}
+          </p>
           <ul className="pr-promises" aria-label="What every plan includes">
             <li>{PROMISES.replies}</li>
             <li>{PROMISES.turnaround}</li>
@@ -254,7 +256,7 @@ export default function PricingPage() {
               <span className="pr-step-num">3</span>
               <div>
                 <h3>{PRESENCE.name}: {PRESENCE.priceLabel}{PRESENCE.per}</h3>
-                <p>{PRESENCE.tagline} The plan most clients run on.</p>
+                <p>{PRESENCE.tagline} Video, posts and your website, every week.</p>
               </div>
             </li>
             <li>

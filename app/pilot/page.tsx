@@ -15,8 +15,7 @@ const SITE_URL = 'https://echopulse.media';
 const ACCENT = '#E8541A';
 
 export const metadata: Metadata = {
-  title: 'The $299 Pilot',
-  // 156 chars.
+  title: 'The $299 14-Day Content Pilot',
   description:
     'The $299 Pilot is 14 days of real work on your brand: a recorded strategy session, 6 video edits, 2 posts, 1 sourced blog, an audit and a 30-day plan.',
   alternates: { canonical: `${SITE_URL}/pilot` },
@@ -109,7 +108,11 @@ export default function PilotPage() {
           </nav>
           <p className="pl-eyebrow">{PILOT.name}, {PILOT.per}</p>
           <h1 className="pl-h1">The {PILOT.priceLabel} Pilot: 14 days of real work on your brand</h1>
-          <p className="pl-lede">{PILOT.tagline}</p>
+          <p className="pl-lede">
+            The {PILOT.priceLabel} Pilot is a one-off, 14-day trial of EchoPulse Media for founders,
+            coaches, real estate agents and business owners who want to see real work on their brand
+            before any monthly plan.
+          </p>
           <div className="pl-cta-row">
             <ICPBookButton label={BOOK_CALL_LABEL} location="pilot_page" accent={ACCENT} size="lg" fullWidthMobile />
             <Link href="/free-edits" className="pl-cta-alt">Or get 2 free edits first</Link>
@@ -186,7 +189,7 @@ export default function PilotPage() {
 
         <section className="pl-cta">
           <h2 className="pl-h2">Ready to see real work on your brand?</h2>
-          <p>{PILOT.cta}, or start with the free sample. Either way you keep what we make.</p>
+          <p>Book a free 15-minute call to start the Pilot, or send footage for the free sample first. Either way you keep what we make.</p>
           <div className="pl-cta-row">
             <ICPBookButton label={BOOK_CALL_LABEL} location="pilot_page" accent={ACCENT} size="lg" fullWidthMobile />
             <Link href="/free-edits" className="pl-cta-alt">Get 2 free edits</Link>

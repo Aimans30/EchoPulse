@@ -94,8 +94,9 @@ export default function FaqPage() {
           <p className="fq-eyebrow">Questions</p>
           <h1 className="fq-h1">EchoPulse Media FAQ</h1>
           <p className="fq-lede">
-            What buyers ask before they hire a content studio, answered from our real prices and
-            terms. If yours is not here, book a free 15-minute call and ask it straight.
+            Answers for founders, coaches, real estate agents and business owners deciding whether to
+            hire EchoPulse Media, a done-for-you content and website studio, taken from our real prices
+            and terms. If yours is not here, book a free 15-minute call and ask it straight.
           </p>
           <ul className="fq-jump" aria-label="Jump to a topic">
             {FAQ_GROUPS.map((g) => (

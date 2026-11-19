@@ -54,7 +54,7 @@ export const AGENCY_COMPARISON: ComparisonRow[] = [
   { feature: 'What you are buying', us: 'A full content pipeline, handled by one team', them: 'One channel, then upsells for the rest' },
   { feature: 'Who does the work',   us: 'The founder plus a small senior team',          them: 'Junior staff behind an account manager' },
   { feature: 'Who you talk to',     us: 'The person actually building it',                them: 'An account manager relaying messages' },
-  { feature: 'Turnaround',          us: 'Days, not weeks',                                them: 'Stuck in queues and approval chains' },
+  { feature: 'Turnaround',          us: '48 hours on short-form edits',                   them: 'Stuck in queues and approval chains' },
   { feature: 'Revisions',           us: "Redone until you would post it under your own name", them: 'Limited rounds, extra rounds cost more' },
   { feature: 'Pricing',             us: 'Flat and predictable',                           them: 'Retainer plus scope creep and hidden fees' },
   { feature: 'Commitment',          us: 'Month to month, no lock-in',                     them: 'Long contracts' },
@@ -157,7 +157,7 @@ export const icps: IcpData[] = [
     accentColor: '#f59e0b',
     metaTitle: 'Real Estate Video Editing & Listing Reels',
     metaDescription:
-      'Listing reels, agent clips and market updates cut from your phone footage in 48 hours. First 2 edits free, then $399 a month.',
+      'Real estate video editing for agents: listing reels, walkthroughs and agent clips from your phone footage, plus your site. 2 free edits, then $399 a month.',
     eyebrow: 'For Real Estate Agents & Brokerages',
     // Hero rewrite: the old version led with an industry stat ("nine in ten
     // agents skip video"), which is interesting but not about them. This leads
@@ -173,8 +173,8 @@ export const icps: IcpData[] = [
       headlineAccent: 'Most agents still show up with a phone photo.',
       body: [
         'The first showing now happens on a screen. Before a buyer ever books a walkthrough, they have scrolled your listing, watched (or not watched) the video, and decided whether you look like the agent who takes the property seriously. A carousel of static photos reads as the bare minimum. A cinematic reel reads as a professional who will market their home the same way.',
-        'Here is the opening: almost every agent knows video works, and almost none of them actually ship it consistently. The ones who tried usually hired a videographer once, waited a week for the edit, and quietly gave up. That gap between what works and what agents actually do is the whole opportunity, and it is wide open right now.',
-        'This does not stay open forever. Every quarter more agents figure out that listing video is how you win the listing and the buyer. The agents who build the habit now are the ones sellers call first.',
+        'Here is the opening: almost every agent knows video works, and almost none of them actually ship it consistently. The ones who tried usually hired a videographer once, waited a week for the edit, and quietly gave up. That gap between what works and what agents actually do is the opportunity.',
+        'NAR puts consistent video use at about one agent in four. The agents who post a reel for every listing give sellers something to judge before the listing appointment, and give buyers a reason to stop scrolling.',
       ],
     },
     stats: [
@@ -229,13 +229,13 @@ export const icps: IcpData[] = [
           title: 'The buyer side',
           points: [
             'The first showing now happens on a screen. A walkthrough video pre-qualifies buyers so the people who book are serious.',
-            'Video listings surface further in social and portal feeds than static photo carousels.',
+            'A walkthrough reel gives buyers a reason to stop on your listing in a feed full of photo carousels.',
             'Fewer wasted weekend viewings, because buyers already toured the property before they called you.',
           ],
         },
       },
       takeaway:
-        'Nine in ten agents still are not shipping listing video consistently. That gap is not permanent, and it is the cheapest edge available to you right now.',
+        'About three in four agents still do not use video on every listing, by NAR\'s count. Closing that gap on your own listings is one of the cheapest edges you have.',
     },
     deliverables: [
       { title: 'Win more listing appointments', desc: 'Cinematic property reels and walkthrough edits become your listing presentation. Sellers see how their home will be marketed before you say a word, and pick the agent who already looks like the professional.' },
@@ -330,7 +330,7 @@ export const icps: IcpData[] = [
     accentColor: '#E8541A',
     metaTitle: 'Done-For-You Content for Founders',
     metaDescription:
-      'One team for your LinkedIn, short-form video, blogs, and ads. Founder-led content that builds pipeline while you run the company.',
+      'Done-for-you content for SaaS, agency and consulting founders: LinkedIn posts and short-form video from $399 a month, blogs and ads on Growth, from one team.',
     eyebrow: 'For SaaS, Agency & Consulting Founders',
     // Hero rewrite. The old line ("Stop reviewing five freelancers. Run the
     // business.") sold relief from admin — a real pain, but it frames us as a
@@ -376,7 +376,7 @@ export const icps: IcpData[] = [
       headline: 'Your name is the one asset',
       headlineAccent: 'a competitor cannot copy.',
       intro: [
-        'A competitor can copy your pricing page in an afternoon, your feature set in a quarter, and your ad angles the moment they see them working. What they cannot copy is the founder whose thinking your buyers already trust. That is why founder-led content outperforms brand content on every platform that matters: people follow people.',
+        'A competitor can copy your pricing page in an afternoon, your feature set in a quarter, and your ad angles the moment they see them working. What they cannot copy is the founder whose thinking your buyers already trust. That is why founder-led content tends to travel further than a company page: people follow people.',
         'And the window where that trust gets built has moved. Buyers now do the majority of their evaluation before they ever raise a hand, which means the content published months before a deal is what shapes the shortlist. You are either present in that window or you are being compared to someone who was.',
       ],
       stats: [
@@ -411,7 +411,7 @@ export const icps: IcpData[] = [
     deliverables: [
       { title: 'Show up in your buyers’ research window', desc: 'LinkedIn posts written from a recorded interview, in your actual voice, shipped on cadence. When a buyer quietly evaluates you weeks before reaching out, there is a body of thinking for them to find.' },
       { title: 'Build trust before the first call', desc: 'Face-to-camera short-form cut for retention. Buyers who have watched you talk for weeks arrive at the first call already half-convinced, which is how long B2B cycles get shorter.' },
-      { title: 'Get found when they Google you', desc: 'Researched, SEO-built articles that rank for your category and compound. Mid-cycle, every serious buyer searches your name and your space; this is what they land on.' },
+      { title: 'Get found when they Google you', desc: 'Researched articles written to rank for your category, on the Growth plan. Mid-cycle, every serious buyer searches your name and your space; this is what they land on.' },
       { title: 'Scale what already works', desc: 'Your best-performing organic posts get recut into static and video ads. You only pay to amplify content that proved itself, so ad spend stops being a guess.' },
       { title: 'Never leak an inbound lead', desc: 'DM and CRM automations route every reply and profile visit to a follow-up while you are heads-down running the company. Interest that used to evaporate becomes booked calls.' },
       { title: 'Spend 2-3 hours a month, not 20', desc: 'One strategy call and batched approvals is your entire involvement. You review, we produce, and the machine runs whether you posted that day or not.' },
@@ -431,8 +431,8 @@ export const icps: IcpData[] = [
     faq: [
       { q: 'Will the content actually sound like me, not a generic ghostwriter?', a: 'That is the whole point. We open with a recorded onboarding session of about an hour to pull your actual words, opinions, and hot takes, then build a brand brief every writer and editor reads before touching a draft. If the first batch does not sound like you, we redo it at no charge.' },
       { q: 'Can three people actually handle a full content pipeline?', a: 'The studio is owner-operated. Lakshya Soni runs it, Shaurya leads design, Aiman leads delivery, and every deliverable gets senior review before it reaches you. The volume in Growth is scoped to what that team ships on a 48-hour cycle, not stretched past what three people can actually review.' },
-      { q: 'I already work with a freelancer or two. Can you slot in?', a: 'Yes. Plenty of founders start by handing us the channel that is eating the most of their time, usually LinkedIn or video, and expand once they see the work. You do not have to fire anyone to start.' },
-      { q: 'How much of my time does this take each month?', a: 'After onboarding, most founders spend 2 to 3 hours a month with us: one strategy call, batched approvals, and sending raw footage for video. The heavy lift is the onboarding interview up front. After that, you approve, we produce.' },
+      { q: 'I already work with a freelancer or two. Can you slot in?', a: 'Yes. You can start by handing us the channel that eats the most of your time, often LinkedIn or video, and add more once you have seen the work. You do not have to fire anyone to start.' },
+      { q: 'How much of my time does this take each month?', a: 'After onboarding, plan on 2 to 3 hours a month with us: one strategy call, batched approvals, and sending raw footage for video. The heavy lift is the onboarding interview up front. After that, you approve, we produce.' },
       { q: 'Do you lock me into a contract?', a: 'No. After the $299 14-day Pilot, plans are month-to-month, cancel with 14 days written notice. We would rather earn the next month than trap you in it.' },
     ],
     // Closest to the default. Explicitly founder-voiced: LinkedIn-led personal
@@ -488,7 +488,7 @@ export const icps: IcpData[] = [
     // the sub now names all three models outright.
     metaTitle: 'Content & Funnels for Coaches',
     metaDescription:
-      'Evergreen short-form, ad creative, and a nurture funnel that sells for cohorts, ongoing programs and memberships alike. Fill your roster, not your DMs.',
+      'Content and funnels for coaches and course creators running cohorts, ongoing programs or memberships: video and posts from $399 a month, funnels on Growth.',
     eyebrow: 'For Coaches & Course Creators',
     heroHeadline: 'Fill your roster',
     heroHeadlineAccent: 'without living in the DMs.',
@@ -499,9 +499,9 @@ export const icps: IcpData[] = [
       headline: 'Cold traffic to a sales page',
       headlineAccent: 'barely converts anymore.',
       body: [
-        'The money was never in pointing an ad straight at your offer. It is in the warm middle: a lead magnet that earns the email, a nurture sequence that builds trust, then the offer to someone who already wants it. Warm, nurtured audiences convert at multiples of cold traffic hitting a sales page for the first time.',
+        'The money was never in pointing an ad straight at your offer. It is in the warm middle: a lead magnet that earns the email, a nurture sequence that builds trust, then the offer to someone who already wants it. A lead who has had a few useful emails from you is an easier sale than a stranger landing on a sales page.',
         'The problem is that running that machine takes content volume and funnel plumbing most coaches do not have time to build. So the default becomes manual: pushes that drain you, DMs you answer one by one, revenue that swings with how much energy you had that month. You are either heads-down filming or heads-down selling, never both.',
-        'Evergreen content and an automated funnel change the shape of the business. The top of funnel fills without you filming daily, the nurture sequence does the selling while you coach, and signing someone becomes an offer to a primed list instead of starting from zero. The tooling to run this is cheaper and better than it has ever been. The coaches who set it up now stop trading energy for revenue.',
+        'Evergreen content and an automated funnel change the shape of the business. The top of funnel fills without you filming daily, the nurture sequence does the selling while you coach, and signing someone becomes an offer to a primed list instead of starting from zero.',
       ],
     },
     // "~2x qualified leads" and "Multiples higher conversion" were removed.
@@ -567,7 +567,7 @@ export const icps: IcpData[] = [
     deliverables: [
       { title: 'Own your audience, not rent it', desc: 'A complete lead-magnet funnel: magnet, opt-in page, and booking or sales page pouring warm leads into the platform you already use. How many people hear your offer stops depending on what the algorithm felt like that week.' },
       { title: 'Stay visible without filming daily', desc: 'One workshop or session becomes weeks of evergreen clips. Discovery keeps running on your worst weeks, which is exactly when it used to stop.' },
-      { title: 'Enroll clients while you sleep', desc: 'Email and DM nurture sequences move a lead from curious to committed over a series of touches. The selling happens on autopilot; you find out when they sign up.' },
+      { title: 'Follow up with every lead, even in a full week', desc: 'Email and DM nurture sequences move a lead from curious to committed over a series of touches. They keep sending while you coach, and you see who replies and who signs up.' },
       { title: 'Make the program feel worth the price', desc: 'Polished session and module editing (lecture cuts, chapters, branded intros), including Kajabi, Teachable, Thinkific and Skool if you run a course or membership. Production quality is what clients screenshot, share, and refer.' },
       { title: 'Scale cold traffic safely', desc: 'Ad creative that drives strangers into the lead magnet instead of straight at your offer, so paid spend feeds the funnel that converts instead of burning on a cold pitch.' },
     ],
@@ -577,7 +577,7 @@ export const icps: IcpData[] = [
     services: [
       { slug: 'websites-funnels',      name: 'Funnels & Lead Pages', why: 'The core. Lead magnet to opt-in to nurture to booking page. This is what turns scattered content into signed clients.', weight: 'Core' },
       { slug: 'video-editing',         name: 'Short-Form Video',     why: 'Evergreen clips that fill the top of funnel daily, without you filming daily.',                                       weight: 'High' },
-      { slug: 'automations',           name: 'Automations',          why: 'Email nurture and DM flows. Warm audiences convert at multiples of cold, and it runs without you in the loop.',         weight: 'High' },
+      { slug: 'automations',           name: 'Automations',          why: 'Email nurture and DM flows that keep following up with leads while you coach.',                                        weight: 'High' },
       { slug: 'ad-creatives',          name: 'Ad Creatives',         why: 'Drive cold traffic into the lead magnet, not straight at the offer.',                                                 weight: 'Medium' },
       { slug: 'linkedin-ghostwriting', name: 'Social & Authority',   why: 'Authority content that keeps the audience warm, whether enrolment is rolling or opens on a date.',                     weight: 'Medium' },
       { slug: 'blog-production',       name: 'Blog Production',       why: 'Evergreen organic discovery for coaches who want SEO, not just paid.',                                                 weight: 'Medium' },
@@ -586,7 +586,7 @@ export const icps: IcpData[] = [
     faq: [
       { q: 'I already have a course or coaching platform. Do you replace it?', a: 'No, we build the funnel that feeds it. Lead magnet, opt-in, nurture sequence, and booking or sales page that pour warm leads into whatever you already run on, whether that is a cohort platform, an ongoing coaching program, or a membership (Kajabi, Teachable, Thinkific, Skool, and the rest).' },
       { q: 'Can you edit my course modules too, not just marketing content?', a: 'Yes. Module editing, including lecture cuts, lower thirds, chapter markers, and branded intros, is part of our video service, alongside the evergreen short-form that fills your funnel.' },
-      { q: 'How does the nurture actually sell without me?', a: 'We map an email and DM sequence that warms a lead from the lead magnet to the offer over a series of touches. Warm, nurtured audiences convert several times higher than cold traffic hitting a sales page cold, and that sequence runs on autopilot while you teach.' },
+      { q: 'How does the nurture actually sell without me?', a: 'We map an email and DM sequence that warms a lead from the lead magnet to the offer over a series of touches. A lead who has had a few useful emails from you is an easier sale than a stranger on a sales page, and the sequence keeps running while you teach. You approve every message first.' },
       // Reframed from "I launch live a few times a year" so it answers the
       // coach running rolling enrollment first, then covers launches second.
       // A fitness coach with an ongoing program read this page and concluded
@@ -646,7 +646,7 @@ export const icps: IcpData[] = [
     accentColor: '#10b981',
     metaTitle: 'DTC Ad Creative on Subscription',
     metaDescription:
-      'Fresh static and video ad creative every week on subscription, plus store, funnels, and email. Beat creative fatigue and keep your CPA sane.',
+      'Ad creative for DTC and e-commerce brands: 6 static and video ads a month on the $1,997 Growth plan, plus short-form edits and landing pages.',
     eyebrow: 'For DTC & E-Commerce Brands',
     heroHeadline: 'Creative dies in days.',
     heroHeadlineAccent: 'We refill the tank on subscription.',
@@ -663,10 +663,14 @@ export const icps: IcpData[] = [
       ],
     },
     stats: [
-      { value: '7-14 days', label: 'typical TikTok creative lifespan before fatigue sets in' },
-      { value: '~3.0', label: 'ad frequency past this reliably drags CTR down' },
-      { value: '15-25', label: 'active variants performance teams run per campaign' },
-      { value: 'UGC', label: 'style ads consistently beat polished brand content on CPM' },
+      // The four figures here were unsourced industry benchmarks (creative
+      // lifespan, frequency ceiling, variant counts, UGC vs polished CPM), the
+      // same ones already removed from the authority block below for that
+      // reason. Replaced with facts from lib/pricing.ts a buyer can check.
+      { value: '6/mo', label: 'ad creatives on Growth, 4 static and 2 video' },
+      { value: '3-5', label: 'hook variations cut from each ad that is working' },
+      { value: '48 hr', label: 'turnaround on short-form edits' },
+      { value: '2', label: 'free edits to start, no card' },
     ],
     pipeline: {
       input: { label: 'You send product and brief', detail: 'Product footage, UGC, or brand assets' },
@@ -745,7 +749,7 @@ export const icps: IcpData[] = [
     ],
     starterStack: 'Start with the Ad Creatives subscription + Video Editing. Add Email/SMS automations to lift LTV.',
     faq: [
-      { q: 'How many ad variants do I get per month?', a: 'It depends on the plan, but the model is built around volume. Performance teams typically run 15 to 25 active variants per campaign, and subscription production is what makes that cadence affordable. We agree on a monthly batch size up front and ship fresh hooks before the current ones fatigue.' },
+      { q: 'How many ad variants do I get per month?', a: 'On Growth, 6 a month: 4 static and 2 video, plus 3 to 5 hook variations cut from whichever ad is working. Ads are not in the Presence Engine. If you need more volume than that, it is a Custom scope, agreed in writing on a call before you pay.' },
       { q: 'Do you do UGC-style ads or only polished brand content?', a: 'Both, and we lean into UGC-style for performance because it consistently beats polished brand content on CPM and conversion. We mix formats and let the testing data decide what scales.' },
       { q: 'Can you edit the footage we already have from creators?', a: 'Yes. Send us raw UGC, product footage, or creator clips and we cut them into multiple ad variants with different hooks, captions, and formats for each platform.' },
       { q: 'Do you actually understand performance marketing, or are you just editors?', a: 'We are not media buyers and we do not run your ad account. That stays with you or your buyer. What we own is the creative pipeline: the hooks, formats and variants built around what performs on Meta and TikTok rather than what looks good in a portfolio. We work from your account data and test results, not guesses.' },
@@ -765,9 +769,9 @@ export const icps: IcpData[] = [
     // loss because the rest of the copy fits her exactly. Widened to cover a
     // national consultancy without losing the local operator, who is still
     // named first.
-    metaTitle: 'Inbound Lead Content for Service Businesses',
+    metaTitle: 'Inbound Leads for Service Businesses',
     metaDescription:
-      'SEO content that ranks, a conversion-built website, and automations that catch every lead. Built for service businesses, local shops and national firms alike.',
+      'Content and websites for local and national service businesses: video, posts and your Google profile from $399 a month, SEO blogs on Growth. 2 free edits first.',
     eyebrow: 'For Local and National Service Businesses',
     heroHeadline: 'Get inbound leads',
     heroHeadlineAccent: 'instead of chasing cold ones.',
@@ -780,7 +784,7 @@ export const icps: IcpData[] = [
       body: [
         'The cold-outreach math keeps getting worse. Lists decay, inboxes filter harder, and the cost of chasing a lead who never asked to hear from you climbs every year. Meanwhile inbound (content that ranks, a site that converts, a system that catches the lead) costs less per lead and closes far better, because the prospect found you and already trusts you before they reach out.',
         'The reason most owners stay stuck on the outreach treadmill is not that they think it works better. It is that inbound takes consistent content and a site built to convert, and there is never time to build either while running the business. So the phone stays quiet unless you are actively dialing.',
-        'This is a compounding gap. Content published now ranks and keeps producing leads for years, while every cold-outreach lead has to be re-earned from scratch. The businesses that plant the inbound engine now are the ones whose phone rings on its own later.',
+        'This is a compounding gap. Content published now ranks and keeps producing leads for years, while every cold-outreach lead has to be re-earned from scratch.',
       ],
     },
     stats: [
@@ -849,7 +853,7 @@ export const icps: IcpData[] = [
     ],
     transformFrom: 'You chase leads with cold outreach and a site that does not convert the few who show up.',
     transformTo:
-      'Content brings them in already warm, the site converts them, and the system captures every single lead.',
+      'Content brings them in already warm, the site turns them into enquiries, and every enquiry gets a same-day follow-up.',
     services: [
       { slug: 'blog-production',       name: 'Blog Production (SEO)', why: 'The inbound engine. Ranks, compounds, and is the highest-ROI channel for this segment.',          weight: 'Core' },
       { slug: 'websites-funnels',      name: 'Websites & Funnels',    why: 'A fast, conversion-built site that turns the traffic content earns into actual leads.',            weight: 'High' },

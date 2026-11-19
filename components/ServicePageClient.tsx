@@ -119,7 +119,7 @@ const comparisonsByService: Record<string, ComparisonRow[]> = {
     { feature: 'Onboarding',          us: 'Two-week paid Pilot, see work first',            them: 'Pay full retainer upfront' },
   ],
   'linkedin-ghostwriting': [
-    { feature: 'Onboarding',          us: '90-min recorded brand brief interview',          them: 'Onboarding form, 5 questions' },
+    { feature: 'Onboarding',          us: 'Recorded onboarding interview, about an hour',   them: 'Onboarding form, 5 questions' },
     { feature: 'Brief fidelity audit', us: 'Scored 8/10 minimum before ship',               them: 'No audit, no scoring' },
     { feature: 'Anti-AI tells',       us: 'Banned-phrase list, manual scrub on every post', them: '"Delve into the tapestry"' },
     { feature: 'Story sourcing',      us: 'Pulled from your story bank',                    them: 'Generic templates' },
@@ -147,7 +147,7 @@ const comparisonsByService: Record<string, ComparisonRow[]> = {
     { feature: 'Onboarding',          us: 'Two-week paid Pilot, see work first',            them: 'Pay full retainer upfront' },
   ],
   'ad-creatives': [
-    { feature: 'Output cadence',      us: '8 to 12 fresh creatives per month',              them: '2 to 3 per month' },
+    { feature: 'Output cadence',      us: '6 a month on Growth (4 static, 2 video)',        them: '2 to 3 per month' },
     { feature: 'Refresh cycle',       us: 'Weekly hook variations',                         them: 'Every 4 to 6 weeks' },
     { feature: 'Hook variations',     us: '3 to 5 per top performer',                       them: 'None. One and done' },
     { feature: 'Turnaround',          us: '48 hours per creative',                          them: '5 to 14 days' },
@@ -272,13 +272,13 @@ const promisesWebsites: Promise[] = [
     stat: '<2s',
     statLabel: 'Mobile load time',
     headline: 'Fast enough to keep buyers reading.',
-    body: 'Sub-2-second mobile load on every site. That one number changes everything: visitors stay longer, Google ranks you higher, bounce rate drops. The difference between a site that books calls and a site that loads after they have closed the tab.',
+    body: 'We build every site to load in under 2 seconds on mobile. A slow page loses visitors before they read a word, and Google treats page speed as one of its signals.',
   },
   {
     stat: '∞',
-    statLabel: 'Revisions until it converts',
-    headline: 'We refine until the site books calls.',
-    body: 'Most agencies cap rounds and charge for the fifth. We do not. We iterate on copy, layout, and flow until the site looks the way you want and converts the way you need. The build is done when you say it is done.',
+    statLabel: 'Revisions until you are happy',
+    headline: 'We refine until you sign off.',
+    body: 'No cap on rounds and no charge for the fifth. We keep working on the copy, layout, and flow until the site is the one you want. The build is done when you say it is done.',
   },
   {
     stat: '14d',
@@ -1280,7 +1280,7 @@ export default function ServicePageClient({ service, guides = [] }: { service: S
             transition={{ duration: 0.7, delay: 0.15 }}
             style={{ fontSize: '16px', color: 'rgba(242,238,231,0.55)', lineHeight: 1.7, maxWidth: '600px', margin: '0 0 64px' }}
           >
-            Premium output is the bar. We back it with four standing commitments. None of these are upsells, all of them are the standard.
+            Four commitments that come with the work, at no extra cost.
           </motion.p>
 
           {/* Stat-led data cards. Award-site style: huge light-weight stat + clean type, no glass overload.
@@ -1442,11 +1442,11 @@ export default function ServicePageClient({ service, guides = [] }: { service: S
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10b981', boxShadow: '0 0 10px #10b981' }} />
               <span style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', color: 'rgba(242,238,231,0.5)' }}>
-                Now booking 15-minute calls
+                Free 15-minute call
               </span>
             </div>
             <span style={{ fontSize: '14px', color: 'rgba(242,238,231,0.7)', flex: 1, lineHeight: 1.5 }}>
-              Free 15-minute call. No commitment. We send a custom plan whether or not you ever hire us.
+              Lakshya looks at your site and your last few posts and tells you the first three things he would fix, whether or not you hire us.
             </span>
             <button
               type="button"

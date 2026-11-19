@@ -6,7 +6,7 @@ import { FREE_SAMPLE } from '@/lib/pricing';
 
 const canonical = 'https://echopulse.media/free-edits';
 const DESCRIPTION =
-  'Send raw footage and get 2 edited short-form videos back within 48 hours. No card, no call, and you keep the files.';
+  'A free EchoPulse Media sample for business owners and creators: send raw footage and get 2 edited short-form videos back within 48 hours. No card, no call.';
 
 export const metadata: Metadata = {
   title: 'Get 2 Free Edits',

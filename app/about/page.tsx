@@ -45,9 +45,9 @@ export const metadata: Metadata = {
   // ~4 this page converts at 0.78% when that slot should do far better, so the
   // snippet is the thing to fix: lead with what the reader gets from opening
   // it, not with a definition of the company they already searched for.
-  title: { absolute: 'About EchoPulse Media, a Content Studio for Founders' },
+  title: { absolute: 'About EchoPulse Media, a Content and Website Studio' },
   description:
-    'Who runs EchoPulse Media, how the work actually gets done, and what to expect if you hire us. Written by founder Lakshya Soni.',
+    'Who runs EchoPulse Media, how the work gets done and what to expect if you hire us, written by founder Lakshya Soni for founders, coaches and business owners.',
   alternates: { canonical: `${SITE_URL}/about` },
   openGraph: {
     title: 'About EchoPulse Media: Lakshya Soni, Founder',
@@ -81,10 +81,10 @@ const TIMELINE: { period: string; title: string; body: string }[] = [
 const FACTS: { label: string; value: string }[] = [
   { label: 'Founded', value: '2025' },
   { label: 'Founder', value: 'Lakshya Soni' },
-  { label: 'Model', value: 'Done-for-you content studio' },
+  { label: 'Model', value: 'Done-for-you content and website studio' },
   { label: 'Serves', value: 'Founders, coaches, course creators, business owners, real estate agents' },
   { label: 'Markets', value: 'United States, United Kingdom, Canada, Australia, Western Europe' },
-  { label: 'Starts at', value: '$299 for a 14-day paid Pilot, no contract' },
+  { label: 'Starts at', value: '2 free edits, then $299 for a 14-day paid Pilot, no contract' },
   // 14 days, not 30. app/terms/page.tsx section 3 is the binding document and
   // states "fourteen (14) calendar days written notice"; public/llms.txt also
   // already said 14. Three marketing pages had drifted to 30, which both
@@ -161,11 +161,11 @@ export default function AboutPage() {
           before any storytelling.
         */}
         <p className="about-lede">
-          EchoPulse Media is a done-for-you content studio for founders, coaches, and
-          business owners. You record; we handle the video editing, LinkedIn posts,
-          blogs, ad creative, and the funnel they point at. One team, one bill, every
-          channel. It was founded in 2025 by Lakshya Soni and starts with a $299,
-          14-day paid Pilot with no contract.
+          EchoPulse Media is a done-for-you content and website studio for founders,
+          coaches, real estate agents and business owners. You record; we handle the
+          video editing, LinkedIn posts, blogs, ad creative, and the website and funnel
+          they point at. One team, one bill. It was founded in 2025 by Lakshya Soni.
+          You can start with 2 free edits, then a $299, 14-day Pilot with no contract.
         </p>
       </section>
 

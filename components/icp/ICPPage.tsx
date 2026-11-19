@@ -155,7 +155,7 @@ export default function ICPPage({ data, videos, guides = [] }: { data: IcpData; 
                 We have not published work for this segment yet, and we are not going to
                 dress up someone else&apos;s as if we had.{' '}
                 <Link href="/case-studies/magicbnb-seo-aeo" style={{ color: accent, fontWeight: 700 }}>
-                  Read the one case study we can show you
+                  Read the MagicBNB case study
                 </Link>
                 , with a real Search Console export published with the client&apos;s permission,
                 and the open problems still on the account listed at the bottom of it. It is a
@@ -276,7 +276,7 @@ export default function ICPPage({ data, videos, guides = [] }: { data: IcpData; 
                           the card itself still links for whoever wants depth,
                           but the visible affordance is informational. */}
                       <span className="icp-svc-link" style={{ color: '#9a958c' }}>
-                        Included in your plan
+                        What each plan includes is below
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" aria-hidden="true"><path d="M20 6L9 17l-5-5" /></svg>
                       </span>
                     </a>
@@ -301,7 +301,7 @@ export default function ICPPage({ data, videos, guides = [] }: { data: IcpData; 
                   more importantly the section that follows contains no receipts
                   at all, only benefit blurbs. Promising evidence and then not
                   producing it is worse than not promising it. */}
-              <h2 className="icp-h2" style={{ color: '#F2EEE7' }}>Not deliverables. <span style={{ color: accent }}>Work that earns its place.</span></h2>
+              <h2 className="icp-h2" style={{ color: '#F2EEE7' }}>What each piece of work <span style={{ color: accent }}>is there to do.</span></h2>
             </Reveal>
             <div className="icp-deliv-list">
               {data.deliverables.map((d, i) => (
