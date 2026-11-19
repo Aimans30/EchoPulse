@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import AppsSoftwareVisual from './AppsSoftwareVisual';
 
 /**
  * Per-service hero visual. Each service gets a distinct mockup so the pages
@@ -22,7 +23,7 @@ export default function ServiceHeroVisual({ slug, accent }: { slug: string; acce
     case 'automations':
       return <AutomationVisual accent={accent} />;
     case 'apps-software':
-      return <GradientVisual accent={accent} />;
+      return <AppsSoftwareVisual accent={accent} />;
     default:
       return <GradientVisual accent={accent} />;
   }
