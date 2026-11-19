@@ -51,6 +51,8 @@ export const videos: VideoEntry[] = [
   { url: 'https://res.cloudinary.com/dqqd9rq8s/video/upload/v1782372139/2438_fn_z6wry7.mp4',                                    type: 'realestate', brand: 'Listing Reel', label: 'Property',                            icp: ['real-estate'] },
 
   // ─── New clips ───────────────────────────────────────────────────────────
+  // Business content reel that also fits real estate.
+  { url: 'https://res.cloudinary.com/dkzhqy2od/video/upload/v1795126660/Full_video_qqft5a.mp4',                                  type: 'talking',  brand: 'Business Reel',  label: 'Business Content', orientation: 'vertical', icp: ['business-owners', 'real-estate'] },
   // DTC brand reel (LuxeGlow), also founder content.
   { url: 'https://res.cloudinary.com/dkzhqy2od/video/upload/v1795126626/LuxeGlow-Reel_01_ynozhc.mp4',                            type: 'talking',  brand: 'DTC Reel',       label: 'Brand Content', orientation: 'vertical', icp: ['dtc', 'founders'] },
   // Founder info content reel, also used for DTC.
