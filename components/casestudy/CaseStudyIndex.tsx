@@ -1,22 +1,20 @@
-'use client';
-
 import Link from 'next/link';
 import Image from 'next/image';
 import type { CaseStudy } from '@/lib/caseStudyData';
 import { staticBookingUrl, BOOK_CALL_LABEL, BOOK_CALL_REASSURANCE } from '@/lib/links';
-import Reveal from '@/components/icp/Reveal';
-import ImpressionChart from './ImpressionChart';
+import { Rise } from './motion';
 
 /**
- * Case studies hub.
+ * Case studies hub, laid out like a studio portfolio.
  *
- * Layout: the first study is a large featured card (text left, evidence chart
- * right). Every other study is an image-led card in a two column grid. If the
- * remaining count is odd, the last card spans both columns in a horizontal
- * layout so the grid never ends on an orphan gap.
+ * The hero is short on purpose: one line of headline, one line of sub, and
+ * the first card on screen at 1440x900 and inside the first screen on a
+ * phone. Each card leads with a large real visual (the live site, the old
+ * and new homepages side by side, or a still from the work), then the client,
+ * three or four tags, the one headline result and a clear link.
  *
- * The standards panel states the rules every entry has to meet before it is
- * published here.
+ * The honesty is kept, positively: every number links to the export or the
+ * live site, and each study still ends with its open problems.
  */
 
 const STANDARDS = [
@@ -42,185 +40,159 @@ const STANDARDS = [
   },
 ];
 
-const CLIENT_CTA = 'Read the full case study, including the open problems';
-const FOUNDER_CTA = 'Read the founder story';
+const parse = (s: string) => {
+  const n = parseFloat(s.replace(/,/g, ''));
+  return Number.isFinite(n) ? n : 0;
+};
 
-type Visual = { src: string; alt: string; width: number; height: number; tag?: string; position: string };
+/** A small static line of the monthly averages, drawn from the month table. */
+function Sparkline({ study }: { study: CaseStudy }) {
+  const months = study.months ?? [];
+  if (months.length < 2) return null;
+  const v = months.map((m) => parse(m.perDay));
+  const max = Math.max(...v, 1);
+  const pts = v.map((x, i) => `${((i / (v.length - 1)) * 200).toFixed(1)},${(60 - (x / max) * 54).toFixed(1)}`);
+  return (
+    <div className="csi-spark" aria-hidden="true">
+      <p className="csi-spark-h">
+        <span>Daily Google impressions</span>
+        <strong>
+          5.8 <em>&rarr;</em> 4,803
+        </strong>
+      </p>
+      <svg viewBox="0 0 200 62" preserveAspectRatio="none">
+        <polygon points={`0,62 ${pts.join(' ')} 200,62`} fill="rgba(232,84,26,0.22)" />
+        <polyline points={pts.join(' ')} fill="none" stroke="#E8541A" strokeWidth="2" vectorEffect="non-scaling-stroke" strokeLinejoin="round" />
+      </svg>
+      <p className="csi-spark-axis">
+        <span>Apr 2026</span>
+        <span>1 to 16 Nov 2026</span>
+      </p>
+    </div>
+  );
+}
 
-function visualFor(s: CaseStudy): Visual | null {
-  if (s.comparison) {
-    return {
-      src: s.comparison.beforeSrc,
-      alt: s.comparison.beforeAlt,
-      width: s.comparison.beforeWidth,
-      height: s.comparison.beforeHeight,
-      tag: s.comparison.beforeLabel,
-      position: 'top center',
-    };
+function Visual({ study }: { study: CaseStudy }) {
+  if (study.heroShot) {
+    return (
+      <div className="csi-vis csi-vis-shot">
+        <div className="csi-browser">
+          <span className="csi-browser-bar" aria-hidden="true">
+            <i />
+            <i />
+            <i />
+            <b>{study.heroShot.url}</b>
+          </span>
+          <Image
+            src={study.heroShot.src}
+            alt={study.heroShot.alt}
+            width={study.heroShot.width}
+            height={study.heroShot.height}
+            sizes="(max-width: 1000px) 92vw, 380px"
+            className="csi-img"
+            loading="eager"
+          />
+        </div>
+        <Sparkline study={study} />
+      </div>
+    );
   }
-  if (s.heroMedia) {
-    return {
-      src: s.heroMedia.src,
-      alt: s.heroMedia.alt,
-      width: s.heroMedia.width,
-      height: s.heroMedia.height,
-      position: '50% 48%',
-    };
+  if (study.comparison?.afterSrc) {
+    return (
+      <div className="csi-vis csi-split">
+        <div className="csi-split-half">
+          <Image
+            src={study.comparison.afterSrc}
+            alt={study.comparison.afterAlt ?? ''}
+            width={study.comparison.afterWidth ?? 1200}
+            height={study.comparison.afterHeight ?? 2500}
+            sizes="(max-width: 1000px) 50vw, 200px"
+            className="csi-img"
+            loading="eager"
+          />
+          <span className="csi-tag csi-tag-after">After</span>
+        </div>
+        <div className="csi-split-half csi-split-before">
+          <Image
+            src={study.comparison.beforeSrc}
+            alt={study.comparison.beforeAlt}
+            width={study.comparison.beforeWidth}
+            height={study.comparison.beforeHeight}
+            sizes="(max-width: 1000px) 50vw, 200px"
+            className="csi-img"
+            loading="eager"
+          />
+          <span className="csi-tag">Before</span>
+        </div>
+      </div>
+    );
+  }
+  if (study.heroMedia) {
+    const still = study.workstreams[0]?.media?.[0];
+    return (
+      <div className="csi-vis csi-vis-founder">
+        <Image
+          src={study.heroMedia.src}
+          alt={study.heroMedia.alt}
+          width={study.heroMedia.width}
+          height={study.heroMedia.height}
+          sizes="(max-width: 1000px) 92vw, 380px"
+          className="csi-img csi-img-portrait"
+          loading="eager"
+        />
+        {still && (
+          <span className="csi-still">
+            <Image src={still.src} alt={still.alt} width={still.width} height={still.height} sizes="90px" className="csi-img" />
+          </span>
+        )}
+      </div>
+    );
   }
   return null;
 }
 
-function Metrics({ study }: { study: CaseStudy }) {
-  const items = study.heroMetrics.slice(0, 3);
-  if (items.length === 0) return null;
-  return (
-    <dl className="csi-metrics">
-      {items.map((m) => (
-        <div key={m.label} className="csi-metric">
-          <dd className="csi-metric-value">{m.value}</dd>
-          <dt className="csi-metric-label">{m.label}</dt>
-        </div>
-      ))}
-    </dl>
-  );
-}
-
-function Chips({ items }: { items: string[] }) {
-  return (
-    <ul className="csi-chips">
-      {items.map((x) => (
-        <li key={x}>{x}</li>
-      ))}
-    </ul>
-  );
-}
-
-function Cta({ study }: { study: CaseStudy }) {
-  return (
-    <span className="csi-cta">
-      {study.kind === 'founder' ? FOUNDER_CTA : CLIENT_CTA}
-      <span aria-hidden="true" className="csi-cta-arrow"> &rarr;</span>
-    </span>
-  );
-}
-
-function Featured({ study }: { study: CaseStudy }) {
-  const visual = study.chart ? null : visualFor(study);
-  return (
-    <Link href={`/case-studies/${study.slug}`} className="csi-card csi-featured">
-      <div className="csi-featured-text">
-        <div className="csi-meta">
-          <div>
-            <p className="csi-client">{study.client}</p>
-            <p className="csi-industry">{study.industry}</p>
-          </div>
-          <span className="csi-window">{study.windowLabel}</span>
-        </div>
-        <h2 className="csi-title csi-title-lg">
-          {study.headline} <span className="csi-accent">{study.headlineAccent}</span>
-        </h2>
-        <p className="csi-result">{study.indexResult}</p>
-        <Metrics study={study} />
-        <Chips items={study.services} />
-        <Cta study={study} />
-      </div>
-      <div className="csi-featured-visual">
-        {study.chart && (
-          <div className="csi-chart" aria-hidden="true">
-            <ImpressionChart chart={study.chart} />
-          </div>
-        )}
-        {visual && (
-          <div className="csi-media csi-media-fill">
-            <Image
-              src={visual.src}
-              alt={visual.alt}
-              width={visual.width}
-              height={visual.height}
-              sizes="(max-width: 900px) 100vw, 560px"
-              style={{ objectPosition: visual.position }}
-            />
-          </div>
-        )}
-      </div>
-    </Link>
-  );
-}
-
-function StudyCard({ study, wide }: { study: CaseStudy; wide: boolean }) {
-  const visual = visualFor(study);
+function StudyCard({ study, index }: { study: CaseStudy; index: number }) {
   const founder = study.kind === 'founder';
-  const eyebrow = study.labels?.eyebrowIndex ?? (founder ? study.eyebrow : study.client);
+  const lead = study.heroMetrics[0];
+  const tags = study.indexTags ?? study.services.slice(0, 4);
   return (
-    <Link href={`/case-studies/${study.slug}`} className={`csi-card csi-study${wide ? ' is-wide' : ''}`}>
-      {study.comparison?.afterSrc ? (
-        // Website rebuilds: the new site and the old one side by side, so the
-        // card itself shows the before and after.
-        <div className="csi-media csi-split">
-          <div className="csi-split-half">
-            <Image
-              src={study.comparison.afterSrc}
-              alt={study.comparison.afterAlt ?? ''}
-              width={study.comparison.afterWidth ?? 1200}
-              height={study.comparison.afterHeight ?? 2500}
-              sizes={wide ? '(max-width: 900px) 50vw, 260px' : '(max-width: 900px) 50vw, 290px'}
-              style={{ objectPosition: 'top center' }}
-            />
-            <span className="csi-tag csi-tag-after">After</span>
-          </div>
-          <div className="csi-split-half csi-split-before">
-            <Image
-              src={study.comparison.beforeSrc}
-              alt={study.comparison.beforeAlt}
-              width={study.comparison.beforeWidth}
-              height={study.comparison.beforeHeight}
-              sizes={wide ? '(max-width: 900px) 50vw, 260px' : '(max-width: 900px) 50vw, 290px'}
-              style={{ objectPosition: 'top center' }}
-            />
-            <span className="csi-tag">Before</span>
-          </div>
-        </div>
-      ) : visual && (
-        <div className="csi-media">
-          <Image
-            src={visual.src}
-            alt={visual.alt}
-            width={visual.width}
-            height={visual.height}
-            sizes={wide ? '(max-width: 900px) 100vw, 520px' : '(max-width: 900px) 100vw, 580px'}
-            style={{ objectPosition: visual.position }}
-          />
-          {visual.tag && <span className="csi-tag">{visual.tag}</span>}
-        </div>
-      )}
-      <div className="csi-study-body">
-        {founder ? (
-          <p className="csi-badge">{eyebrow}</p>
-        ) : (
-          <>
-            <p className="csi-client">{study.client}</p>
-            <p className="csi-industry">{study.industry}</p>
-          </>
+    <Link href={`/case-studies/${study.slug}`} className="csi-card">
+      <Visual study={study} />
+      <div className="csi-body">
+        <p className="csi-meta">
+          <span className="csi-num">{String(index + 1).padStart(2, '0')}</span>
+          {founder ? <span className="csi-badge">{study.eyebrow}</span> : <span>{study.industry}</span>}
+        </p>
+        <h2 className="csi-client">{study.shortName}</h2>
+        <ul className="csi-tags" aria-label="What we did">
+          {tags.map((t) => (
+            <li key={t}>{t}</li>
+          ))}
+        </ul>
+        {lead && (
+          <p className="csi-result">
+            <strong>{lead.value}</strong>
+            <span>{lead.label}</span>
+          </p>
         )}
-        <h2 className="csi-title">
-          {study.headline} <span className="csi-accent">{study.headlineAccent}</span>
-        </h2>
-        <p className="csi-result">{study.indexResult}</p>
-        <Metrics study={study} />
-        <Chips items={study.services} />
-        <Cta study={study} />
+        <p className="csi-sentence">{study.indexResult}</p>
+        <span className="csi-cta">
+          {founder ? 'Read the founder story' : 'Read the case study'}
+          <span aria-hidden="true" className="csi-cta-arrow">
+            &rarr;
+          </span>
+        </span>
       </div>
     </Link>
   );
 }
 
 export default function CaseStudyIndex({ studies }: { studies: CaseStudy[] }) {
-  const [first, ...rest] = studies;
-  const oddRest = rest.length % 2 === 1;
-  const lead = studies[0]?.heroMetrics[0];
-
   return (
     <main id="main" className="csi-root">
+      <noscript>
+        <style>{`.cs-rise{opacity:1!important;transform:none!important}`}</style>
+      </noscript>
       <section className="csi-hero" data-dark-bg="true">
         <div className="csi-container">
           <nav className="csi-crumb" aria-label="Breadcrumb">
@@ -228,76 +200,50 @@ export default function CaseStudyIndex({ studies }: { studies: CaseStudy[] }) {
             <span aria-hidden="true">/</span>
             <span aria-current="page">Case studies</span>
           </nav>
-          <Reveal>
-            <p className="csi-eyebrow">Case studies</p>
-            <h1 className="csi-h1">
-              Named clients, real exports, <span className="csi-accent">and the parts that are still broken.</span>
-            </h1>
-            <p className="csi-sub">
-              One case study per client, only with their consent, and only where the claim can be checked: an
-              export we still hold, or a live site you can open right now. There are not many yet. Each one
-              ends with what is still wrong.
-            </p>
-          </Reveal>
-          <Reveal delay={0.08}>
-            <dl className="csi-proof">
-              {lead && (
-                <div>
-                  <dd className="csi-proof-value">{lead.value}</dd>
-                  <dt className="csi-proof-label">{lead.label}</dt>
-                </div>
-              )}
-              <div>
-                <dd className="csi-proof-value">{studies.length}</dd>
-                <dt className="csi-proof-label">studies published</dt>
-              </div>
-              <div>
-                <dd className="csi-proof-value">Real</dd>
-                <dt className="csi-proof-label">exports published</dt>
-              </div>
-            </dl>
-          </Reveal>
+          <div className="csi-hero-row">
+            <Rise>
+              <p className="csi-eyebrow">Case studies</p>
+              <h1 className="csi-h1">
+                Client results, <span className="csi-accent">with the receipts.</span>
+              </h1>
+            </Rise>
+            <Rise delay={0.06}>
+              <p className="csi-sub">
+                Work for real businesses, named with their consent. Every number links to the export or the live site.
+              </p>
+              <a className="csi-jump" href="#studies">
+                See the case studies <span aria-hidden="true">&darr;</span>
+              </a>
+            </Rise>
+          </div>
         </div>
       </section>
 
-      <section className="csi-section" aria-label="Published studies">
+      <section className="csi-studies" id="studies" aria-label="Published case studies">
         <div className="csi-container">
-          {first && (
-            <Reveal>
-              <Featured study={first} />
-            </Reveal>
-          )}
-          {rest.length > 0 && (
-            <div className="csi-grid">
-              {rest.map((s, i) => (
-                <Reveal
-                  key={s.slug}
-                  delay={Math.min(i * 0.07, 0.2)}
-                  className={`csi-cell${oddRest && i === rest.length - 1 ? ' is-wide' : ''}`}
-                >
-                  <StudyCard study={s} wide={oddRest && i === rest.length - 1} />
-                </Reveal>
-              ))}
-            </div>
-          )}
+          <ol className="csi-grid">
+            {studies.map((s, i) => (
+              <Rise as="li" key={s.slug} delay={Math.min(i * 0.08, 0.24)} className="csi-cell">
+                <StudyCard study={s} index={i} />
+              </Rise>
+            ))}
+          </ol>
         </div>
       </section>
 
       <section className="csi-section csi-section-standards">
         <div className="csi-container">
-          <Reveal>
+          <Rise>
             <p className="csi-kicker">The standard</p>
             <h2 className="csi-h2">What has to be true before anything is published here.</h2>
-          </Reveal>
+          </Rise>
           <ol className="csi-standards">
             {STANDARDS.map((s, i) => (
-              <Reveal as="li" key={s.title} delay={Math.min(i * 0.05, 0.2)} className="csi-standard-cell">
-                <div className="csi-standard">
-                  <span className="csi-standard-num">{String(i + 1).padStart(2, '0')}</span>
-                  <h3 className="csi-standard-title">{s.title}</h3>
-                  <p className="csi-standard-detail">{s.detail}</p>
-                </div>
-              </Reveal>
+              <Rise as="li" key={s.title} delay={Math.min(i * 0.05, 0.2)} className="csi-standard">
+                <span className="csi-standard-num">{String(i + 1).padStart(2, '0')}</span>
+                <h3 className="csi-standard-title">{s.title}</h3>
+                <p className="csi-standard-detail">{s.detail}</p>
+              </Rise>
             ))}
           </ol>
         </div>
@@ -305,174 +251,166 @@ export default function CaseStudyIndex({ studies }: { studies: CaseStudy[] }) {
 
       <section className="csi-close" id="book-call">
         <div className="csi-container">
-          <Reveal>
+          <Rise>
             <h2 className="csi-h2 csi-h2-light">
               Your site, read the same way <span className="csi-accent">on a 15 minute call.</span>
             </h2>
             <p className="csi-sub csi-sub-tight">
-              We open your site and, where you have it, your Search Console, tell you what is structurally
-              holding it back, and leave you with a 30 day plan. You keep the plan whether or not you hire us.
+              We open your site and, where you have it, your Search Console, tell you what is structurally holding it back, and leave you with a 30 day plan. You keep the plan whether or not you hire us.
             </p>
-            <a
-              className="csi-btn"
-              href={staticBookingUrl('case_study_index')}
-              data-track="case_study_cta_click"
-              data-track-location="case_study_index"
-              target="_blank"
-              rel="noopener"
-            >
-              {BOOK_CALL_LABEL}
-            </a>
-            <p className="csi-reassure">{BOOK_CALL_REASSURANCE}</p>
-            <p className="csi-reassure">
+            <div className="csi-close-cta">
+              <a
+                className="csi-btn"
+                href={staticBookingUrl('case_study_index')}
+                data-track="case_study_cta_click"
+                data-track-location="case_study_index"
+                target="_blank"
+                rel="noopener"
+              >
+                {BOOK_CALL_LABEL}
+              </a>
               <Link className="csi-textlink" href="/pricing">
                 See prices
               </Link>
-            </p>
-          </Reveal>
+            </div>
+            <p className="csi-reassure">{BOOK_CALL_REASSURANCE}</p>
+          </Rise>
         </div>
       </section>
 
       <style>{`
-        .csi-root { --csi-ink-orange: #B5400F; background: var(--cream); color: var(--black); overflow-x: clip; }
-        .csi-container { max-width: 1180px; margin: 0 auto; padding: 0 32px; }
+        .csi-root { --csi-ink-orange: #B5400F; --cs-ease: cubic-bezier(0.16,1,0.3,1); background: var(--cream); color: var(--black); overflow-x: clip; }
+        .csi-root *, .csi-root *::before, .csi-root *::after { box-sizing: border-box; }
+        .csi-root :focus-visible { outline: 3px solid var(--orange); outline-offset: 3px; }
+        .csi-container { max-width: 1240px; margin: 0 auto; padding: 0 40px; }
         .csi-accent { color: var(--orange); }
+        .cs-rise { opacity: 0; transform: translate3d(0, 22px, 0); transition: opacity 0.7s ease, transform 0.9s var(--cs-ease); }
+        .cs-rise.is-in { opacity: 1; transform: none; }
+        .cs-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
 
-        /* Hero */
-        .csi-hero { background: var(--black); color: var(--cream); padding: 108px 0 72px; }
-        .csi-crumb { display: flex; gap: 10px; align-items: center; font-family: Inter, sans-serif; font-size: 13px; color: rgba(242,238,231,0.6); margin-bottom: 44px; }
-        .csi-crumb a { color: rgba(242,238,231,0.78); text-decoration: none; }
+        /* Hero: short, so the work is on the first screen */
+        .csi-hero { background: var(--black); color: var(--cream); padding: 112px 0 132px; }
+        .csi-crumb { display: flex; gap: 10px; align-items: center; font-family: Inter, sans-serif; font-size: 13px; color: rgba(242,238,231,0.55); margin-bottom: 28px; }
+        .csi-crumb a { color: rgba(242,238,231,0.75); text-decoration: none; display: inline-flex; min-height: 44px; align-items: center; }
         .csi-crumb a:hover { color: var(--orange); }
-        .csi-eyebrow { font-family: Inter, sans-serif; font-size: 12px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: var(--orange); margin: 0 0 20px; }
-        .csi-h1 { font-family: Inter, sans-serif; font-size: clamp(34px, 5.4vw, 60px); font-weight: 800; letter-spacing: -2px; line-height: 1.06; margin: 0 0 24px; max-width: 20ch; }
-        .csi-sub { font-size: 17px; line-height: 1.65; color: rgba(242,238,231,0.74); max-width: 60ch; margin: 0; }
-        .csi-sub-tight { margin-bottom: 34px; }
+        .csi-hero-row { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 0.7fr); gap: 24px 64px; align-items: end; }
+        .csi-eyebrow { font-family: Inter, sans-serif; font-size: 12px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: var(--orange); margin: 0 0 16px; }
+        .csi-h1 { font-family: Inter, sans-serif; font-size: clamp(36px, 5vw, 64px); font-weight: 800; letter-spacing: -0.042em; line-height: 1; margin: 0; text-wrap: balance; }
+        .csi-sub { font-size: 16.5px; line-height: 1.6; color: rgba(242,238,231,0.72); max-width: 44ch; margin: 0; }
+        .csi-jump { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; margin-top: 6px; font-family: Inter, sans-serif; font-size: 14px; font-weight: 700; color: var(--cream); text-decoration: none; }
+        .csi-jump:hover { color: var(--orange); }
 
-        .csi-proof { display: grid; grid-template-columns: repeat(3, auto); justify-content: start; gap: 0; margin: 44px 0 0; padding: 0; border-top: 1px solid rgba(242,238,231,0.14); }
-        .csi-proof > div { padding: 22px 40px 0 0; margin-right: 40px; border-right: 1px solid rgba(242,238,231,0.14); }
-        .csi-proof > div:last-child { border-right: 0; margin-right: 0; padding-right: 0; }
-        .csi-proof-value { font-family: Inter, sans-serif; font-size: clamp(22px, 2.6vw, 30px); font-weight: 800; letter-spacing: -1px; color: var(--cream); margin: 0 0 6px; }
-        .csi-proof > div:first-child .csi-proof-value { color: var(--orange); }
-        .csi-proof-label { font-size: 13px; line-height: 1.45; color: rgba(242,238,231,0.7); margin: 0; max-width: 22ch; }
+        /* Cards overlap the bottom of the hero */
+        .csi-studies { margin-top: -92px; padding-bottom: 104px; scroll-margin-top: 80px; }
+        .csi-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; }
+        .csi-cell { min-width: 0; display: flex; }
+        .csi-card { display: flex; flex-direction: column; width: 100%; background: #fff; color: var(--black); border: 1px solid rgba(12,12,11,0.1); border-radius: 22px; overflow: hidden; text-decoration: none; box-shadow: 0 30px 60px -36px rgba(12,12,11,0.35); transition: transform 0.45s var(--cs-ease), box-shadow 0.45s ease, border-color 0.3s ease; }
+        .csi-card:hover, .csi-card:focus-visible { transform: translateY(-6px); box-shadow: 0 40px 70px -30px rgba(12,12,11,0.4); border-color: rgba(232,84,26,0.6); }
 
-        .csi-section { padding: 72px 0; }
-        .csi-section-standards { padding-top: 8px; }
+        .csi-vis { position: relative; aspect-ratio: 4 / 3; overflow: hidden; background: #141413; }
+        .csi-img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top center; transition: transform 0.8s var(--cs-ease); }
+        .csi-card:hover .csi-img { transform: scale(1.035); }
+        .csi-vis-shot { background: #ECE8F8; padding: 22px 22px 0; }
+        .csi-browser { position: relative; border-radius: 10px 10px 0 0; overflow: hidden; background: #fff; box-shadow: 0 20px 40px -18px rgba(30,20,80,0.45); height: 100%; }
+        .csi-browser-bar { display: flex; align-items: center; gap: 5px; height: 24px; padding: 0 10px; background: #F1EEE8; border-bottom: 1px solid rgba(12,12,11,0.07); }
+        .csi-browser-bar i { width: 7px; height: 7px; border-radius: 50%; background: rgba(12,12,11,0.16); }
+        .csi-browser-bar b { margin: 0 auto; padding-right: 26px; font: 500 10px Inter, sans-serif; color: rgba(12,12,11,0.55); }
+        .csi-browser .csi-img { height: calc(100% - 24px); }
+        .csi-spark { position: absolute; left: 14px; bottom: 14px; width: 58%; padding: 12px 14px 10px; border-radius: 12px; background: rgba(12,12,11,0.94); color: var(--cream); box-shadow: 0 16px 34px rgba(12,12,11,0.35); transition: transform 0.6s var(--cs-ease); }
+        .csi-card:hover .csi-spark { transform: translateY(-4px); }
+        .csi-spark-h { display: flex; flex-direction: column; gap: 2px; margin: 0 0 6px; font-family: Inter, sans-serif; }
+        .csi-spark-h span { font-size: 10.5px; color: rgba(242,238,231,0.6); }
+        .csi-spark-h strong { font-size: 18px; font-weight: 800; letter-spacing: -0.03em; color: var(--orange); }
+        .csi-spark-h em { font-style: normal; color: rgba(242,238,231,0.6); }
+        .csi-spark svg { display: block; width: 100%; height: 40px; }
+        .csi-spark-axis { display: flex; justify-content: space-between; margin: 4px 0 0; font: 500 10px ui-monospace, monospace; color: rgba(242,238,231,0.5); }
 
-        /* Cards */
-        .csi-card { display: block; position: relative; background: var(--black); color: var(--cream); border: 1px solid rgba(242,238,231,0.1); border-radius: 26px; text-decoration: none; overflow: hidden; height: 100%;
-          transition: transform 0.35s cubic-bezier(0.16,1,0.3,1), border-color 0.25s ease, box-shadow 0.35s ease; }
-        .csi-card:hover, .csi-card:focus-visible { transform: translateY(-4px); border-color: var(--orange); box-shadow: 0 22px 52px rgba(12,12,11,0.2); }
-        .csi-card:focus-visible { outline: 3px solid var(--orange); outline-offset: 4px; }
-        .csi-card:hover .csi-cta-arrow, .csi-card:focus-visible .csi-cta-arrow { transform: translateX(4px); }
-        .csi-card:hover .csi-media img { transform: scale(1.03); }
-
-        .csi-client { font-family: Inter, sans-serif; font-size: 19px; font-weight: 800; letter-spacing: -0.5px; margin: 0 0 4px; }
-        .csi-industry { font-size: 13.5px; line-height: 1.45; color: rgba(242,238,231,0.64); margin: 0; }
-        .csi-window { font-family: ui-monospace, monospace; font-size: 12.5px; color: rgba(242,238,231,0.64); }
-        .csi-title { font-family: Inter, sans-serif; font-size: clamp(22px, 2.3vw, 27px); font-weight: 800; letter-spacing: -0.9px; line-height: 1.16; margin: 18px 0 0; }
-        .csi-title-lg { font-size: clamp(28px, 3.3vw, 42px); letter-spacing: -1.4px; line-height: 1.1; margin: 28px 0 0; }
-
-        .csi-result { font-size: 14.5px; line-height: 1.62; color: rgba(242,238,231,0.82); margin: 16px 0 0; max-width: 62ch; }
-        .csi-metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin: 26px 0 0; padding: 22px 0 0; border-top: 1px solid rgba(242,238,231,0.14); }
-        .csi-metric { min-width: 0; }
-        .csi-metric-value { font-family: Inter, sans-serif; font-size: clamp(18px, 1.9vw, 24px); font-weight: 800; letter-spacing: -0.8px; line-height: 1.1; color: var(--orange); margin: 0 0 8px; overflow-wrap: anywhere; }
-        .csi-metric-label { font-size: 12.5px; line-height: 1.45; color: rgba(242,238,231,0.72); margin: 0; }
-        .csi-metrics { margin-left: 0; }
-        .csi-metric dd, .csi-metric dt { margin-left: 0; }
-        .csi-metric { display: flex; flex-direction: column; }
-        .csi-metric > dd { order: 1; }
-        .csi-metric > dt { order: 2; }
-
-        .csi-chips { list-style: none; display: flex; flex-wrap: wrap; gap: 7px; padding: 0; margin: 24px 0 0; }
-        .csi-chips li { font-family: Inter, sans-serif; font-size: 12px; font-weight: 600; color: rgba(242,238,231,0.74); border: 1px solid rgba(242,238,231,0.2); border-radius: 100px; padding: 6px 12px; }
-
-        .csi-cta { display: inline-block; margin-top: 26px; font-family: Inter, sans-serif; font-size: 14.5px; font-weight: 700; color: var(--orange); }
-        .csi-cta-arrow { display: inline-block; transition: transform 0.3s cubic-bezier(0.16,1,0.3,1); }
-
-        /* Featured */
-        .csi-featured { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: 44px; padding: 44px; align-items: center; }
-        .csi-meta { display: flex; flex-wrap: wrap; gap: 10px 24px; justify-content: space-between; align-items: baseline; padding-bottom: 20px; border-bottom: 1px solid rgba(242,238,231,0.14); }
-        .csi-featured-visual { min-width: 0; }
-        .csi-chart { border: 1px solid rgba(242,238,231,0.12); border-radius: 18px; padding: 18px 14px 12px; background: rgba(242,238,231,0.03); }
-
-        /* Media (screenshots and photos) */
-        .csi-media { position: relative; overflow: hidden; background: #1a1a18; aspect-ratio: 16 / 10; }
-        .csi-media img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.6s cubic-bezier(0.16,1,0.3,1); }
-        .csi-media-fill { border-radius: 18px; }
         .csi-split { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; background: #0C0C0B; }
         .csi-split-half { position: relative; overflow: hidden; min-height: 0; }
-        .csi-split-half img { position: absolute; inset: 0; }
-        .csi-split-before img { filter: saturate(0.75) brightness(0.92); }
-        .csi-card:hover .csi-split-before img { filter: none; }
-        .csi-tag-after { background: #E8541A; border-color: #E8541A; color: #fff; }
-        .csi-tag { position: absolute; top: 14px; left: 14px; font-family: Inter, sans-serif; font-size: 10.5px; font-weight: 800; letter-spacing: 1.4px; text-transform: uppercase; padding: 6px 12px; border-radius: 100px; background: rgba(12,12,11,0.82); color: rgba(242,238,231,0.95); border: 1px solid rgba(242,238,231,0.24); }
+        .csi-split-half .csi-img { position: absolute; inset: 0; }
+        .csi-split-before .csi-img { filter: saturate(0.7) brightness(0.88); transition: transform 0.8s var(--cs-ease), filter 0.4s ease; }
+        .csi-card:hover .csi-split-before .csi-img { filter: none; }
+        .csi-tag { position: absolute; top: 12px; left: 12px; font-family: Inter, sans-serif; font-size: 10.5px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; padding: 6px 10px; border-radius: 100px; background: rgba(12,12,11,0.85); color: var(--cream); }
+        .csi-tag-after { background: var(--orange); color: #0C0C0B; }
 
-        /* Grid of remaining studies */
-        .csi-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; margin-top: 24px; }
-        .csi-cell { min-width: 0; }
-        .csi-cell.is-wide { grid-column: 1 / -1; }
-        .csi-study { display: flex; flex-direction: column; }
-        .csi-study-body { padding: 30px 32px 34px; display: flex; flex-direction: column; flex: 1; }
-        .csi-study-body .csi-cta { margin-top: auto; padding-top: 26px; }
-        .csi-study .csi-media { aspect-ratio: 16 / 9; }
-        .csi-study.is-wide { flex-direction: row; }
-        .csi-study.is-wide .csi-media { flex: 0 0 44%; aspect-ratio: auto; min-height: 320px; }
-        .csi-badge { align-self: flex-start; font-family: Inter, sans-serif; font-size: 11px; font-weight: 800; letter-spacing: 1.3px; text-transform: uppercase; color: var(--orange); border: 1px solid rgba(232,84,26,0.6); border-radius: 100px; padding: 6px 12px; margin: 0; }
+        .csi-vis-founder .csi-img-portrait { object-position: center 22%; }
+        .csi-still { position: absolute; right: 14px; bottom: 14px; width: 78px; aspect-ratio: 9 / 16; border-radius: 12px; overflow: hidden; border: 3px solid #111; box-shadow: 0 14px 30px rgba(0,0,0,0.45); transition: transform 0.6s var(--cs-ease); }
+        .csi-card:hover .csi-still { transform: translateY(-4px) rotate(-2deg); }
+
+        .csi-body { display: flex; flex-direction: column; flex: 1; padding: 22px 24px 24px; }
+        .csi-meta { display: flex; align-items: center; gap: 12px; margin: 0 0 10px; font-family: Inter, sans-serif; font-size: 12.5px; color: var(--grey); min-height: 26px; }
+        .csi-num { font: 700 12px ui-monospace, monospace; color: var(--csi-ink-orange); }
+        .csi-badge { font-size: 11px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--csi-ink-orange); border: 1px solid rgba(181,64,15,0.4); border-radius: 100px; padding: 4px 10px; }
+        .csi-client { font-family: Inter, sans-serif; font-size: 26px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; margin: 0 0 14px; }
+        .csi-tags { list-style: none; display: flex; flex-wrap: wrap; gap: 6px; padding: 0; margin: 0 0 20px; }
+        .csi-tags li { font-family: Inter, sans-serif; font-size: 12px; font-weight: 600; color: #3d3a34; background: #F4F1EB; border-radius: 100px; padding: 5px 10px; }
+        .csi-result { display: grid; gap: 6px; margin: 0 0 12px; padding-top: 16px; border-top: 1px solid rgba(12,12,11,0.1); }
+        .csi-result strong { font-family: Inter, sans-serif; font-size: 30px; font-weight: 800; letter-spacing: -0.04em; line-height: 1; color: var(--csi-ink-orange); }
+        .csi-result span { font-size: 13.5px; line-height: 1.45; color: #3d3a34; }
+        .csi-sentence { font-size: 13px; line-height: 1.55; color: var(--grey); margin: 0 0 18px; }
+        .csi-cta { margin-top: auto; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; font-family: Inter, sans-serif; font-size: 15px; font-weight: 700; color: var(--black); }
+        .csi-cta-arrow { display: inline-block; color: var(--orange); transition: transform 0.35s var(--cs-ease); }
+        .csi-card:hover .csi-cta-arrow { transform: translateX(5px); }
 
         /* Standards */
-        .csi-kicker { font-family: Inter, sans-serif; font-size: 12px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: var(--csi-ink-orange); margin: 0 0 16px; }
-        .csi-h2 { font-family: Inter, sans-serif; font-size: clamp(26px, 3.4vw, 38px); font-weight: 800; letter-spacing: -1.3px; line-height: 1.14; margin: 0 0 36px; max-width: 22ch; }
+        .csi-section { padding: 0 0 104px; }
+        .csi-kicker { font-family: Inter, sans-serif; font-size: 12px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: var(--csi-ink-orange); margin: 0 0 16px; }
+        .csi-h2 { font-family: Inter, sans-serif; font-size: clamp(28px, 3.4vw, 42px); font-weight: 800; letter-spacing: -0.035em; line-height: 1.08; margin: 0 0 36px; max-width: 22ch; text-wrap: balance; }
         .csi-h2-light { color: var(--cream); }
-        .csi-standards { list-style: none; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; padding: 0; margin: 0; border-top: 1px solid rgba(12,12,11,0.16); }
-        .csi-standard-cell { min-width: 0; }
-        .csi-standard { padding: 26px 26px 8px 0; height: 100%; }
-        .csi-standard-cell + .csi-standard-cell .csi-standard { padding-left: 26px; border-left: 1px solid rgba(12,12,11,0.12); }
+        .csi-standards { list-style: none; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); padding: 0; margin: 0; border-top: 1px solid rgba(12,12,11,0.16); }
+        .csi-standard { padding: 26px 26px 0 0; min-width: 0; }
+        .csi-standard + .csi-standard { padding-left: 26px; border-left: 1px solid rgba(12,12,11,0.12); }
         .csi-standard-num { font-family: ui-monospace, monospace; font-size: 13px; font-weight: 700; color: var(--csi-ink-orange); }
-        .csi-standard-title { font-family: Inter, sans-serif; font-size: 17px; font-weight: 800; letter-spacing: -0.4px; line-height: 1.25; margin: 14px 0 12px; }
-        .csi-standard-detail { font-size: 14px; line-height: 1.66; color: var(--grey); margin: 0; }
+        .csi-standard-title { font-family: Inter, sans-serif; font-size: 17px; font-weight: 800; letter-spacing: -0.015em; line-height: 1.25; margin: 14px 0 10px; }
+        .csi-standard-detail { font-size: 14.5px; line-height: 1.66; color: var(--grey); margin: 0; }
 
         /* Close */
-        .csi-close { background: var(--black); color: var(--cream); padding: 84px 0; }
-        .csi-btn { display: inline-block; background: var(--orange); color: #fff; font-family: Inter, sans-serif; font-size: 16px; font-weight: 700; border-radius: 100px; padding: 17px 34px; text-decoration: none; transition: transform 0.2s cubic-bezier(0.16,1,0.3,1), box-shadow 0.2s ease; }
-        .csi-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(232,84,26,0.34); }
+        .csi-close { background: var(--black); color: var(--cream); padding: 104px 0; }
+        .csi-sub-tight { margin-bottom: 32px; max-width: 60ch; }
+        .csi-close-cta { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 28px; }
+        .csi-btn { display: inline-flex; align-items: center; min-height: 56px; background: var(--orange); color: #0C0C0B; font-family: Inter, sans-serif; font-size: 16px; font-weight: 700; border-radius: 100px; padding: 0 32px; text-decoration: none; transition: transform 0.25s var(--cs-ease), box-shadow 0.25s ease; }
+        .csi-btn:hover { transform: translateY(-2px); box-shadow: 0 14px 34px rgba(232,84,26,0.36); }
         .csi-btn:focus-visible { outline: 3px solid var(--cream); outline-offset: 4px; }
-        .csi-reassure { font-size: 13.5px; color: rgba(242,238,231,0.64); margin: 14px 0 0; }
-        .csi-textlink { color: var(--cream); font-weight: 700; text-decoration: underline; text-underline-offset: 4px; }
+        .csi-reassure { font-size: 13.5px; color: rgba(242,238,231,0.6); margin: 14px 0 0; }
+        .csi-textlink { display: inline-flex; align-items: center; min-height: 44px; color: var(--cream); font-family: Inter, sans-serif; font-size: 15px; font-weight: 700; text-decoration: underline; text-underline-offset: 5px; }
         .csi-textlink:hover { color: var(--orange); }
 
         @media (max-width: 1000px) {
-          .csi-featured { grid-template-columns: 1fr; gap: 32px; padding: 34px; }
-          .csi-standards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-          .csi-standard-cell:nth-child(odd) .csi-standard { padding-left: 0; border-left: 0; }
-          .csi-standard-cell:nth-child(n+3) { border-top: 1px solid rgba(12,12,11,0.12); }
-          .csi-standard-cell:nth-child(even) .csi-standard { padding-left: 26px; border-left: 1px solid rgba(12,12,11,0.12); }
-        }
-        @media (max-width: 860px) {
-          .csi-grid { grid-template-columns: 1fr; gap: 20px; }
-          .csi-study.is-wide { flex-direction: column; }
-          .csi-study.is-wide .csi-media { flex: none; aspect-ratio: 16 / 9; min-height: 0; }
+          .csi-container { padding: 0 32px; }
+          .csi-hero-row { grid-template-columns: minmax(0, 1fr); }
+          .csi-grid { grid-template-columns: minmax(0, 1fr); gap: 24px; max-width: 620px; margin: 0 auto; }
+          .csi-standards { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 24px; }
+          .csi-standard:nth-child(3) { padding-left: 0; border-left: 0; }
         }
         @media (max-width: 760px) {
           .csi-container { padding: 0 20px; }
-          .csi-root .csi-hero { padding: 100px 0 52px !important; }
-          .csi-section { padding: 52px 0; }
-          .csi-close { padding: 64px 0; }
-          .csi-h1 { letter-spacing: -1.3px; max-width: none; }
-          .csi-proof { grid-template-columns: 1fr 1fr; gap: 22px 0; margin-top: 36px; }
-          .csi-proof > div { padding: 0 16px 0 0; margin-right: 0; border-right: 0; }
-          .csi-proof > div:first-child { grid-column: 1 / -1; padding-top: 22px; }
-          .csi-card { border-radius: 20px; }
-          .csi-featured { padding: 24px 20px; gap: 26px; }
-          .csi-chart { padding: 12px 8px 8px; }
-          .csi-metrics { grid-template-columns: 1fr; gap: 16px; }
-          .csi-study-body { padding: 24px 20px 28px; }
-          .csi-standards { grid-template-columns: 1fr; }
-          .csi-standard-cell + .csi-standard-cell { border-top: 1px solid rgba(12,12,11,0.12); }
-          .csi-standard-cell .csi-standard, .csi-standard-cell:nth-child(even) .csi-standard { padding: 22px 0 8px; border-left: 0; }
+          .csi-hero { padding: 108px 0 100px; }
+          .csi-crumb { margin-bottom: 18px; }
+          .csi-h1 { font-size: clamp(32px, 9vw, 40px); }
+          .csi-sub { font-size: 15.5px; }
+          .csi-jump { display: none; }
+          .csi-studies { margin-top: -72px; padding-bottom: 72px; }
+          .csi-body { padding: 20px 20px 22px; }
+          .csi-vis-shot { padding: 16px 16px 0; }
+          .csi-spark { width: 64%; }
+          .csi-section { padding-bottom: 72px; }
+          .csi-standards { grid-template-columns: minmax(0, 1fr); }
+          .csi-standard, .csi-standard + .csi-standard { padding: 22px 0; border-left: 0; border-bottom: 1px solid rgba(12,12,11,0.12); }
+          .csi-close { padding: 80px 0; }
+          .csi-btn { width: 100%; justify-content: center; }
+        }
+        /* Cancel the global !important section padding; gutters live on .csi-container. */
+        .csi-root > section { padding-left: 0 !important; padding-right: 0 !important; }
+        @media (max-width: 768px) {
+          .csi-root > .csi-hero { padding-top: 108px !important; padding-bottom: 100px !important; }
+          .csi-root > .csi-studies { padding-top: 0 !important; padding-bottom: 72px !important; }
+          .csi-root > .csi-section { padding-top: 0 !important; padding-bottom: 72px !important; }
+          .csi-root > .csi-close { padding-top: 80px !important; padding-bottom: 80px !important; }
         }
         @media (prefers-reduced-motion: reduce) {
-          .csi-card, .csi-media img, .csi-cta-arrow, .csi-btn { transition: none; }
-          .csi-card:hover, .csi-card:focus-visible, .csi-btn:hover, .csi-card:hover .csi-media img, .csi-card:hover .csi-cta-arrow { transform: none; }
+          .cs-rise, .cs-rise.is-in { opacity: 1 !important; transform: none !important; transition: none !important; }
+          .csi-root * { transition: none !important; }
+          .csi-card:hover, .csi-card:focus-visible, .csi-btn:hover, .csi-card:hover .csi-img, .csi-card:hover .csi-spark, .csi-card:hover .csi-still, .csi-card:hover .csi-cta-arrow { transform: none; }
         }
       `}</style>
     </main>

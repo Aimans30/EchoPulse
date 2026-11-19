@@ -1,8 +1,5 @@
-"use client";
-
-import { useState } from "react";
-import Link from "next/link";
-import Image from "next/image";
+import Link from 'next/link';
+import Image from 'next/image';
 import {
   type CaseStudy,
   CASE_STUDY_AUTHOR,
@@ -10,194 +7,185 @@ import {
   canonicalFor,
   citationFor,
   formatISODate,
-} from "@/lib/caseStudyData";
-import { getIcp } from "@/lib/icpData";
+} from '@/lib/caseStudyData';
+import { getIcp } from '@/lib/icpData';
 import {
   staticBookingUrl,
   BOOK_CALL_LABEL,
   BOOK_CALL_REASSURANCE,
   FREE_EDITS_LABEL,
   FREE_EDITS_URL,
-} from "@/lib/links";
-import { GROWTH, PILOT, PRESENCE } from "@/lib/pricing";
-import Reveal from "@/components/icp/Reveal";
-import ImpressionChart from "./ImpressionChart";
-import BeforeAfter from "./BeforeAfter";
-import BarChart from "./BarChart";
-import WorkstreamList from "./WorkstreamList";
-import SectionNav, { type SectionNavItem } from "./SectionNav";
-import { CASE_STUDY_CSS } from "./caseStudyStyles";
+} from '@/lib/links';
+import { GROWTH, PILOT, PRESENCE } from '@/lib/pricing';
+import { Rise, CountUp } from './motion';
+import { BrowserFrame, PhoneFrame, Shot } from './Frames';
+import Parallax from './Parallax';
+import HeroCurve from './HeroCurve';
+import MonthlyChart from './MonthlyChart';
+import ImpressionChart from './ImpressionChart';
+import CompareSlider from './CompareSlider';
+import PageRail from './PageRail';
+import DashboardMock from './DashboardMock';
+import CostCompare from './CostCompare';
+import BarChart from './BarChart';
+import WorkTimeline from './WorkTimeline';
+import CopyCitation from './CopyCitation';
+import SectionNav, { type SectionNavItem } from './SectionNav';
+import { CASE_STUDY_CSS } from './caseStudyStyles';
 
 /**
- * Case study detail page.
+ * Case study detail page. A server component: the copy, the tables, the
+ * answer block and the citation are plain server HTML, and only the charts,
+ * the slider, the rail, the dashboard tabs and the reveal wrappers hydrate.
  *
  * THE ARGUMENT THIS PAGE IS BUILT TO MAKE
  *
- * EchoPulse has no testimonials and one permissioned client. A studio in that
- * position cannot ask a stranger to trust its claims about itself, so this page
- * does not try. It makes claims that require nothing but checking: a named
- * client with a live URL, a named measurement instrument, an exact date window,
- * a chart drawn from the raw daily export with nothing smoothed, and a list of
- * what is still broken.
+ * EchoPulse has no testimonials and few permissioned clients, so the page
+ * makes claims that require nothing but checking: a named client with a live
+ * URL, real captures of that site, a named instrument, an exact date window,
+ * and a list of what is still broken.
  *
- * SECTION ORDER IS DELIBERATE
+ * READING ORDER
  *
- * Result, then verification, then method, then failures, then limits, then ask.
- * A sceptical buyer wants to know whether the number is real before they will
- * spend attention on how it was produced, so the chart and the source caption
- * come before any description of the work. The open-problems section is given
- * the same visual weight as the results, not tucked into a footnote, because it
- * is the section that makes the results believable.
+ * The result is shown before it is described: the hero is the chart, the
+ * slider or the work itself. Then a short summary, the key facts table, the
+ * evidence as visuals, the work as a timeline, and only then the method,
+ * the open problems, the limits and the ask. Every long explanation is
+ * still on the page, inside a <details>, so nothing that was published
+ * before has been removed; it has been moved out of the reader's way.
  *
- * WHY THERE IS NO STICKY CTA
- *
- * The mobile sticky CTA was removed from the blog for looking cheap, and the
- * same logic applies harder here: a page whose entire argument is restraint
- * should not chase the reader down the screen. Three CTAs sit at natural
- * decision points instead, after the proof, and at the end.
+ * NO STICKY CTA. One ask, "Book a free 15-minute call", at three natural
+ * decision points, with "See prices" as a text link next to it.
  */
 
-const NUMBER_WORDS = [
-  "zero",
-  "one",
-  "two",
-  "three",
-  "four",
-  "five",
-  "six",
-  "seven",
-  "eight",
-  "nine",
-  "ten",
-];
+const NUMBER_WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'];
 const numberWord = (n: number) => NUMBER_WORDS[n] ?? String(n);
 const capital = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
 /** "Result: text" becomes { label: 'Result', text: 'text' }. */
 function splitLead(line: string): { label: string | null; text: string } {
-  const i = line.indexOf(":");
-  if (i > 0 && i <= 24)
-    return { label: line.slice(0, i), text: line.slice(i + 1).trim() };
+  const i = line.indexOf(':');
+  if (i > 0 && i <= 24) return { label: line.slice(0, i), text: line.slice(i + 1).trim() };
   return { label: null, text: line };
 }
 
-/** Impressions strings look like "13,466". Anything unparseable draws no bar. */
-const parseCount = (s: string) => {
-  const n = parseFloat(s.replace(/,/g, ""));
-  return Number.isFinite(n) ? n : 0;
-};
-
-const ORIGIN = "https://echopulse.media";
+const ORIGIN = 'https://echopulse.media';
 
 /** At-a-glance rows that the Key facts table already states. Not repeated. */
 const GLANCE_COVERED = new Set([
-  "Client",
-  "Who",
-  "Industry",
-  "Starting point",
-  "Date window",
-  "Measured result",
-  "How measured",
-  "Last updated",
+  'Client',
+  'Who',
+  'Industry',
+  'Starting point',
+  'Date window',
+  'Measured result',
+  'How measured',
+  'Last updated',
 ]);
 
-/**
- * Copy button for the citation. The citation text itself is rendered by the
- * page as plain server HTML; this only copies it. Fails silently where the
- * clipboard API is unavailable, because the text is selectable either way.
- */
-function CopyCitation({ text }: { text: string }) {
-  const [copied, setCopied] = useState(false);
+function BookButton({ location, large = false }: { location: string; large?: boolean }) {
   return (
-    <button
-      type="button"
-      className="cs-copy"
-      onClick={async () => {
-        try {
-          await navigator.clipboard.writeText(text);
-          setCopied(true);
-          window.setTimeout(() => setCopied(false), 2000);
-        } catch {
-          /* clipboard blocked: the text is on the page to select by hand */
-        }
-      }}
+    <a
+      className={`cs-btn cs-btn-primary${large ? ' cs-btn-lg' : ''}`}
+      href={staticBookingUrl(location)}
+      data-track="case_study_cta_click"
+      data-track-location={location}
+      target="_blank"
+      rel="noopener"
     >
-      <span aria-live="polite">{copied ? "Copied" : "Copy citation"}</span>
-    </button>
+      {BOOK_CALL_LABEL}
+      <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+        <path d="M7 17L17 7M9 7h8v8" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    </a>
+  );
+}
+
+function SectionHead({
+  kicker,
+  question,
+  claim,
+  light = false,
+  children,
+}: {
+  kicker: string;
+  question: string;
+  claim?: React.ReactNode;
+  light?: boolean;
+  children?: React.ReactNode;
+}) {
+  return (
+    <Rise className="cs-head">
+      <p className="cs-kicker">{kicker}</p>
+      <h2 className={`cs-h2${light ? ' cs-h2-light' : ''}`}>{question}</h2>
+      {claim && <p className="cs-claim">{claim}</p>}
+      {children}
+    </Rise>
   );
 }
 
 export default function CaseStudyPage({ study }: { study: CaseStudy }) {
   const icp = getIcp(study.icpKey);
   const labels = study.labels ?? {};
-  const isFounder = study.kind === "founder";
+  const isFounder = study.kind === 'founder';
   const internalLink = study.clientUrl.startsWith(ORIGIN);
-  const internalHref = study.clientUrl.slice(ORIGIN.length) || "/";
-  const clientLinkLabel =
-    labels.clientLinkLabel ??
-    `Open ${study.clientUrl.replace("https://", "")} and check`;
+  const internalHref = study.clientUrl.slice(ORIGIN.length) || '/';
+  const clientLinkLabel = labels.clientLinkLabel ?? `Open ${study.clientUrl.replace('https://', '')} and check`;
 
-  const situationKicker = labels.situationKicker ?? "Where it started";
-  const workKicker = labels.workKicker ?? "What we did";
-  const openKicker = labels.openProblemsKicker ?? "Open problems";
-  const limitsKicker = labels.limitsKicker ?? "Scope";
+  const situationKicker = labels.situationKicker ?? 'Where it started';
+  const workKicker = labels.workKicker ?? 'What we did';
+  const openKicker = labels.openProblemsKicker ?? 'Open problems';
+  const limitsKicker = labels.limitsKicker ?? 'Scope';
 
-  const hasNumbers = Boolean(
-    (study.bars && study.bars.length) || study.months || study.funnel,
-  );
-  const maxImpressions = study.months
-    ? Math.max(...study.months.map((m) => parseCount(m.impressions)), 1)
-    : 1;
+  const monthlyBars = study.bars?.find((b) => b.replacedByMonthly);
+  const otherBars = (study.bars ?? []).filter((b) => !b.replacedByMonthly);
+  const hasNumbers = Boolean(otherBars.length || study.months || study.funnel);
   const tldr = (study.tldr ?? []).map(splitLead);
-  const heroMetricCount = study.heroMetrics.length;
-
   const tracking = study.tracking;
   const trackingScreens = tracking?.screens ?? [];
+  const isRebuild = Boolean(study.comparison);
 
-  // Six stops at most: a longer bar crowds the page and nobody scans it.
   const sections: SectionNavItem[] = [
-    { id: "glance", label: "Key facts" },
-    { id: "work", label: workKicker },
-    ...(hasNumbers ? [{ id: "numbers", label: "The numbers" }] : []),
-    ...(tracking ? [{ id: "tracking", label: "Tracking" }] : []),
-    ...(study.pairs ? [{ id: "pages", label: "Before and after" }] : []),
-    { id: "open", label: openKicker },
-    { id: "fit", label: "Right for you?" },
+    { id: 'glance', label: 'Key facts' },
+    ...(hasNumbers ? [{ id: 'numbers', label: 'The numbers' }] : []),
+    ...(isRebuild ? [{ id: 'cost', label: 'The cost' }] : []),
+    ...(study.pairs ? [{ id: 'pages', label: 'Before and after' }] : []),
+    { id: 'work', label: workKicker },
+    ...(tracking ? [{ id: 'tracking', label: 'Tracking' }] : []),
+    { id: 'open', label: openKicker },
+    { id: 'fit', label: 'Right for you?' },
   ].slice(0, 6);
 
   /**
-   * QUESTION HEADINGS
-   *
-   * Every section H2 is the question a buyer, or an answer engine on a buyer's
-   * behalf, would actually ask. The original editorial headline is kept
-   * directly underneath as the first line of the answer. The ids are stable
-   * anchors: do not rename them, other pages and llms.txt link to them.
+   * QUESTION HEADINGS. Every section H2 is the question a buyer, or an answer
+   * engine on a buyer's behalf, would ask. The ids are stable anchors: other
+   * pages and llms.txt link to them, so do not rename them.
    */
   const who = study.shortName;
   const q = isFounder
     ? {
         situation: `Where did ${who} work before EchoPulse?`,
-        work: "What did he edit for those agents?",
-        numbers: "What are the numbers?",
-        pages: "What changed on each page?",
-        screens: "Which pages are new?",
-        exportQ: "Where is the source export?",
-        measured: "How was this measured?",
-        open: "What does this page not claim?",
-        scope: "What does EchoPulse do differently?",
-        fit: "Is EchoPulse right for you?",
+        work: 'What did he edit for those agents?',
+        numbers: 'What are the numbers?',
+        pages: 'What changed on each page?',
+        screens: 'Which pages are new?',
+        exportQ: 'Where is the source export?',
+        measured: 'How was this measured?',
+        open: 'What does this page not claim?',
+        scope: 'What does EchoPulse do differently?',
+        fit: 'Is EchoPulse right for you?',
       }
     : {
         situation: `What was wrong at ${who} before the work started?`,
         work: `What did EchoPulse do for ${who}?`,
         numbers: `What were the results for ${who}?`,
-        pages: "What changed on each page?",
-        screens: "Which pages are new?",
-        exportQ: "Where is the source export?",
-        measured: "How was this measured?",
-        open: "What is still not working?",
-        scope: "When is this approach the wrong one?",
-        fit: "Is this right for you?",
+        pages: 'What changed on each page?',
+        screens: 'Which pages are new?',
+        exportQ: 'Where is the source export?',
+        measured: 'How was this measured?',
+        open: 'What is still not working?',
+        scope: 'When is this approach the wrong one?',
+        fit: 'Is this right for you?',
       };
 
   const canonical = canonicalFor(study);
@@ -205,11 +193,8 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
   const published = formatISODate(study.publishedISO);
   const updatedISO = study.updatedISO ?? study.publishedISO;
   const wasUpdated = updatedISO !== study.publishedISO;
-  const glanceRest = study.atAGlance.filter(
-    (row) => !GLANCE_COVERED.has(row.label),
-  );
-  const notFor =
-    study.fit.notFor ?? study.notApplicable.map((n) => n.title);
+  const glanceRest = study.atAGlance.filter((row) => !GLANCE_COVERED.has(row.label));
+  const notFor = study.fit.notFor ?? study.notApplicable.map((n) => n.title);
 
   const clientLink = internalLink ? (
     <Link className="cs-verify" href={internalHref}>
@@ -217,19 +202,101 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
       <span aria-hidden="true"> &rarr;</span>
     </Link>
   ) : (
-    <a
-      className="cs-verify"
-      href={study.clientUrl}
-      target="_blank"
-      rel="noopener"
-    >
+    <a className="cs-verify" href={study.clientUrl} target="_blank" rel="noopener">
       {clientLinkLabel}
       <span aria-hidden="true"> &rarr;</span>
     </a>
   );
 
+  /* ── Hero visual, one per kind of study ───────────────────────────── */
+  let heroVisual: React.ReactNode = null;
+  if (study.chart && study.months && study.heroShot) {
+    const floor = study.months.findIndex((m) => m.month.startsWith('April'));
+    const launch = study.months.findIndex((m) => m.month.startsWith('May'));
+    heroVisual = (
+      <div className="cs-hero-stage cs-hero-stage-chart">
+        <Parallax className="cs-hero-shot" range={2}>
+          <BrowserFrame url={study.heroShot.url} tone="dark">
+            <Shot media={study.heroShot} sizes="(max-width: 1000px) 92vw, 560px" priority />
+          </BrowserFrame>
+        </Parallax>
+        <div className="cs-hero-chartcard">
+          <p className="cs-hero-chartcard-h">
+            Average daily Google impressions, by month
+            <span>Google Search Console, magicbnb.io</span>
+          </p>
+          <HeroCurve
+            months={study.months}
+            startIndex={floor < 0 ? 0 : floor}
+            launchIndex={launch < 1 ? 1 : launch}
+            launchLabel="5 May: rebuilt site live"
+            startValue="5.8 a day"
+            endValue="4,803 a day"
+            startCaption="April 2026"
+            endCaption="1 to 16 Nov 2026"
+            ariaLabel="Average daily Google search impressions for magicbnb.io by month, February to 16 November 2026. 5.8 a day in April 2026, the floor, then the rebuilt site went live on 5 May 2026, and 4,803 a day in 1 to 16 November 2026."
+          />
+        </div>
+      </div>
+    );
+  } else if (study.comparison?.slider) {
+    heroVisual = (
+      <div className="cs-hero-stage">
+        <CompareSlider
+          before={study.comparison.slider.before}
+          after={study.comparison.slider.after}
+          beforeLabel={study.comparison.beforeLabel}
+          afterLabel={study.comparison.afterLabel}
+          url={study.comparison.liveUrl.replace('https://', '')}
+        />
+        <p className="cs-hero-cap">
+          {study.comparison.caption}{' '}
+          <a href={study.comparison.liveUrl} target="_blank" rel="noopener">
+            Open the live site <span aria-hidden="true">&rarr;</span>
+          </a>
+        </p>
+      </div>
+    );
+  } else if (study.heroMedia) {
+    const stills = (study.workstreams[0]?.media ?? []).slice(0, 2);
+    heroVisual = (
+      <div className="cs-hero-stage cs-hero-stage-founder">
+        <figure className="cs-portrait">
+          <Parallax range={2}>
+            <Image
+              src={study.heroMedia.src}
+              alt={study.heroMedia.alt}
+              width={study.heroMedia.width}
+              height={study.heroMedia.height}
+              sizes="(max-width: 1000px) 80vw, 440px"
+              loading="eager"
+              fetchPriority="high"
+              className="cs-shot"
+            />
+          </Parallax>
+          {study.heroMedia.caption && <figcaption className="cs-sr">{study.heroMedia.caption}</figcaption>}
+        </figure>
+        {stills.length > 0 && (
+          <ul className="cs-founder-stills" aria-label="Frames from listing reels">
+            {stills.map((m) => (
+              <li key={m.src}>
+                <PhoneFrame>
+                  <Image src={m.src} alt={m.alt} width={m.width} height={m.height} sizes="150px" className="cs-shot" />
+                </PhoneFrame>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    );
+  }
+
   return (
-    <main id="main" className="cs-root">
+    <main id="main" className={`cs-root cs-kind-${isFounder ? 'founder' : isRebuild ? 'rebuild' : 'measured'}`}>
+      <noscript>
+        <style>{`.cs-rise{opacity:1!important;transform:none!important}`}</style>
+      </noscript>
+
       {/* ── Hero ───────────────────────────────────────────────────────── */}
       <section className="cs-hero" data-dark-bg="true">
         <div className="cs-container">
@@ -243,177 +310,122 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
 
           <div className="cs-hero-grid">
             <div className="cs-hero-copy">
-              <Reveal>
-                <p className="cs-eyebrow">{study.eyebrow}</p>
+              <Rise>
+                <p className="cs-eyebrow">
+                  <span>{study.eyebrow}</span>
+                  <span className="cs-eyebrow-sep" aria-hidden="true" />
+                  <span>{isFounder ? study.shortName : study.client}</span>
+                </p>
                 <h1 className="cs-h1">
-                  {study.headline}{" "}
-                  <span className="cs-accent">{study.headlineAccent}</span>
+                  {study.headline} <span className="cs-accent">{study.headlineAccent}</span>
                 </h1>
-                {/* The answer block. Two or three sentences that can be
-                    quoted alone: client, what was done, the result with its
-                    unit and dates, and the source. Plain server HTML. */}
-                <div className="cs-answer" id="answer">
-                  <p className="cs-answer-result">{study.resultLine}</p>
-                  <p className="cs-answer-text">{study.answer.join(" ")}</p>
-                  <p className="cs-byline">
-                    <span>
-                      By{" "}
-                      <Link href={CASE_STUDY_AUTHOR.path} rel="author">
-                        {CASE_STUDY_AUTHOR.name}
-                      </Link>
-                      , {CASE_STUDY_PUBLISHER}
-                    </span>
-                    <span>
-                      Published{" "}
-                      <time dateTime={study.publishedISO}>{published}</time>
-                    </span>
-                    {wasUpdated && (
-                      <span>
-                        Updated{" "}
-                        <time dateTime={updatedISO}>
-                          {formatISODate(updatedISO)}
-                        </time>
-                      </span>
-                    )}
-                  </p>
-                </div>
-              </Reveal>
-
-              <Reveal delay={0.08}>
-                <div className="cs-clientbar">
-                  <div className="cs-clientbar-main">
-                    <p className="cs-client-name">{study.client}</p>
-                    <p className="cs-client-tag">{study.clientTagline}</p>
-                  </div>
-                  {/* The verification link is the whole mechanism. A claim the
-                      reader can check in one click is worth more than a
-                      testimonial they cannot. */}
-                  {clientLink}
-                </div>
-                <ul className="cs-services" aria-label="Services delivered">
-                  {study.services.map((s) => (
-                    <li key={s}>{s}</li>
-                  ))}
-                </ul>
-              </Reveal>
-
-              <Reveal delay={0.12}>
+                {study.heroLede && <p className="cs-lede">{study.heroLede}</p>}
+              </Rise>
+              <Rise delay={0.08}>
                 <div className="cs-hero-cta">
-                  <a
-                    className="cs-btn cs-btn-primary"
-                    href={staticBookingUrl("case_study_hero")}
-                    data-track="case_study_cta_click"
-                    data-track-location="case_study_hero"
-                    target="_blank"
-                    rel="noopener"
-                  >
-                    {BOOK_CALL_LABEL}
-                  </a>
-                  <p className="cs-reassure">{BOOK_CALL_REASSURANCE}</p>
-                  {study.slug !== "magicbnb-seo-aeo" && (
-                    <Link className="cs-textlink cs-textlink-light" href="/pricing">
-                      See prices
-                    </Link>
-                  )}
-                  {study.slug === "magicbnb-seo-aeo" ? (
-                    <p className="cs-reassure">
-                      This is the search work in the Growth plan, {GROWTH.priceLabel} a month, month-to-month.{" "}
-                      <Link href="/pricing">See prices</Link>.
-                    </p>
-                  ) : null}
+                  <BookButton location="case_study_hero" />
+                  <Link className="cs-textlink cs-textlink-light" href="/pricing">
+                    See prices
+                  </Link>
                 </div>
-              </Reveal>
+                <p className="cs-reassure">{BOOK_CALL_REASSURANCE}</p>
+                <p className="cs-hero-client">
+                  <span className="cs-hero-client-name">{study.client}</span>
+                  {clientLink}
+                </p>
+              </Rise>
             </div>
-
-            {/* The evidence block. A measured engagement gets the daily series;
-                a visible-result engagement gets the before and after; a story
-                with neither gets its photo. One visual is always present. */}
-            <div className="cs-hero-visual">
-              <Reveal delay={0.1}>
-                {study.chart ? (
-                  <div className="cs-chartblock">
-                    <ImpressionChart chart={study.chart} />
-                    <p className="cs-chart-caption">{study.chart.caption}</p>
-                  </div>
-                ) : study.comparison ? (
-                  <div className="cs-chartblock">
-                    <BeforeAfter data={study.comparison} />
-                  </div>
-                ) : study.heroMedia ? (
-                  <figure className="cs-photo">
-                    <div className="cs-photo-frame">
-                      <Image
-                        src={study.heroMedia.src}
-                        alt={study.heroMedia.alt}
-                        width={study.heroMedia.width}
-                        height={study.heroMedia.height}
-                        sizes="(max-width: 1000px) 100vw, 560px"
-                        loading="eager"
-                        fetchPriority="high"
-                      />
-                    </div>
-                    {study.heroMedia.caption && (
-                      <figcaption>{study.heroMedia.caption}</figcaption>
-                    )}
-                  </figure>
-                ) : null}
-              </Reveal>
-
-              {/* Metric strip. This is the block an answer engine is most
-                  likely to lift, so every value carries its unit and its
-                  qualifier. */}
-              <Reveal delay={0.16}>
-                <ul className="cs-metrics" data-count={heroMetricCount}>
-                  {study.heroMetrics.map((m) => (
-                    <li className="cs-metric" key={m.label}>
-                      <p className="cs-metric-value">{m.value}</p>
-                      <p className="cs-metric-label">{m.label}</p>
-                      {m.note && <p className="cs-metric-note">{m.note}</p>}
-                    </li>
-                  ))}
-                </ul>
-              </Reveal>
-            </div>
+            <Rise className="cs-hero-visual" delay={0.05}>
+              {heroVisual}
+            </Rise>
           </div>
+
+          {/* Metric strip. Every value carries its unit and its qualifier,
+              because this is the block an answer engine is most likely to
+              lift. Values count up once; the final text is in the HTML. */}
+          <ul className="cs-stats" data-count={study.heroMetrics.length}>
+            {study.heroMetrics.map((m, i) => (
+              <Rise as="li" className="cs-stat" key={m.label} delay={0.12 + i * 0.06}>
+                <p className="cs-stat-value">
+                  <CountUp value={m.value} />
+                </p>
+                <p className="cs-stat-label">{m.label}</p>
+                {m.note && <p className="cs-stat-note">{m.note}</p>}
+              </Rise>
+            ))}
+          </ul>
+          {study.heroNote && <p className="cs-hero-note">{study.heroNote}</p>}
         </div>
       </section>
 
-      {/* ── TL;DR ──────────────────────────────────────────────────────── */}
-      {tldr.length > 0 && (
-        <section className="cs-tldr" aria-labelledby="cs-tldr-h">
-          <div className="cs-container">
-            <h2 className="cs-sr" id="cs-tldr-h">
-              Summary
-            </h2>
-            <ul className="cs-tldr-grid">
-              {tldr.map((t, i) => (
-                <Reveal as="li" key={t.text.slice(0, 40)} delay={i * 0.06}>
-                  <div className="cs-tldr-card">
-                    {t.label && <p className="cs-tldr-label">{t.label}</p>}
-                    <p className="cs-tldr-text">{t.text.charAt(0).toUpperCase() + t.text.slice(1)}</p>
-                  </div>
-                </Reveal>
+      {/* ── In short: the answer block ─────────────────────────────────────
+          Two or three sentences that can be quoted alone, as plain server
+          HTML, directly under the hero. */}
+      <section className="cs-short" aria-labelledby="cs-short-h">
+        <div className="cs-container cs-short-grid">
+          <Rise className="cs-answer-wrap">
+            <p className="cs-kicker" id="cs-short-h">
+              In short
+            </p>
+            <div className="cs-answer" id="answer">
+              {!isFounder && <p className="cs-answer-result">{study.resultLine}</p>}
+              {study.answer.map((a) => (
+                <p className="cs-answer-text" key={a.slice(0, 40)}>
+                  {a}
+                </p>
               ))}
-            </ul>
-          </div>
-        </section>
-      )}
+              <p className="cs-byline">
+                <span>
+                  By{' '}
+                  <Link href={CASE_STUDY_AUTHOR.path} rel="author">
+                    {CASE_STUDY_AUTHOR.name}
+                  </Link>
+                  , {CASE_STUDY_PUBLISHER}
+                </span>
+                <span>
+                  Published <time dateTime={study.publishedISO}>{published}</time>
+                </span>
+                {wasUpdated && (
+                  <span>
+                    Updated <time dateTime={updatedISO}>{formatISODate(updatedISO)}</time>
+                  </span>
+                )}
+              </p>
+            </div>
+          </Rise>
+          <Rise className="cs-short-side" delay={0.08}>
+            {tldr.length > 0 && (
+              <ul className="cs-tldr">
+                {tldr.map((t) => (
+                  <li key={t.text.slice(0, 40)}>
+                    {t.label && <strong>{t.label}.</strong>} {capital(t.text)}
+                  </li>
+                ))}
+              </ul>
+            )}
+            <div className="cs-clientcard">
+              <p className="cs-clientcard-name">{study.client}</p>
+              <p className="cs-clientcard-tag">{study.clientTagline}</p>
+              <ul className="cs-services" aria-label="Services delivered">
+                {study.services.map((s) => (
+                  <li key={s}>{s}</li>
+                ))}
+              </ul>
+            </div>
+          </Rise>
+        </div>
+      </section>
 
       <SectionNav items={sections} />
 
-      {/* ── At a glance ────────────────────────────────────────────────── */}
-      <section className="cs-section cs-tone-cream" id="glance">
+      {/* ── Key facts ──────────────────────────────────────────────────── */}
+      <section className="cs-section" id="glance">
         <div className="cs-container">
-          <Reveal>
-            <div className="cs-section-head">
-              <h2 className="cs-h2">Key facts</h2>
-              <p className="cs-body">{study.summary}</p>
-            </div>
+          <SectionHead kicker="At a glance" question="Key facts" />
+          <Rise>
             <div className="cs-table-scroll">
               <table className="cs-table cs-facts">
-                <caption className="cs-sr">
-                  Key facts: {study.client}
-                </caption>
+                <caption className="cs-sr">Key facts: {study.client}</caption>
                 <thead>
                   <tr>
                     <th scope="col">Fact</th>
@@ -427,9 +439,7 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
                       <td>
                         {row.href ? (
                           row.href.startsWith(ORIGIN) ? (
-                            <Link href={row.href.slice(ORIGIN.length) || "/"}>
-                              {row.value}
-                            </Link>
+                            <Link href={row.href.slice(ORIGIN.length) || '/'}>{row.value}</Link>
                           ) : (
                             <a href={row.href} target="_blank" rel="noopener">
                               {row.value}
@@ -452,326 +462,389 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
                 </Link>
               )}
               <a href="#measured">
-                How this was measured
-                <span aria-hidden="true"> &rarr;</span>
+                How this was measured<span aria-hidden="true"> &rarr;</span>
               </a>
               <a href="#cite">
-                Cite this page
-                <span aria-hidden="true"> &rarr;</span>
+                Cite this page<span aria-hidden="true"> &rarr;</span>
               </a>
             </p>
-            {glanceRest.length > 0 && (
-              <div className="cs-sub" id="engagement">
-                <h3 className="cs-h3">
-                  {isFounder ? "More detail" : "The engagement in detail"}
-                </h3>
-                <dl className="cs-glance">
-                  {glanceRest.map((row) => (
-                    <div className="cs-glance-row" key={row.label}>
-                      <dt>{row.label}</dt>
-                      <dd>{row.value}</dd>
-                    </div>
-                  ))}
-                </dl>
-              </div>
-            )}
-          </Reveal>
-        </div>
-      </section>
-
-      {/* ── The situation ──────────────────────────────────────────────── */}
-      <section className="cs-section cs-tone-paper" id="situation">
-        <div className="cs-container">
-          <Reveal>
-            <div className="cs-section-head" style={{ marginBottom: 0 }}>
-              <p className="cs-kicker">{situationKicker}</p>
-              <h2 className="cs-h2">{q.situation}</h2>
-              <p className="cs-claim">{study.situation.headline}</p>
-              {study.situation.body.map((p) => (
-                <p className="cs-body" key={p.slice(0, 40)}>
-                  {p}
-                </p>
-              ))}
-            </div>
-          </Reveal>
-          <ol className="cs-fail-grid">
-            {study.situation.failures.map((f, i) => (
-              <Reveal as="li" key={f.title} delay={Math.min(i * 0.05, 0.2)}>
-                <div className="cs-fail-card">
-                  <h3 className="cs-fail-title">{f.title}</h3>
-                  <p className="cs-fail-desc">{f.detail}</p>
-                </div>
-              </Reveal>
-            ))}
-          </ol>
-        </div>
-      </section>
-
-      {/* ── What we did ────────────────────────────────────────────────── */}
-      <section className="cs-section cs-tone-cream" id="work">
-        <div className="cs-container">
-          <Reveal>
-            <div className="cs-section-head">
-              <p className="cs-kicker">{workKicker}</p>
-              <h2 className="cs-h2">{q.work}</h2>
-              <p className="cs-claim">
-                {labels.workHeading ?? (
-                  <>
-                    {capital(numberWord(study.workstreams.length))} workstreams,{" "}
-                    <span className="cs-ink-accent">
-                      one team, one invoice.
-                    </span>
-                  </>
+            <details className="cs-more cs-more-wide" id="engagement">
+              <summary>
+                <span>{isFounder ? 'More detail, and the story in one paragraph' : 'The engagement in detail, and the story in one paragraph'}</span>
+              </summary>
+              <div className="cs-more-body">
+                <p className="cs-body">{study.summary}</p>
+                {glanceRest.length > 0 && (
+                  <dl className="cs-glance">
+                    {glanceRest.map((row) => (
+                      <div className="cs-glance-row" key={row.label}>
+                        <dt>{row.label}</dt>
+                        <dd>{row.value}</dd>
+                      </div>
+                    ))}
+                  </dl>
                 )}
-              </p>
-              {!isFounder && (
-                <p className="cs-lead">
-                  Each of these is a service you can buy on its own. They are
-                  listed here in the order they were sequenced, because the
-                  order is most of why it worked.
-                </p>
-              )}
-            </div>
-          </Reveal>
-          <WorkstreamList items={study.workstreams} />
+              </div>
+            </details>
+          </Rise>
         </div>
       </section>
 
-      {/* ── Numbers ────────────────────────────────────────────────────── */}
+      {/* ── Numbers (measured work) ────────────────────────────────────── */}
       {hasNumbers && (
         <section className="cs-section cs-tone-paper" id="numbers">
           <div className="cs-container">
-            <Reveal>
-              <div className="cs-section-head" style={{ marginBottom: 28 }}>
-                <p className="cs-kicker">The numbers</p>
-                <h2 className="cs-h2">{q.numbers}</h2>
-                <p className="cs-lead">{study.resultLine}</p>
-              </div>
-            </Reveal>
-
-            {study.bars && study.bars.length > 0 && (
-              <div className="cs-bars-grid">
-                {study.bars.map((b, i) => (
-                  <Reveal key={b.title} delay={Math.min(i * 0.06, 0.2)}>
-                    <BarChart data={b} />
-                  </Reveal>
-                ))}
-              </div>
-            )}
+            <SectionHead kicker="The numbers" question={q.numbers} claim="Every month in the window, including the two that produced nothing." />
 
             {study.months && (
-              <Reveal>
-                <div
-                  id="timeline"
-                  className={
-                    study.bars && study.bars.length > 0
-                      ? "cs-sub cs-anchor"
-                      : "cs-anchor"
-                  }
-                >
-                  <p className="cs-kicker">The curve, month by month</p>
-                  <h3 className="cs-h3">How long did it take?</h3>
-                  {study.timelineAnswer && (
-                    <p className="cs-body">{study.timelineAnswer}</p>
-                  )}
-                  <p className="cs-claim cs-claim-sm">
-                    Every month in the window, including the two that produced
-                    nothing.
-                  </p>
-                  <div className="cs-table-scroll">
-                    <table className="cs-table">
-                      <thead>
-                        <tr>
-                          <th scope="col">Month</th>
-                          <th scope="col">Impressions</th>
-                          <th scope="col">Per day</th>
-                          <th scope="col">What was happening</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {study.months.map((m) => {
-                          const w =
-                            (parseCount(m.impressions) / maxImpressions) * 100;
-                          return (
+              <div className="cs-anchor" id="timeline">
+                <div className="cs-split">
+                  <Rise className="cs-split-text">
+                    <h3 className="cs-h3">How long did it take?</h3>
+                    {study.timelineAnswer && <p className="cs-body">{study.timelineAnswer}</p>}
+                    <p className="cs-hint">Hover or tap a month for its total and what was happening.</p>
+                  </Rise>
+                  <Rise className="cs-split-visual" delay={0.06}>
+                    <MonthlyChart months={study.months} caption={monthlyBars?.caption ?? ''} />
+                  </Rise>
+                </div>
+
+                {study.chart && (
+                  <Rise className="cs-daily">
+                    <div className="cs-daily-head">
+                      <h3 className="cs-h3 cs-h3-light">Every day, straight from the export</h3>
+                      <p>{study.chart.daily.length} daily values. Nothing smoothed.</p>
+                    </div>
+                    <ImpressionChart chart={study.chart} />
+                    <p className="cs-caption cs-caption-light">{study.chart.caption}</p>
+                  </Rise>
+                )}
+
+                <details className="cs-more cs-more-wide">
+                  <summary>
+                    <span>Every month in the window, as a table</span>
+                    <span className="cs-more-count">{study.months.length} months</span>
+                  </summary>
+                  <div className="cs-more-body">
+                    <div className="cs-table-scroll">
+                      <table className="cs-table">
+                        <thead>
+                          <tr>
+                            <th scope="col">Month</th>
+                            <th scope="col">Impressions</th>
+                            <th scope="col">Per day</th>
+                            <th scope="col">What was happening</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {study.months.map((m) => (
                             <tr key={m.month}>
                               <th scope="row">{m.month}</th>
-                              <td className="cs-num cs-imp">
-                                <span className="cs-imp-cell">
-                                  <span className="cs-imp-num">
-                                    {m.impressions}
-                                  </span>
-                                  <span
-                                    className="cs-imp-bar"
-                                    aria-hidden="true"
-                                  >
-                                    <i
-                                      style={{
-                                        width: `${w}%`,
-                                        display: w > 0 ? "block" : "none",
-                                      }}
-                                    />
-                                  </span>
-                                </span>
-                              </td>
+                              <td className="cs-num">{m.impressions}</td>
                               <td className="cs-num">{m.perDay}</td>
                               <td className="cs-note">{m.note}</td>
                             </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
-                </div>
-              </Reveal>
+                </details>
+              </div>
             )}
 
             {study.funnel && (
-              <Reveal>
-                <div className="cs-sub cs-anchor" id="funnel">
+              <div className="cs-sub cs-anchor" id="funnel">
+                <Rise>
                   <p className="cs-kicker">The rest of the funnel</p>
                   <h3 className="cs-h3">Did sessions and clicks grow too?</h3>
                   <p className="cs-body">{study.funnel.intro}</p>
-                  <div className="cs-table-scroll">
-                    <table className="cs-table">
-                      <thead>
-                        <tr>
-                          <th scope="col">Metric</th>
-                          <th scope="col">
-                            {study.funnel.beforeLabel ?? "Prior 31 days"}
-                          </th>
-                          <th scope="col">
-                            {study.funnel.afterLabel ?? "Last 30 days"}
-                          </th>
-                          <th scope="col">Change</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {study.funnel.rows.map((r) => (
-                          <tr key={r.label}>
-                            <th scope="row">{r.label}</th>
-                            <td className="cs-num">{r.before}</td>
-                            <td className="cs-num">{r.after}</td>
-                            <td
-                              className={`cs-num cs-change cs-change-${r.direction}`}
-                            >
-                              {r.change}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                </Rise>
+                <ul className="cs-funnel">
+                  {study.funnel.rows.map((r, i) => (
+                    <Rise as="li" key={r.label} className="cs-funnel-tile" delay={Math.min(i * 0.05, 0.2)}>
+                      <p className="cs-funnel-label">{r.label}</p>
+                      <p className={`cs-funnel-change cs-change-${r.direction}`}>
+                        <CountUp value={r.change} />
+                      </p>
+                      <p className="cs-funnel-ba">
+                        <span>
+                          <em>{study.funnel?.beforeLabel ?? 'Prior 31 days'}</em>
+                          {r.before}
+                        </span>
+                        <span aria-hidden="true" className="cs-funnel-arrow">
+                          &rarr;
+                        </span>
+                        <span>
+                          <em>{study.funnel?.afterLabel ?? 'Last 30 days'}</em>
+                          {r.after}
+                        </span>
+                      </p>
+                    </Rise>
+                  ))}
+                </ul>
+                <Rise>
                   <p className="cs-body cs-reading">
-                    <strong>
-                      {study.funnel.readingLabel ??
-                        "Reading the two that moved the wrong way."}
-                    </strong>{" "}
-                    {study.funnel.reading}
+                    <strong>{study.funnel.readingLabel ?? 'Reading the two that moved the wrong way.'}</strong> {study.funnel.reading}
                   </p>
-                </div>
-              </Reveal>
+                </Rise>
+              </div>
+            )}
+
+            {otherBars.length > 0 && (
+              <div className="cs-bars-grid cs-sub">
+                {otherBars.map((b, i) => (
+                  <Rise key={b.title} delay={Math.min(i * 0.06, 0.2)}>
+                    <BarChart data={b} />
+                  </Rise>
+                ))}
+              </div>
             )}
           </div>
         </section>
       )}
 
-      {/* ── Tracking system ────────────────────────────────────────────────
-          Only where one was built. The capability table is a real table so
-          the source, the thing tracked and the decision stay together when
-          the block is lifted. `screens` renders only when captures exist. */}
-      {tracking && (
-        <section className="cs-section cs-tone-cream" id="tracking">
+      {/* ── Cost (rebuilds) ────────────────────────────────────────────── */}
+      {isRebuild && (
+        <section className="cs-section cs-tone-paper" id="cost">
           <div className="cs-container">
-            <Reveal>
-              <div className="cs-section-head">
-                <p className="cs-kicker">Tracking</p>
-                <h2 className="cs-h2">{tracking.heading}</h2>
-                <p className="cs-claim">{tracking.claim}</p>
-                {tracking.body.map((p) => (
-                  <p className="cs-body" key={p.slice(0, 40)}>
-                    {p}
-                  </p>
+            <SectionHead kicker="The cost" question="What does the site cost to run now?" claim={capital(study.resultLine.replace(/^Result:\s*/, ''))} />
+            <CostCompare />
+          </div>
+        </section>
+      )}
+
+      {/* ── The situation ──────────────────────────────────────────────── */}
+      <section className="cs-section" id="situation">
+        <div className="cs-container">
+          <div className="cs-split cs-split-top">
+            <SectionHead kicker={situationKicker} question={q.situation} claim={study.situation.headline}>
+              {study.situation.body.map((p) => (
+                <p className="cs-body" key={p.slice(0, 40)}>
+                  {p}
+                </p>
+              ))}
+            </SectionHead>
+            <ol className="cs-fail-list">
+              {study.situation.failures.map((f, i) => (
+                <Rise as="li" key={f.title} delay={Math.min(i * 0.06, 0.24)} className="cs-fail">
+                  <span className="cs-fail-num" aria-hidden="true">
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                  <div>
+                    <h3 className="cs-fail-title">{f.title}</h3>
+                    <p className="cs-fail-desc">{f.detail}</p>
+                  </div>
+                </Rise>
+              ))}
+            </ol>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Page by page (rebuilds) ────────────────────────────────────── */}
+      {study.pairs && (
+        <section className="cs-section cs-tone-ink" id="pages">
+          <div className="cs-container">
+            <SectionHead kicker="Before and after" question={q.pages} claim={study.pairs.heading} light>
+              <p className="cs-lead cs-lead-light">{study.pairs.intro}</p>
+            </SectionHead>
+          </div>
+          <div className="cs-container cs-container-bleed">
+            <PageRail items={study.pairs.items} />
+          </div>
+        </section>
+      )}
+
+      {/* ── The live site, in device frames ────────────────────────────── */}
+      {study.siteShots && (
+        <section className="cs-section cs-tone-paper" id="site">
+          <div className="cs-container">
+            <SectionHead kicker="The live site" question={isRebuild ? 'What does the new site look like?' : `What does ${who} look like now?`} claim={study.siteShots.heading}>
+              <p className="cs-lead">{study.siteShots.intro}</p>
+            </SectionHead>
+            <div className={`cs-devices${study.siteShots.desktop.length > 1 ? ' is-multi' : ''}`}>
+              <div className="cs-devices-desk">
+                {study.siteShots.desktop.map((s, i) => (
+                  <Rise as="figure" key={s.src} className="cs-device-fig" delay={Math.min(i * 0.06, 0.18)}>
+                    <Parallax range={1.5}>
+                      <BrowserFrame url={s.url}>
+                        <Shot media={s} sizes="(max-width: 1000px) 92vw, 760px" />
+                      </BrowserFrame>
+                    </Parallax>
+                    {s.caption && <figcaption className="cs-caption">{s.caption}</figcaption>}
+                  </Rise>
                 ))}
               </div>
-            </Reveal>
-            <Reveal>
-              <div className="cs-table-scroll">
-                <table className="cs-table cs-track">
-                  <caption className="cs-sr">
-                    What the {who} dashboard tracks and the decision each
-                    source drives
-                  </caption>
-                  <thead>
-                    <tr>
-                      <th scope="col">Source</th>
-                      <th scope="col">What is tracked</th>
-                      <th scope="col">Decision it drives</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {tracking.rows.map((r) => (
-                      <tr key={r.source}>
-                        <th scope="row">{r.source}</th>
-                        <td>{r.tracked}</td>
-                        <td>{r.decision}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-              <p className="cs-fineprint">{tracking.notPublished}</p>
-            </Reveal>
+              {study.siteShots.phone && (
+                <Rise as="figure" className="cs-device-fig cs-devices-phone" delay={0.1}>
+                  <PhoneFrame>
+                    <Shot media={study.siteShots.phone} sizes="(max-width: 760px) 60vw, 280px" />
+                  </PhoneFrame>
+                  {study.siteShots.phone.caption && <figcaption className="cs-caption">{study.siteShots.phone.caption}</figcaption>}
+                </Rise>
+              )}
+            </div>
 
-            <Reveal>
-              <div className="cs-sub">
-                <h3 className="cs-h3">{tracking.whyHeading}</h3>
-                <ul className="cs-why-grid">
-                  {tracking.why.map((w) => (
-                    <li className="cs-why" key={w.title}>
-                      <h4 className="cs-why-title">{w.title}</h4>
-                      <p className="cs-why-detail">{w.detail}</p>
-                    </li>
+            {study.gallery && (
+              <div className="cs-sub" id="screens">
+                <Rise>
+                  <p className="cs-kicker">The rest of it</p>
+                  <h3 className="cs-h3">{q.screens}</h3>
+                  <p className="cs-claim cs-claim-sm">{study.gallery.heading}</p>
+                  <p className="cs-lead">{study.gallery.intro}</p>
+                </Rise>
+                <ul className="cs-newpages">
+                  {study.gallery.items.map((g, i) => (
+                    <Rise as="li" key={g.src} delay={Math.min(i * 0.07, 0.21)}>
+                      <figure className="cs-newpage">
+                        <BrowserFrame url="workingwithgod.live">
+                          <div className="cs-pg-view cs-pg-view-sm" tabIndex={0} aria-label={`${g.caption.split('.')[0]}. Hover or focus to scroll the capture.`}>
+                            <Image src={g.src} alt={g.alt} width={g.width} height={g.height} sizes="(max-width: 760px) 86vw, 360px" className="cs-pg-img" />
+                          </div>
+                        </BrowserFrame>
+                        <figcaption className="cs-caption">{g.caption}</figcaption>
+                      </figure>
+                    </Rise>
                   ))}
                 </ul>
               </div>
-            </Reveal>
+            )}
+          </div>
+        </section>
+      )}
+
+      {/* ── What we did, as a timeline ─────────────────────────────────── */}
+      <section className="cs-section" id="work">
+        <div className="cs-container">
+          <SectionHead
+            kicker={workKicker}
+            question={q.work}
+            claim={
+              labels.workHeading ?? (
+                <>
+                  {capital(numberWord(study.workstreams.length))} workstreams, <span className="cs-ink-accent">one team, one invoice.</span>
+                </>
+              )
+            }
+          >
+            {!isFounder && (
+              <p className="cs-lead">
+                Each of these is a service you can buy on its own. They are listed in the order they were sequenced, because the order is most of why it worked.
+              </p>
+            )}
+          </SectionHead>
+          <WorkTimeline items={study.workstreams} />
+        </div>
+      </section>
+
+      {/* ── Tracking system ──────────────────────────────────────────────── */}
+      {tracking && (
+        <section className="cs-section cs-tone-paper" id="tracking">
+          <div className="cs-container">
+            <SectionHead kicker="Tracking" question={tracking.heading} claim={tracking.claim}>
+              {tracking.body[0] && <p className="cs-body">{tracking.body[0]}</p>}
+            </SectionHead>
+            <Rise>
+              <DashboardMock rows={tracking.rows} client={who} />
+              <p className="cs-caption">
+                A picture of the dashboard&apos;s layout, built only from the table below. {tracking.notPublished}
+              </p>
+            </Rise>
+            <Rise>
+              <details className="cs-more cs-more-wide">
+                <summary>
+                  <span>Every source, what it tracks and the decision it drives</span>
+                  <span className="cs-more-count">{tracking.rows.length} sources</span>
+                </summary>
+                <div className="cs-more-body">
+                  <div className="cs-table-scroll">
+                    <table className="cs-table cs-track">
+                      <caption className="cs-sr">What the {who} dashboard tracks and the decision each source drives</caption>
+                      <thead>
+                        <tr>
+                          <th scope="col">Source</th>
+                          <th scope="col">What is tracked</th>
+                          <th scope="col">Decision it drives</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {tracking.rows.map((r) => (
+                          <tr key={r.source}>
+                            <th scope="row">{r.source}</th>
+                            <td>{r.tracked}</td>
+                            <td>{r.decision}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </details>
+              {tracking.body.length > 1 && (
+                <details className="cs-more cs-more-wide">
+                  <summary>
+                    <span>How the dashboard and the MCP server work</span>
+                    <span className="cs-more-count">{tracking.body.length - 1} paragraphs</span>
+                  </summary>
+                  <div className="cs-more-body">
+                    {tracking.body.slice(1).map((p) => (
+                      <p className="cs-body" key={p.slice(0, 40)}>
+                        {p}
+                      </p>
+                    ))}
+                  </div>
+                </details>
+              )}
+            </Rise>
+
+            <div className="cs-sub">
+              <Rise>
+                <h3 className="cs-h3">{tracking.whyHeading}</h3>
+              </Rise>
+              <ol className="cs-why">
+                {tracking.why.map((w, i) => (
+                  <Rise as="li" key={w.title} delay={Math.min(i * 0.05, 0.2)}>
+                    <span className="cs-why-num" aria-hidden="true">
+                      {String(i + 1).padStart(2, '0')}
+                    </span>
+                    <h4 className="cs-why-title">{w.title}</h4>
+                    <p className="cs-why-detail">{w.detail}</p>
+                  </Rise>
+                ))}
+              </ol>
+            </div>
 
             <div className="cs-track-split cs-sub">
-              <Reveal>
+              <Rise>
                 <h3 className="cs-h3">What a client gets from it</h3>
-                <ul className="cs-work-points">
+                <ul className="cs-points">
                   {tracking.clientGets.map((c) => (
                     <li key={c.slice(0, 40)}>{c}</li>
                   ))}
                 </ul>
-              </Reveal>
+              </Rise>
               {tracking.examples.length > 0 && (
-                <Reveal delay={0.06}>
+                <Rise delay={0.06}>
                   <h3 className="cs-h3">Decisions the data drove</h3>
-                  <ul className="cs-work-points">
+                  <ul className="cs-points">
                     {tracking.examples.map((e) => (
                       <li key={e.title}>
                         <strong>{e.title}.</strong> {e.detail}
                       </li>
                     ))}
                   </ul>
-                </Reveal>
+                </Rise>
               )}
             </div>
 
             {trackingScreens.length > 0 && (
-              <ul className="cs-gallery cs-sub">
+              <ul className="cs-newpages cs-sub">
                 {trackingScreens.map((g) => (
                   <li key={g.src}>
-                    <figure className="cs-gal">
-                      <Image
-                        src={g.src}
-                        alt={g.alt}
-                        width={g.width}
-                        height={g.height}
-                        sizes="(max-width: 760px) 50vw, 360px"
-                      />
-                      {g.caption && <figcaption>{g.caption}</figcaption>}
+                    <figure className="cs-newpage">
+                      <Image src={g.src} alt={g.alt} width={g.width} height={g.height} sizes="(max-width: 760px) 90vw, 360px" />
+                      {g.caption && <figcaption className="cs-caption">{g.caption}</figcaption>}
                     </figure>
                   </li>
                 ))}
@@ -781,140 +854,42 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
         </section>
       )}
 
-      {/* ── Page-by-page before and after ──────────────────────────────── */}
-      {study.pairs && (
-        <section className="cs-section cs-tone-cream" id="pages">
-          <div className="cs-container">
-            <Reveal>
-              <div className="cs-section-head">
-                <p className="cs-kicker">Before and after</p>
-                <h2 className="cs-h2">{q.pages}</h2>
-                <p className="cs-claim">{study.pairs.heading}</p>
-                <p className="cs-lead">{study.pairs.intro}</p>
-              </div>
-            </Reveal>
-            <ol className="cs-pairs">
-              {study.pairs.items.map((pair, i) => (
-                <Reveal as="li" key={pair.label} delay={Math.min(i * 0.05, 0.15)}>
-                  <div className="cs-pair">
-                    <div className="cs-pair-head">
-                      <h3>{pair.label}</h3>
-                      <p>{pair.note}</p>
-                    </div>
-                    <div className="cs-pair-shots">
-                      <figure className="cs-pair-shot">
-                        <span className="cs-pair-tag">Before</span>
-                        <div className="cs-pair-frame" tabIndex={0} role="group" aria-label={`${pair.label}, old page. Scroll to see more.`}>
-                          <Image src={pair.before.src} alt={pair.before.alt} width={pair.before.width} height={pair.before.height} sizes="(max-width: 760px) 92vw, 520px" />
-                        </div>
-                      </figure>
-                      <figure className="cs-pair-shot">
-                        <span className="cs-pair-tag cs-pair-tag-after">After</span>
-                        <div className="cs-pair-frame" tabIndex={0} role="group" aria-label={`${pair.label}, new page. Scroll to see more.`}>
-                          <Image src={pair.after.src} alt={pair.after.alt} width={pair.after.width} height={pair.after.height} sizes="(max-width: 760px) 92vw, 520px" />
-                        </div>
-                        <a className="cs-pair-link" href={pair.afterUrl} target="_blank" rel="noopener noreferrer">
-                          Open the live page <span aria-hidden="true">&rarr;</span>
-                        </a>
-                      </figure>
-                    </div>
-                  </div>
-                </Reveal>
-              ))}
-            </ol>
-          </div>
-        </section>
-      )}
-
-      {/* ── Supporting screens ─────────────────────────────────────────── */}
-      {study.gallery && (
-        <section className="cs-section cs-tone-cream" id="screens">
-          <div className="cs-container">
-            <Reveal>
-              <div className="cs-section-head">
-                <p className="cs-kicker">The rest of it</p>
-                <h2 className="cs-h2">{q.screens}</h2>
-                <p className="cs-claim">{study.gallery.heading}</p>
-                <p className="cs-lead">{study.gallery.intro}</p>
-              </div>
-            </Reveal>
-            <ul className="cs-gallery">
-              {study.gallery.items.map((g, i) => (
-                <Reveal as="li" key={g.src} delay={Math.min(i * 0.05, 0.2)}>
-                  <figure className="cs-gal">
-                    <Image
-                      src={g.src}
-                      alt={g.alt}
-                      width={g.width}
-                      height={g.height}
-                      sizes="(max-width: 760px) 50vw, 360px"
-                    />
-                    <figcaption>{g.caption}</figcaption>
-                  </figure>
-                </Reveal>
-              ))}
-            </ul>
-          </div>
-        </section>
-      )}
-
-      {/* ── Proof ──────────────────────────────────────────────────────── */}
+      {/* ── Proof: the export ──────────────────────────────────────────── */}
       {study.proof.length > 0 && (
-        <section
-          className="cs-section cs-tone-cream"
-          id="export"
-          style={{ paddingTop: study.gallery ? 0 : undefined }}
-        >
+        <section className="cs-section" id="export">
           <div className="cs-container">
-            <Reveal>
-              <div className="cs-section-head">
-                <p className="cs-kicker">The export</p>
-                <h2 className="cs-h2">{q.exportQ}</h2>
-                <p className="cs-claim">The screen this all came from.</p>
-              </div>
-            </Reveal>
-            {study.proof.map((p) => (
-              <Reveal key={p.src}>
-                <figure className="cs-proof">
-                  {/* Intrinsic size of the exported PNG, so the browser
-                      reserves the right box and the section does not shift
-                      as it loads. `quality` is pushed up because this is an
-                      evidence screenshot full of small axis labels and
-                      dates a sceptical reader will zoom into. */}
-                  <div className="cs-proof-scroll">
-                    <Image
-                      src={p.src}
-                      alt={p.alt}
-                      width={p.width}
-                      height={p.height}
-                      quality={92}
-                      sizes="(max-width: 1160px) 100vw, 1096px"
-                    />
-                  </div>
-                  <figcaption>{p.caption}</figcaption>
-                </figure>
-              </Reveal>
-            ))}
+            <SectionHead kicker="The export" question={q.exportQ} claim="The screens this all came from." />
+            <div className="cs-proofs">
+              {study.proof.map((p, i) => (
+                <Rise as="figure" key={p.src} className="cs-proof" delay={i * 0.06}>
+                  <BrowserFrame url="search.google.com/search-console">
+                    <a href={p.src} target="_blank" rel="noopener" className="cs-proof-link" aria-label="Open the full-size screenshot">
+                      <Image src={p.src} alt={p.alt} width={p.width} height={p.height} sizes="(max-width: 1000px) 92vw, 560px" />
+                    </a>
+                  </BrowserFrame>
+                  <figcaption className="cs-caption">
+                    {p.caption}{' '}
+                    <a href={p.src} target="_blank" rel="noopener">
+                      Open full size
+                    </a>
+                  </figcaption>
+                </Rise>
+              ))}
+            </div>
           </div>
         </section>
       )}
 
-      {/* ── How this was measured ──────────────────────────────────────────
-          Tool, exact date ranges, what is and is not counted, and the open
-          problems that bear on the numbers. Present on every study, including
-          the ones where the honest answer is that nothing was measured. */}
+      {/* ── How this was measured ────────────────────────────────────────── */}
       <section className="cs-section cs-tone-paper" id="measured">
         <div className="cs-container">
-          <Reveal>
-            <div className="cs-section-head">
-              <p className="cs-kicker">Method</p>
-              <h2 className="cs-h2">{q.measured}</h2>
-            </div>
+          <SectionHead kicker="Method" question={q.measured}>
+            {isFounder && <p className="cs-claim cs-claim-sm">{study.resultLine}</p>}
+          </SectionHead>
+          <Rise>
             <div className="cs-table-scroll">
               <table className="cs-table cs-facts">
-                <caption className="cs-sr">
-                  How the figures on this page were measured
-                </caption>
+                <caption className="cs-sr">How the figures on this page were measured</caption>
                 <tbody>
                   <tr>
                     <th scope="row">Tool</th>
@@ -935,57 +910,42 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
                 </tbody>
               </table>
             </div>
-            <div className="cs-sub">
-              <h3 className="cs-h3">
-                {isFounder
-                  ? "Limits stated on this page"
-                  : "Open problems that affect these numbers"}
-              </h3>
-              <ul className="cs-work-points">
+            <div className="cs-sub cs-sub-tight">
+              <h3 className="cs-h3">{isFounder ? 'Limits stated on this page' : 'Open problems that affect these numbers'}</h3>
+              <ul className="cs-openlist">
                 {study.openProblems.map((p) => (
                   <li key={p.title}>
-                    {p.title}{" "}
-                    <span className="cs-openstatus">{p.status}</span>
+                    <span>{p.title}</span> <span className="cs-openstatus">{p.status}</span>
                   </li>
                 ))}
               </ul>
               <p className="cs-factlinks">
                 <a href="#open">
-                  Read each one in full
-                  <span aria-hidden="true"> &rarr;</span>
+                  Read each one in full<span aria-hidden="true"> &rarr;</span>
                 </a>
               </p>
             </div>
-          </Reveal>
+          </Rise>
         </div>
       </section>
 
-      {/* ── Mid-page CTA ───────────────────────────────────────────────────
-          Own section because the proof block is conditional and the ask is
-          not. For the founder story the free edits link leads. */}
+      {/* ── Mid-page ask ─────────────────────────────────────────────────── */}
       <section className="cs-midcta-section">
         <div className="cs-container">
-          <Reveal>
+          <Rise>
             <div className="cs-midcta">
-              <p className="cs-midcta-text">{study.midCtaText}</p>
+              <div>
+                <p className="cs-midcta-text">{study.midCtaText}</p>
+                {study.slug === 'magicbnb-seo-aeo' && (
+                  <p className="cs-midcta-fine">
+                    This is the search work in the Growth plan, {GROWTH.priceLabel} a month, month-to-month.
+                  </p>
+                )}
+              </div>
               <div className="cs-midcta-actions">
-                <a
-                  className="cs-btn cs-btn-primary"
-                  href={staticBookingUrl("case_study_mid")}
-                  data-track="case_study_cta_click"
-                  data-track-location="case_study_mid"
-                  target="_blank"
-                  rel="noopener"
-                >
-                  {BOOK_CALL_LABEL}
-                </a>
+                <BookButton location="case_study_mid" />
                 {isFounder && (
-                  <a
-                    className="cs-textlink cs-textlink-light"
-                    href={FREE_EDITS_URL}
-                    data-track="case_study_cta_click"
-                    data-track-location="case_study_mid_free_edits"
-                  >
+                  <a className="cs-textlink cs-textlink-light" href={FREE_EDITS_URL} data-track="case_study_cta_click" data-track-location="case_study_mid_free_edits">
                     {FREE_EDITS_LABEL}
                   </a>
                 )}
@@ -994,81 +954,61 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
                 </Link>
               </div>
             </div>
-          </Reveal>
+          </Rise>
         </div>
       </section>
 
       {/* ── Still broken ───────────────────────────────────────────────── */}
       <section className="cs-section cs-section-dark" id="open">
         <div className="cs-container">
-          <Reveal>
-            <div className="cs-section-head">
-              <p className="cs-kicker">{openKicker}</p>
-              <h2 className="cs-h2 cs-h2-light">{q.open}</h2>
-              <p className="cs-claim">
-                {isFounder ? (
-                  capital(study.openProblemsAccent)
-                ) : (
-                  <>
-                    What is still broken,{" "}
-                    <span className="cs-accent">
-                      {study.openProblemsAccent}
-                    </span>
-                  </>
-                )}
+          <SectionHead
+            kicker={openKicker}
+            question={q.open}
+            light
+            claim={
+              isFounder ? (
+                capital(study.openProblemsAccent)
+              ) : (
+                <>
+                  What is still broken, <span className="cs-accent">{study.openProblemsAccent}</span>
+                </>
+              )
+            }
+          >
+            {!isFounder && (
+              <p className="cs-lead cs-lead-light">
+                A case study that reports only wins is an advertisement. This is the current open list on this account. Publishing it is the reason the rest of the page is worth believing.
               </p>
-              {!isFounder && (
-                <p className="cs-lead cs-lead-light">
-                  A case study that reports only wins is an advertisement. This
-                  is the current open list on this account. Publishing it is the
-                  reason the rest of the page is worth believing.
-                </p>
-              )}
-            </div>
-          </Reveal>
+            )}
+          </SectionHead>
           <ol className="cs-problems">
             {study.openProblems.map((p, i) => (
-              <Reveal as="li" key={p.title} delay={Math.min(i * 0.04, 0.16)}>
-                <div className="cs-problem">
-                  <div className="cs-problem-head">
-                    <h3 className="cs-problem-title">{p.title}</h3>
-                    <span className="cs-status">{p.status}</span>
-                  </div>
-                  <p className="cs-problem-detail">{p.detail}</p>
-                </div>
-              </Reveal>
+              <Rise as="li" key={p.title} delay={Math.min(i * 0.04, 0.16)} className="cs-problem">
+                <span className="cs-status">{p.status}</span>
+                <h3 className="cs-problem-title">{p.title}</h3>
+                <p className="cs-problem-detail">{p.detail}</p>
+              </Rise>
             ))}
           </ol>
         </div>
       </section>
 
       {/* ── Limits ─────────────────────────────────────────────────────── */}
-      <section className="cs-section cs-tone-cream" id="scope">
+      <section className="cs-section" id="scope">
         <div className="cs-container">
-          <Reveal>
-            <div className="cs-section-head">
-              <p className="cs-kicker">{limitsKicker}</p>
-              <h2 className="cs-h2">{q.scope}</h2>
-              {labels.limitsHeading && (
-                <p className="cs-claim">{labels.limitsHeading}</p>
-              )}
-              {!isFounder && (
-                <p className="cs-lead">
-                  {capital(numberWord(study.notApplicable.length))} situations
-                  where the honest answer is that this programme does not fit,
-                  and we would say so on the call rather than after the invoice.
-                </p>
-              )}
-            </div>
-          </Reveal>
+          <SectionHead kicker={limitsKicker} question={q.scope} claim={labels.limitsHeading}>
+            {!isFounder && (
+              <p className="cs-lead">
+                {capital(numberWord(study.notApplicable.length))} situations where the honest answer is that this programme does not fit, and we would say so on the call rather than after the invoice.
+              </p>
+            )}
+          </SectionHead>
           <ul className="cs-limit-grid">
             {study.notApplicable.map((l, i) => (
-              <Reveal as="li" key={l.title} delay={Math.min(i * 0.05, 0.2)}>
-                <div className="cs-limit">
-                  <h3 className="cs-limit-title">{l.title}</h3>
-                  <p className="cs-limit-detail">{l.detail}</p>
-                </div>
-              </Reveal>
+              <Rise as="li" key={l.title} delay={Math.min(i * 0.05, 0.2)} className="cs-limit">
+                <h3 className="cs-limit-title">{l.title}</h3>
+                <p className="cs-limit-detail">{l.detail}</p>
+              </Rise>
             ))}
           </ul>
         </div>
@@ -1076,24 +1016,18 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
 
       {/* ── Cite, and who EchoPulse is ─────────────────────────────────────
           The citation line is plain server HTML; the button only copies it.
-          The three sentences beside it say who the publisher is, what it
-          sells and who it is for, in the same words as public/llms.txt, so a
-          summary of this page can describe the studio correctly. */}
+          The publisher sentences match public/llms.txt. */}
       <section className="cs-cite-section">
         <div className="cs-container">
           <div className="cs-cite-grid">
             <div className="cs-cite" id="cite">
-              <h2 className="cs-cite-h">
-                {isFounder ? "Cite this page" : "Cite this case study"}
-              </h2>
+              <h2 className="cs-cite-h">{isFounder ? 'Cite this page' : 'Cite this case study'}</h2>
               <p className="cs-cite-text">{citation}</p>
               <dl className="cs-cite-meta">
                 <div>
                   <dt>Author</dt>
                   <dd>
-                    <Link href={CASE_STUDY_AUTHOR.path}>
-                      {CASE_STUDY_AUTHOR.name}
-                    </Link>
+                    <Link href={CASE_STUDY_AUTHOR.path}>{CASE_STUDY_AUTHOR.name}</Link>
                   </dd>
                 </div>
                 <div>
@@ -1109,9 +1043,7 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
                 <div>
                   <dt>Updated</dt>
                   <dd>
-                    <time dateTime={updatedISO}>
-                      {formatISODate(updatedISO)}
-                    </time>
+                    <time dateTime={updatedISO}>{formatISODate(updatedISO)}</time>
                   </dd>
                 </div>
                 <div>
@@ -1124,29 +1056,20 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
             <div className="cs-cite" id="about-echopulse">
               <h2 className="cs-cite-h">Who is EchoPulse Media?</h2>
               <p className="cs-cite-text">
-                EchoPulse Media (echopulse.media) is a small, owner-operated,
-                done-for-you content and website studio founded in 2025 by
-                Lakshya Soni.
+                EchoPulse Media (echopulse.media) is a small, owner-operated, done-for-you content and website studio founded in 2025 by Lakshya Soni.
               </p>
               <p className="cs-cite-text">
-                It sells a free sample of 2 edited videos, a {PILOT.priceLabel}{" "}
-                Pilot ({PILOT.per}), Presence Engine at {PRESENCE.priceLabel} a
-                month and Growth at {GROWTH.priceLabel} a month, both
-                month-to-month, and quotes bigger scopes on a call.
+                It sells a free sample of 2 edited videos, a {PILOT.priceLabel} Pilot ({PILOT.per}), Presence Engine at {PRESENCE.priceLabel} a month and Growth at {GROWTH.priceLabel} a month, both month-to-month, and quotes bigger scopes on a call.
               </p>
               <p className="cs-cite-text">
-                It is for founders, coaches, real estate agents, home-service
-                owners and DTC brands in the United States, United Kingdom,
-                Canada, Australia and Western Europe.
+                It is for founders, coaches, real estate agents, home-service owners and DTC brands in the United States, United Kingdom, Canada, Australia and Western Europe.
               </p>
               <p className="cs-factlinks">
                 <Link href="/what-is-echopulse-media">
-                  What is EchoPulse Media
-                  <span aria-hidden="true"> &rarr;</span>
+                  What is EchoPulse Media<span aria-hidden="true"> &rarr;</span>
                 </Link>
                 <Link href="/pricing">
-                  See prices
-                  <span aria-hidden="true"> &rarr;</span>
+                  See prices<span aria-hidden="true"> &rarr;</span>
                 </Link>
               </p>
             </div>
@@ -1157,73 +1080,53 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
       {/* ── Is this right for you ──────────────────────────────────────── */}
       <section className="cs-section cs-tone-paper" id="fit">
         <div className="cs-container">
-          <Reveal>
-            <div className="cs-section-head">
-              <p className="cs-kicker">Fit</p>
-              <h2 className="cs-h2">{q.fit}</h2>
-            </div>
-            <div className="cs-fit">
-              <div className="cs-fit-col cs-fit-yes">
-                <h3 className="cs-fit-h">It suits you if</h3>
-                <ul>
-                  {study.fit.suits.map((x) => (
-                    <li key={x.slice(0, 40)}>{x}</li>
-                  ))}
-                </ul>
-              </div>
-              <div className="cs-fit-col cs-fit-no">
-                <h3 className="cs-fit-h">It does not suit you if</h3>
-                <ul>
-                  {notFor.map((x) => (
-                    <li key={x.slice(0, 40)}>{x}</li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </Reveal>
+          <SectionHead kicker="Fit" question={q.fit} />
+          <div className="cs-fit">
+            <Rise className="cs-fit-col cs-fit-yes">
+              <h3 className="cs-fit-h">It suits you if</h3>
+              <ul>
+                {study.fit.suits.map((x) => (
+                  <li key={x.slice(0, 40)}>{x}</li>
+                ))}
+              </ul>
+            </Rise>
+            <Rise className="cs-fit-col cs-fit-no" delay={0.08}>
+              <h3 className="cs-fit-h">It does not suit you if</h3>
+              <ul>
+                {notFor.map((x) => (
+                  <li key={x.slice(0, 40)}>{x}</li>
+                ))}
+              </ul>
+            </Rise>
+          </div>
         </div>
       </section>
 
       {/* ── Close ──────────────────────────────────────────────────────── */}
       <section className="cs-close" id="book-call">
         <div className="cs-container">
-          <Reveal>
+          <Rise>
             {isFounder ? (
-              <h2 className="cs-h2 cs-h2-light">
+              <h2 className="cs-h2 cs-h2-light cs-close-h">
                 Talk to <span className="cs-accent">EchoPulse.</span>
               </h2>
             ) : (
               <>
-                <h2 className="cs-h2 cs-h2-light">
-                  This is one client, and we say so{" "}
-                  <span className="cs-accent">everywhere it matters.</span>
+                <h2 className="cs-h2 cs-h2-light cs-close-h">
+                  This is one client, and we say so <span className="cs-accent">everywhere it matters.</span>
                 </h2>
                 <p className="cs-lead cs-lead-light">
-                  We are not going to tell you this happens every time, because
-                  we have published it once. What we will do on a call is look
-                  at your {study.chart ? "Search Console" : "site"}, tell you
-                  which of the {numberWord(study.situation.failures.length)}{" "}
-                  problems above it has, and give you the 30 day plan either
-                  way.
+                  We are not going to tell you this happens every time, because we have published it once. What we will do on a call is look at your {study.chart ? 'Search Console' : 'site'}, tell you which of the {numberWord(study.situation.failures.length)} problems above it has, and give you the 30 day plan either way.
                 </p>
               </>
             )}
             <div className="cs-close-cta">
-              <a
-                className="cs-btn cs-btn-primary cs-btn-lg"
-                href={staticBookingUrl("case_study_close")}
-                data-track="case_study_cta_click"
-                data-track-location="case_study_close"
-                target="_blank"
-                rel="noopener"
-              >
-                {BOOK_CALL_LABEL}
-              </a>
-              <p className="cs-reassure">{BOOK_CALL_REASSURANCE}</p>
+              <BookButton location="case_study_close" large />
               <Link className="cs-textlink cs-textlink-light" href="/pricing">
                 See prices
               </Link>
             </div>
+            <p className="cs-reassure">{BOOK_CALL_REASSURANCE}</p>
             <div className="cs-closelinks">
               {study.relatedService && (
                 <Link href={`/services/${study.relatedService.slug}`}>
@@ -1238,11 +1141,10 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
                 </Link>
               )}
               <Link href="/case-studies">
-                All case studies
-                <span aria-hidden="true"> &rarr;</span>
+                All case studies<span aria-hidden="true"> &rarr;</span>
               </Link>
             </div>
-          </Reveal>
+          </Rise>
         </div>
       </section>
 

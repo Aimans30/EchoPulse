@@ -125,38 +125,37 @@ export default function ImpressionChart({ chart }: { chart: CaseStudyChart }) {
             side of the marker; only the background changes. */}
         <div className="cs-ch-before" style={{ width: launchPct }} />
 
-        {/* The reveal clip is applied to the <svg> element, not to the paths
-            inside it. clip-path with percentage insets resolves against the
-            object bounding box on an SVG child, which browsers disagree about;
-            on the replaced element itself it resolves against the border box
-            and behaves identically everywhere. */}
-        <svg
-          className={drawn ? 'cs-ch-svg is-in' : 'cs-ch-svg'}
-          viewBox={`0 0 ${W} ${H}`}
-          xmlns="http://www.w3.org/2000/svg"
-          preserveAspectRatio="none"
-          aria-hidden="true"
-          focusable="false"
-        >
-          <defs>
-            <linearGradient id={fillId} x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#E8541A" stopOpacity="0.42" />
-              <stop offset="100%" stopColor="#E8541A" stopOpacity="0" />
-            </linearGradient>
-          </defs>
-          <path d={area} fill={`url(#${fillId})`} />
-          <path
-            d={line}
-            fill="none"
-            stroke="#E8541A"
-            strokeWidth="2"
-            strokeLinejoin="round"
-            strokeLinecap="round"
-            // Keeps the stroke 2px regardless of the non-uniform scale.
-            // Without it the line thins out as the chart gets narrower.
-            vectorEffect="non-scaling-stroke"
-          />
-        </svg>
+        <div className={drawn ? 'cs-ch-wipe is-in' : 'cs-ch-wipe'} aria-hidden="true">
+          <div className="cs-ch-wipe-inner">
+            <svg
+              className="cs-ch-svg"
+              viewBox={`0 0 ${W} ${H}`}
+              xmlns="http://www.w3.org/2000/svg"
+              preserveAspectRatio="none"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <defs>
+                <linearGradient id={fillId} x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#E8541A" stopOpacity="0.42" />
+                  <stop offset="100%" stopColor="#E8541A" stopOpacity="0" />
+                </linearGradient>
+              </defs>
+              <path d={area} fill={`url(#${fillId})`} />
+              <path
+                d={line}
+                fill="none"
+                stroke="#E8541A"
+                strokeWidth="2"
+                strokeLinejoin="round"
+                strokeLinecap="round"
+                // Keeps the stroke 2px regardless of the non-uniform scale.
+                // Without it the line thins out as the chart gets narrower.
+                vectorEffect="non-scaling-stroke"
+              />
+            </svg>
+          </div>
+        </div>
 
         <div className="cs-ch-marker" style={{ left: launchPct }} aria-hidden="true" />
         <span
@@ -205,18 +204,21 @@ export default function ImpressionChart({ chart }: { chart: CaseStudyChart }) {
         .cs-ch-axis { position: relative; height: 18px; margin-top: 6px; }
         .cs-ch-axis span { position: absolute; top: 0; font-family: ui-monospace, monospace; font-size: 11px; line-height: 1; color: rgba(242,238,231,0.42); }
 
-        /* Reveal. A left-to-right clip so the curve builds in date order, which
-           is the order the story happened in. */
-        .cs-ch-svg { clip-path: inset(0 100% 0 0); }
-        .cs-ch-svg.is-in { clip-path: inset(0 0 0 0); transition: clip-path 1.6s cubic-bezier(0.16, 1, 0.3, 1); }
+        /* Reveal. A left-to-right wipe so the curve builds in date order,
+           which is the order the story happened in. Two opposing transforms:
+           the window slides in from the left while the plot inside slides the
+           other way, so only transform animates. */
+        .cs-ch-wipe { position: absolute; inset: 0; overflow: hidden; transform: translate3d(-100%,0,0); }
+        .cs-ch-wipe-inner { position: absolute; inset: 0; transform: translate3d(100%,0,0); }
+        .cs-ch-wipe.is-in, .cs-ch-wipe.is-in .cs-ch-wipe-inner { transform: none; transition: transform 1.6s cubic-bezier(0.16, 1, 0.3, 1); }
 
         @media (prefers-reduced-motion: reduce) {
-          .cs-ch-svg, .cs-ch-svg.is-in { clip-path: none; transition: none; }
+          .cs-ch-wipe, .cs-ch-wipe-inner { transform: none !important; transition: none !important; }
         }
 
         @media (max-width: 720px) {
           .cs-ch-plot { height: 220px; }
-          .cs-ch-launch, .cs-ch-before-label { font-size: 11px; }
+          .cs-ch-launch, .cs-ch-before-label, .cs-ch-axis span, .cs-ch-ytick { font-size: 12px; }
           /* On a narrow screen the full marker label does not fit beside the
              line, so it drops to the short form and the "before" caption is
              hidden rather than allowed to collide with it. */

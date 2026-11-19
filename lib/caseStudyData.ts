@@ -43,6 +43,8 @@ export type CaseStudyBarItem = { label: string; value: number; display: string }
 /** A small horizontal bar chart. Values are real, sourced in `caption`. */
 export type CaseStudyBars = {
   title: string;
+  /** True when the monthly impressions chart already draws this series. */
+  replacedByMonthly?: boolean;
   caption: string;
   items: CaseStudyBarItem[];
 };
@@ -58,6 +60,10 @@ export type CaseStudyMedia = {
 
 export type CaseStudyWorkstream = {
   name: string;
+  /** Short when-or-where label for the timeline marker. Facts only. */
+  when?: string;
+  /** Icon key for the timeline marker. See components/casestudy/WorkTimeline. */
+  icon?: string;
   /** One number that sums the workstream up, shown as a chip on the card. */
   stat?: { value: string; label: string };
   /** Optional stills shown with the workstream (max 3). */
@@ -128,7 +134,12 @@ export type CaseStudyChart = {
   caption: string;
 };
 
+/** A real capture of a live page, shown in a browser or phone frame. */
+export type CaseStudyShot = CaseStudyMedia & { url: string };
+
 export type CaseStudyComparison = {
+  /** Matching 16:10 crops of the two homepages for the drag slider. */
+  slider?: { before: CaseStudyMedia; after: CaseStudyMedia };
   beforeSrc: string;
   beforeAlt: string;
   beforeWidth: number;
@@ -216,6 +227,16 @@ export type CaseStudy = {
   kind?: 'client' | 'founder';
   /** Three short lines for the summary box under the hero: result, how, catch. */
   tldr?: string[];
+  /** One or two plain sentences printed under the H1. No caveats here. */
+  heroLede?: string;
+  /** One short honest line under the hero, for pages that need it. */
+  heroNote?: string;
+  /** Three or four short service tags for the index card. */
+  indexTags?: string[];
+  /** Real capture of the live site, shown in a browser frame in the hero. */
+  heroShot?: CaseStudyShot;
+  /** Real captures of the live site, shown in device frames. */
+  siteShots?: { heading: string; intro: string; desktop: CaseStudyShot[]; phone?: CaseStudyShot };
   /** Picture for the hero when there is no chart or before/after to show. */
   heroMedia?: CaseStudyMedia;
   /** Small bar charts shown in the numbers section. */
@@ -352,6 +373,55 @@ export type CaseStudy = {
 const magicbnb: CaseStudy = {
   slug: 'magicbnb-seo-aeo',
   shortName: 'MagicBNB',
+  heroLede:
+    'Average daily Google impressions for magicbnb.io, April 2026 against 1 to 16 November 2026. One team runs the site, the content, social, ads and tracking.',
+  indexTags: ['Site rebuild', 'SEO and AEO content', 'Founder brand', 'Ads and analytics'],
+  heroShot: {
+    src: '/case-studies/mbnb-live-home-desktop.webp',
+    alt: 'The magicbnb.io homepage: a deal, close and run product walkthrough above the headline "Do You Actually Know Which Properties Are Making Money?" and a Start Free Trial button.',
+    width: 1600,
+    height: 1000,
+    url: 'magicbnb.io',
+    caption: 'magicbnb.io, captured from the live site on 19 November 2026.',
+  },
+  siteShots: {
+    heading: 'The site we rebuilt, as it stands today.',
+    intro: 'Captured from the live site on 19 November 2026. Open magicbnb.io and check it against these.',
+    desktop: [
+      {
+        src: '/case-studies/mbnb-live-features-desktop.webp',
+        alt: 'A magicbnb.io section titled "Every property. Every dollar. One screen." with a portfolio dashboard drawn as working interface.',
+        width: 1600,
+        height: 1000,
+        url: 'magicbnb.io',
+        caption: 'Product surfaces drawn as working interface on the page, not static screenshots.',
+      },
+      {
+        src: '/case-studies/mbnb-live-reconcile-desktop.webp',
+        alt: 'A dark magicbnb.io section: "Your bank says one number. Your PMS says another. We reconcile them automatically."',
+        width: 1600,
+        height: 778,
+        url: 'magicbnb.io',
+        caption: 'The product described in the language of the problem it solves, not in feature language.',
+      },
+      {
+        src: '/case-studies/mbnb-live-statements-desktop.webp',
+        alt: 'A magicbnb.io section for property managers: "Run owner statements in minutes, not weekends."',
+        width: 1600,
+        height: 963,
+        url: 'magicbnb.io',
+        caption: 'A section per buyer: owner statements for property managers.',
+      },
+    ],
+    phone: {
+      src: '/case-studies/mbnb-live-home-phone.webp',
+      alt: 'The magicbnb.io homepage on a phone.',
+      width: 780,
+      height: 1688,
+      url: 'magicbnb.io',
+      caption: 'The homepage on a phone.',
+    },
+  },
   resultLine:
     'Result: 5.8 Google impressions a day in April 2026 to 4,803 a day in 1 to 16 November 2026. Source: Google Search Console.',
   answer: [
@@ -550,6 +620,7 @@ const magicbnb: CaseStudy = {
     },
     {
       title: 'Average daily impressions by month',
+      replacedByMonthly: true,
       caption: 'Average daily Google search impressions per month, Google Search Console, magicbnb.io, read 19 November 2026. February is the 19th to the 28th; November is the 1st to the 16th (4,802.9, shown as 4,803 elsewhere on this page). February 33.7 and March 18.0 are in the month table below.',
       items: [
         { label: 'Apr', value: 5.8, display: '5.8' },
@@ -672,7 +743,7 @@ const magicbnb: CaseStudy = {
 
   workstreams: [
     {
-      name: 'Site rebuild and development',
+      name: 'Site rebuild and development', when: 'Live 5 May 2026', icon: 'layout',
       stat: { value: '13 to 209', label: 'impressions, the day before launch against launch day' },
       serviceSlug: 'websites-funnels',
       summary:
@@ -686,7 +757,7 @@ const magicbnb: CaseStudy = {
       ],
     },
     {
-      name: 'Content planning: what gets written, and why',
+      name: 'Content planning: what gets written, and why', when: 'Rebuilt every week', icon: 'compass',
       stat: { value: '11.5 to 9.2', label: 'average position, 90 days to 16 November' },
       serviceSlug: 'seo-aeo',
       summary:
@@ -700,7 +771,7 @@ const magicbnb: CaseStudy = {
       ],
     },
     {
-      name: 'Content architecture, shipped before the content',
+      name: 'Content architecture, shipped before the content', when: 'Before the first article', icon: 'layers',
       stat: { value: '227', label: 'articles live' },
       serviceSlug: 'seo-aeo',
       summary:
@@ -714,7 +785,7 @@ const magicbnb: CaseStudy = {
       ],
     },
     {
-      name: 'Choosing what to rank for',
+      name: 'Choosing what to rank for', when: 'May to mid August 2026', icon: 'target',
       stat: { value: '52,793', label: 'impressions from one article, May to mid August' },
       serviceSlug: 'seo-aeo',
       summary:
@@ -727,7 +798,7 @@ const magicbnb: CaseStudy = {
       ],
     },
     {
-      name: 'Answer engines and AI presence',
+      name: 'Answer engines and AI presence', when: 'In every article', icon: 'sparkles',
       stat: { value: '86', label: 'visits from AI assistants in 90 days' },
       serviceSlug: 'seo-aeo',
       summary:
@@ -741,7 +812,7 @@ const magicbnb: CaseStudy = {
       ],
     },
     {
-      name: 'Founder brand: Instagram and LinkedIn',
+      name: 'Founder brand: Instagram and LinkedIn', when: '12 Aug to 9 Nov 2026', icon: 'user',
       stat: { value: '8,009', label: 'accounts reached by Reels in 90 days' },
       serviceSlug: 'video-editing',
       summary:
@@ -755,7 +826,7 @@ const magicbnb: CaseStudy = {
       ],
     },
     {
-      name: 'Paid social and ad creative',
+      name: 'Paid social and ad creative', when: '12 Aug to 9 Nov 2026', icon: 'megaphone',
       stat: { value: '$2,211.87', label: 'ad spend in 90 days' },
       serviceSlug: 'ad-creatives',
       summary:
@@ -768,7 +839,7 @@ const magicbnb: CaseStudy = {
       ],
     },
     {
-      name: 'Site visitors, tracking and reporting',
+      name: 'Site visitors, tracking and reporting', when: 'Collected daily', icon: 'activity',
       stat: { value: '18', label: 'conversions recorded, from zero tracked' },
       serviceSlug: 'automations',
       summary:
@@ -933,6 +1004,10 @@ const founderStory: CaseStudy = {
   slug: 'founder-200-real-estate-agents',
   kind: 'founder',
   shortName: 'Lakshya Soni',
+  heroLede:
+    'Listing tours, agent brand videos and UGC-style ads for more than 200 agents across Canada. What I saw from the editing desk, and why EchoPulse is built the opposite way.',
+  heroNote: 'These agents were clients of the company I worked for, not EchoPulse clients.',
+  indexTags: ['Listing tours in 4K', 'Agent brand content', 'UGC-style ads'],
   resultLine: 'No client result is claimed on this page. It is the founder\'s work history, in his own account.',
   fit: {
     suits: [
@@ -946,9 +1021,8 @@ const founderStory: CaseStudy = {
     ],
   },
   answer: [
-    'This is a founder background page, not a client case study: before starting EchoPulse Media, Lakshya Soni worked as a video editor at a Canadian real estate media company, where he edited listing tours, agent personal brand videos and UGC-style ads for more than 200 real estate agents across Canada.',
-    'Those agents were the previous company\'s clients, not EchoPulse clients, and no agent or brokerage mentioned on the page endorses EchoPulse.',
-    'The figure of more than 200 agents is the founder\'s own account of his work history, with no dated period and no measured result claimed.',
+    'Lakshya Soni founded EchoPulse Media after working as a video editor at a Canadian real estate media company, where he edited listing tours, agent personal brand videos and UGC-style ads for more than 200 real estate agents across Canada.',
+    'This page is his account of that work, what he saw from the editing desk, and why EchoPulse publishes its prices and keeps the person who hears the brief on the edit.',
   ],
   keyFacts: [
     { label: 'Who', value: 'Lakshya Soni, founder of EchoPulse Media', href: 'https://echopulse.media/about/lakshya-soni' },
@@ -966,7 +1040,7 @@ const founderStory: CaseStudy = {
     tool: 'None. This page is the founder\'s own account of his work history, not a measured result.',
     dateRanges: 'No dated window is claimed. The work was done before EchoPulse Media. This page was published on 13 November 2026.',
     counted: 'The number of agents edited for (more than 200, across Canada), the footage format (4K, at 120 frames per second and above) and the three kinds of work.',
-    notCounted: 'Any result for those agents. The founder edited the videos, did not run those agents\' marketing and does not have their numbers, so none are printed.',
+    notCounted: 'Any result for those agents. The founder edited the videos, did not run those agents\' marketing and does not have their numbers, so none are printed. This is a founder background page, not a client case study: those agents were the previous company\'s clients, not EchoPulse clients, and no agent or brokerage mentioned on the page endorses EchoPulse. The figure of more than 200 agents is the founder\'s own account of his work history, with no dated period.',
   },
   client: 'Lakshya Soni, founder',
   clientUrl: 'https://echopulse.media/about',
@@ -1061,7 +1135,7 @@ const founderStory: CaseStudy = {
 
   workstreams: [
     {
-      name: 'Listing and property tours',
+      name: 'Listing and property tours', icon: 'film',
       serviceSlug: 'video-editing',
       stat: { value: '4K, 120fps+', label: 'source footage' },
       summary:
@@ -1078,7 +1152,7 @@ const founderStory: CaseStudy = {
       ],
     },
     {
-      name: 'Agent personal brand content',
+      name: 'Agent personal brand content', icon: 'user',
       serviceSlug: 'video-editing',
       stat: { value: '2 seconds', label: 'to earn the watch' },
       summary:
@@ -1089,7 +1163,7 @@ const founderStory: CaseStudy = {
       ],
     },
     {
-      name: 'UGC-style ads',
+      name: 'UGC-style ads', icon: 'clapperboard',
       serviceSlug: 'ad-creatives',
       stat: { value: '3 seconds', label: 'decide if the rest is seen' },
       summary: 'Short ads cut to look native in a feed, for agents and for other businesses.',
@@ -1165,6 +1239,31 @@ const founderStory: CaseStudy = {
 const workingWithGod: CaseStudy = {
   slug: 'working-with-god-rebuild',
   shortName: 'Working With God',
+  heroLede:
+    'A coaching practice was one bullet on a shared GoDaddy site. We gave it a site of its own, and took the monthly platform bill from $50 to $60 down to $0 for a one-time $599.',
+  indexTags: ['Positioning', 'Copy and design', 'Build and launch', 'Tracking'],
+  siteShots: {
+    heading: 'workingwithgod.live, as it stands today.',
+    intro: 'Captured from the live site on 19 November 2026. Every page is public, so you can open it and check.',
+    desktop: [
+      {
+        src: '/case-studies/wwg-live-offers-desktop.webp',
+        alt: 'The "Bring God into your next decision" section of workingwithgod.live: five numbered ways to begin, two marked free, each with its own link.',
+        width: 1600,
+        height: 1000,
+        url: 'workingwithgod.live',
+        caption: 'Five ways to begin, two of them free, each with its own button. This replaced one contact form.',
+      },
+    ],
+    phone: {
+      src: '/case-studies/wwg-live-home-phone.webp',
+      alt: 'The workingwithgod.live homepage on a phone: the headline about perspective and a booking button.',
+      width: 780,
+      height: 1688,
+      url: 'workingwithgod.live',
+      caption: 'The homepage on a phone.',
+    },
+  },
   resultLine:
     'Result: monthly platform bill from $50 to $60 down to $0, for a one-time $599. No traffic or conversion result is claimed.',
   fit: {
@@ -1299,8 +1398,12 @@ const workingWithGod: CaseStudy = {
     afterHeight: 2500,
     afterLabel: 'After, workingwithgod.live',
     liveUrl: 'https://workingwithgod.live',
+    slider: {
+      before: { src: '/case-studies/wwg-slider-before.jpg', alt: 'Top of the old Reframed Reality homepage on GoDaddy Airo: a green and white template, a stock bridge photo, "Got Growth?" and "Grow Well" above a list of challenges.', width: 1280, height: 800 },
+      after: { src: '/case-studies/wwg-live-home-desktop.webp', alt: 'Top of the new workingwithgod.live homepage: a deep navy hero, the headline "Leaders don\'t plateau for lack of effort. They plateau for lack of perspective.", "Coaching for Christian Professionals", one booking button and the credential strip.', width: 1600, height: 1000 },
+    },
     caption:
-      'Left, the old reframedreality.com homepage on GoDaddy Airo, captured before replacement. Right, workingwithgod.live, captured November 18, 2026. The new site is live, so you can open it and check it against this rather than take the screenshot for it.',
+      'The old reframedreality.com homepage on GoDaddy Airo, captured before replacement, against workingwithgod.live, captured November 18, 2026 for the page pairs and again on November 19, 2026 for the slider. The new site is live, so you can open it and check it against this rather than take the screenshot for it.',
   },
 
   situation: {
@@ -1335,7 +1438,7 @@ const workingWithGod: CaseStudy = {
 
   workstreams: [
     {
-      name: 'Split the two businesses',
+      name: 'Split the two businesses', when: 'The first decision', icon: 'split',
       summary:
         'The first decision was not a design decision. One site cannot introduce two practices to two different buyers without weakening both, so the coaching practice was given its own domain, its own name and its own audience.',
       points: [
@@ -1345,7 +1448,7 @@ const workingWithGod: CaseStudy = {
       ],
     },
     {
-      name: 'Build an offer ladder instead of a contact form',
+      name: 'Build an offer ladder instead of a contact form', when: 'Five ways in', icon: 'list',
       serviceSlug: 'websites-funnels',
       summary:
         'A single contact form asks the visitor to commit before they have any reason to. The new site gives five ways to begin, ordered by how much they cost the visitor, and two of them are free.',
@@ -1357,7 +1460,7 @@ const workingWithGod: CaseStudy = {
       ],
     },
     {
-      name: 'Put the credentials where the doubt is',
+      name: 'Put the credentials where the doubt is', when: 'Under the headline', icon: 'badge',
       serviceSlug: 'websites-funnels',
       summary:
         'Thirty years of practice, a doctorate, a clinical qualification and three certifications were spread across a long About page nobody scrolled. They now sit directly under the headline.',
@@ -1368,7 +1471,7 @@ const workingWithGod: CaseStudy = {
       ],
     },
     {
-      name: 'Design and build',
+      name: 'Design and build', when: 'Static build', icon: 'code',
       serviceSlug: 'websites-funnels',
       summary:
         'A static build on Netlify, with media on Cloudinary. No plugin stack, no monthly platform bill, nothing to keep patched.',
@@ -1380,7 +1483,7 @@ const workingWithGod: CaseStudy = {
       ],
     },
     {
-      name: 'Tracking that actually reports',
+      name: 'Tracking that actually reports', when: 'Confirmed 18 Nov 2026', icon: 'gauge',
       stat: { value: '3 signals', label: 'page views, scroll depth, booking clicks' },
       media: [
         {
@@ -1402,7 +1505,7 @@ const workingWithGod: CaseStudy = {
       ],
     },
     {
-      name: 'Still here after launch',
+      name: 'Still here after launch', when: 'After launch', icon: 'lifebuoy',
       stat: { value: '$0 a month', label: 'for fixes and small changes' },
       summary:
         'Most small-business sites are built, invoiced and abandoned. This one was handed over in full and is still looked after, because a site that nobody answers for goes stale within a year.',
@@ -1414,7 +1517,7 @@ const workingWithGod: CaseStudy = {
       ],
     },
     {
-      name: 'Hand it over completely',
+      name: 'Hand it over completely', when: 'On launch', icon: 'key',
       summary:
         'The point of leaving a site builder is not paying less. It is owning the thing. Everything transferred on launch.',
       points: [
