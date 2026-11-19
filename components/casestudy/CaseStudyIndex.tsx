@@ -88,12 +88,24 @@ function Visual({ study }: { study: CaseStudy }) {
             alt={study.heroShot.alt}
             width={study.heroShot.width}
             height={study.heroShot.height}
-            sizes="(max-width: 1000px) 92vw, 380px"
+            sizes="(max-width: 1000px) 92vw, 600px"
             className="csi-img"
             loading="eager"
           />
         </div>
         <Sparkline study={study} />
+        {study.product && (
+          <span className="csi-phone">
+            <Image
+              src={study.product.heroPhone.src}
+              alt=""
+              width={study.product.heroPhone.width}
+              height={study.product.heroPhone.height}
+              sizes="96px"
+              className="csi-img"
+            />
+          </span>
+        )}
       </div>
     );
   }
@@ -153,7 +165,7 @@ function Visual({ study }: { study: CaseStudy }) {
 
 function StudyCard({ study, index }: { study: CaseStudy; index: number }) {
   const founder = study.kind === 'founder';
-  const lead = study.heroMetrics[0];
+  const lead = study.indexLead ?? study.heroMetrics[0];
   const tags = study.indexTags ?? study.services.slice(0, 4);
   return (
     <Link href={`/case-studies/${study.slug}`} className="csi-card">
@@ -221,7 +233,7 @@ export default function CaseStudyIndex({ studies }: { studies: CaseStudy[] }) {
 
       <section className="csi-studies" id="studies" aria-label="Published case studies">
         <div className="csi-container">
-          <ol className="csi-grid">
+          <ol className="csi-grid" data-count={studies.length}>
             {studies.map((s, i) => (
               <Rise as="li" key={s.slug} delay={Math.min(i * 0.08, 0.24)} className="csi-cell">
                 <StudyCard study={s} index={i} />
@@ -333,6 +345,11 @@ export default function CaseStudyIndex({ studies }: { studies: CaseStudy[] }) {
         .csi-tag { position: absolute; top: 12px; left: 12px; font-family: Inter, sans-serif; font-size: 10.5px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; padding: 6px 10px; border-radius: 100px; background: rgba(12,12,11,0.85); color: var(--cream); }
         .csi-tag-after { background: var(--orange); color: #0C0C0B; }
 
+        .csi-phone { position: absolute; left: 14px; bottom: 14px; width: 92px; aspect-ratio: 9 / 19.5; border-radius: 14px; overflow: hidden; border: 3px solid #111; background: #000; box-shadow: 0 16px 34px rgba(12,12,11,0.45); transition: transform 0.6s var(--cs-ease); }
+        .csi-card:hover .csi-phone { transform: translateY(-4px); }
+        .csi-grid[data-count="4"] { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 26px; }
+        .csi-grid[data-count="4"] .csi-vis { aspect-ratio: 16 / 10; }
+        @media (max-width: 1000px) { .csi-grid[data-count="4"] { grid-template-columns: minmax(0, 1fr); gap: 24px; } }
         .csi-vis-founder .csi-img-portrait { object-position: center 22%; }
         .csi-still { position: absolute; right: 14px; bottom: 14px; width: 78px; aspect-ratio: 9 / 16; border-radius: 12px; overflow: hidden; border: 3px solid #111; box-shadow: 0 14px 30px rgba(0,0,0,0.45); transition: transform 0.6s var(--cs-ease); }
         .csi-card:hover .csi-still { transform: translateY(-4px) rotate(-2deg); }
@@ -410,7 +427,7 @@ export default function CaseStudyIndex({ studies }: { studies: CaseStudy[] }) {
         @media (prefers-reduced-motion: reduce) {
           .cs-rise, .cs-rise.is-in { opacity: 1 !important; transform: none !important; transition: none !important; }
           .csi-root * { transition: none !important; }
-          .csi-card:hover, .csi-card:focus-visible, .csi-btn:hover, .csi-card:hover .csi-img, .csi-card:hover .csi-spark, .csi-card:hover .csi-still, .csi-card:hover .csi-cta-arrow { transform: none; }
+          .csi-card:hover, .csi-card:focus-visible, .csi-btn:hover, .csi-card:hover .csi-img, .csi-card:hover .csi-spark, .csi-card:hover .csi-still, .csi-card:hover .csi-phone, .csi-card:hover .csi-cta-arrow { transform: none; }
         }
       `}</style>
     </main>

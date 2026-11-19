@@ -32,6 +32,8 @@ import WorkTimeline from './WorkTimeline';
 import CopyCitation from './CopyCitation';
 import SectionNav, { type SectionNavItem } from './SectionNav';
 import { CASE_STUDY_CSS } from './caseStudyStyles';
+import ProductStory, { ProductHero } from './ProductStory';
+import { PRODUCT_CSS } from './productStyles';
 
 /**
  * Case study detail page. A server component: the copy, the tables, the
@@ -144,8 +146,18 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
   const tracking = study.tracking;
   const trackingScreens = tracking?.screens ?? [];
   const isRebuild = Boolean(study.comparison);
+  const isProduct = Boolean(study.product);
 
-  const sections: SectionNavItem[] = [
+  const sections: SectionNavItem[] = isProduct
+    ? [
+        { id: 'glance', label: 'Key facts' },
+        { id: 'outlets', label: 'Outlets' },
+        { id: 'tour', label: 'The product' },
+        { id: 'assistant', label: 'Brighty' },
+        { id: 'website', label: 'Website' },
+        { id: 'open', label: openKicker },
+      ]
+    : [
     { id: 'glance', label: 'Key facts' },
     ...(hasNumbers ? [{ id: 'numbers', label: 'The numbers' }] : []),
     ...(isRebuild ? [{ id: 'cost', label: 'The cost' }] : []),
@@ -210,7 +222,9 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
 
   /* ── Hero visual, one per kind of study ───────────────────────────── */
   let heroVisual: React.ReactNode = null;
-  if (study.chart && study.months && study.heroShot) {
+  if (isProduct) {
+    heroVisual = <ProductHero study={study} />;
+  } else if (study.chart && study.months && study.heroShot) {
     const floor = study.months.findIndex((m) => m.month.startsWith('April'));
     const launch = study.months.findIndex((m) => m.month.startsWith('May'));
     heroVisual = (
@@ -292,7 +306,7 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
   }
 
   return (
-    <main id="main" className={`cs-root cs-kind-${isFounder ? 'founder' : isRebuild ? 'rebuild' : 'measured'}`}>
+    <main id="main" className={`cs-root cs-kind-${isFounder ? 'founder' : isProduct ? 'product' : isRebuild ? 'rebuild' : 'measured'}`}>
       <noscript>
         <style>{`.cs-rise{opacity:1!important;transform:none!important}`}</style>
       </noscript>
@@ -614,7 +628,11 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
         </section>
       )}
 
+      {/* ── Software builds: the product, screen by screen ──────────────── */}
+      {isProduct && <ProductStory study={study} />}
+
       {/* ── The situation ──────────────────────────────────────────────── */}
+      {!isProduct && (
       <section className="cs-section" id="situation">
         <div className="cs-container">
           <div className="cs-split cs-split-top">
@@ -641,6 +659,7 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
           </div>
         </div>
       </section>
+      )}
 
       {/* ── Page by page (rebuilds) ────────────────────────────────────── */}
       {study.pairs && (
@@ -714,7 +733,9 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
         </section>
       )}
 
-      {/* ── What we did, as a timeline ─────────────────────────────────── */}
+      {/* ── What we did, as a timeline (software builds render it inside
+          ProductStory, under the stack) ───────────────────────────────── */}
+      {!isProduct && (
       <section className="cs-section" id="work">
         <div className="cs-container">
           <SectionHead
@@ -737,6 +758,7 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
           <WorkTimeline items={study.workstreams} />
         </div>
       </section>
+      )}
 
       {/* ── Tracking system ──────────────────────────────────────────────── */}
       {tracking && (
@@ -1116,7 +1138,11 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
                   This is one client, and we say so <span className="cs-accent">everywhere it matters.</span>
                 </h2>
                 <p className="cs-lead cs-lead-light">
-                  We are not going to tell you this happens every time, because we have published it once. What we will do on a call is look at your {study.chart ? 'Search Console' : 'site'}, tell you which of the {numberWord(study.situation.failures.length)} problems above it has, and give you the 30 day plan either way.
+                  {study.closeText ?? (
+                    <>
+                      We are not going to tell you this happens every time, because we have published it once. What we will do on a call is look at your {study.chart ? 'Search Console' : 'site'}, tell you which of the {numberWord(study.situation.failures.length)} problems above it has, and give you the 30 day plan either way.
+                    </>
+                  )}
                 </p>
               </>
             )}
@@ -1149,6 +1175,7 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
       </section>
 
       <style>{CASE_STUDY_CSS}</style>
+      {isProduct && <style>{PRODUCT_CSS}</style>}
     </main>
   );
 }

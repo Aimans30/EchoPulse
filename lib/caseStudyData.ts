@@ -188,8 +188,108 @@ export type CaseStudyTracking = {
   screens?: CaseStudyMedia[];
 };
 
+/**
+ * SOFTWARE BUILDS
+ *
+ * A product engagement has no traffic curve and no before and after page. Its
+ * evidence is the product itself: the screens, what each one does, and where
+ * the client operates. These types carry that, and the page renders the
+ * product sections only when `product` is set, so the other studies are
+ * untouched.
+ */
+
+/** One product screen in the tour, with two to four short benefit lines. */
+export type CaseStudyScreen = CaseStudyMedia & { title: string; points: string[] };
+
+/** One outlet, as the client publishes it, plotted on the static map. */
+export type CaseStudyOutlet = {
+  name: string;
+  address: string;
+  hours: string;
+  /** The client's own Google Maps link for the outlet. */
+  mapsUrl: string;
+  /** Pin position on the map image, in percent of its width and height. */
+  x: number;
+  y: number;
+  /** True when the pin is placed by area rather than by listed coordinates. */
+  approximate?: boolean;
+  /** Which side of the pin the label sits on, so close pins do not collide. */
+  labelSide?: 'left' | 'right';
+};
+
+/**
+ * Verified enquiry figures for the client's website. Stays null until the
+ * owner sends dated evidence; the page renders nothing for it until then.
+ */
+export type CaseStudyEnquiryProof = {
+  figure: string;
+  period: string;
+  source: string;
+  screenshot?: CaseStudyProof;
+};
+
+export type CaseStudyProduct = {
+  /** Phone capture that overlaps the hero browser frame. */
+  heroPhone: CaseStudyMedia;
+  /** "The client and the challenge", as three short cards. */
+  challenge: { title: string; body: string }[];
+  outlets: {
+    heading: string;
+    intro: string;
+    map: CaseStudyMedia;
+    attribution: { label: string; href: string };
+    items: CaseStudyOutlet[];
+    /** A non-outlet landmark for orientation, drawn muted. */
+    reference?: { name: string; x: number; y: number };
+    note: string;
+  };
+  system: {
+    intro: string;
+    columns: { name: string; panel: 'store' | 'hq'; items: string[] }[];
+    assistant: { name: string; body: string };
+  };
+  tour: {
+    intro: string;
+    groups: { name: string; summary: string; screens: CaseStudyScreen[] }[];
+  };
+  assistant: {
+    name: string;
+    claim: string;
+    intro: string;
+    queries: { q: string; what: string; shot: CaseStudyMedia }[];
+    more: (CaseStudyMedia & { title: string })[];
+    capabilities: { title: string; detail: string }[];
+    counter: CaseStudyScreen;
+    noBill: { title: string; body: string[] };
+  };
+  hq: { intro: string; screens: CaseStudyScreen[] };
+  phone: { intro: string; points: { title: string; detail: string }[]; shots: CaseStudyMedia[] };
+  website: {
+    url: string;
+    heading: string;
+    intro: string;
+    hero: CaseStudyShot;
+    phone: CaseStudyShot;
+    more: CaseStudyShot[];
+    built: { title: string; detail: string }[];
+    /** Printed under the list: what this section does and does not claim. */
+    note: string;
+  };
+  /** Verified enquiry figures. null renders nothing. */
+  enquiryProof: CaseStudyEnquiryProof | null;
+  stack: { group: string; items: { name: string; detail: string }[] }[];
+  approach: { heading: string; intro: string };
+  benefits: { title: string; detail: string }[];
+};
+
 export type CaseStudy = {
   slug: string;
+  /** Software builds only. See `CaseStudyProduct`. */
+  product?: CaseStudyProduct;
+  /** Index card headline in place of the first hero metric. */
+  indexLead?: CaseStudyMetric;
+  /** Overrides the paragraph under the closing heading. */
+  closeText?: string;
   /** Short name used in question headings: "What did EchoPulse do for X?" */
   shortName: string;
   /**
@@ -1656,7 +1756,744 @@ const workingWithGod: CaseStudy = {
   ],
 };
 
-export const caseStudies: CaseStudy[] = [magicbnb, workingWithGod, founderStory];
+/**
+ * Whites & Brights. A complete operating system for a multi-outlet laundry
+ * and dry-cleaning chain in Patna, India, plus the public website.
+ *
+ * SOURCES, AND WHAT IS DELIBERATELY NOT HERE
+ *
+ * The software facts come from the product walkthrough EchoPulse wrote for
+ * the owner (19 pages). Its screens use sample data. The screenshots below are
+ * the originals embedded in that document, with every sample customer name,
+ * phone number and street locality blurred, because sample data that looks
+ * like a real person's details should not be published as if it were.
+ * Numbers visible inside the screens (takings, orders, Brighty usage) are
+ * sample data and are never quoted as results.
+ *
+ * The outlets and the website section come from whitesandbrights.com, opened
+ * and captured on 19 November 2026. The pins use the coordinates in each
+ * outlet's Google Maps listing, which the client's own site links to.
+ *
+ * The owner has said in conversation that the site's branch pages bring in a
+ * large number of enquiries and that EchoPulse runs AI-driven marketing on the
+ * pages. Neither has evidence attached yet, so no enquiry number is printed,
+ * `enquiryProof` stays null, and the open problems say so.
+ */
+const whitesBrights: CaseStudy = {
+  slug: 'whites-and-brights-operating-system',
+  shortName: 'Whites & Brights',
+  heroLede:
+    'Counter billing, orders, delivery, customers, reports, monthly plans, a customer app channel and a head-office command centre, with Brighty, an assistant that answers staff in Hindi, Hinglish or English, built in.',
+  indexTags: ['Custom software', 'POS and multi-outlet HQ', 'In-browser AI assistant', 'Website'],
+  indexLead: { value: 'One system', label: 'for every outlet, with 0 monthly AI fees' },
+  heroShot: {
+    src: '/case-studies/wb-hq.webp',
+    alt: 'The Whites & Brights HQ Command Centre: outlets, collections, outstanding money and orders for the month, an alerts list per outlet, and a side-by-side outlet comparison. Sample data.',
+    width: 1600,
+    height: 1000,
+    url: 'HQ panel · Command Centre',
+    caption: 'The HQ Command Centre, from the delivered product. Sample data.',
+  },
+  resultLine:
+    'Result: one system for every outlet, with 13 store screens across 2 panels and 0 monthly AI fees.',
+  answer: [
+    'EchoPulse Media built a complete operating system for Whites & Brights, a premium laundry and dry-cleaning chain in Patna, India: counter billing, orders, delivery, customers, reports, monthly plans, a customer app channel, a head-office command centre and Brighty, an in-browser assistant that answers staff in Hindi, Hinglish and English.',
+    'The delivered system has 13 store screens across 2 panels (store and head office), a price list of more than 240 items per outlet, and 0 monthly AI fees, because Brighty and its garment photo recognition run in the browser on the shop\'s own PC.',
+    'This page describes the delivered product and the client\'s live site at whitesandbrights.com, both read on 19 November 2026; no revenue, time-saved or enquiry figures are published.',
+  ],
+  keyFacts: [
+    { label: 'Client', value: 'Whites & Brights (whitesandbrights.com), WNB Cleantech Pvt Ltd', href: 'https://whitesandbrights.com' },
+    { label: 'Industry', value: 'Premium laundry and dry cleaning, a multi-outlet chain with a head office, pickup and delivery riders, monthly plans and business (B2B) customers' },
+    { label: 'Location', value: 'Patna, Bihar, India. Three outlets on the client\'s site: Sona Market (Danapur), Anandmai Colony (Phulwari Sharif) and R.K. Puram (Danapur)' },
+    { label: 'What was built', value: 'One operating system: 13 store screens (POS, sales and orders, order status board, delivery list, customers, reports, expenses, monthly plans, supplies, app orders and more), an HQ panel with a command centre, and Brighty, an in-browser assistant with garment photo recognition. Also the public website, whitesandbrights.com.' },
+    { label: 'Stack', value: 'React and Vite web app for PC and phone. Supabase: Postgres, sign-in, file storage, real-time updates and row-level security per outlet. Netlify, deployed from GitHub. An on-device vision model in the browser.' },
+    { label: 'Period', value: 'Not stated in the delivery document. Product screens and the live site were read on 19 November 2026.' },
+    { label: 'Result', value: 'Delivered and described. No revenue, billing time, collections or enquiry figures are published.' },
+    { label: 'Data source', value: 'The delivered product (EchoPulse\'s walkthrough for the owner, with screens on sample data) and the client\'s live site, whitesandbrights.com, read 19 November 2026.' },
+    { label: 'Last updated', value: '19 November 2026' },
+  ],
+  indexResult:
+    'For Whites & Brights, a laundry chain in Patna, EchoPulse built one operating system for every outlet: 13 store screens, a head-office panel and Brighty, an assistant that reads Hindi, Hinglish and English, at 0 monthly AI fees.',
+  measurement: {
+    tool: 'None. No analytics or system export is used. The page describes the delivered product, from the walkthrough document EchoPulse wrote for the owner and the screenshots inside it, and the client\'s live website, crawled and captured on 19 November 2026.',
+    dateRanges:
+      'Product screens: sample data dated 19 November 2026. Live site: thirteen public pages crawled and captured on 19 November 2026. There is no before and after window.',
+    counted:
+      'Counts on this page describe the product, not results: 13 store screens, 2 panels, more than 240 items in each outlet\'s price list, 3 languages Brighty reads, 0 monthly AI fees. The outlets are the three listed on whitesandbrights.com, pinned from the coordinates in each one\'s Google Maps listing.',
+    notCounted:
+      'Revenue, billing time, collections, enquiries or any other outcome. Every figure visible inside the screenshots (takings, orders, Brighty usage) is sample data, and sample names, phone numbers and localities are blurred. The owner has described enquiry volumes from the website and AI-driven marketing on its pages; neither is printed or described as a result until there is dated evidence.',
+  },
+  relatedService: { slug: 'apps-software', label: 'How the apps and software service works' },
+  fit: {
+    suits: [
+      'You run more than one counter, branch or outlet, and cannot see them all in one place.',
+      'Your staff phone the owner or head office to ask what something costs.',
+      'Your price list is long, and your team speaks Hindi or Hinglish at the counter.',
+      'You have pickups, deliveries, monthly plans or business customers to keep track of.',
+    ],
+  },
+  client: 'Whites & Brights',
+  organizationName: 'Whites & Brights',
+  clientUrl: 'https://whitesandbrights.com',
+  clientTagline:
+    'Premium laundry and dry cleaning in Patna, India, run by WNB Cleantech Pvt Ltd. Outlets in Danapur and Phulwari Sharif, free doorstep pickup, monthly plans and business customers.',
+  industry: 'Laundry and dry cleaning, multi-outlet',
+  icpKey: 'business-owners',
+
+  metaTitle: 'Whites & Brights: One System for Every Outlet',
+  metaDescription:
+    'How EchoPulse built one operating system for a Patna laundry chain: billing, delivery, HQ command centre and Brighty, a Hindi and English assistant. No AI bill.',
+
+  eyebrow: 'Case study',
+  headline: 'One operating system',
+  headlineAccent: 'for every outlet.',
+  summary:
+    'Whites & Brights is a premium laundry and dry-cleaning chain in Patna with more than one outlet, a head office, pickup and delivery riders, monthly plans and business customers. Bills were slow, prices varied between counters, staff phoned head office for every unusual item, and each outlet was a black box to the owners until month-end. EchoPulse built one system for all of it: a store panel for every outlet, an HQ panel that sees them all live, and Brighty, an assistant that answers staff in the language they type in and runs on the shop\'s own PC. EchoPulse also built the public website, whitesandbrights.com.',
+  tldr: [
+    'The problem: slow bills, prices that varied by counter, staff phoning head office, and no single view of what was due, overdue or unpaid.',
+    'What we built: a store panel with 13 screens, an HQ command centre, and Brighty, an assistant in Hindi, Hinglish and English with photo recognition.',
+    'What it costs to run: no monthly AI bill. Brighty runs in the browser on the shop\'s PC, and garment photos never leave the shop.',
+    'In use: every outlet bills, tracks orders and reports in the same system, and head office sees all of them live. Outcome figures will be added here from the live system with the client\'s permission.',
+  ],
+
+  windowLabel: 'Delivered 2026',
+  windowStartISO: '2026-11-19',
+  windowEndISO: '2026-11-19',
+  publishedISO: '2026-11-19',
+
+  services: [
+    'Custom software',
+    'Point of sale and billing',
+    'Multi-outlet HQ dashboard',
+    'In-app assistant in Hindi and English',
+    'On-device photo recognition',
+    'Price list and catalogue clean-up',
+    'Website',
+  ],
+
+  heroMetrics: [
+    { value: '13', label: 'store screens', note: 'From the dashboard to app orders' },
+    { value: '2', label: 'panels: store and HQ', note: 'Each outlet in its own store panel' },
+    { value: '240+', label: 'items in each outlet\'s price list', note: 'Searchable by name, nickname or Hindi word' },
+    { value: '3', label: 'languages Brighty reads', note: 'English, Hindi and Hinglish' },
+    { value: '0', label: 'monthly AI fees', note: 'Brighty runs on the shop\'s own PC' },
+  ],
+
+  atAGlance: [
+    { label: 'Panels', value: 'Store panel for each outlet; HQ panel that sees every outlet live' },
+    { label: 'Assistant', value: 'Brighty: prices, offers, rules, how-tos, today\'s numbers, a customer\'s orders and garment photos, answered from the live catalogue, HQ rules and past bills' },
+    { label: 'Access', value: 'Counter staff, outlet managers and super admins each get the right screens. Each outlet reads and changes only its own data.' },
+    { label: 'Alongside the software', value: 'The price list, the team guide and the catalogue clean-up, so the launch came with correct data' },
+    { label: 'Website', value: 'whitesandbrights.com, captured 19 November 2026' },
+  ],
+
+  situation: {
+    headline: 'Every outlet ran on memory, phone calls and month-end totals.',
+    body: [
+      'Whites & Brights runs a menu of hundreds of items, from a shirt press to a bridal lehenga or a sofa cover, across more than one outlet, with riders on the road and customers on monthly plans.',
+    ],
+    failures: [
+      { title: 'Slow bills', detail: 'Billing at the counter took too long for a busy shop.' },
+      { title: 'Prices varied between counters', detail: 'The same item could be billed differently at different outlets.' },
+      { title: 'Staff phoned head office', detail: 'Every unusual item meant a call to ask the price.' },
+      { title: 'No single view of the money', detail: 'Nobody could see, in one place, what was due today, what was overdue or who still owed money.' },
+      { title: 'Each outlet was a black box', detail: 'The owners saw how an outlet was doing only at month-end.' },
+    ],
+  },
+
+  /* The short-cycle approach, rendered as the timeline. Facts from the
+     delivery document only: no dates are given there, so none are printed. */
+  workstreams: [
+    {
+      name: 'Build one screen with the owners',
+      when: 'Each cycle',
+      icon: 'layout',
+      serviceSlug: 'apps-software',
+      summary: 'Work ran in short cycles with the owners. Each one started from a single screen of the store or HQ panel.',
+      points: [
+        'Short cycles with the owners: build a screen, put it in front of counter staff, fix what slowed them down, repeat.',
+        'Every change went live automatically from GitHub to Netlify, so a fixed screen reached the shop without a manual release.',
+      ],
+    },
+    {
+      name: 'Put it in front of counter staff',
+      when: 'Each cycle',
+      icon: 'user',
+      summary: 'The test was a busy counter, not a demo. Keyboard shortcuts, one-tap chips and large touch targets came out of that.',
+      points: [
+        'Keyboard first at the counter: / to search, F2 to pay, F4 to save unpaid.',
+        'On the phone: large tap targets, a slide-out menu and a full-screen assistant.',
+      ],
+    },
+    {
+      name: 'Fix what slowed them down, and repeat',
+      when: 'Each cycle',
+      icon: 'activity',
+      summary: 'What staff stumbled on went into the next cycle. When the POS search finds nothing, for example, Brighty opens with the same words already typed.',
+      points: [
+        '"No item called sofa cum bed" becomes "Ask Brighty the price of sofa cum bed".',
+        'Ctrl + J opens the assistant from any screen without losing the bill in progress.',
+      ],
+    },
+    {
+      name: 'Clean the data alongside the code',
+      when: 'Alongside',
+      icon: 'layers',
+      summary: 'The price list, the team guide and the catalogue clean-up were done alongside the software, so the launch came with correct data, not just correct code.',
+      points: [
+        'Catalogue changes ship as reviewed SQL scripts with a backup taken first.',
+        'HQ edits prices and rules in one place; the counter and Brighty update instantly.',
+      ],
+    },
+  ],
+
+  proof: [],
+
+  midCtaText:
+    'Running a business on spreadsheets, phone calls and WhatsApp? The call opens with how your counters, branches and staff actually work, and ends with what we would build first.',
+  closeText:
+    'We will not tell you every business needs custom software. On a call we will look at how your counters, branches and staff work today, tell you which of the problems above you share, and say plainly whether off-the-shelf software would do.',
+  openProblemsAccent: 'and what this page cannot prove yet.',
+
+  openProblems: [
+    {
+      title: 'No outcome figures are published yet',
+      detail:
+        'There are no before and after numbers on this page for billing speed, collections, overdue orders or outlet performance. The product walkthrough uses sample data, and no export from the live system has been shared for publication. The page shows what was delivered, not what it changed.',
+      status: 'Not measured',
+    },
+    {
+      title: 'Website enquiry figures are not verified',
+      detail:
+        'The owner reports that the website brings in a large number of enquiries. No dated evidence has been provided, so no number is printed here. It will be added with its source once the enquiries inbox or analytics export is shared.',
+      status: 'Awaiting evidence',
+    },
+    {
+      title: 'No separate page per branch on the live site',
+      detail:
+        'On 19 November 2026 the crawl of whitesandbrights.com found thirteen public pages and no standalone page for each outlet; the three outlets are listed on the home and contact pages. Any branch or campaign pages hosted elsewhere were not linked from the site and are not described here.',
+      status: 'Checked 19 Nov 2026',
+    },
+    {
+      title: 'The website is rendered in the browser',
+      detail:
+        'whitesandbrights.com is a single-page app. Before JavaScript runs, a crawler sees only the home page title and description, and no LocalBusiness structured data was found. Server-rendered outlet pages with their own structured data are the obvious next step for local search.',
+      status: 'Open',
+    },
+    {
+      title: 'Brighty\'s answer rate is not published',
+      detail:
+        'The HQ usage screen tracks how many questions Brighty answers by itself and which items it could not price. The figures in the screenshots here are sample data, and no live figure is published.',
+      status: 'Not measured',
+    },
+  ],
+
+  notApplicable: [
+    {
+      title: 'You have one counter and a short price list',
+      detail:
+        'An off-the-shelf billing app is cheaper and will do the job. A system like this earns its cost when there are several outlets, a long menu and staff who need answers without phoning anyone.',
+    },
+    {
+      title: 'The owners cannot give time to the cycles',
+      detail:
+        'This was built screen by screen with the owners and counter staff. Without someone from the business to try each screen and say what slowed them down, the short cycles do not work.',
+    },
+    {
+      title: 'You want an assistant that answers anything',
+      detail:
+        'Brighty answers only from the live catalogue, head-office rules and real past bills, and asks when it is not sure. That is deliberate. If you want open-ended chat, this is not it.',
+    },
+    {
+      title: 'Your data cannot be cleaned first',
+      detail:
+        'The price list and catalogue were cleaned alongside the software. Software built on a price list nobody agrees on gives wrong answers faster.',
+    },
+  ],
+
+  product: {
+    heroPhone: {
+      src: '/case-studies/wb-hero-phone.webp',
+      alt: 'The store dashboard on a phone: a needs-attention list with orders to hand over, overdue orders, unpaid money, app orders awaiting pickup and supplies to approve. Sample data.',
+      width: 780,
+      height: 1688,
+    },
+    challenge: [
+      {
+        title: 'The client',
+        body: 'A premium laundry and dry-cleaning brand in Patna with more than one outlet, a head office, pickup and delivery riders, monthly plans and business (B2B) customers. The menu runs to hundreds of items, from a shirt press to a bridal lehenga or a sofa cover.',
+      },
+      {
+        title: 'What was hurting',
+        body: 'Bills were slow and prices varied between counters. Staff phoned head office for every unusual item. Nobody could see, in one place, what was due today, what was overdue or who still owed money. Each outlet was a black box to the owners until month-end.',
+      },
+      {
+        title: 'What they asked for',
+        body: 'One system for every outlet, simple enough for counter staff on day one, that works on the shop PC and on a phone. Owners wanted live numbers across all outlets; staff wanted fast, correct answers to "how much for this?" without calling anyone.',
+      },
+    ],
+    outlets: {
+      heading: 'Where Whites & Brights operates',
+      intro:
+        'Three outlets in west Patna, as the client lists them on whitesandbrights.com. Every outlet runs its own store panel; head office sees all three live.',
+      map: {
+        src: '/case-studies/wb-map-patna.webp',
+        alt: 'A dark map of west and central Patna from Danapur to Patna Junction, with the Ganga along the top.',
+        width: 1600,
+        height: 1055,
+      },
+      attribution: { label: 'Map data © OpenStreetMap contributors', href: 'https://www.openstreetmap.org/copyright' },
+      items: [
+        {
+          name: 'Sona Market, Danapur',
+          address: 'Sona Market, Cant Road, in front of Danapur Club, Danapur, Patna 801105',
+          hours: 'Open till 7 pm',
+          mapsUrl: 'https://maps.app.goo.gl/Q2hPJ1jRe2eEW4D66',
+          x: 23.56,
+          y: 45.71,
+          labelSide: 'right',
+        },
+        {
+          name: 'R.K. Puram, Danapur',
+          address: 'Kalawati Complex, Ward 2, R.K. Puram, Khagaul Road, Danapur 801503',
+          hours: 'Open till 9 pm',
+          mapsUrl: 'https://maps.app.goo.gl/1zTQ136dYz3fJzeLA',
+          x: 25.31,
+          y: 37.46,
+          labelSide: 'right',
+        },
+        {
+          name: 'Anandmai Colony, Phulwari Sharif',
+          address: 'Anandmai Colony, beside Canara Bank, Phulwari Sharif, Patna',
+          hours: 'Open till 9 pm',
+          mapsUrl: 'https://maps.app.goo.gl/Bpq5nYxFDE7kg3Vy8',
+          x: 41.25,
+          y: 76.54,
+          labelSide: 'right',
+        },
+      ],
+      reference: { name: 'Patna Junction', x: 79.06, y: 48.7 },
+      note:
+        'Names, addresses and hours as published on whitesandbrights.com on 19 November 2026. Pins use the coordinates in each outlet\'s Google Maps listing, linked from the client\'s site. Patna Junction is shown only for orientation.',
+    },
+    system: {
+      intro:
+        'Every outlet works in its own store panel. Head office sees all of them live in the HQ panel. Brighty sits on top of both, one keystroke away.',
+      columns: [
+        { name: 'Counter', panel: 'store', items: ['Point of Sale', 'Sales and orders', 'Order status board', 'Delivery list'] },
+        { name: 'Customers', panel: 'store', items: ['Customer directory', 'Birthday and anniversary wishes', 'Monthly plans', 'Customer app orders and live tracking'] },
+        { name: 'Back office', panel: 'store', items: ['Reports', 'Expenses', 'Supplies and reorder stock', 'Catalogue and prices'] },
+        { name: 'Head office', panel: 'hq', items: ['Command centre', 'Outlet comparison', 'Alerts', 'Brighty training and usage'] },
+      ],
+      assistant: {
+        name: 'Brighty, the built-in assistant',
+        body: 'Prices, offers, rules, "how do I", today\'s numbers, a customer\'s orders, and photos of garments. It reads the same live catalogue the counter bills from, learns from every bill and every head-office answer, and runs entirely inside the browser.',
+      },
+    },
+    tour: {
+      intro:
+        'The store panel, screen by screen, from the delivered product. Screens use sample data; sample names and phone numbers are blurred.',
+      groups: [
+        {
+          name: 'Counter',
+          summary: 'The first screen of the day, and billing in seconds.',
+          screens: [
+            {
+              title: 'Dashboard',
+              src: '/case-studies/wb-dashboard.webp',
+              alt: 'The store dashboard: a needs-attention row with orders to hand over today, overdue orders, unpaid money, app orders awaiting pickup, a supply order to approve, birthdays and a plan expiring, then today\'s billed, collected and to-hand-over totals. Sample data.',
+              width: 1600,
+              height: 1000,
+              points: [
+                'Needs attention first: orders to hand over today, overdue orders, unpaid money, app orders waiting for a driver, supplies to approve, plans expiring this week.',
+                'Birthdays and anniversaries with a one-tap WhatsApp wish that carries a ready-made offer.',
+                'Counter and Owner views: staff see the work; the owner view adds takings, trends and comparisons.',
+                'Every card is a shortcut to the filtered list behind it.',
+              ],
+            },
+            {
+              title: 'Point of Sale',
+              src: '/case-studies/wb-pos.webp',
+              alt: 'The Point of Sale screen: a product search, frequent items as one-tap chips, category filters, a grid of priced garments, and a cart with discount, total and keyboard shortcuts. Sample data.',
+              width: 1600,
+              height: 1000,
+              points: [
+                'Find any of 240+ items by name, nickname or Hindi word; frequent items sit on top as one-tap chips.',
+                'Type a phone number and a returning customer\'s name and address fill in by themselves.',
+                'The delivery-date picker shows how full the plant already is that day.',
+                'Keyboard first: / to search, F2 to pay, F4 to save unpaid.',
+              ],
+            },
+          ],
+        },
+        {
+          name: 'Orders and delivery',
+          summary: 'From the counter to the plant to the customer\'s door.',
+          screens: [
+            {
+              title: 'Sales list',
+              src: '/case-studies/wb-sales.webp',
+              alt: 'The Sales list with filter chips for unpaid, partial, overdue, not delivered, app orders and cancelled, and a day header showing billed, collected and due. Sample data, client names blurred.',
+              width: 1600,
+              height: 1000,
+              points: [
+                'Filters that match real questions: unpaid, partial, overdue, not delivered, app orders, each with a live count.',
+                'Each outlet gets its own order series (RKP-1216, PSF-113), so staff never mix them up.',
+              ],
+            },
+            {
+              title: 'Order drawer',
+              src: '/case-studies/wb-order-drawer.webp',
+              alt: 'An order drawer over the sales list: total, paid and balance due, status, billed and pickup dates, outlet, channel, pieces, buttons for a WhatsApp ready message, a payment reminder and a call, and the items. Sample data, customer details blurred.',
+              width: 1600,
+              height: 1000,
+              points: [
+                'Total, paid, balance, status, items, pickup date, channel and customer in one side drawer.',
+                '"Ready for pickup" and payment reminders open WhatsApp with the message already written.',
+              ],
+            },
+            {
+              title: 'Order status board',
+              src: '/case-studies/wb-status-board.webp',
+              alt: 'The Order Status board with a barcode scan box, app orders in columns from pending pickup to at outlet, and walk-in orders from order placed to received at plant. Sample data, names blurred.',
+              width: 1600,
+              height: 1000,
+              points: [
+                'A board for the plant: orders move from placed to processing to ready, so the counter knows what is done.',
+                'A change on one PC shows on every other screen instantly.',
+              ],
+            },
+            {
+              title: 'Delivery list',
+              src: '/case-studies/wb-delivery.webp',
+              alt: 'The Delivery List for today: pickup-at-store and home-delivery cards with outlet, order number, status, pieces, amount to collect, and Collect and Handed over buttons, plus overdue and upcoming tabs. Sample data, customer details blurred.',
+              width: 1600,
+              height: 1000,
+              points: [
+                'Today\'s pickups and drop-offs for riders, with addresses and amounts to collect.',
+                'Overdue orders stay highlighted until they are handed over.',
+              ],
+            },
+          ],
+        },
+        {
+          name: 'Customers and reports',
+          summary: 'Know every customer, and know how the business is really doing.',
+          screens: [
+            {
+              title: 'Customer directory',
+              src: '/case-studies/wb-customers.webp',
+              alt: 'The Customers list with filters for owes money, has plan, inactive, new this month and birthdays, and columns for outlet, visits, last visit, billed, due and plan. Sample data, names and phones blurred.',
+              width: 1600,
+              height: 1000,
+              points: [
+                'Every order, total spend, balance and important dates for each customer.',
+                'Each outlet only sees its own customers; HQ sees all.',
+              ],
+            },
+            {
+              title: 'Reports',
+              src: '/case-studies/wb-reports.webp',
+              alt: 'The Reports screen for a month: collected, expenses and supplies, net and orders billed, a money in versus out bar chart by day, and where the money went. Sample data.',
+              width: 1600,
+              height: 1000,
+              points: [
+                'Sales, collections, outstanding and expenses by day, month and outlet.',
+                'Switch between a single outlet and the whole chain in one click.',
+              ],
+            },
+          ],
+        },
+        {
+          name: 'Money and plans',
+          summary: 'The money going out, and the regular money coming in.',
+          screens: [
+            {
+              title: 'Expenses',
+              src: '/case-studies/wb-expenses.webp',
+              alt: 'The Expenses screen: a reminder of monthly costs not yet added, totals for rent, salary, utilities, maintenance and general, and a list of expenses by date and outlet. Sample data.',
+              width: 1600,
+              height: 1000,
+              points: [
+                'Rent, wages, chemicals and electricity, logged at the outlet and visible to HQ.',
+                'Expenses and supplies feed straight into the reports, so profit is real.',
+              ],
+            },
+            {
+              title: 'Monthly plans',
+              src: '/case-studies/wb-plans.webp',
+              alt: 'The Subscriptions screen with four weight-based monthly plans and a list of customer subscriptions with balance in kilos, expiry date and a renew message button. Sample data, names blurred.',
+              width: 1600,
+              height: 1000,
+              points: [
+                'Monthly laundry plans with usage tracking and expiry reminders.',
+                'Plans expiring this week appear on the dashboard with a renewal offer.',
+              ],
+            },
+          ],
+        },
+        {
+          name: 'Supplies and the app channel',
+          summary: 'Stock for the shop, and orders from the customer app.',
+          screens: [
+            {
+              title: 'Reorder stock',
+              src: '/case-studies/wb-supplies.webp',
+              alt: 'The Reorder Stock screen: chemicals and packaging with prices and minimum order quantities, a reorder cart with a note for HQ, and a Send order to HQ button. Sample data.',
+              width: 1600,
+              height: 1000,
+              points: [
+                'Outlets request supplies; HQ approves them in its own panel.',
+              ],
+            },
+            {
+              title: 'App orders',
+              src: '/case-studies/wb-app-orders.webp',
+              alt: 'The App Orders screen, live: awaiting pickup, in progress and delivered counts, and a list of app orders with status and an Assign pickup button. Sample data, customer details blurred.',
+              width: 1600,
+              height: 1000,
+              points: [
+                'Orders placed in the customer app land here, ready to be assigned a pickup driver.',
+                'Staff and customers can follow the rider on a map.',
+                'The app, the counter and Brighty all read the same prices.',
+              ],
+            },
+          ],
+        },
+      ],
+    },
+    assistant: {
+      name: 'Brighty',
+      claim: 'Answers that never leave staff stuck.',
+      intro:
+        'Counter staff ask the way they would ask on WhatsApp. Brighty answers with the price, where it comes from, and a button to add it to the bill.',
+      queries: [
+        {
+          q: 'lehnga bhari kitna lagega',
+          what: 'Hinglish, misspelt. Brighty finds the heavy bridal lehenga, shows the price and its sources, and offers Add to bill.',
+          shot: {
+            src: '/case-studies/wb-brighty-lehenga.webp',
+            alt: 'Brighty on a phone answering "lehnga bhari kitna lagega" with Lehenga, heavy bridal, dry clean, ₹549 a set, where the price comes from, and Add to bill, Copy quote, WhatsApp and Ask HQ buttons. Sample data.',
+            width: 780,
+            height: 1578,
+          },
+        },
+        {
+          q: 'pikup rule',
+          what: 'A rule, not a price. Brighty returns the free pickup and delivery rule, next to a step-by-step answer on how to make a bill.',
+          shot: {
+            src: '/case-studies/wb-brighty-howto.webp',
+            alt: 'Brighty answering "bill kaise banaye" with steps to make a bill and an Open Point of Sale button, then "pikup rule" with the free pickup and delivery rule. Sample data.',
+            width: 780,
+            height: 1578,
+          },
+        },
+        {
+          q: 'aaj ka sale',
+          what: 'Today\'s numbers: bills made, collected, due today and overdue, with a button that opens the dashboard.',
+          shot: {
+            src: '/case-studies/wb-brighty-today.webp',
+            alt: 'Brighty answering "aaj ka sale" with today so far: bills made, collected, due today and overdue, and an Open Dashboard button. Sample data.',
+            width: 780,
+            height: 1578,
+          },
+        },
+      ],
+      more: [
+        { title: 'New-customer offer applied', src: '/case-studies/wb-brighty-offer.webp', alt: 'Brighty quoting two heavy sarees for a new customer with the first-order offer applied. Sample data.', width: 780, height: 1578 },
+        { title: 'Asks: for whom?', src: '/case-studies/wb-brighty-forwhom.webp', alt: 'Brighty answering "3 piece suit" with a question, for whom, and both prices for men and women. Sample data.', width: 780, height: 1578 },
+        { title: 'Bulk quote with express', src: '/case-studies/wb-brighty-bulk.webp', alt: 'Brighty quoting 120 shirts and 60 trousers for steam press with an express note. Sample data.', width: 780, height: 1578 },
+        { title: 'Kids rate card', src: '/case-studies/wb-brighty-kids.webp', alt: 'Brighty listing the kids dry-clean rate card. Sample data.', width: 780, height: 1578 },
+        { title: 'Hindi (Devanagari)', src: '/case-studies/wb-brighty-hindi.webp', alt: 'Brighty answering a question typed in Hindi script with the heavy lehenga price. Sample data.', width: 780, height: 1578 },
+        { title: 'From past bills', src: '/case-studies/wb-brighty-pastbills.webp', alt: 'Brighty pricing a car seat cover that is not on the list, from a past bill, marked likely. Sample data.', width: 780, height: 1578 },
+      ],
+      capabilities: [
+        { title: 'Speaks like the staff do', detail: 'English, Hindi in Devanagari, and Hinglish with spelling mistakes.' },
+        { title: 'Shows its working', detail: 'Every price shows its source: the approved price list, the billing catalogue and what past bills actually charged.' },
+        { title: 'Asks instead of guessing', detail: '"3 piece suit" gets a quick "for whom?" with both prices, not a wrong answer.' },
+        { title: 'Quotes, offers and lists', detail: 'Bulk quotes with express charges, first-order and birthday discounts, and full rate cards by category.' },
+        { title: 'Knows the shop', detail: 'Today\'s sales, what is due, what is unpaid, a customer\'s orders, the outlet\'s address, and how-tos that open the right screen.' },
+        { title: 'Recognises photos', detail: 'Snap a garment and Brighty suggests the item. The image model runs inside the browser.' },
+        { title: 'Learns by itself', detail: 'Every bill and every head-office answer teaches it. A question it cannot answer goes to HQ once, and is answered automatically next time.' },
+      ],
+      counter: {
+        title: 'Built into the counter',
+        src: '/case-studies/wb-pos-brighty.webp',
+        alt: 'The Point of Sale with "sofa cum bed" typed in the search, the message "No item called sofa cum bed here" and a button "Ask Brighty the price of sofa cum bed", next to the billing form with a plant load bar. Sample data.',
+        width: 1600,
+        height: 1000,
+        points: [
+          '"No item called sofa cum bed" becomes "Ask Brighty the price of sofa cum bed".',
+          'Ctrl + J opens the assistant from any screen without losing the bill in progress.',
+          'Brighty\'s answer has an Add to bill button that drops the item into the cart.',
+        ],
+      },
+      noBill: {
+        title: 'No monthly AI bill',
+        body: [
+          'Brighty runs on the shop\'s own PC, inside the browser. There is no per-question charge from an AI provider, so asking a hundred questions costs the same as asking one.',
+          'Garment photos are read by a compact image model in the browser, so they never leave the shop.',
+          'It answers only from the live catalogue, head-office rules and real past bills, never made up.',
+        ],
+      },
+    },
+    hq: {
+      intro: 'Every outlet\'s takings, orders and problems on one screen, and the place where Brighty is taught.',
+      screens: [
+        {
+          title: 'HQ Command Centre',
+          src: '/case-studies/wb-hq.webp',
+          alt: 'The HQ Command Centre: outlets, collected, outstanding and orders for the month, alerts per outlet for orders past due, old unpaid balances and app orders waiting for a driver, and an outlet comparison table. Sample data.',
+          width: 1600,
+          height: 1000,
+          points: [
+            'Outlets, collections, outstanding money and order counts for any month.',
+            'Alerts per outlet: overdue orders, unpaid balances older than 30 days, app orders waiting for a driver.',
+            'Side-by-side collections, expenses and supplies, so owners spot the weak outlet early.',
+            'Add outlets, run offers, manage app customers and approve supply orders.',
+          ],
+        },
+        {
+          title: 'Questions from outlets',
+          src: '/case-studies/wb-training.webp',
+          alt: 'The Brighty training screen in the HQ panel: a question from an outlet about a bridal lehenga with the assistant\'s best guess, and fields for HQ to set the price and answer once. Sample data.',
+          width: 1600,
+          height: 1000,
+          points: [
+            'When Brighty cannot answer, the question lands at HQ with the staff\'s guess; HQ\'s answer is remembered.',
+            'HQ edits prices and rules in one place; the counter and Brighty update instantly.',
+          ],
+        },
+        {
+          title: 'Usage over 30 days',
+          src: '/case-studies/wb-usage.webp',
+          alt: 'The Brighty usage screen: questions asked over 30 days, the share answered by Brighty itself, questions by outlet, what Brighty could not answer and the most asked items. Sample data.',
+          width: 1600,
+          height: 1000,
+          points: [
+            'Questions per outlet, the share Brighty answered by itself, and the most-asked items.',
+            '"What Brighty couldn\'t answer" shows exactly which items to add to the price list.',
+          ],
+        },
+      ],
+    },
+    phone: {
+      intro: 'The same app adapts to a phone: owners check the day from anywhere, riders and staff use it on the move.',
+      points: [
+        { title: 'One app, every screen size', detail: 'Nothing separate to install or keep updated: it opens in the browser and can be added to the home screen.' },
+        { title: 'Owner on the go', detail: 'The needs-attention list, collections and alerts are the first thing on the phone.' },
+        { title: 'Brighty in the pocket', detail: 'Staff can snap a garment with the phone camera and get the price.' },
+        { title: 'Touch-friendly', detail: 'Large tap targets, a slide-out menu and a full-screen assistant.' },
+      ],
+      shots: [
+        { src: '/case-studies/wb-phone-dashboard.webp', alt: 'The store dashboard on a phone with the needs-attention list first. Sample data.', width: 780, height: 1688, caption: 'Dashboard' },
+        { src: '/case-studies/wb-phone-brighty.webp', alt: 'Brighty full screen on a phone answering "lehenga heavy kitna". Sample data.', width: 780, height: 1688, caption: 'Brighty' },
+        { src: '/case-studies/wb-brighty-welcome.webp', alt: 'Brighty\'s welcome message on a phone with suggested questions in Hinglish and English. Sample data.', width: 780, height: 1578, caption: 'Suggested questions' },
+      ],
+    },
+    website: {
+      url: 'https://whitesandbrights.com',
+      heading: 'The website, as it stands today.',
+      intro:
+        'EchoPulse also built the public website. Everything below is what anyone can see on whitesandbrights.com, captured on 19 November 2026.',
+      hero: {
+        src: '/case-studies/wb-live-home-desktop.webp',
+        alt: 'The whitesandbrights.com homepage: "Fresh clothes, without the chores", free doorstep pickup across Danapur and Phulwari Sharif, Book a free pickup and WhatsApp us buttons, and a strip with Google rating, three outlets and a first-order offer.',
+        width: 1600,
+        height: 1000,
+        url: 'whitesandbrights.com',
+        caption: 'The homepage, captured 19 November 2026.',
+      },
+      phone: {
+        src: '/case-studies/wb-live-home-phone.webp',
+        alt: 'The whitesandbrights.com homepage on a phone, with Book a free pickup and WhatsApp us buttons and a floating WhatsApp button.',
+        width: 780,
+        height: 1688,
+        url: 'whitesandbrights.com',
+        caption: 'The homepage on a phone.',
+      },
+      more: [
+        {
+          src: '/case-studies/wb-live-outlets-desktop.webp',
+          alt: 'The outlets section of whitesandbrights.com: "Three outlets. One standard." with each outlet\'s name, rating, opening hours, full address and a map link.',
+          width: 1600,
+          height: 1000,
+          url: 'whitesandbrights.com',
+          caption: 'Every outlet with its address, hours and a Google Maps link.',
+        },
+        {
+          src: '/case-studies/wb-live-services-desktop.webp',
+          alt: 'The Services and Prices page of whitesandbrights.com with tabs for laundry by kilo, dry cleaning, steam ironing, household and shoes, express and subscriptions, and a per-kilogram price table with turnaround times.',
+          width: 1600,
+          height: 1000,
+          url: 'whitesandbrights.com/services',
+          caption: 'The full price list, with turnaround times, by service.',
+        },
+        {
+          src: '/case-studies/wb-live-contact-desktop.webp',
+          alt: 'The Contact page of whitesandbrights.com: WhatsApp, call and email, and a form that asks what the enquiry is about.',
+          width: 1600,
+          height: 1000,
+          url: 'whitesandbrights.com/contact',
+          caption: 'Contact: WhatsApp, call, email, and a form that sorts enquiries by type.',
+        },
+      ],
+      built: [
+        { title: 'Thirteen public pages', detail: 'Home, services and full price list, franchise, about, CSR, associate, careers, contact, help centre, FAQ, terms, privacy and account deletion.' },
+        { title: 'Local by default', detail: 'Patna, Danapur and Phulwari Sharif in the page titles, descriptions and copy, and every outlet with its full address, hours and a Google Maps link.' },
+        { title: 'A booking path on every page', detail: 'Book a pickup, a WhatsApp button that opens a pre-written booking message, a click-to-call number and a floating WhatsApp button.' },
+        { title: 'Enquiries sorted at the source', detail: 'The contact form asks what the enquiry is about: a pickup, a service question, business or bulk laundry, franchise or a job.' },
+        { title: 'Pages for partners', detail: 'Franchise and associate pages with their own application forms, kept apart from the customer booking path.' },
+        { title: 'The app, linked', detail: 'Get the app links to the Android app on Google Play from the header and the homepage.' },
+      ],
+      note:
+        'This section describes what is visible on the live site. It does not claim traffic, rankings or enquiry numbers, because none have been shared with evidence.',
+    },
+    enquiryProof: null,
+    stack: [
+      {
+        group: 'Stack',
+        items: [
+          { name: 'Front end', detail: 'React with Vite: one responsive web app for PC and phone.' },
+          { name: 'Back end', detail: 'Supabase: Postgres database, sign-in, file storage and real-time updates.' },
+          { name: 'Hosting', detail: 'Netlify, with every change going live automatically from GitHub.' },
+        ],
+      },
+      {
+        group: 'Data and security',
+        items: [
+          { name: 'Row-level security', detail: 'Each outlet can only read and change its own data; HQ sees all.' },
+          { name: 'Roles', detail: 'Counter staff, outlet managers and super admins each get the right screens.' },
+          { name: 'Audit-friendly', detail: 'Catalogue changes ship as reviewed SQL scripts with a backup taken first.' },
+        ],
+      },
+      {
+        group: 'Brighty\'s engine',
+        items: [
+          { name: 'Language', detail: 'Spelling-tolerant matching, Hindi and Hinglish words, sound-alike words and number words.' },
+          { name: 'Grounded answers', detail: 'Only from the live catalogue, HQ rules and real past bills, never made up.' },
+          { name: 'On-device vision', detail: 'A compact image model runs in the browser for garment photos.' },
+        ],
+      },
+    ],
+    approach: {
+      heading: 'Short cycles, with the data cleaned alongside.',
+      intro: 'Build a screen, put it in front of counter staff, fix what slowed them down, repeat. The launch came with correct data, not just correct code.',
+    },
+    benefits: [
+      { title: 'One price, everywhere', detail: 'The app, the counter and Brighty all read the same prices, and HQ edits them in one place.' },
+      { title: 'Fewer calls to head office', detail: 'Staff ask Brighty. A question it cannot answer goes to HQ once, and is answered automatically next time.' },
+      { title: 'Due, overdue and unpaid in one place', detail: 'The dashboard opens on what needs attention, and every card leads to the list behind it.' },
+      { title: 'No outlet is a black box', detail: 'HQ sees every outlet live, with alerts and a side-by-side comparison, not a month-end total.' },
+      { title: 'Live across screens', detail: 'A change on one PC shows on every other screen instantly.' },
+      { title: 'Each outlet sees only its own data', detail: 'Row-level security per outlet; head office sees all.' },
+      { title: 'No monthly AI bill', detail: 'Brighty runs in the browser on the shop\'s PC, with no per-question charge, and photos never leave the shop.' },
+      { title: 'Regular money, tracked', detail: 'Monthly plans with usage, expiry reminders and renewal offers, and expenses that feed straight into the reports.' },
+    ],
+  },
+};
+
+export const caseStudies: CaseStudy[] = [magicbnb, whitesBrights, workingWithGod, founderStory];
 
 const SITE_ORIGIN = 'https://echopulse.media';
 const MONTH_NAMES = [
@@ -1711,5 +2548,8 @@ export function heroImageFor(study: CaseStudy): { src: string; caption: string }
   if (study.proof[0]) return { src: study.proof[0].src, caption: study.proof[0].caption };
   if (study.comparison) return { src: study.comparison.beforeSrc, caption: study.comparison.caption };
   if (study.heroMedia) return { src: study.heroMedia.src, caption: study.heroMedia.caption ?? study.heroMedia.alt };
+  // A software build has no export or before screen: its main product screen
+  // is the image that carries the argument.
+  if (study.heroShot) return { src: study.heroShot.src, caption: study.heroShot.caption ?? study.heroShot.alt };
   return null;
 }

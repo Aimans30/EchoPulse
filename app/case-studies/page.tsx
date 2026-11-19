@@ -7,7 +7,7 @@ const SITE_URL = 'https://echopulse.media';
 const canonical = `${SITE_URL}/case-studies`;
 
 const META_DESCRIPTION =
-  'Client work with named companies, live URLs you can check, and the open problems still on each account. A search engagement and a full site replacement, both with receipts.';
+  'Client work with named companies and live URLs you can check: a search engagement, a website rebuild and a full operating system for a multi-outlet laundry chain.';
 
 export const metadata: Metadata = {
   title: 'Case Studies',
