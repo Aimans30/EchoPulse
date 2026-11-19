@@ -593,7 +593,7 @@ export default function Hero() {
                 sizes. Figures are the ones on the case study page. */}
             <p className="hero-proof">
               <Link href="/case-studies/magicbnb-seo-aeo" data-cursor-hover>
-                MagicBNB went from 5.8 to 4,859 Google impressions a day in seven months. See the
+                MagicBNB went from 5.8 to 4,803 Google impressions a day in seven months. See the
                 Search Console export, including what is still not working.
               </Link>
             </p>

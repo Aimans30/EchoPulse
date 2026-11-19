@@ -158,7 +158,7 @@ export const FAQ_GROUPS: FaqGroup[] = [
     items: [
       {
         q: 'What results has EchoPulse published?',
-        a: 'Two client case studies. The first is MagicBNB, which EchoPulse runs end to end. Between 19 February and 11 November 2026 the site went from an average of 5.8 Google impressions a day in April to an average of 4,859 a day in the first 11 days of November, after a site rebuild and more than 200 articles. The Search Console export is on the case study page, along with what is still not working. The second is Working With God, a coaching practice whose site was rebuilt and whose monthly platform bill went from $50 to $60 down to $0 for a one-time $599. No traffic result is claimed for it.',
+        a: 'Two client case studies. The first is MagicBNB, which EchoPulse runs end to end. Between 19 February and 16 November 2026 the site went from an average of 5.8 Google impressions a day in April to an average of 4,803 a day in the first 16 days of November, after a site rebuild and more than 200 articles. The Search Console export is on the case study page, along with what is still not working. The second is Working With God, a coaching practice whose site was rebuilt and whose monthly platform bill went from $50 to $60 down to $0 for a one-time $599. No traffic result is claimed for it.',
         link: { href: '/case-studies/magicbnb-seo-aeo', label: 'Read the MagicBNB case study' },
       },
       {

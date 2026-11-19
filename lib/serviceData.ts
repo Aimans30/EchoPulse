@@ -453,7 +453,7 @@ export const services: ServiceData[] = [
     result: {
       client: 'MagicBNB, a software company',
       role: 'One engagement, not a typical result',
-      stat: '5.8 to 4,859',
+      stat: '5.8 to 4,803',
       statLabel: 'daily Google impressions, April to early November 2026',
       body: 'This is the one published search result, and it comes from the whole marketing system, not search work alone. It is not a promise for your site. The same export shows a click-through rate under half a percent, a small number of conversions and a broken link still sending visitors to a 404. The full case study prints all of it.',
     },
@@ -463,7 +463,7 @@ export const services: ServiceData[] = [
       role: 'Founder, EchoPulse',
     },
     faq: [
-      { q: 'What is the MagicBNB result?', a: 'Daily Google impressions for magicbnb.io went from 5.8 in April 2026 to 4,859 in early November 2026. That is impressions, not sales. It came from the whole marketing system, and it is one case, so do not read it as typical. See /case-studies/magicbnb-seo-aeo for the export.' },
+      { q: 'What is the MagicBNB result?', a: 'Daily Google impressions for magicbnb.io went from 5.8 in April 2026 to 4,803 in early November 2026. That is impressions, not sales. It came from the whole marketing system, and it is one case, so do not read it as typical. See /case-studies/magicbnb-seo-aeo for the export.' },
       { q: 'What is still not working on that case?', a: 'Click-through rate is still under half a percent, conversions are few, a broken inbound link still sends visitors to a 404, and some pages compete with each other for the same query. The case study lists each one with its status.' },
       { q: 'Do you guarantee rankings or AI citations?', a: 'No. Nobody outside Google controls rankings, and we do not publish AI citation counts. We commit to the work: the pages, the structured data, the sourced blogs and the monthly review.' },
       { q: 'What do I get at each price?', a: `Presence Engine, ${PRESENCE_P} a month, covers pages, Google Business Profile and structured data, with no blogs. Growth, ${GROWTH_P} a month, adds 4 SEO blogs a month, the website rebuilt in month one and tuned monthly, and funnel tracking. Both are month-to-month.` },

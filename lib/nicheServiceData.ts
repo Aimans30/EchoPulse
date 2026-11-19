@@ -290,7 +290,7 @@ const RAW_PAGES: NichePageRaw[] = [
       heading: 'What we can and cannot show',
       paragraphs: [
         'EchoPulse has no published agent-site result, so none appears here. The founder, Lakshya Soni, edited listing tours for more than 200 Canadian agents at a previous company. That was video, not websites, and those agents were that company\'s clients, not ours.',
-        'There are two published site rebuilds, neither for an agent. MagicBNB, a software company, put its new site live on 5 May 2026. On 4 May it earned 13 Google impressions and on 5 May, 209. Daily impressions averaged 5.8 in April and 4,859 in early November, but that covers 219 articles and ads too, so the site alone does not explain it. Working With God, an executive coaching practice, moved off a shared GoDaddy site to its own, and its monthly platform bill went from $50 to $60 down to $0 for a one-time $599. No traffic result is claimed for it.',
+        'There are two published site rebuilds, neither for an agent. MagicBNB, a software company, put its new site live on 5 May 2026. On 4 May it earned 13 Google impressions and on 5 May, 209. Daily impressions averaged 5.8 in April and 4,803 in early November, but that covers 227 articles and ads too, so the site alone does not explain it. Working With God, an executive coaching practice, moved off a shared GoDaddy site to its own, and its monthly platform bill went from $50 to $60 down to $0 for a one-time $599. No traffic result is claimed for it.',
       ],
       links: [
         { href: '/case-studies/founder-200-real-estate-agents', label: 'Read the founder story' },
@@ -596,7 +596,7 @@ const RAW_PAGES: NichePageRaw[] = [
       heading: 'What we can and cannot show',
       paragraphs: [
         'EchoPulse has no published LinkedIn result for a coach, and this page has no client quotes or logos.',
-        'The only case study is MagicBNB, a software company, where LinkedIn is one workstream next to a site rebuild, 219 articles and ads. It prints no LinkedIn figures, so it cannot tell you what posts alone would do for a coach.',
+        'The only case study is MagicBNB, a software company, where LinkedIn is one workstream next to a site rebuild, 227 articles and ads. It prints no LinkedIn figures, so it cannot tell you what posts alone would do for a coach.',
         'To judge the writing, take the Pilot. You get 2 posts in your voice and you can walk away with them.',
       ],
       links: [{ href: '/case-studies/magicbnb-seo-aeo', label: 'Read the MagicBNB case study' }],
@@ -800,8 +800,8 @@ const RAW_PAGES: NichePageRaw[] = [
     proof: {
       heading: 'What we can and cannot show',
       paragraphs: [
-        'EchoPulse runs marketing for MagicBNB, a software company, including the founder brand on Instagram and LinkedIn. Its published result is Google search impressions, which averaged 5.8 a day in April 2026 and 4,859 in the first 11 days of November.',
-        'That comes from the whole system, 219 articles and a rebuilt site included. The case study prints no LinkedIn numbers, so we claim none, and it lists what is still not working.',
+        'EchoPulse runs marketing for MagicBNB, a software company, including the founder brand on Instagram and LinkedIn. Its published result is Google search impressions, which averaged 5.8 a day in April 2026 and 4,803 in the first 16 days of November.',
+        'That comes from the whole system, 227 articles and a rebuilt site included. The case study prints no LinkedIn numbers, so we claim none, and it lists what is still not working.',
       ],
       links: [{ href: '/case-studies/magicbnb-seo-aeo', label: 'Read the MagicBNB case study' }],
       showClips: false,
@@ -1421,8 +1421,8 @@ const RAW_PAGES: NichePageRaw[] = [
     proof: {
       heading: 'The two published site rebuilds',
       paragraphs: [
-        'The rebuilt site for MagicBNB, a software company, went live on 5 May 2026. On 4 May it earned 13 Google impressions and on 5 May, 209. Daily impressions averaged 5.8 in April and 4,859 in the first 11 days of November.',
-        'That is the result of the whole system, 219 articles and ads included, and the study says the site alone does not explain it. It also lists what is not working yet, such as a click-through rate under half a percent.',
+        'The rebuilt site for MagicBNB, a software company, went live on 5 May 2026. On 4 May it earned 13 Google impressions and on 5 May, 209. Daily impressions averaged 5.8 in April and 4,803 in the first 16 days of November.',
+        'That is the result of the whole system, 227 articles and ads included, and the study says the site alone does not explain it. It also lists what is not working yet, such as a click-through rate under half a percent.',
         'Working With God, an executive coaching practice, moved off a shared GoDaddy site to its own. Its monthly platform bill went from $50 to $60 down to $0 for a one-time $599. No traffic result is claimed for it.',
       ],
       links: [

@@ -76,7 +76,7 @@ const FAQ: { q: string; a: string }[] = [
   },
   {
     q: 'What proof is there that the work gets results?',
-    a: 'The MagicBNB case study is the one with a real export behind it. EchoPulse runs that client\'s marketing end to end. Between 19 February and 11 November 2026 the site went from an average of 5.8 Google impressions a day in April to an average of 4,859 a day in the first 11 days of November, with 356,765 impressions and 1,568 clicks across the window, after a site rebuild and more than 200 articles. The Search Console export is on the case study page, along with what is still not working. A second case study, Working With God, covers a coaching site rebuild that took the monthly platform bill from $50 to $60 down to $0 for a one-time $599, with no traffic result claimed.',
+    a: 'The MagicBNB case study is the one with a real export behind it. EchoPulse runs that client\'s marketing end to end. Between 19 February and 16 November 2026 the site went from an average of 5.8 Google impressions a day in April to an average of 4,803 a day in the first 16 days of November, with 380,327 impressions and 1,624 clicks across the window, after a site rebuild and more than 200 articles. The Search Console export is on the case study page, along with what is still not working. A second case study, Working With God, covers a coaching site rebuild that took the monthly platform bill from $50 to $60 down to $0 for a one-time $599, with no traffic result claimed.',
   },
 ];
 

@@ -289,7 +289,7 @@ export default function HeroReel() {
       <div className="hr-float hr-growth" aria-hidden="true">
         <span className="hr-kicker">MagicBNB, daily Google impressions</span>
         <div className="hr-growth-row">
-          <strong>5.8 &rarr; 4,859</strong>
+          <strong>5.8 &rarr; 4,803</strong>
           <svg viewBox="0 0 96 34" width="96" height="34">
             <path d="M2 31 C 18 30, 26 28, 36 25 S 54 20, 62 15 S 80 8, 94 3" fill="none" stroke="#E8541A" strokeWidth="2.5" strokeLinecap="round" pathLength="1" />
           </svg>

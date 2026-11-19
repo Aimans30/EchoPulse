@@ -46,7 +46,7 @@ export default function BlogSideCTA({ icp, service, slug }: { icp: IcpKey; servi
   );
   const proof = (
     <>
-      <strong style={{ color: '#0C0C0B' }}>5.8 &rarr; 4,859</strong> daily Google impressions.
+      <strong style={{ color: '#0C0C0B' }}>5.8 &rarr; 4,803</strong> daily Google impressions.
     </>
   );
 
