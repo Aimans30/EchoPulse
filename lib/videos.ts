@@ -51,6 +51,10 @@ export const videos: VideoEntry[] = [
   { url: 'https://res.cloudinary.com/dqqd9rq8s/video/upload/v1782372139/2438_fn_z6wry7.mp4',                                    type: 'realestate', brand: 'Listing Reel', label: 'Property',                            icp: ['real-estate'] },
 
   // ─── New clips ───────────────────────────────────────────────────────────
+  // Real estate listing reel.
+  { url: 'https://res.cloudinary.com/dkzhqy2od/video/upload/v1795125985/reel_1_bswr7q.mp4',                                      type: 'realestate', brand: 'Listing Reel', label: 'Property', orientation: 'vertical', icp: ['real-estate'] },
+  // Coach personal brand reel, Hormozi-style captions and pacing.
+  { url: 'https://res.cloudinary.com/dkzhqy2od/video/upload/v1795126002/FOREST_FIRE_hlwwy7.mp4',                                 type: 'talking',  brand: 'Coach Reel',     label: 'Personal Brand', orientation: 'vertical', icp: ['coaches'] },
   // DTC ad reel that also works as business owner content.
   { url: 'https://res.cloudinary.com/dkzhqy2od/video/upload/v1795122874/c16_h5bzrt.mp4',                                         type: 'talking',  brand: 'DTC Ad',         label: 'Ad Reel', orientation: 'vertical', icp: ['dtc', 'business-owners'] },
   // Ad reel mixing AI visuals and motion graphics.

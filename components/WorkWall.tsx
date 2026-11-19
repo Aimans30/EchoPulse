@@ -70,8 +70,20 @@ type Tile = { key: string; x: number; y: number; w: number; h: number; clip: Wal
  */
 const MOMENTS = [0, 30, 55, 78, 15, 42, 66];
 function momentOf(clip: WallClip, n: number) {
+  if (clip.youtube) {
+    // YouTube publishes frames at 25, 50 and 75 percent of the video
+    // (maxres1..3, sd1..3) besides the thumbnail; cycle through them.
+    const f = (n + Number(/maxres(\d)/.exec(clip.poster)?.[1] ?? 0)) % 4;
+    if (!n || /oar/.test(clip.poster)) return { poster: clip.poster, posterSm: clip.posterSm, preview: clip.preview };
+    const id = clip.youtube.id;
+    return {
+      poster: `https://i.ytimg.com/vi/${id}/${f ? `maxres${f}` : 'maxresdefault'}.jpg`,
+      posterSm: `https://i.ytimg.com/vi/${id}/${f ? `sd${f}` : 'sddefault'}.jpg`,
+      preview: clip.preview,
+    };
+  }
   const pct = MOMENTS[n % MOMENTS.length];
-  if (!pct || clip.youtube) return { poster: clip.poster, posterSm: clip.posterSm, preview: clip.preview };
+  if (!pct) return { poster: clip.poster, posterSm: clip.posterSm, preview: clip.preview };
   const so = `so_${pct}p`;
   return {
     poster: clip.poster.replace(/\/so_[^,/]+,/, `/${so},`),
@@ -88,8 +100,10 @@ function makeGrid(vw: number, vh: number, clips: WallClip[]): Grid | null {
   const mod = pitch * 8;
   const tall = clips.filter((c) => c.orientation !== 'horizontal');
   const wide = clips.filter((c) => c.orientation === 'horizontal');
-  const tallPool = tall.length ? tall : clips;
-  const widePool = wide.length ? wide : clips;
+  // With only a few landscape (or portrait) clips under a filter, those few
+  // would fill every slot of that shape and repeat; mix the whole set in.
+  const tallPool = tall.length >= 6 ? tall : clips;
+  const widePool = wide.length >= 6 ? wide : clips;
 
   let mc = Math.ceil(vw / mod) + 2;
   let mr = Math.ceil(vh / mod) + 2;
@@ -111,7 +125,7 @@ function makeGrid(vw: number, vh: number, clips: WallClip[]): Grid | null {
       if (p.id !== id) return false;
       const dx = Math.min(Math.abs(p.x - x), W - Math.abs(p.x - x));
       const dy = Math.min(Math.abs(p.y - y), H - Math.abs(p.y - y));
-      return Math.hypot(dx, dy) < mod * 1.2;
+      return Math.hypot(dx, dy) < mod * 1.6;
     });
   const pick = (pool: WallClip[], start: number, x: number, y: number) => {
     for (let k = 0; k < pool.length; k++) {
