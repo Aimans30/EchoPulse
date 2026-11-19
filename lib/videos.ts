@@ -51,6 +51,8 @@ export const videos: VideoEntry[] = [
   { url: 'https://res.cloudinary.com/dqqd9rq8s/video/upload/v1782372139/2438_fn_z6wry7.mp4',                                    type: 'realestate', brand: 'Listing Reel', label: 'Property',                            icp: ['real-estate'] },
 
   // ─── New clips ───────────────────────────────────────────────────────────
+  // Informational reel for business owners.
+  { url: 'https://res.cloudinary.com/dkzhqy2od/video/upload/v1795122842/c10_crifo8.mp4',                                         type: 'talking',  brand: 'Business Reel',  label: 'Info Content', orientation: 'vertical', icp: ['business-owners'] },
   // SaaS ad reel for DTC-style paid social (Milo series).
   { url: 'https://res.cloudinary.com/dkzhqy2od/video/upload/v1795122828/milo_5_zxyxwn.mp4',                                      type: 'talking',  brand: 'SaaS Ad',        label: 'Ad Reel', orientation: 'vertical', icp: ['dtc', 'founders'] },
   // MagicBNB SaaS ad reel (DTC-style paid social), also fits business owners.
