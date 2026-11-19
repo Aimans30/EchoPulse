@@ -51,6 +51,8 @@ export const videos: VideoEntry[] = [
   { url: 'https://res.cloudinary.com/dqqd9rq8s/video/upload/v1782372139/2438_fn_z6wry7.mp4',                                    type: 'realestate', brand: 'Listing Reel', label: 'Property',                            icp: ['real-estate'] },
 
   // ─── New clips ───────────────────────────────────────────────────────────
+  // Founder info content reel, also used for DTC.
+  { url: 'https://res.cloudinary.com/dkzhqy2od/video/upload/v1795125954/Jan_v1_byEchoPulse_gkl6m6.mp4',                          type: 'talking',  brand: 'Founder Reel',   label: 'Info Content', orientation: 'vertical', icp: ['founders', 'dtc'] },
   // Real estate listing reel.
   { url: 'https://res.cloudinary.com/dkzhqy2od/video/upload/v1795125985/reel_1_bswr7q.mp4',                                      type: 'realestate', brand: 'Listing Reel', label: 'Property', orientation: 'vertical', icp: ['real-estate'] },
   // Coach personal brand reel, Hormozi-style captions and pacing.
