@@ -105,6 +105,7 @@ export default function Manifesto() {
           .mf-dot { display: none; }
           .mf-vis { height: 132px; }
           .mf-body { padding: 18px 18px 20px; }
+          .mf-tray, .mf-ends { font-size: 12px; }
         }
         @media (prefers-reduced-motion: reduce) {
           .mf-item, .mf-dot, .mf-rail i { transition: none; opacity: 1; transform: none; }

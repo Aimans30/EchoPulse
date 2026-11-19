@@ -805,7 +805,8 @@ export default function WorkWall({ clips }: { clips: WallClip[] }) {
           .ww-book { padding: 0 16px; min-height: 42px; }
           .ww-hint { bottom: 80px; }
           .ww-in { border-radius: 12px; }
-          .ww-hint { font-size: 11px; }
+          .ww-hint { font-size: 12px; }
+          .ww-yt { font-size: 12px; }
         }
         @media (prefers-reduced-motion: reduce) {
           .ww-in, .ww-in video, .ww-hint, .ww-cursor { transition: none; }
