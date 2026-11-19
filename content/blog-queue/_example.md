@@ -1,6 +1,6 @@
 ---
 # FORMAT EXAMPLE ONLY. Vendors, prices and sources below are placeholders (Vendor A, example.com),
-# not research. It shows the shape the validator expects. Files starting with "_" are never published.
+# not research. It shows the shape the validator expects (and the chart: --dry-run draws it). Files starting with "_" are never published.
 # The rules are in content/BLOG-ENGINE.md; the frontmatter keys are explained in README.md.
 title: "Listing Video Editing Cost: $40 to $250 a Video (Example)"
 slug: example-listing-video-editing-cost
@@ -16,6 +16,9 @@ moneyPage: /real-estate/video-editing
 whatsNew: "PLACEHOLDER: per-video prices for 6 example vendors in one table, with the monthly cost at 4 listings."
 thumbnailText: "Listing Video Editing Cost: $40 to $250"
 thumbnailSub: "6 vendors, price per video"
+chartColumn: "Price per video, USD, 18 Nov 2026"
+chartLabel: "Vendor"
+chartSource: "6 example vendors' pricing pages"
 tags: [real estate, video]
 ---
 

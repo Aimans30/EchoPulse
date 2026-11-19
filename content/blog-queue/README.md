@@ -55,6 +55,9 @@ thumbnailText: "The post title, or a shorter version of it" # optional, 30 to 60
 thumbnailSub: "Per video vs monthly plans" # optional, max 40 chars, the angle in one line under the title
 tags: [video, real estate]          # optional, free text, not stored
 readTime: 6                         # optional minutes; computed from the word count if omitted
+chartColumn: "Year one, USD (our arithmetic)"   # optional: the main table's header (exact) to draw as a bar chart
+chartLabel: "Vendor"                # optional: the column that names each bar; default the first column
+chartSource: "10 vendors' own pricing pages"   # optional, max 80 chars: the source line on the chart and caption
 refresh: true                       # written by --pull on a refresh file; leave it. A live slug is never changed
 engine: false                       # hand-written posts only: report the engine standard as warnings instead of errors. The engine never sets this
 ---
@@ -65,8 +68,9 @@ Categories (must match exactly, these are the labels `lib/blog.ts` uses):
 `Automation`, `Strategy`, `Company`, `Insights`.
 
 What is stored on the Sanity document: `icp`, `service`, `postType`, `updateBy`, `targetQuery`,
-`moneyPage`, `whatsNew`, plus `lastChecked` (read from the `Last checked: D Month YYYY.` line in
-the body) and `coverText` (the text on the rendered cover). The site reads the stored `icp` and
+`moneyPage`, `whatsNew`, `chartColumn`, `chartLabel`, `chartSource`, plus `lastChecked` (read from
+the `Last checked: D Month YYYY.` line in the body; the page's `dateModified` comes from it) and
+`coverText` (the text on the rendered cover). The site reads the stored `icp` and
 `service` to choose a post's call to action and its money-page link (`audienceFor` in
 `lib/blogLinks.ts`); posts published before those fields existed fall back to keywords in the
 slug and title. The last five fields are not in the Studio schema yet, so Studio lists them as
@@ -98,11 +102,40 @@ checks one. Each error line ends with its fix. For engine posts (every file here
 - "I ..." sentences, experience and client claims ("in our experience", "our clients", "we tested"),
   a `cal.com` link, the retired tier, Clutch, and the banned phrases in BLOG-ENGINE.md section 5.3;
 - an internal link to a page that does not exist in the checkout; more than half of the paragraphs
-  with a price or percentage naming no source.
+  with a price or percentage naming no source;
+- the banned phrases and constructions in `content/blog-data/style-guide.md` part 1, a paragraph that
+  opens with a question or a closing summary, a paragraph over 160 words;
+- the exact `targetQuery` phrase in more than 2 headings or more than 2 + 1 per 400 words; under 800
+  words (asset); any image line in a new post (the publisher draws the only chart);
+- a year in the title that is not the year of the `Last checked:` line;
+- a founder quote that is not, word for word, the `Quote:` line of a `public: yes` note in
+  `content/blog-data/founder-notes.md` with the same date.
 
 Warnings (fix, or explain in the run report): filler words, fewer than 2 links to sibling posts,
-few question H2s, a long EchoPulse section, over 2,400 words. At publish time the publisher also
-checks that every `/blog/` link is a live post published on or after 1 July 2026.
+an H2 that is neither a question nor a task, a long EchoPulse section, over 2,400 words, paragraphs
+over 90 words, an average sentence over 18 words, sentences over 35 words, a price column with no
+currency in its header, a first table with no date in its header, a sentence that restates its
+heading, first 100 words missing the target query's words, a `chartColumn` that cannot be drawn.
+The thresholds were calibrated on the three newest live posts (16 to 18 November 2026): none of
+them fails a new check; each gets a few of the new warnings.
+
+At publish time the publisher also checks that every `/blog/` link is a live post published on or
+after 1 July 2026, refuses a new post when 4 new posts are already live this ISO week or 2 today
+(Asia/Kolkata), refuses a new post whose title or `targetQuery` repeats a live post's topic,
+refuses a `--refresh` that changes nothing but dates, and refuses everything while
+`content/blog-data/PAUSE` exists.
+
+## The chart
+
+With `chartColumn` set, the publisher reads that column of the first table that has it, draws a
+1200 px wide bar chart (Poppins outlines through `opentype.js` and `sharp`, the same tooling as the
+cover, no new dependencies), uploads it to Sanity as an image asset and inserts an `imageUrl` block
+after the table (after the cite block when one follows it), with alt text built from the data and the
+caption "<column>. Source: <chartSource>, checked <date>. Chart by EchoPulse Media from the table
+above." A cell is drawn when it holds one figure or "a to b" in one currency; anything else is
+listed under the bars as not charted. Fewer than 3 drawable rows, more than 14, or mixed currencies:
+the chart is skipped with a warning and the post publishes without it. A refresh drops the old chart
+(found by its caption) and draws a new one. `--dry-run` writes the PNG to `.thumbs/<slug>-chart.png`.
 
 Files in `content/blog-published/` and files whose name starts with `_` are checked as legacy: the
 standard is printed as warnings (`npm run blog:validate -- --published` includes the published folder).
@@ -110,7 +143,7 @@ standard is printed as warnings (`npm run blog:validate -- --published` includes
 ## Refreshing a live post
 
 ```
-node scripts/publish-blog.mjs --refresh-list                 # what to refresh, in order (reads content/blog-data/gsc-pages-*.csv)
+node scripts/publish-blog.mjs --refresh-list                 # refresh order (tiers T, P, A, B, C), caps, PAUSE
 node scripts/publish-blog.mjs --pull <slug>                  # live post -> content/blog-queue/<today>-<slug>.md, round trip verified
 npm run blog:validate -- --file content/blog-queue/<file>.md
 npm run blog:publish -- --refresh --dry-run --file content/blog-queue/<file>.md   # prints what is kept and what changes

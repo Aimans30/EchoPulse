@@ -48,7 +48,9 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, statSync,
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import yaml from 'js-yaml';
-import { markdownToPortableText, assertPortableText } from './markdown-to-portable-text.mjs';
+import opentype from 'opentype.js';
+import sharp from 'sharp';
+import { markdownToPortableText, assertPortableText, makeKey } from './markdown-to-portable-text.mjs';
 import { renderThumbnail, pickIcon } from './render-thumbnail.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -107,6 +109,15 @@ const EXCERPT_MIN = 130;
 const TITLE_MAX_ENGINE = 60;
 /** Posts published before this date are under owner review for removal: not refreshed, not linked. */
 const LEGACY_CUTOFF = '2026-07-01';
+/** New posts (asset or trending, not refreshes) per ISO week and per day, Asia/Kolkata calendar. */
+const WEEK_CAP = 4;
+const DAY_CAP = 2;
+/** A cost or pricing post is re-checked at least this often; other posts become DUE after 45 days. */
+const PRICE_RECHECK_DAYS = 90;
+const DUE_DAYS = 45;
+/** Every chart the publisher inserts ends its caption with this, so a refresh can replace it. */
+const CHART_MARK = 'Chart by EchoPulse Media from the table above.';
+const FONT_DIR = join(ROOT, 'scripts', 'fonts');
 
 // ─── CLI args ────────────────────────────────────────────────────────────────
 
@@ -247,16 +258,26 @@ export function parsePost(filePath, opts = {}) {
   const moneyPage = str(data.moneyPage).replace(/(.)\/$/, '$1');
   const whatsNew = str(data.whatsNew);
 
-  const known = new Set(['title', 'slug', 'excerpt', 'category', 'author', 'publishAt', 'icp', 'service', 'tags', 'thumbnailText', 'thumbnailSub', 'readTime', 'postType', 'updateBy', 'targetQuery', 'moneyPage', 'whatsNew', 'ask', 'engine', 'refresh']);
+  const chartColumn = str(data.chartColumn);
+  const chartLabel = str(data.chartLabel);
+  const chartSource = str(data.chartSource);
+  if (chartSource.length > 80) errors.push(`chartSource is ${chartSource.length} chars; max 80`);
+
+  const known = new Set(['title', 'slug', 'excerpt', 'category', 'author', 'publishAt', 'icp', 'service', 'tags', 'thumbnailText', 'thumbnailSub', 'readTime', 'postType', 'updateBy', 'targetQuery', 'moneyPage', 'whatsNew', 'ask', 'engine', 'refresh', 'chartColumn', 'chartLabel', 'chartSource']);
   const warnings = [];
   for (const k of Object.keys(data)) if (!known.has(k)) warnings.push(`unknown frontmatter key "${k}" ignored`);
 
   let blocks = [];
   let wordCount = 0;
+  let oldCharts = 0;
   if (!errors.length) {
     try {
       const r = markdownToPortableText(body);
-      blocks = r.blocks;
+      // A chart the publisher inserted earlier comes back in a pulled refresh
+      // file. It is drawn from the old table, so it is dropped here and, when
+      // chartColumn is set, drawn again from the table as it is now.
+      blocks = r.blocks.filter((b) => !(b._type === 'imageUrl' && String(b.caption || '').endsWith(CHART_MARK)));
+      oldCharts = r.blocks.length - blocks.length;
       wordCount = r.wordCount;
       warnings.push(...r.warnings);
       assertPortableText(blocks);
@@ -272,13 +293,13 @@ export function parsePost(filePath, opts = {}) {
   const template = basename(filePath).startsWith('_');
   const legacy = Boolean(opts.legacy) || template || data.engine === false || str(data.engine).toLowerCase() === 'false';
   let standard = { errors: [], warnings: [], facts: [], lastChecked: null };
+  let checkBlocks = blocks;
   if (!errors.length) {
     // Tables must be counted as tables even while BLOG_TABLES=pipes is set.
-    let checkBlocks = blocks;
     if (process.env.BLOG_TABLES === 'pipes') {
       const saved = process.env.BLOG_TABLES;
       delete process.env.BLOG_TABLES;
-      try { checkBlocks = markdownToPortableText(body).blocks; } finally { process.env.BLOG_TABLES = saved; }
+      try { checkBlocks = markdownToPortableText(body).blocks.filter((b) => !(b._type === 'imageUrl' && String(b.caption || '').endsWith(CHART_MARK))); } finally { process.env.BLOG_TABLES = saved; }
     }
     standard = checkStandard({
       src, body, data, blocks: checkBlocks, wordCount,
@@ -290,6 +311,25 @@ export function parsePost(filePath, opts = {}) {
     } else {
       errors.push(...standard.errors);
       warnings.push(...standard.warnings);
+    }
+  }
+
+  // The chart: planned here (no network, no rendering) so validate reports it.
+  let chart = null;
+  if (!errors.length) {
+    if (oldCharts) standard.facts.push(`${oldCharts} old chart block${oldCharts > 1 ? 's' : ''} dropped (redrawn from the current table if chartColumn is set)`);
+    if (chartColumn) {
+      // Planned on real table blocks; under BLOG_TABLES=pipes the publisher then skips drawing it.
+      chart = planChart(checkBlocks, { column: chartColumn, label: chartLabel });
+      if (chart.skip) {
+        warnings.push(`chart skipped: ${chart.skip} Fix: point chartColumn at a column of the main table whose cells each hold one figure or "a to b" in one currency, with 3 or more such rows, or delete chartColumn.`);
+        standard.facts.push('chart skipped');
+        chart = null;
+      } else {
+        standard.facts.push(`chart ${chart.rows.length} bars from "${chart.header}"${chart.missing.length ? `, ${chart.missing.length} not charted` : ''}`);
+      }
+    } else {
+      standard.facts.push('chart none (no chartColumn)');
     }
   }
 
@@ -307,6 +347,7 @@ export function parsePost(filePath, opts = {}) {
     thumbnailText, thumbnailSub, readTime, wordCount, blocks, warnings, postType, updateBy,
     targetQuery, moneyPage, whatsNew, lastChecked: standard.lastChecked, legacy, facts: standard.facts,
     coverTextExplicit: Boolean(str(data.thumbnailText)),
+    chart, chartColumn, chartLabel, chartSource,
   };
 }
 
@@ -348,8 +389,37 @@ export function repoFacts() {
   for (const m of rulesSrc.matchAll(/\['([a-z-]+)',\s*\[([^\]]*)\]\]/g)) {
     icpRules.push([m[1], [...m[2].matchAll(/'([^']+)'/g)].map((x) => x[1])]);
   }
-  repoFactsCache = { routes, niche, prices, icpRules };
+  repoFactsCache = { routes, niche, prices, icpRules, founderNotes: parseFounderNotes(read('content/blog-data/founder-notes.md')) };
   return repoFactsCache;
+}
+
+/** Straight quotes, single spaces: how a quote is compared with the note it came from. */
+const normQuote = (t) => String(t).replace(/[“”]/g, '"').replace(/[‘’]/g, "'").replace(/\s+/g, ' ').trim();
+
+/**
+ * content/blog-data/founder-notes.md: one "## YYYY-MM-DD | public: yes|no | ..."
+ * heading per note, with a `Quote: "..."` line. Anything inside a fenced code
+ * block (the template's example) is ignored.
+ * @returns {{ date: string, public: boolean, quote: string }[]}
+ */
+export function parseFounderNotes(src) {
+  const notes = [];
+  let fence = false;
+  let cur = null;
+  for (const line of String(src || '').split('\n')) {
+    if (/^\s*(```|~~~)/.test(line)) { fence = !fence; continue; }
+    if (fence) continue;
+    const h = line.match(/^##\s+(\d{4}-\d{2}-\d{2})\s*\|(.*)$/);
+    if (h) {
+      cur = { date: h[1], public: /\bpublic:\s*yes\b/i.test(h[2]), quote: '' };
+      notes.push(cur);
+      continue;
+    }
+    if (/^##\s/.test(line)) { cur = null; continue; }
+    const q = cur && line.match(/^\s*-?\s*Quote:\s*["“](.*)["”]\s*$/);
+    if (q) cur.quote = normQuote(q[1]);
+  }
+  return notes.filter((n) => n.quote);
 }
 
 /** The one selling page a post feeds: the niche page when the pair exists, else the service page. */
@@ -375,9 +445,19 @@ const BANNED_HARD = [
   [/\bhere['’]s the thing\b/i, "here's the thing"], [/\bthe truth is\b/i, 'the truth is'], [/\bworth noting\b/i, "it's worth noting"],
   [/\bimportant to (note|remember)\b/i, "it's important to note"], [/\bwhat most people miss\b/i, 'what most people miss'],
   [/\bultimate guide\b|\bcomplete guide\b|\beverything you need to know\b/i, 'ultimate/complete guide'],
+  // content/blog-data/style-guide.md, the mechanical part
+  [/\bfast[- ]paced\b/i, 'fast-paced'], [/\bin conclusion\b|\bin summary\b|\bto sum (it )?up\b|\bthe bottom line\b/i, 'in conclusion / in summary'],
+  [/\bwhether you['’]re an? \b/i, "whether you're a"], [/\bnavigat(e|es|ing) (the|this|these|your)\b/i, 'navigate the'],
+  [/\bnot (just|only|merely) [^.;:?!]{1,60}?,? but( also)?\b/i, '"not just X, but Y"'],
+  [/\bit['’]s not (just )?(about )?[^.;:?!]{1,40}?[,;] it['’]s\b/i, '"it\'s not X, it\'s Y"'],
+  [/\bunlock(s|ed|ing)? (the|your|new|a|real|growth|potential|value)\b/i, 'unlock'], [/\blandscape\b(?! (video|mode|orientation|format|photo|shot|footage|version|aspect))/i, 'landscape (outside "landscape video")'],
+  [/\bempower(s|ed|ing)?\b/i, 'empower'], [/\btransformative\b/i, 'transformative'], [/\bin the realm of\b|\brealm\b/i, 'realm'],
+  [/\bgame plan\b|\bnext level\b|\btake (it|your \w+) to the next level\b/i, 'next level'], [/\bhidden gem\b|\bsecret sauce\b|\bmagic bullet\b/i, 'secret sauce / magic bullet'],
+  [/\blook no further\b|\bwithout further ado\b|\bbuckle up\b/i, 'look no further / without further ado'],
+  [/\b(ever )?wondered (why|how|what|whether|if)\b/i, 'ever wondered'],
 ];
 /** Words that are usually filler but have literal uses ("landscape video"). Warnings. */
-const BANNED_SOFT = /\b(elevat\w*|leverag\w*|robust|unlock\w*|empower\w*|streamlin\w*|transformative|foster\w*|realm|landscape|navigat\w*|crucial|really|very|truly|simply|essentially|arguably)\b/i;
+const BANNED_SOFT = /\b(elevat\w*|leverag\w*|robust|unlock\w*|streamlin\w*|foster\w*|navigat\w*|crucial|really|very|truly|simply|essentially|arguably|comprehensive|holistic|myriad|plethora|pivotal|paramount|vibrant|bustling|meticulous\w*|endeavou?r\w*|embark\w*|harness\w*|boost\w*)\b/i;
 /** Things the engine cannot have done, or that EchoPulse never says. Errors. */
 const BANNED_CLAIMS = [
   [/\bI (checked|tested|tried|reviewed|read|opened|compared|counted|looked|ran|found|built|pulled|priced|asked|called|spoke|use|used|have|recommend|think|would)\b|\bI['’](ve|d|m|ll)\b/, 'first person singular ("I ..."). The run is automated. Fix: write "we" for what was read or calculated ("we read 10 pricing pages"), or cut the sentence.'],
@@ -493,8 +573,6 @@ export function checkStandard(p, now) {
   let moneyLinked = false;
   let tables = 0;
   let cite = false;
-  let h2Count = 0;
-  let h2Questions = 0;
   let figureBlocks = 0;
   const unsourced = [];
   const fitPrices = new Set();
@@ -534,8 +612,6 @@ export function checkStandard(p, now) {
   info.forEach((b, idx) => {
     if (b.kind === 'h2') {
       h2 = norm(b.text); h3 = '';
-      h2Count++;
-      if (/\?\s*$/.test(b.text.trim())) h2Questions++;
       if (isFaq(b.text)) hasFaq = true;
       if (/^sources/.test(h2)) hasSources = true;
       if (/echopulse/.test(h2)) hasFit = true;
@@ -575,8 +651,11 @@ export function checkStandard(p, now) {
     facts.push(`tables ${tables}`);
     if (!tables) errors.push('an asset post needs at least one table. Fix: put the asset in a pipe table whose header row names the unit and the date.');
     if (!cite) errors.push(`no cite block. Fix: directly after the asset add one blockquote: "> **Cite this:** <the finding with its number and date>. Source: EchoPulse Media, "<title>", https://echopulse.media/blog/${p.slug}".`);
-    if (p.template) { /* a format example is short on purpose */ } else if (p.wordCount < 1200) errors.push(`${p.wordCount} words. Fix: an asset post is 1,200 to 2,200 words; add the missing buyer questions, not padding.`);
-    else if (p.wordCount > 2400) warnings.push(`${p.wordCount} words; the target is 1,200 to 2,200. Cut restated points.`);
+    // Length follows the answer (style-guide.md). The floor only catches a
+    // post too short to hold a table, the method, the buyers' questions and
+    // the FAQ; thinness is judged by the editor gate on information gain.
+    if (p.template) { /* a format example is short on purpose */ } else if (p.wordCount < 800) errors.push(`${p.wordCount} words. Fix: an asset post that answers the buyers' questions with a table, method and FAQ is rarely under 800 words; add the missing buyer questions from the gap table, never padding.`);
+    else if (p.wordCount > 2400) warnings.push(`${p.wordCount} words. Length follows the answer: cut restated points and anything the gap table did not ask for.`);
   } else if (p.wordCount < 600) {
     errors.push(`${p.wordCount} words. Fix: a trending post is at least 600 words.`);
   }
@@ -640,9 +719,302 @@ export function checkStandard(p, now) {
     if (figureBlocks >= 4 && unsourced.length > figureBlocks / 2) errors.push(msg + fix);
     else warnings.push(msg + fix);
   }
-  if (h2Count && h2Questions < h2Count / 2) warnings.push(`${h2Questions} of ${h2Count} H2s are questions. Section headings should be the buyer's questions.`);
+
+  // ── the year in the title follows the re-check, never the calendar ──
+  const ty = (p.title.match(/\b(20[2-3]\d)\b/) || [])[1];
+  if (ty && lastChecked && !p.template) {
+    const lcy = lastChecked.slice(0, 4);
+    if (ty > lcy) errors.push(`the title says ${ty} but the post was last checked in ${lcy}. Fix: the year in a title is the year of the "Last checked:" line.`);
+    else if (ty < lcy && !p.isRefresh) errors.push(`the title says ${ty} but the post is checked in ${lcy}. Fix: use ${lcy}.`);
+    else if (ty < lcy) warnings.push(`the title says ${ty} and every figure was re-checked in ${lcy}. Change the year only if G4 shows every figure re-opened today; otherwise keep it and say why in the report.`);
+  }
+
+  // ── experience: only the owner's own notes, quoted word for word ──
+  const notes = repoFacts().founderNotes;
+  const MONTH_RE = /(\d{1,2}) ([A-Za-z]+) (\d{4})/;
+  for (const b of p.blocks) {
+    if (b._type !== 'block') continue;
+    const text = b.children.map((c) => c.text).join('');
+    if (!/lakshya/i.test(text)) continue;
+    if (b.style === 'blockquote' && /^\s*Lakshya Soni\b/.test(text)) {
+      const m = text.match(/^\s*Lakshya Soni[^:"“]*?(\d{1,2} [A-Za-z]+ \d{4}):\s*["“](.+)["”]\s*$/);
+      const d = m && m[1].match(MONTH_RE);
+      const iso = d && MONTHS.includes(d[2].toLowerCase())
+        ? `${d[3]}-${String(MONTHS.indexOf(d[2].toLowerCase()) + 1).padStart(2, '0')}-${d[1].padStart(2, '0')}` : null;
+      const note = iso && notes.find((n) => n.date === iso && n.quote === normQuote(m[2]));
+      if (!m || !iso) errors.push(`a founder quote is not in the fixed form. Fix: write it as one blockquote: > **Lakshya Soni, founder of EchoPulse Media, 12 November 2026:** "<the Quote line of that note, word for word>"`);
+      else if (!note) errors.push(`the founder quote dated ${m[1]} is not, word for word, the Quote line of a note dated ${iso} in content/blog-data/founder-notes.md. Fix: copy the Quote line exactly, or remove the quote. Nothing else counts as experience.`);
+      else if (!note.public) errors.push(`the founder note dated ${iso} is marked "public: no". Fix: remove the quote; only notes marked "public: yes" may be quoted.`);
+      else facts.push(`founder note ${iso} quoted`);
+    } else {
+      warnings.push(`"Lakshya" appears outside a founder quote: "${text.slice(0, 60).trim()}...". Experience goes only in the founder blockquote (section 4 step 8); a plain mention is fine only if it states no experience.`);
+    }
+  }
+
+  // ── readability and scannability (section 5.3) ──
+  // Calibrated on the three newest live posts (16 to 18 Nov 2026): average
+  // sentence 14 to 16 words; 2 to 6 sentences over 35 words each; longest
+  // paragraph 100 to 148 words. Warnings, except a paragraph over 160 words.
+  const sentencesOf = (t) => t
+    .replace(/\b(e\.g|i\.e|vs|Mr|Dr|St|Inc|Co|approx)\./gi, '$1')
+    .replace(/(\d)\.(\d)/g, '$1$2')
+    .split(/(?<=[.!?])["')\]]*\s+(?=["'(\[]?[A-Z0-9$£€])/)
+    .map((s) => s.trim())
+    .filter((s) => /[a-z]/i.test(s));
+  const longParas = [];
+  const hugeParas = [];
+  const longSentences = [];
+  let sentenceCount = 0;
+  let sentenceWords = 0;
+  {
+    let sec = '';
+    for (const b of p.blocks) {
+      if (b._type !== 'block') continue;
+      const text = b.children.map((c) => c.text).join('');
+      if (b.style === 'h2') { sec = norm(text); continue; }
+      if (/^h[1-4]$/.test(b.style) || b.style === 'blockquote' || /^sources/.test(sec)) continue;
+      const w = words(text);
+      if (!b.listItem && w > 160) hugeParas.push(`${w} words: "${text.slice(0, 50).trim()}..."`);
+      else if (!b.listItem && w > 90) longParas.push(`${w} ("${text.slice(0, 40).trim()}...")`);
+      for (const s of sentencesOf(text)) {
+        const sw = words(s);
+        sentenceCount++;
+        sentenceWords += sw;
+        if (sw > 35) longSentences.push(`${sw} ("${s.slice(0, 45).trim()}...")`);
+      }
+    }
+  }
+  const avgSentence = sentenceCount ? sentenceWords / sentenceCount : 0;
+  facts.push(`avg sentence ${avgSentence.toFixed(1)} words`);
+  if (hugeParas.length) errors.push(`paragraph over 160 words: ${hugeParas.slice(0, 3).join('; ')}. Fix: split it; a paragraph is 1 to 4 sentences.`);
+  if (longParas.length) warnings.push(`${longParas.length} paragraph${longParas.length > 1 ? 's' : ''} over 90 words: ${longParas.slice(0, 4).join('; ')}. Split each, or use a list or the table.`);
+  if (avgSentence > 18) warnings.push(`average sentence is ${avgSentence.toFixed(1)} words; the bar is under 18. Split the longest sentences.`);
+  if (longSentences.length) warnings.push(`${longSentences.length} sentence${longSentences.length > 1 ? 's' : ''} over 35 words: ${longSentences.slice(0, 4).join('; ')}. Split each at "and", "which" or a comma.`);
+
+  // every H2 is the buyer's question or a clear task
+  const FIXED_H2 = /^(faq|frequently asked questions|sources|related)\b/;
+  const TASK_H2 = /^(how to|how do|how much|worked example|example|checklist|template|step|steps|what to|which|when|where|who|why|what|is|are|can|should|do|does)\b/;
+  const badH2 = info.filter((b) => b.kind === 'h2' && !/\?\s*$/.test(b.text.trim()) && !FIXED_H2.test(norm(b.text)) && !TASK_H2.test(norm(b.text))).map((b) => `"${b.text.trim()}"`);
+  if (badH2.length) warnings.push(`H2 not a question or a task: ${badH2.slice(0, 5).join(', ')}. Fix: phrase it as the buyer's question ("How much does X cost?") or a task ("Worked example: ...", "Checklist: ...").`);
+
+  // tables: units in the header, and the asset table names its date
+  const MONEY = /[$£€]\s?\d/;
+  const CURRENCY = /\b(USD|GBP|CAD|EUR|AUD|dollars?|pounds?)\b|[$£€]/i;
+  const DATE_IN = /\b\d{1,2} (jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]* \d{4}\b|\bchecked\b|\bas of\b/i;
+  let firstTable = true;
+  for (const b of p.blocks) {
+    if (b._type !== 'table' || !b.rows?.length) continue;
+    const head = b.rows[0].cells.map((c) => String(c));
+    const bodyRows = b.rows.slice(1).map((r) => r.cells.map((c) => String(c)));
+    const noUnit = [];
+    head.forEach((h, i) => {
+      if (i === 0) return;
+      const cells = bodyRows.map((r) => r[i] || '');
+      const money = cells.filter((c) => MONEY.test(c)).length;
+      if (money && money >= cells.length / 2 && !CURRENCY.test(h)) noUnit.push(`"${h}"`);
+    });
+    if (noUnit.length) warnings.push(`table "${head.join(' | ').slice(0, 60)}": column${noUnit.length > 1 ? 's' : ''} ${noUnit.join(', ')} ${noUnit.length > 1 ? "hold" : "holds"} prices but the header names no currency. Fix: add it to the header ("Monthly price, USD").`);
+    if (firstTable && isAsset && !p.template && !head.some((h) => DATE_IN.test(h))) warnings.push(`the first table's header names no date. Fix: put the check date in a header cell ("Monthly price, USD, 18 Nov 2026").`);
+    firstTable = false;
+  }
+
+  // ── style-guide.md patterns that need the block structure ──
+  {
+    let sec = '';
+    let heading = '';
+    let firstUnder = false;
+    for (const b of p.blocks) {
+      if (b._type !== 'block') continue;
+      const text = b.children.map((c) => c.text).join('').trim();
+      if (/^h[2-4]$/.test(b.style)) { if (b.style === 'h2') sec = norm(text); heading = text; firstUnder = true; continue; }
+      if (b.style !== 'normal' || b.listItem || !text) { firstUnder = false; continue; }
+      const inFaq = isFaq(sec);
+      const firstSentence = sentencesOf(text)[0] || text;
+      if (!inFaq && /\?["')]*$/.test(firstSentence.trim())) errors.push(`a paragraph opens with a question: "${firstSentence.slice(0, 60)}". Fix: open with the answer or the fact; questions belong in headings and the FAQ.`);
+      if (/^(overall|ultimately|in short|all in all|at the end of the day|to wrap (it )?up|wrapping up|in a nutshell|the key takeaway)\b/i.test(text)) errors.push(`a closing-summary paragraph: "${text.slice(0, 60)}". Fix: delete it; the post ends with the FAQ and Sources, not a recap.`);
+      if (firstUnder && heading && !/\d/.test(firstSentence)) {
+        const hw = new Set(norm(heading).split(' '));
+        const sw = norm(firstSentence).split(' ').filter(Boolean);
+        const fresh = sw.filter((w) => !hw.has(w) && !['a', 'an', 'the', 'is', 'are', 'it', 'this', 'that', 'of', 'to', 'and', 'in'].includes(w));
+        const shared = sw.filter((w) => hw.has(w) && w.length > 3).length;
+        // "No." or "Usually, yes." is a direct answer, not a restatement.
+        if (sw.length >= 6 && shared >= 4 && fresh.length < 3) warnings.push(`the sentence under "${heading.slice(0, 50)}" restates the heading ("${firstSentence.slice(0, 60)}"). Fix: open with the answer itself.`);
+      }
+      firstUnder = false;
+    }
+  }
+
+  // ── keyword stuffing: the exact target phrase, in headings and in the body ──
+  if (p.targetQuery && !p.template) {
+    const phrase = norm(p.targetQuery);
+    const count = (t) => (norm(t).match(new RegExp(`\\b${phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'g')) || []).length;
+    const inHeadings = info.filter((b) => /^h[2-4]$/.test(b.kind) && count(b.text)).length;
+    const inBody = info.filter((b) => b.kind !== 'table').reduce((n, b) => n + count(b.text), 0);
+    const cap = 2 + Math.floor(p.wordCount / 400);
+    facts.push(`exact target phrase ${inBody}x (cap ${cap}), in ${inHeadings} heading${inHeadings === 1 ? '' : 's'}`);
+    if (inHeadings > 2) errors.push(`the exact phrase "${p.targetQuery}" is in ${inHeadings} headings. Fix: keep it in the first H2 and at most one more; write the other headings as the buyers' own questions.`);
+    if (inBody > cap) errors.push(`the exact phrase "${p.targetQuery}" appears ${inBody} times; the cap for ${p.wordCount} words is ${cap}. Fix: name the thing plainly ("the site", "a listing video") after the first uses.`);
+  }
+
+  // ── images: the cover and the publisher's own chart are the only images ──
+  const images = p.blocks.filter((b) => b._type === 'imageUrl');
+  if (images.length && !p.template) {
+    const msg = `${images.length} image line${images.length > 1 ? 's' : ''} in the body (${images.map((b) => b.url).slice(0, 2).join(', ')}). The engine adds no images: the publisher draws the chart from the table (chartColumn), and an image from elsewhere could be AI-made or unlicensed.`;
+    if (p.isRefresh) warnings.push(`${msg} This came from the live post: keep it only if it is a real screenshot or photo with a source caption; otherwise delete the line.`);
+    else errors.push(`${msg} Fix: delete the line.`);
+  }
+
+  // the first 100 words carry the target query's main term
+  if (p.targetQuery) {
+    const STOP = new Set(['a', 'an', 'the', 'for', 'in', 'of', 'to', 'and', 'or', 'on', 'per', 'vs', 'versus', 'how', 'much', 'does', 'do', 'is', 'are', 'what', 'which', 'best', 'cost', 'costs', 'price', 'prices', 'pricing', 'rates', 'rate', 'my', 'your', 'with', 'uk', 'us', 'usa']);
+    const first100 = info.filter((b) => b.kind !== 'table' && !/^h[1-4]$/.test(b.kind)).map((b) => b.text).join(' ').split(/\s+/).slice(0, 100).join(' ').toLowerCase();
+    const stem = (w) => (w.length >= 5 ? w.slice(0, 4) : w);
+    const terms = p.targetQuery.toLowerCase().split(/[^a-z0-9]+/).filter((w) => w && !STOP.has(w) && !/^20\d\d$/.test(w));
+    const absent = terms.filter((w) => !new RegExp(`\\b${stem(w)}`).test(first100));
+    if (terms.length && absent.length > (terms.length >= 4 ? 1 : 0)) warnings.push(`the first 100 words miss ${absent.map((w) => `"${w}"`).join(', ')} from the target query "${p.targetQuery}". Fix: name the subject in the searcher's words in the capsule.`);
+  }
 
   return { errors, warnings, facts, lastChecked };
+}
+
+// ─── the chart: the main table's figures as a branded bar chart ─────────────
+
+const fmtMoney = (sym, n) => `${sym}${n.toLocaleString('en-US', { maximumFractionDigits: n < 10 ? 2 : 0 })}`;
+
+/**
+ * Read the chart data out of the first table that has `column`.
+ * A cell is charted when it holds one money figure, or "a to b". Anything
+ * else ("Not published", "$49 + $29", "$720 plus setup") is listed as not charted.
+ * @returns {{ skip: string } | { header, labelHeader, rows: {label, low, high, text}[], missing: string[], sym: string, tableIndex: number }}
+ */
+export function planChart(blocks, { column, label } = {}) {
+  const want = String(column || '').trim().toLowerCase();
+  const tableIndex = blocks.findIndex((b) => b._type === 'table' && (b.rows?.[0]?.cells || []).some((c) => String(c).trim().toLowerCase() === want));
+  if (tableIndex === -1) return { skip: `no table has a header cell exactly "${column}".` };
+  const table = blocks[tableIndex];
+  const head = table.rows[0].cells.map((c) => String(c).trim());
+  const col = head.findIndex((c) => c.toLowerCase() === want);
+  let lab = label ? head.findIndex((c) => c.toLowerCase() === String(label).trim().toLowerCase()) : 0;
+  if (lab === -1) return { skip: `chartLabel "${label}" is not a header of that table.` };
+  if (lab === col) lab = col === 0 ? 1 : 0;
+  const rows = [];
+  const missing = [];
+  const syms = new Set();
+  for (const r of table.rows.slice(1)) {
+    const name = String(r.cells[lab] || '').trim();
+    const cell = String(r.cells[col] || '').trim();
+    const nums = [...cell.matchAll(/([$£€])\s?(\d[\d,]*(?:\.\d+)?)\s?([kK]\b)?/g)].map((m) => {
+      syms.add(m[1]);
+      return Number(m[2].replace(/,/g, '')) * (m[3] ? 1000 : 1);
+    });
+    const range = /\bto\b/i.test(cell) && nums.length === 2;
+    // "$720 plus setup" or "$1,500+" is not a whole figure: listed, not drawn.
+    const partial = /\bplus\b|\+/i.test(cell);
+    if (!name || !nums.length || partial || (nums.length > 1 && !range)) { if (name) missing.push(name); continue; }
+    rows.push({ label: name, low: Math.min(...nums), high: Math.max(...nums), text: cell });
+  }
+  if (syms.size > 1) return { skip: `the column mixes currencies (${[...syms].join(' ')}).` };
+  if (rows.length < 3) return { skip: `only ${rows.length} row${rows.length === 1 ? '' : 's'} of "${head[col]}" hold one figure or "a to b".` };
+  if (rows.length > 14) return { skip: `${rows.length} rows is too many bars to read on a phone (max 14).` };
+  rows.sort((a, b) => a.low - b.low || a.high - b.high);
+  return { header: head[col], labelHeader: head[lab], rows, missing, sym: [...syms][0], tableIndex };
+}
+
+const chartFonts = {};
+function chartFont(file) {
+  if (!chartFonts[file]) {
+    const buf = readFileSync(join(FONT_DIR, file));
+    chartFonts[file] = opentype.parse(buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength));
+  }
+  return chartFonts[file];
+}
+
+/** Text as SVG path outlines (no fonts needed where sharp runs), like render-thumbnail.mjs. */
+function chartText(font, text, x, y, size, anchor = 'start') {
+  const w = font.getAdvanceWidth(text, size);
+  const x0 = anchor === 'end' ? x - w : anchor === 'middle' ? x - w / 2 : x;
+  const n = (v) => String(+v.toFixed(2));
+  let d = '';
+  for (const c of font.getPath(text, x0, y, size).commands) {
+    if (c.type === 'M' || c.type === 'L') d += `${c.type}${n(c.x)} ${n(c.y)}`;
+    else if (c.type === 'Q') d += `Q${n(c.x1)} ${n(c.y1)} ${n(c.x)} ${n(c.y)}`;
+    else if (c.type === 'C') d += `C${n(c.x1)} ${n(c.y1)} ${n(c.x2)} ${n(c.y2)} ${n(c.x)} ${n(c.y)}`;
+    else if (c.type === 'Z') d += 'Z';
+  }
+  return { d, w };
+}
+
+/** Shorten to fit `maxW` at `size`, ending in "..." (three full stops, never a dash or an ellipsis glyph). */
+function fitText(font, text, size, maxW) {
+  if (font.getAdvanceWidth(text, size) <= maxW) return text;
+  let t = text;
+  while (t.length > 1 && font.getAdvanceWidth(`${t}...`, size) > maxW) t = t.slice(0, -1);
+  return `${t.trimEnd()}...`;
+}
+
+/** Alt text and caption, written from the data so they can never disagree with the bars. */
+export function chartWords(plan, { checked, source }) {
+  const lo = plan.rows[0];
+  const hi = [...plan.rows].sort((a, b) => b.high - a.high)[0];
+  const n = plan.rows.length;
+  const alt = `Bar chart of ${plan.header} for ${n} rows of the table above, from ${fmtMoney(plan.sym, lo.low)} (${lo.label}) to ${fmtMoney(plan.sym, hi.high)} (${hi.label})${plan.missing.length ? `. Not charted: ${plan.missing.join(', ')}` : ''}.`;
+  const caption = `${plan.header}. Source: ${source || 'the pages listed under Sources'}, checked ${checked}. ${CHART_MARK}`;
+  return { alt: alt.replace(/[‒–—―]/g, ','), caption: caption.replace(/[‒–—―]/g, ',') };
+}
+
+export function buildChartSvg(plan, { title, checked, source }) {
+  const W = 1200;
+  const M = 56;
+  const ROW = 54;
+  const bold = chartFont('Poppins-Bold.ttf');
+  const semi = chartFont('Poppins-SemiBold.ttf');
+  const reg = chartFont('Poppins-Regular.ttf');
+  const top = 168;
+  const H = top + plan.rows.length * ROW + (plan.missing.length ? 120 : 90);
+  const labelW = 330;
+  const x0 = M + labelW + 20;
+  const valueW = 200;
+  const barMax = W - M - valueW - x0;
+  const max = Math.max(...plan.rows.map((r) => r.high));
+  const parts = [];
+  const path = (t, fill) => parts.push(`<path d="${t.d}" fill="${fill}"/>`);
+  path(chartText(bold, fitText(bold, title, 34, W - 2 * M), M, 78, 34), '#0C0C0B');
+  path(chartText(reg, fitText(reg, `${plan.header}, by ${plan.labelHeader.toLowerCase()}. Lowest first. Checked ${checked}.`, 19, W - 2 * M), M, 118, 19), '#6E6B63');
+  plan.rows.forEach((r, i) => {
+    const cy = top + i * ROW + ROW / 2;
+    path(chartText(semi, fitText(semi, r.label, 19, labelW), M + labelW, cy + 7, 19, 'end'), '#0C0C0B');
+    const wLow = Math.max(4, (r.low / max) * barMax);
+    const wHigh = Math.max(wLow, (r.high / max) * barMax);
+    if (wHigh > wLow) parts.push(`<rect x="${x0}" y="${cy - 15}" width="${wHigh.toFixed(1)}" height="30" rx="6" fill="#E8541A" fill-opacity="0.32"/>`);
+    parts.push(`<rect x="${x0}" y="${cy - 15}" width="${wLow.toFixed(1)}" height="30" rx="6" fill="#E8541A"/>`);
+    const v = r.high > r.low ? `${fmtMoney(plan.sym, r.low)} to ${fmtMoney(plan.sym, r.high)}` : fmtMoney(plan.sym, r.low);
+    path(chartText(bold, v, x0 + wHigh + 12, cy + 7, 18), '#0C0C0B');
+  });
+  let y = top + plan.rows.length * ROW + 34;
+  if (plan.missing.length) {
+    path(chartText(reg, fitText(reg, `Not charted (no single published figure): ${plan.missing.join(', ')}`, 17, W - 2 * M), M, y, 17), '#6E6B63');
+    y += 32;
+  }
+  parts.push(`<rect x="${M}" y="${y - 6}" width="${W - 2 * M}" height="1" fill="#0C0C0B" fill-opacity="0.12"/>`);
+  path(chartText(reg, fitText(reg, `Source: ${source || 'the pages listed under Sources'}.${plan.rows.some((r) => r.high > r.low) ? ' Lighter bar: top of a published range.' : ''}`, 16, W - 2 * M - 260), M, y + 30, 16), '#6E6B63');
+  const wm = chartText(bold, 'EchoPulse', W - M - 22, y + 32, 22, 'end');
+  path(wm, '#0C0C0B');
+  parts.push(`<circle cx="${W - M - 11}" cy="${y + 26}" r="4" fill="#E8541A"/>`);
+  return { svg: `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}"><rect width="${W}" height="${H}" fill="#F2EEE7"/>${parts.join('')}</svg>`, width: W, height: H };
+}
+
+export async function renderChart(plan, meta) {
+  const { svg, width, height } = buildChartSvg(plan, meta);
+  const png = await sharp(Buffer.from(svg), { density: 96 }).png({ compressionLevel: 9 }).toBuffer();
+  return { png, width, height };
+}
+
+/** Where the chart goes: after the table, and after the cite block when it follows the table. */
+export function insertChart(blocks, tableIndex, block) {
+  let at = tableIndex + 1;
+  const next = blocks[at];
+  if (next && next._type === 'block' && next.style === 'blockquote' && /^\s*cite this:/i.test(next.children.map((c) => c.text).join(''))) at++;
+  return [...blocks.slice(0, at), block, ...blocks.slice(at)];
 }
 
 /** Build the Sanity document (without the mainImage asset ref). */
@@ -670,6 +1042,10 @@ export function buildDocument(post, publishedAt) {
     // The text printed on the rendered cover, so a refresh can tell whether
     // the cover needs re-rendering.
     coverText: post.thumbnailText || undefined,
+    // The chart settings, so --pull can write them back into a refresh file.
+    chartColumn: post.chartColumn || undefined,
+    chartLabel: post.chartLabel || undefined,
+    chartSource: post.chartSource || undefined,
     content: post.blocks,
   };
   return doc;
@@ -720,6 +1096,79 @@ async function makeReadClient() {
   // Reads are public. A placeholder token (the cloud proxy injects the real
   // one) or no token both work; never fail a read for lack of one.
   return createClient({ projectId: PROJECT_ID, dataset: DATASET, apiVersion: API_VERSION, useCdn: false, perspective: 'published' });
+}
+
+/** The owner's kill switch: while content/blog-data/PAUSE exists nothing is written to Sanity. */
+export function paused() {
+  return existsSync(join(DATA_DIR, 'PAUSE'));
+}
+
+/** Content words of a title or query, for comparing topics ("cost", "2026" and the like removed). */
+function topicWords(t) {
+  const STOP = new Set(['a', 'an', 'the', 'for', 'in', 'of', 'to', 'and', 'or', 'on', 'per', 'vs', 'versus', 'how', 'much', 'does', 'do', 'is', 'are', 'what', 'which', 'best', 'cost', 'costs', 'price', 'prices', 'pricing', 'rates', 'rate', 'my', 'your', 'with', 'real', 'prices', 'compared', 'guide', 'checklist', 'template', 'month', 'year', 'per', 'by', 'from', 'it', 'you', 'should', 'can']);
+  return new Set(String(t || '').toLowerCase().replace(/\$[\d,]+/g, ' ').split(/[^a-z0-9]+/)
+    .filter((w) => w && !STOP.has(w) && !/^\d+$/.test(w))
+    .map((w) => (w.length > 4 ? w.replace(/(ing|ers|er|es|s)$/, '') : w)));
+}
+
+/**
+ * Live posts that answer the same question. Refused when the content words of
+ * the new title or target query overlap a live one by 75% or more, or when the
+ * two differ by one word each (a city or trade swap: a doorway page).
+ */
+export function nearDuplicates(post, live) {
+  const mine = [topicWords(post.targetQuery), topicWords(post.title)].filter((x) => x.size >= 2);
+  const hits = [];
+  for (const d of live) {
+    if (d.slug === post.slug) continue;
+    for (const theirs of [topicWords(d.targetQuery), topicWords(d.title)].filter((x) => x.size >= 2)) {
+      let best = null;
+      for (const m of mine) {
+        const inter = [...m].filter((w) => theirs.has(w)).length;
+        const overlap = inter / Math.min(m.size, theirs.size);
+        const swap = m.size === theirs.size && m.size >= 3 && inter === m.size - 1;
+        if (overlap >= 0.75 || swap) best = { overlap, swap };
+      }
+      if (best) { hits.push(`/blog/${d.slug} ("${d.title}")${best.swap ? ' differs by one word' : ` ${Math.round(best.overlap * 100)}% the same topic words`}`); break; }
+    }
+  }
+  return hits;
+}
+
+/** YYYY-MM-DD on the run's calendar (Asia/Kolkata). */
+function istDate(d) {
+  return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata' }).format(d instanceof Date ? d : new Date(d));
+}
+
+/** "2026-11-19" -> "19 November 2026" */
+function longDate(iso) {
+  const [y, m, d] = String(iso).slice(0, 10).split('-').map(Number);
+  return `${d} ${MONTHS[m - 1][0].toUpperCase()}${MONTHS[m - 1].slice(1)} ${y}`;
+}
+
+/** Monday of the ISO week that contains `today` (YYYY-MM-DD). */
+function isoMonday(today) {
+  const t = new Date(`${today}T00:00:00Z`);
+  const dow = t.getUTCDay() || 7;
+  return new Date(t.getTime() - (dow - 1) * 86400000).toISOString().slice(0, 10);
+}
+
+/** New posts live this ISO week and today, by publishedAt on the Asia/Kolkata calendar. null without network. */
+async function newPostCounts(client, now) {
+  let rows;
+  try {
+    rows = await client.fetch(`*[_type == "blog" && defined(slug.current) && defined(publishedAt)]{ "slug": slug.current, publishedAt }`);
+  } catch {
+    return null;
+  }
+  return countNewPosts(rows, now);
+}
+
+export function countNewPosts(rows, now) {
+  const today = istDate(now);
+  const monday = isoMonday(today);
+  const week = rows.filter((r) => { const d = istDate(r.publishedAt); return d >= monday && d <= today; });
+  return { week: week.length, day: week.filter((r) => istDate(r.publishedAt) === today).length, monday, today, slugs: week.map((r) => r.slug) };
 }
 
 /** Every live slug with its publish date, for checking /blog/ links. Returns null when the network is unavailable. */
@@ -869,7 +1318,7 @@ function shapeOf(blocks) {
 async function runPull(slug) {
   const client = await makeReadClient();
   const doc = await client.fetch(
-    `*[_type == "blog" && slug.current == $slug][0]{ _id, title, "slug": slug.current, excerpt, category, author, icp, service, postType, updateBy, targetQuery, moneyPage, whatsNew, lastChecked, coverText, publishedAt, content }`,
+    `*[_type == "blog" && slug.current == $slug][0]{ _id, title, "slug": slug.current, excerpt, category, author, icp, service, postType, updateBy, targetQuery, moneyPage, whatsNew, lastChecked, coverText, chartColumn, chartLabel, chartSource, publishedAt, content }`,
     { slug },
   );
   if (!doc) throw new Error(`No live post has the slug "${slug}". Check the slug in the Sanity list (it is never guessed).`);
@@ -901,6 +1350,9 @@ async function runPull(slug) {
     moneyPage: doc.moneyPage || undefined,
     whatsNew: doc.whatsNew || undefined,
     thumbnailText: doc.coverText || doc.title || undefined,
+    chartColumn: doc.chartColumn || undefined,
+    chartLabel: doc.chartLabel || undefined,
+    chartSource: doc.chartSource || undefined,
   };
   for (const k of Object.keys(fm)) if (fm[k] === undefined) delete fm[k];
   const head =
@@ -957,6 +1409,7 @@ async function runRefreshList() {
   const now = new Date();
   // The run's calendar is Asia/Kolkata (the trigger works out the weekday there).
   const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata' }).format(now);
+  if (paused()) console.log('PAUSED: content/blog-data/PAUSE exists. Publish and refresh nothing today; say "paused" in the report.\n');
   const file = newestGscFile();
   let gsc = [];
   if (file) {
@@ -969,26 +1422,41 @@ async function runRefreshList() {
   let live = null;
   try {
     const client = await makeReadClient();
-    live = await client.fetch(`*[_type == "blog" && defined(slug.current)]{ "slug": slug.current, title, icp, postType, updateBy, lastChecked, publishedAt }`);
+    live = await client.fetch(`*[_type == "blog" && defined(slug.current)]{ "slug": slug.current, title, icp, postType, updateBy, lastChecked, publishedAt, targetQuery }`);
   } catch (e) {
     console.log(`Could not read the live post list (${e.message.split('\n')[0]}). Showing Search Console rows only; check each slug is live before pulling it.`);
   }
   const bySlug = new Map((live || []).map((d) => [d.slug, d]));
   const dayAge = (iso) => (iso ? Math.floor((now.getTime() - new Date(iso).getTime()) / 86400000) : null);
+  const gscBySlug = new Map(gsc.map((g) => [g.slug, g]));
+  // A cost or pricing post: its prices go stale, so it is re-checked every
+  // PRICE_RECHECK_DAYS counted from its last check, or from its publish date
+  // when it has never been refreshed (the publish date is when it was checked).
+  const isCostPost = (d) => COST_RE.test(`${d.slug.replace(/-/g, ' ')} ${d.title || ''} ${d.targetQuery || ''}`);
+  const priceAge = (d) => dayAge(d.lastChecked || d.publishedAt);
+  const isOld = (d) => d && String(d.publishedAt || '9999').slice(0, 10) < LEGACY_CUTOFF;
   const row = (tier, g, d) => {
     const lc = d?.lastChecked || null;
     const age = dayAge(lc);
-    const due = age == null || age > 45;
-    const old = d && String(d.publishedAt || '9999').slice(0, 10) < LEGACY_CUTOFF;
+    const cost = d && isCostPost(d);
+    const pAge = d ? priceAge(d) : null;
+    const due = cost ? pAge == null || pAge > PRICE_RECHECK_DAYS || age == null || age > DUE_DAYS : age == null || age > DUE_DAYS;
     const icp = d ? (ENGINE_ICPS.includes(d.icp) ? d.icp : guessIcp(d.slug, d.title)) : guessIcp(g.slug, '');
-    return `| ${tier} | ${g ? g.slug : d.slug} | ${icp} | ${g ? g.impr : '-'} | ${g ? g.pos.toFixed(1) : '-'} | ${g ? g.clicks : '-'} | ${g ? `${g.ctr.toFixed(2)}%` : '-'} | ${lc || 'never'} | ${old ? 'SKIP (legacy, owner is reviewing it for removal)' : due ? 'DUE' : `not due for ${45 - age} days`} |`;
+    const status = isOld(d) ? 'SKIP (legacy, owner is reviewing it for removal)'
+      : tier === 'P' ? `DUE (price re-check: ${pAge} days since ${lc ? 'last check' : 'publish'}, limit ${PRICE_RECHECK_DAYS})`
+      : due ? 'DUE' : `not due for ${DUE_DAYS - age} days`;
+    return `| ${tier} | ${g ? g.slug : d.slug} | ${icp} | ${g ? g.impr : '-'} | ${g ? g.pos.toFixed(1) : '-'} | ${g ? g.clicks : '-'} | ${g ? `${g.ctr.toFixed(2)}%` : '-'} | ${lc || 'never'} | ${status} |`;
   };
   const head = '| Tier | Slug | icp | Impr. | Pos. | Clicks | CTR | Last checked | Status |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- |';
   const isLive = (g) => !live || bySlug.has(g.slug);
   const tierT = (live || []).filter((d) => d.postType === 'trending' && d.updateBy && String(d.updateBy).slice(0, 10) <= today);
-  const tierA = gsc.filter((g) => isLive(g) && g.pos >= 5 && g.pos <= 15 && g.impr >= 100).sort((a, b) => b.impr - a.impr);
-  const tierB = gsc.filter((g) => isLive(g) && g.pos > 15 && g.impr >= 200).sort((a, b) => b.impr - a.impr);
-  const ranked = new Set([...tierT.map((d) => d.slug), ...tierA.map((g) => g.slug), ...tierB.map((g) => g.slug)]);
+  const tierP = (live || [])
+    .filter((d) => !tierT.includes(d) && !isOld(d) && isCostPost(d) && (priceAge(d) ?? 0) > PRICE_RECHECK_DAYS)
+    .sort((a, b) => (gscBySlug.get(b.slug)?.impr || 0) - (gscBySlug.get(a.slug)?.impr || 0) || priceAge(b) - priceAge(a));
+  const early = new Set([...tierT.map((d) => d.slug), ...tierP.map((d) => d.slug)]);
+  const tierA = gsc.filter((g) => isLive(g) && !early.has(g.slug) && g.pos >= 5 && g.pos <= 15 && g.impr >= 100).sort((a, b) => b.impr - a.impr);
+  const tierB = gsc.filter((g) => isLive(g) && !early.has(g.slug) && g.pos > 15 && g.impr >= 200).sort((a, b) => b.impr - a.impr);
+  const ranked = new Set([...early, ...tierA.map((g) => g.slug), ...tierB.map((g) => g.slug)]);
   const tierC = (live || [])
     .filter((d) => !ranked.has(d.slug) && String(d.publishedAt || '9999').slice(0, 10) >= LEGACY_CUTOFF)
     .sort((a, b) => String(a.lastChecked || '').localeCompare(String(b.lastChecked || '')) || String(a.publishedAt || '').localeCompare(String(b.publishedAt || '')))
@@ -996,7 +1464,8 @@ async function runRefreshList() {
 
   console.log(`\nRefresh order, top to bottom. Work the first DUE row that fits today's rule (BLOG-ENGINE.md section 8).\n`);
   console.log(head);
-  for (const d of tierT) console.log(row('T', null, d));
+  for (const d of tierT) console.log(row('T', gscBySlug.get(d.slug), d));
+  for (const d of tierP) console.log(row('P', gscBySlug.get(d.slug), d));
   for (const g of tierA) console.log(row('A', g, bySlug.get(g.slug)));
   for (const g of tierB) console.log(row('B', g, bySlug.get(g.slug)));
   for (const d of tierC) console.log(row('C', null, d));
@@ -1010,11 +1479,13 @@ async function runRefreshList() {
       && d.publishedAt && new Date(`${d.lastChecked}T00:00:00Z`).getTime() - new Date(d.publishedAt).getTime() > 2 * 86400000);
     console.log(`\nToday is ${today} (Asia/Kolkata), weekday ${dow}. Posts refreshed since Monday ${monday}: ${done.length}${done.length ? ` (${done.map((d) => d.slug).join(', ')})` : ''}.`);
     console.log(dow === 7 ? 'SUNDAY: refresh up to 3 posts today, Tier T rows first, then DUE rows from the top.' : `WEEKDAY REFRESHES LEFT THIS WEEK: ${Math.max(0, 2 - done.length)} of 2`);
+    const counts = countNewPosts(live.filter((d) => d.publishedAt), now);
+    console.log(`NEW POSTS THIS ISO WEEK: ${counts.week} of ${WEEK_CAP}${counts.week ? ` (${counts.slugs.join(', ')})` : ''}. NEW POSTS TODAY: ${counts.day} of ${DAY_CAP}.${counts.week >= WEEK_CAP ? ' WEEKLY CAP REACHED: no new post until Monday; refresh or publish nothing.' : ''}`);
     const gone = gsc.filter((g) => !bySlug.has(g.slug) && g.impr >= 100).map((g) => g.slug);
     if (gone.length) console.log(`In the export but no longer live (ignored): ${gone.join(', ')}`);
   }
   console.log(`SKIP rows were published before ${LEGACY_CUTOFF}: never refresh them and never link to them.`);
-  console.log('\nT = trending post past its updateBy. A = position 5 to 15 with 100+ impressions. B = position above 15 with 200+ impressions. C = no data, oldest check first (top 5 shown).');
+  console.log(`\nT = trending post past its updateBy. P = cost or pricing post not re-checked for ${PRICE_RECHECK_DAYS} days (most impressions first). A = position 5 to 15 with 100+ impressions. B = position above 15 with 200+ impressions. C = no data, oldest check first (top 5 shown). A post appears once, in its first tier.`);
   console.log('icp is the stored value, or the keyword guess for posts published before it was stored.');
   return 0;
 }
@@ -1056,6 +1527,57 @@ async function publishOne(post, { client, dryRun, force, refresh, newCover, now 
       }
       console.log(`  links:     ${wanted.length} /blog/ link${wanted.length > 1 ? 's' : ''} checked, all live`);
     }
+  }
+
+  // 0a. quality over volume: at most WEEK_CAP new posts per ISO week, DAY_CAP a day
+  if (!refresh && !force && !post.legacy) {
+    const counts = await newPostCounts(reader, now);
+    if (!counts) {
+      if (!dryRun) throw new Error('Could not read the live post list to count this week\'s new posts. Nothing was published; retry once.');
+      console.log('  cap:       NOT checked (no network in this dry run)');
+    } else {
+      console.log(`  cap:       ${counts.week} of ${WEEK_CAP} new posts this ISO week (since ${counts.monday}), ${counts.day} of ${DAY_CAP} today (${counts.today}, Asia/Kolkata)`);
+      if (counts.week >= WEEK_CAP) throw new Error(`${counts.week} new posts are already live this ISO week (since Monday ${counts.monday}): ${counts.slugs.join(', ')}. The cap is ${WEEK_CAP} (BLOG-ENGINE.md section 1 rule 1). Publish nothing new; refresh instead or report "weekly cap reached".`);
+      if (counts.day >= DAY_CAP) throw new Error(`${counts.day} new posts are already live today (${counts.today}, Asia/Kolkata). Never three in a day. Publish nothing more today.`);
+    }
+  }
+
+  // 0a2. one live post per question: a near-duplicate is a refresh, never a new post
+  if (!refresh && !force && !post.legacy) {
+    let rows = null;
+    try { rows = await reader.fetch(`*[_type == "blog" && defined(slug.current)]{ "slug": slug.current, title, targetQuery }`); } catch { /* reported below */ }
+    if (!rows) {
+      if (!dryRun) throw new Error('Could not read the live post list to check for duplicate topics. Nothing was published; retry once.');
+      console.log('  topic:     duplicates NOT checked (no network in this dry run)');
+    } else {
+      const dupes = nearDuplicates(post, rows);
+      if (dupes.length) throw new Error(`This topic is already live: ${dupes.slice(0, 3).join('; ')}. The refresh path wins (BLOG-ENGINE.md section 3 step 1): refresh that post instead, or pick a different question.`);
+      console.log(`  topic:     no live post with the same topic words (${rows.length} checked)`);
+    }
+  }
+
+  // 0b. the chart, drawn from the post's own table
+  if (post.chart && process.env.BLOG_TABLES === 'pipes') {
+    console.log('  chart:     skipped (BLOG_TABLES=pipes: the live site has no table renderer, so the chart would sit under pipe text)');
+  } else if (post.chart) {
+    const checked = longDate(post.lastChecked || new Date().toISOString().slice(0, 10));
+    const { alt, caption } = chartWords(post.chart, { checked, source: post.chartSource });
+    const { png, width, height } = await renderChart(post.chart, { title: post.title, checked, source: post.chartSource });
+    mkdirSync(THUMBS_DIR, { recursive: true });
+    const chartPath = join(THUMBS_DIR, `${post.slug}-chart.png`);
+    writeFileSync(chartPath, png);
+    let chartUrl = `https://cdn.sanity.io/images/${PROJECT_ID}/${DATASET}/chart-uploaded-at-publish-${width}x${height}.png`;
+    if (!dryRun) {
+      const asset = await client.assets.upload('image', png, { filename: `${post.slug}-chart-${width}x${height}.png`, contentType: 'image/png', title: `${post.title}: chart` });
+      if (!asset?.url) throw new Error('Sanity did not return a URL for the chart image. Nothing was published; retry once.');
+      chartUrl = asset.url;
+    }
+    doc.content = insertChart(doc.content, post.chart.tableIndex, { _type: 'imageUrl', _key: makeKey(), url: chartUrl, alt, caption });
+    console.log(`  chart:     ${chartPath} (${width}x${height}, ${post.chart.rows.length} bars)${dryRun ? '' : ` uploaded: ${chartUrl}`}`);
+    console.log(`    alt:     ${alt}`);
+    console.log(`    caption: ${caption}`);
+  } else {
+    console.log(`  chart:     none${post.chartColumn ? ' (chartColumn set, table not chart-able: see the warning above)' : ' (no chartColumn in the frontmatter)'}`);
   }
 
   const render = async () => {
@@ -1101,7 +1623,7 @@ async function publishOne(post, { client, dryRun, force, refresh, newCover, now 
     let prior;
     try {
       prior = await reader.fetch(
-        `*[_type == "blog" && slug.current == $slug && !(_id in path("drafts.**"))][0]{ _id, title, excerpt, publishedAt, category, author, coverText, "hasCover": defined(mainImage.asset) || defined(mainImageUrl), "blocks": count(content) }`,
+        `*[_type == "blog" && slug.current == $slug && !(_id in path("drafts.**"))][0]{ _id, title, excerpt, publishedAt, category, author, coverText, "hasCover": defined(mainImage.asset) || defined(mainImageUrl), "blocks": count(content), content }`,
         { slug: post.slug },
       );
     } catch (e) {
@@ -1114,19 +1636,29 @@ async function publishOne(post, { client, dryRun, force, refresh, newCover, now 
     }
     // The cover is re-rendered only when the text printed on it changes.
     const same = (a, b) => String(a || '').trim().toLowerCase() === String(b || '').trim().toLowerCase();
+    // No fake freshness: a refresh that changes only the date is refused, so
+    // "Updated" and dateModified only ever follow a real content change.
+    const readable = (blocks) => shapeOf((blocks || []).filter((b) => !(b._type === 'imageUrl' && String(b.caption || '').endsWith(CHART_MARK))))
+      .map((l) => l.replace(/(Last checked:|checked on|checked|as of|read)\s*\d{1,2} [A-Za-z]+ \d{4}/gi, '$1 <date>').replace(/\b\d{1,2} (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]* \d{4}\b/g, '<date>'))
+      .join('\n');
+    if (same(prior.title, doc.title) && same(prior.excerpt, doc.excerpt) && readable(prior.content) === readable(doc.content)) {
+      throw new Error(`The refresh of "${post.slug}" changes nothing but dates. A refresh that changes nothing a reader would notice is not published (BLOG-ENGINE.md section 8): re-check the figures, update what changed, or take the next row.`);
+    }
     const oldCoverText = prior.coverText || prior.title;
     const coverChanges = newCover || !prior.hasCover || !same(post.thumbnailText, oldCoverText);
     const set = {
       title: doc.title, excerpt: doc.excerpt, readTime: doc.readTime, content: doc.content,
       postType: doc.postType,
     };
-    for (const k of ['icp', 'service', 'targetQuery', 'moneyPage', 'whatsNew', 'lastChecked']) if (doc[k]) set[k] = doc[k];
+    for (const k of ['icp', 'service', 'targetQuery', 'moneyPage', 'whatsNew', 'lastChecked', 'chartColumn', 'chartLabel', 'chartSource']) if (doc[k]) set[k] = doc[k];
     if (doc.updateBy) set.updateBy = doc.updateBy;
-    const unset = doc.updateBy ? [] : ['updateBy'];
+    const unset = [...(doc.updateBy ? [] : ['updateBy']), ...['chartColumn', 'chartLabel', 'chartSource'].filter((k) => !doc[k])];
 
     console.log('  refresh plan:');
     console.log(`    keep:    _id ${prior._id}, slug, publishedAt ${String(prior.publishedAt || '').slice(0, 10)}, category "${prior.category ?? ''}", author "${prior.author ?? ''}", any field set in Studio`);
     console.log(`    title:   ${same(prior.title, doc.title) ? 'unchanged' : `"${prior.title}" -> "${doc.title}"`}`);
+    const yearOf = (t) => (String(t || '').match(/\b(20[2-3]\d)\b/) || [])[1] || null;
+    if (yearOf(prior.title) !== yearOf(doc.title)) console.log(`    year:    title year ${yearOf(prior.title) || 'none'} -> ${yearOf(doc.title) || 'none'}. Allowed only because every figure was re-opened today (G4 must say so).`);
     console.log(`    excerpt: ${same(prior.excerpt, doc.excerpt) ? 'unchanged' : 'changed'}`);
     console.log(`    body:    ${prior.blocks ?? 0} blocks -> ${doc.content.length} blocks`);
     console.log(`    set:     ${Object.keys(set).filter((k) => k !== 'content').join(', ')}${unset.length ? `; unset: ${unset.join(', ')}` : ''}`);
@@ -1251,6 +1783,10 @@ function runValidate(args) {
 
 async function runPublish(args) {
   const now = new Date();
+  if (paused()) {
+    if (!args.dryRun) throw new Error(`content/blog-data/PAUSE exists: the owner has paused the blog. Nothing was published. Report "paused" and stop.`);
+    console.log('PAUSED: content/blog-data/PAUSE exists. This dry run continues, but a real publish or refresh is refused.');
+  }
   let posts;
   if (args.file) {
     const f = resolve(ROOT, args.file);

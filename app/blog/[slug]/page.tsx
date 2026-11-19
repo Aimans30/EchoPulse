@@ -91,7 +91,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       url: `${SITE_URL}/blog/${slug}`,
       type: 'article',
       publishedTime: post.publishedAt,
-      modifiedTime: post._updatedAt,
+      // No modifiedTime: _updatedAt moves on every bulk edit, which would
+      // claim false freshness. The real re-check date is in the JSON-LD.
       authors: [resolveAuthor(post.author)],
       images: ogImage ? [{ url: ogImage, width: 1200, height: 630 }] : undefined,
     },
@@ -125,8 +126,8 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   // guess from the slug and title is only the fallback for older posts that
   // have neither. A failed read falls back the same way, never a 500.
   const stored = await sanityClient
-    .fetch<{ icp?: string | null; service?: string | null } | null>(
-      `*[_type == "blog" && slug.current == $slug][0]{ icp, service }`,
+    .fetch<{ icp?: string | null; service?: string | null; lastChecked?: string | null } | null>(
+      `*[_type == "blog" && slug.current == $slug][0]{ icp, service, lastChecked }`,
       { slug },
       { next: { revalidate: 60 } },
     )
@@ -175,12 +176,15 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   // Show an "Updated" date only when the post was meaningfully revised after
   // publishing (more than a day later), so recency is visible to readers and
   // answer engines without showing a redundant "updated = published" line.
+  // Uses the stored "Last checked" date, never _updatedAt (bulk field edits
+  // bump _updatedAt on every post, which would be a false freshness signal).
+  const checkedAt = stored?.lastChecked ?? null;
   const showUpdated =
-    post._updatedAt &&
+    checkedAt &&
     post.publishedAt &&
-    new Date(post._updatedAt).getTime() - new Date(post.publishedAt).getTime() >
+    new Date(checkedAt).getTime() - new Date(post.publishedAt).getTime() >
       24 * 60 * 60 * 1000;
-  const updatedLabel = showUpdated ? fmtDate(post._updatedAt) : null;
+  const updatedLabel = showUpdated ? fmtDate(checkedAt) : null;
 
   // Named, human author — strongest E-E-A-T / AI-citation signal we have.
   const authorName = resolveAuthor(post.author);
@@ -196,15 +200,33 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     headline: post.title,
     description: post.excerpt || undefined,
     datePublished: post.publishedAt || undefined,
-    dateModified: post._updatedAt || post.publishedAt || undefined,
-    // @id reference wires the byline into the Person node declared once in the
-    // root layout, so "Lakshya Soni" resolves to a single entity across the
-    // whole site rather than a bare string repeated on 43 pages.
+    // The date the post's content was last re-checked (the publisher stores
+    // `lastChecked` from the "Last checked:" line), never _updatedAt: bulk
+    // field edits bump _updatedAt on every post, and claiming those as
+    // modifications is the fake freshness Google's guidance warns about.
+    dateModified:
+      stored?.lastChecked && post.publishedAt && stored.lastChecked > post.publishedAt.slice(0, 10)
+        ? stored.lastChecked
+        : post.publishedAt || undefined,
+    // Typed and named in place, with the same @id as the Person and
+    // Organization nodes in the root layout, so a parser that does not
+    // resolve @id references still sees who wrote and who published it.
     author:
       authorName === 'Lakshya Soni'
-        ? { '@id': `${SITE_URL}/#founder` }
+        ? {
+            '@type': 'Person',
+            '@id': `${SITE_URL}/#founder`,
+            name: 'Lakshya Soni',
+            url: `${SITE_URL}/about/lakshya-soni`,
+          }
         : { '@type': 'Person', name: authorName },
-    publisher: { '@id': `${SITE_URL}/#organization` },
+    publisher: {
+      '@type': 'Organization',
+      '@id': `${SITE_URL}/#organization`,
+      name: 'EchoPulse Media',
+      url: SITE_URL,
+      logo: { '@type': 'ImageObject', url: `${SITE_URL}/logo-512.png` },
+    },
     mainEntityOfPage: { '@type': 'WebPage', '@id': `${SITE_URL}/blog/${slug}` },
     // Full ImageObject rather than a bare URL string: gives the cover image a
     // caption and creator, which is what makes it eligible for image search
@@ -213,6 +235,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
       ? {
           '@type': 'ImageObject',
           url: headerImageSrc,
+          ...(headerImageDims ? { width: headerImageDims.w, height: headerImageDims.h } : {}),
           caption: post.title,
           creditText: 'EchoPulse Media',
           creator: { '@id': `${SITE_URL}/#organization` },
