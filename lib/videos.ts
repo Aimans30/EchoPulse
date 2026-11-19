@@ -51,6 +51,8 @@ export const videos: VideoEntry[] = [
   { url: 'https://res.cloudinary.com/dqqd9rq8s/video/upload/v1782372139/2438_fn_z6wry7.mp4',                                    type: 'realestate', brand: 'Listing Reel', label: 'Property',                            icp: ['real-estate'] },
 
   // ─── New clips ───────────────────────────────────────────────────────────
+  // DTC ad reel that also works as business owner content.
+  { url: 'https://res.cloudinary.com/dkzhqy2od/video/upload/v1795122874/c16_h5bzrt.mp4',                                         type: 'talking',  brand: 'DTC Ad',         label: 'Ad Reel', orientation: 'vertical', icp: ['dtc', 'business-owners'] },
   // Ad reel mixing AI visuals and motion graphics.
   { url: 'https://res.cloudinary.com/dkzhqy2od/video/upload/v1795122876/c13_ttg4ix.mp4',                                         type: 'talking',  brand: 'Ad Reel',        label: 'AI Motion Graphics', orientation: 'vertical', icp: ['dtc', 'business-owners', 'founders'] },
   // DTC ad reel, business content for people and brand pages.
