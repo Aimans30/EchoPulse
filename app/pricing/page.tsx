@@ -1,23 +1,29 @@
 import type { Metadata } from 'next';
+import type { ReactNode } from 'react';
 import Link from 'next/link';
 import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
-import ICPBookButton from '@/components/icp/ICPBookButton';
+import PlanButton from '@/components/PlanButton';
+import Rise from '@/components/pricing/Rise';
+import CompareSwitcher from '@/components/pricing/CompareSwitcher';
+import BookCallButton from '@/components/pricing/BookCallButton';
 import { icps } from '@/lib/icpData';
 import { getCaseStudy } from '@/lib/caseStudyData';
 import { BOOK_CALL_LABEL, BOOK_CALL_REASSURANCE, FREE_EDITS_URL, type BookablePlanKey } from '@/lib/links';
-import PlanButton from '@/components/PlanButton';
 import {
   FREE_SAMPLE,
   PILOT,
   PRESENCE,
   GROWTH,
   PRICING_CARDS,
+  VISIBLE_PLANS,
   PROMISES,
   PRICE_LADDER_SENTENCE,
   pricingOffers,
   type Plan,
+  type PlanKey,
 } from '@/lib/pricing';
+import './pricing.css';
 
 /**
  * /pricing: the full price page.
@@ -29,12 +35,18 @@ import {
  * lib/pricing.ts; nothing is typed here that would drift when the ladder
  * changes.
  *
- * Server component, plain CSS. The FAQ renders every answer in the HTML, so
- * the FAQPage schema below describes what the page actually contains.
+ * Reading order is the price ladder itself: free sample, Pilot, the two
+ * monthly plans, then Custom. The ladder at the top, the free band, the cards
+ * and the "what happens next" strip all follow that order.
+ *
+ * Server component. Client islands: the plan buttons (intake modal), the
+ * phone comparison switcher, the reveal wrapper and the closing call button.
+ * Styles live in ./pricing.css under the `ppg-` prefix. The FAQ renders every
+ * answer in the HTML (native <details>), so the FAQPage schema below describes
+ * what the page actually contains.
  */
 
 const SITE_URL = 'https://echopulse.media';
-const ACCENT = '#E8541A';
 
 export const metadata: Metadata = {
   title: { absolute: 'EchoPulse Media Pricing: $299 Pilot, $399 or $1,997 a Month' },
@@ -50,10 +62,13 @@ export const metadata: Metadata = {
   },
 };
 
+/** The plans in the comparison table, in column order. */
+const COMPARE_PLANS: Plan[] = [FREE_SAMPLE, PILOT, PRESENCE, GROWTH];
+
 /**
  * Comparison rows. The cell text is written to match each plan's `scope` in
  * lib/pricing.ts line for line. If a scope line changes there, change the
- * matching cell here; the plan column order is FREE, PILOT, PRESENCE, GROWTH.
+ * matching cell here; the plan column order is COMPARE_PLANS above.
  */
 const COMPARE: { label: string; cells: [string, string, string, string] }[] = [
   { label: 'Price', cells: [FREE_SAMPLE.priceLabel, PILOT.priceLabel, PRESENCE.priceLabel, GROWTH.priceLabel] },
@@ -127,26 +142,126 @@ const FAQ: { q: string; a: string }[] = [
   },
 ];
 
-function PlanCard({ plan }: { plan: Plan }) {
-  const dark = plan.featured === true;
+/** What each rung of the ladder is for, in the visitor's words. */
+const LADDER_ROLE: Record<PlanKey, string> = {
+  free: 'Start free',
+  pilot: 'Try it for 14 days',
+  presence: 'Go monthly',
+  growth: 'Every channel',
+  full: 'Bigger scopes',
+};
+
+/** The plan card that carries the quiet "starting point" label. */
+const STARTING_PLAN: PlanKey = 'pilot';
+
+/**
+ * What happens after a plan button is pressed. Every line restates something
+ * the site already says: the intake modal (components/PlanIntakeModal.tsx),
+ * the booking reassurance (lib/links.ts), the onboarding session in the plan
+ * scopes and the billing terms below.
+ */
+const NEXT_STEPS: { title: string; body: string }[] = [
+  { title: 'A short intake', body: 'Pick a plan and answer a few quick questions. No card is needed to book.' },
+  { title: 'A free 15-minute call', body: `${BOOK_CALL_REASSURANCE} Nothing is charged to book it.` },
+  { title: 'Onboarding', body: 'A strategy session sets your brief and plan. Work starts when payment clears.' },
+  { title: 'First edits', body: `${PROMISES.turnaround}, counted from when we have the footage.` },
+];
+
+/** "$399" + "/month" + "month-to-month", or "$299" + "" + "one-off, 14 days". */
+function priceParts(p: Plan): { amount: string; unit: string; note: string } {
+  if (p.per.startsWith('/')) {
+    const [unit, ...rest] = p.per.split(', ');
+    return { amount: p.priceLabel, unit, note: rest.join(', ') };
+  }
+  return { amount: p.priceLabel, unit: '', note: p.per };
+}
+
+function Check() {
   return (
-    <article className={`pr-card${dark ? ' pr-card-dark' : ''}`} aria-labelledby={`plan-${plan.key}`}>
-      <p className="pr-badge">{plan.badge}</p>
-      <h3 id={`plan-${plan.key}`} className="pr-card-name">{plan.name}</h3>
-      <p className="pr-price">
-        <span className="pr-price-num">{plan.priceLabel}</span>
-        <span className="pr-price-per">{plan.per}</span>
+    <svg className="ppg-check" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <path d="M3.5 8.25 6.5 11.25 12.5 4.75" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function Arrow() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M5 12h14M13 6l6 6-6 6" />
+    </svg>
+  );
+}
+
+function stepOf(key: PlanKey): number {
+  return VISIBLE_PLANS.findIndex((p) => p.key === key) + 1;
+}
+
+function PlanCard({ plan, index }: { plan: Plan; index: number }) {
+  const start = plan.key === STARTING_PLAN;
+  const { amount, unit, note } = priceParts(plan);
+  return (
+    <Rise
+      as="article"
+      lift
+      delay={index * 0.06}
+      id={`plan-${plan.key}`}
+      labelledBy={`plan-${plan.key}-name`}
+      className={`ppg-card${start ? ' ppg-card-start' : ''}`}
+    >
+      <p className="ppg-card-top">
+        <span className="ppg-step-tag">Step {stepOf(plan.key)}</span>
+        {start && <span className="ppg-start">First paid step</span>}
       </p>
-      <p className="pr-tagline">{plan.tagline}</p>
-      <ul className="pr-scope">
+      <h3 id={`plan-${plan.key}-name`} className="ppg-card-name">{plan.name}</h3>
+      <p className="ppg-card-price">
+        <span className="ppg-amount">{amount}</span>
+        {unit && <span className="ppg-unit">{unit}</span>}
+      </p>
+      <p className="ppg-card-note">{note}</p>
+      <p className="ppg-card-for">{plan.tagline}</p>
+      <ul className="ppg-checks" aria-label={`${plan.name} includes`}>
         {plan.scope.map((line) => (
-          <li key={line}>{line}</li>
+          <li key={line}><Check />{line}</li>
         ))}
       </ul>
-      <div className="pr-card-cta">
-        <PlanButton planKey={plan.key as BookablePlanKey} dark={dark} />
+      <div className="ppg-card-cta">
+        <PlanButton planKey={plan.key as BookablePlanKey} variant={start ? 'primary' : 'secondary'} />
       </div>
-    </article>
+    </Rise>
+  );
+}
+
+/**
+ * Full-width band for the two ends of the ladder: the free sample (step 1)
+ * and Custom (step 5). Same parts as a card, laid out across the row.
+ */
+function PlanBand({ plan, action, priceText }: { plan: Plan; action: ReactNode; priceText?: string }) {
+  const { amount, note } = priceParts(plan);
+  const id = plan.key === 'free' ? 'free-sample' : `plan-${plan.key}`;
+  return (
+    <Rise className="ppg-band" id={id} labelledBy={`${id}-name`}>
+      <div className="ppg-band-head">
+        <p className="ppg-card-top"><span className="ppg-step-tag">Step {stepOf(plan.key)}</span></p>
+        <h3 id={`${id}-name`} className="ppg-card-name">{plan.name}</h3>
+        {priceText ? (
+          <p className="ppg-card-price ppg-card-price-text">
+            <span className="ppg-sr">{plan.priceLabel}, </span>{priceText}
+          </p>
+        ) : (
+          <p className="ppg-card-price"><span className="ppg-amount">{amount}</span></p>
+        )}
+        {!priceText && <p className="ppg-card-note">{note}</p>}
+        <p className="ppg-card-for">{plan.tagline}</p>
+      </div>
+      <div className="ppg-band-body">
+        <ul className="ppg-checks ppg-checks-2" aria-label={`${plan.name} includes`}>
+          {plan.scope.map((line) => (
+            <li key={line}><Check />{line}</li>
+          ))}
+        </ul>
+        <div className="ppg-band-cta">{action}</div>
+      </div>
+    </Rise>
   );
 }
 
@@ -196,364 +311,311 @@ export default function PricingPage() {
     ],
   };
 
-  const plans = [FREE_SAMPLE, ...PRICING_CARDS];
   const proofMetrics = (getCaseStudy('magicbnb-seo-aeo')?.heroMetrics ?? []).slice(0, 3);
+  const pricedCards = PRICING_CARDS.filter((p) => p.priceUsd > 0);
+  const customPlan = PRICING_CARDS.find((p) => p.priceUsd <= 0);
+
+  const switcherPlans = COMPARE_PLANS.map((p) => {
+    const { amount, unit } = priceParts(p);
+    return { key: p.key, name: p.name, short: p.key === 'free' ? 'Free' : p.name.split(' ')[0], price: `${amount}${unit.replace('/month', '/mo')}` };
+  });
 
   return (
     <>
       <Nav />
 
-      <main id="main" className="pr-page">
+      <main id="main" className="ppg">
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
         />
 
-        {/* ── Hero ───────────────────────────────────────────────────────── */}
-        <section className="pr-hero">
-          <nav aria-label="Breadcrumb" className="pr-crumb">
-            <Link href="/">Home</Link>
-            <span aria-hidden="true">/</span>
-            <span>Pricing</span>
-          </nav>
-          <p className="pr-eyebrow">Pricing</p>
-          <h1 className="pr-h1">
-            Four steps, one price each.
-            <span className="accent"> Nothing hidden.</span>
-          </h1>
-          <p className="pr-lede">
-            EchoPulse Media is a done-for-you content and website studio for founders, coaches, real
-            estate agents and business owners. {PRICE_LADDER_SENTENCE}
-          </p>
-          <ul className="pr-promises" aria-label="What every plan includes">
-            <li>{PROMISES.replies}</li>
-            <li>{PROMISES.turnaround}</li>
-            <li>{PROMISES.revisions}</li>
-            <li>{PROMISES.ownership}</li>
-          </ul>
+        {/* ── Hero + ladder ─────────────────────────────────────────────── */}
+        <section className="ppg-hero" aria-labelledby="ppg-title">
+          <div className="ppg-wrap">
+            <nav aria-label="Breadcrumb" className="ppg-crumb">
+              <ol>
+                <li><Link href="/">Home</Link></li>
+                <li aria-current="page">Pricing</li>
+              </ol>
+            </nav>
+            <h1 id="ppg-title" className="ppg-h1">Start free. Step up when you are ready.</h1>
+            <p className="ppg-lede">
+              EchoPulse Media is a growth partner for founders and businesses of every kind: content,
+              websites, custom software and AI automation. Every price is below, in US dollars, with what it buys
+              and what it leaves out.
+            </p>
+
+            <ol className="ppg-ladder" aria-label="The price ladder, in order">
+              {VISIBLE_PLANS.map((p, i) => {
+                const { amount, unit } = priceParts(p);
+                // Custom has no number; "Custom" under the name "Custom" read twice.
+                const shown = p.key !== 'free' && p.priceUsd <= 0 ? 'On a call' : amount;
+                return (
+                  <li key={p.key} className="ppg-rung">
+                    <a href={p.key === 'free' ? '#free-sample' : `#plan-${p.key}`} className="ppg-rung-link">
+                      <span className="ppg-rung-num" aria-hidden="true">{i + 1}</span>
+                      <span className="ppg-rung-body">
+                        <span className="ppg-rung-role">{LADDER_ROLE[p.key]}</span>
+                        <span className="ppg-rung-name">{p.name}</span>
+                        <span className="ppg-rung-price">
+                          {shown}
+                          {unit && <span className="ppg-rung-unit">{unit}</span>}
+                        </span>
+                      </span>
+                    </a>
+                  </li>
+                );
+              })}
+            </ol>
+          </div>
         </section>
 
-        {/* ── The ladder ─────────────────────────────────────────────────── */}
-        <section className="pr-ladder" aria-labelledby="ladder-heading">
-          <p className="pr-eyebrow">How it works</p>
-          <h2 id="ladder-heading" className="pr-h2">Start free. Then a Pilot. Then monthly.</h2>
-          <ol className="pr-steps">
-            <li>
-              <span className="pr-step-num">1</span>
-              <div>
-                <h3>{FREE_SAMPLE.name}: {FREE_SAMPLE.priceLabel}</h3>
-                <p>{FREE_SAMPLE.tagline} You see how we cut before anyone talks about money.</p>
-              </div>
-            </li>
-            <li>
-              <span className="pr-step-num">2</span>
-              <div>
-                <h3>{PILOT.name}: {PILOT.priceLabel}, {PILOT.per}</h3>
-                <p>{PILOT.tagline} One payment, a strategy session, real deliverables, and a 30-day plan you keep either way.</p>
-              </div>
-            </li>
-            <li>
-              <span className="pr-step-num">3</span>
-              <div>
-                <h3>{PRESENCE.name}: {PRESENCE.priceLabel}{PRESENCE.per}</h3>
-                <p>{PRESENCE.tagline} Video, posts and your website, every week.</p>
-              </div>
-            </li>
-            <li>
-              <span className="pr-step-num">4</span>
-              <div>
-                <h3>{GROWTH.name}: {GROWTH.priceLabel}{GROWTH.per}</h3>
-                <p>{GROWTH.tagline} Video, posts, blogs, ads, website and funnel, one team.</p>
-              </div>
-            </li>
-          </ol>
+        {/* ── Step 1: free sample ───────────────────────────────────────── */}
+        <section className="ppg-sec ppg-sec-tight" aria-label={`Step 1: ${FREE_SAMPLE.name}`}>
+          <div className="ppg-wrap">
+            <PlanBand
+              plan={FREE_SAMPLE}
+              action={
+                <Link href={FREE_EDITS_URL} data-track-location="pricing_page_free_card" className="ppg-btn-ink">
+                  <span>{FREE_SAMPLE.cta}</span><Arrow />
+                </Link>
+              }
+            />
+          </div>
         </section>
 
-        {/* ── Free sample block ──────────────────────────────────────────── */}
-        <section className="pr-free" aria-labelledby="free-heading">
-          <div className="pr-free-inner">
-            <p className="pr-badge">{FREE_SAMPLE.badge}</p>
-            <h2 id="free-heading" className="pr-h2">{FREE_SAMPLE.name}. {FREE_SAMPLE.priceLabel}, {FREE_SAMPLE.per}.</h2>
-            <p className="pr-free-tag">{FREE_SAMPLE.tagline}</p>
-            <ul className="pr-scope">
-              {FREE_SAMPLE.scope.map((line) => (
-                <li key={line}>{line}</li>
+        {/* ── Steps 2 to 5: plan cards ──────────────────────────────────── */}
+        <section className="ppg-sec ppg-sec-tight" aria-labelledby="plans-heading">
+          <div className="ppg-wrap">
+            <header className="ppg-head">
+              <p className="ppg-eyebrow">Paid plans</p>
+              <h2 id="plans-heading" className="ppg-h2">Then a Pilot, a monthly plan, or a custom scope</h2>
+            </header>
+            <div className="ppg-cards">
+              {pricedCards.map((plan, i) => (
+                <PlanCard key={plan.key} plan={plan} index={i} />
+              ))}
+            </div>
+
+            {customPlan && (
+              <PlanBand
+                plan={customPlan}
+                priceText={customPlan.per.charAt(0).toUpperCase() + customPlan.per.slice(1)}
+                action={<PlanButton planKey={customPlan.key as BookablePlanKey} variant="secondary" />}
+              />
+            )}
+
+            <ul className="ppg-promises" aria-label="Every plan includes">
+              {[PROMISES.replies, PROMISES.turnaround, PROMISES.revisions, PROMISES.ownership].map((p) => (
+                <li key={p}><Check />{p}</li>
               ))}
             </ul>
-            <div className="pr-card-cta">
-              <Link href={FREE_EDITS_URL} data-track-location="pricing_page_free_card" className="pr-free-btn">{FREE_SAMPLE.cta} <span aria-hidden="true">&rarr;</span></Link>
-              <p className="pr-reassure">A short form, or email the footage link. No card and no call are asked for at any point.</p>
+
+            {proofMetrics.length > 0 && (
+              <aside className="ppg-proof" aria-label="Proof from a client engagement">
+                <p className="ppg-proof-title">From the MagicBNB engagement</p>
+                <ul className="ppg-proof-list">
+                  {proofMetrics.map((m) => (
+                    <li key={m.label}>
+                      <span className="ppg-proof-val">{m.value}</span>
+                      <span className="ppg-proof-label">{m.label}</span>
+                    </li>
+                  ))}
+                </ul>
+                <Link href="/case-studies/magicbnb-seo-aeo" className="ppg-textlink">See the MagicBNB case study</Link>
+              </aside>
+            )}
+          </div>
+        </section>
+
+        {/* ── What happens next ─────────────────────────────────────────── */}
+        <section className="ppg-sec" aria-labelledby="next-heading">
+          <div className="ppg-wrap">
+            <header className="ppg-head">
+              <p className="ppg-eyebrow">After you pick a plan</p>
+              <h2 id="next-heading" className="ppg-h2">What happens next</h2>
+            </header>
+            <ol className="ppg-next">
+              {NEXT_STEPS.map((s, i) => (
+                <Rise as="li" key={s.title} delay={i * 0.06} className="ppg-next-step">
+                  <span className="ppg-next-num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+                  <h3 className="ppg-next-title">{s.title}</h3>
+                  <p className="ppg-next-body">{s.body}</p>
+                </Rise>
+              ))}
+            </ol>
+          </div>
+        </section>
+
+        {/* ── Comparison ────────────────────────────────────────────────── */}
+        <section className="ppg-sec" aria-labelledby="compare-heading">
+          <div className="ppg-wrap">
+            <header className="ppg-head">
+              <p className="ppg-eyebrow">Side by side</p>
+              <h2 id="compare-heading" className="ppg-h2">Compare plans</h2>
+            </header>
+
+            <div className="ppg-table-wrap">
+              <table className="ppg-table">
+                <caption className="ppg-sr">What each plan includes, from the free sample to Growth</caption>
+                <thead>
+                  <tr>
+                    <th scope="col" className="ppg-th-corner">What you get</th>
+                    {COMPARE_PLANS.map((p) => {
+                      const { amount, unit } = priceParts(p);
+                      return (
+                        <th scope="col" key={p.key}>
+                          <span className="ppg-th-name">{p.name}</span>
+                          <span className="ppg-th-price">{amount}{unit}</span>
+                        </th>
+                      );
+                    })}
+                  </tr>
+                </thead>
+                <tbody>
+                  {COMPARE.map((row) => (
+                    <tr key={row.label}>
+                      <th scope="row">{row.label}</th>
+                      {row.cells.map((cell, i) => (
+                        <td key={COMPARE_PLANS[i].key} data-none={cell === 'None' ? '' : undefined}>{cell}</td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="ppg-switch">
+              <CompareSwitcher plans={switcherPlans} rows={COMPARE} initial={1} />
+            </div>
+
+            <p className="ppg-after-table">
+              Need more than Growth? <a href="#plan-full" className="ppg-textlink">Custom scopes</a> are quoted on a call.
+            </p>
+          </div>
+        </section>
+
+        {/* ── Not included ──────────────────────────────────────────────── */}
+        <section className="ppg-sec" aria-labelledby="not-heading">
+          <div className="ppg-wrap ppg-split">
+            <header className="ppg-split-head">
+              <p className="ppg-eyebrow">Read this before you buy</p>
+              <h2 id="not-heading" className="ppg-h2">What is not included</h2>
+            </header>
+            <dl className="ppg-rows">
+              {NOT_INCLUDED.map((item) => (
+                <div key={item.title} className="ppg-row">
+                  <dt>{item.title}</dt>
+                  <dd>{item.body}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+        </section>
+
+        {/* ── Billing ───────────────────────────────────────────────────── */}
+        <section className="ppg-sec" aria-labelledby="billing-heading">
+          <div className="ppg-wrap ppg-split">
+            <header className="ppg-split-head">
+              <p className="ppg-eyebrow">Billing</p>
+              <h2 id="billing-heading" className="ppg-h2">How billing works</h2>
+            </header>
+            <div>
+              <dl className="ppg-rows">
+                <div className="ppg-row"><dt>Month-to-month</dt><dd>{PROMISES.noContract} Monthly plans are charged in advance on the same date each month.</dd></div>
+                <div className="ppg-row"><dt>14 days notice</dt><dd>To cancel, send written notice 14 days before the next billing date. The current month is not refunded, and the work for it is finished.</dd></div>
+                <div className="ppg-row"><dt>Card, through Razorpay or Dodo Payments</dt><dd>Your card details go to the processor. We never see them. Bank transfer is available on request for monthly plans.</dd></div>
+                <div className="ppg-row"><dt>USD, worldwide</dt><dd>One price everywhere, in US dollars. Your bank converts at its rate. Taxes your country requires you to self-account for are not included.</dd></div>
+                <div className="ppg-row"><dt>Work starts when payment clears</dt><dd>The 48-hour turnaround on short-form edits starts when we have the footage.</dd></div>
+                <div className="ppg-row"><dt>The Pilot is one payment</dt><dd>Nothing recurs after it unless you choose a monthly plan.</dd></div>
+              </dl>
+              <p className="ppg-small">
+                The binding version of all of this is in the <Link href="/terms" className="ppg-textlink">Terms of Service</Link>.
+              </p>
             </div>
           </div>
         </section>
 
-        {/* ── Plan cards ─────────────────────────────────────────────────── */}
-        <section className="pr-plans" aria-labelledby="plans-heading">
-          <p className="pr-eyebrow">Paid plans</p>
-          <h2 id="plans-heading" className="pr-h2">What each plan buys</h2>
-          <div className="pr-cards">
-            {PRICING_CARDS.map((plan) => (
-              <PlanCard key={plan.key} plan={plan} />
-            ))}
-          </div>
-        </section>
-
-        {/* ── Proof strip: figures read from the case study data ─────────── */}
-        {proofMetrics.length > 0 && (
-          <section className="pr-proof" aria-label="Proof from a client engagement">
-            <ul className="pr-proof-list">
-              {proofMetrics.map((m) => (
-                <li key={m.label} className="pr-proof-item">
-                  <span className="pr-proof-val">{m.value}</span>
-                  <span className="pr-proof-label">{m.label}</span>
-                </li>
-              ))}
+        {/* ── Who each plan fits ────────────────────────────────────────── */}
+        <section className="ppg-sec" aria-labelledby="fit-heading">
+          <div className="ppg-wrap ppg-split">
+            <header className="ppg-split-head">
+              <p className="ppg-eyebrow">Which plan</p>
+              <h2 id="fit-heading" className="ppg-h2">Who each plan fits</h2>
+            </header>
+            <ul className="ppg-rows ppg-fit">
+              {FIT.map((f) => {
+                const icp = icps.find((i) => i.key === f.icpKey);
+                if (!icp) return null;
+                return (
+                  <li key={f.icpKey} className="ppg-row">
+                    <h3 className="ppg-fit-who">
+                      <Link href={`/${icp.key}`} className="ppg-fit-link">
+                        <span>{icp.name}</span><Arrow />
+                      </Link>
+                    </h3>
+                    <div>
+                      <p className="ppg-fit-plan">{f.plan}</p>
+                      <p className="ppg-fit-why">{f.why}</p>
+                    </div>
+                  </li>
+                );
+              })}
             </ul>
-            <Link href="/case-studies/magicbnb-seo-aeo" className="pr-proof-link">See the MagicBNB case study</Link>
-          </section>
-        )}
-
-        {/* ── Comparison table ───────────────────────────────────────────── */}
-        <section className="pr-compare" aria-labelledby="compare-heading">
-          <p className="pr-eyebrow">Side by side</p>
-          <h2 id="compare-heading" className="pr-h2">Plan by plan</h2>
-          <div className="pr-table-wrap">
-            <table className="pr-table">
-              <thead>
-                <tr>
-                  <th scope="col">What you get</th>
-                  {plans.map((p) => (
-                    <th scope="col" key={p.key}>{p.name}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {COMPARE.map((row) => (
-                  <tr key={row.label}>
-                    <th scope="row">{row.label}</th>
-                    {row.cells.map((cell, i) => (
-                      <td key={plans[i].key} data-plan={plans[i].name}>{cell}</td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
           </div>
         </section>
 
-        {/* ── Not included ───────────────────────────────────────────────── */}
-        <section className="pr-not" aria-labelledby="not-heading">
-          <p className="pr-eyebrow">Read this before you buy</p>
-          <h2 id="not-heading" className="pr-h2">What is not included</h2>
-          <dl className="pr-not-list">
-            {NOT_INCLUDED.map((item) => (
-              <div key={item.title}>
-                <dt>{item.title}</dt>
-                <dd>{item.body}</dd>
-              </div>
-            ))}
-          </dl>
-        </section>
-
-        {/* ── Billing ────────────────────────────────────────────────────── */}
-        <section className="pr-billing" aria-labelledby="billing-heading">
-          <p className="pr-eyebrow">Billing</p>
-          <h2 id="billing-heading" className="pr-h2">How billing works</h2>
-          <ul className="pr-billing-list">
-            <li><strong>Month-to-month.</strong> {PROMISES.noContract} Monthly plans are charged in advance on the same date each month.</li>
-            <li><strong>14 days notice.</strong> To cancel, send written notice 14 days before the next billing date. The current month is not refunded, and the work for it is finished.</li>
-            <li><strong>Card, through Razorpay or Dodo Payments.</strong> Your card details go to the processor. We never see them. Bank transfer is available on request for monthly plans.</li>
-            <li><strong>USD, worldwide.</strong> One price everywhere, in US dollars. Your bank converts at its rate. Taxes your country requires you to self-account for are not included.</li>
-            <li><strong>Work starts when payment clears.</strong> The 48-hour turnaround on short-form edits starts when we have the footage.</li>
-            <li><strong>The Pilot is one payment.</strong> Nothing recurs after it unless you choose a monthly plan.</li>
-          </ul>
-          <p className="pr-terms-note">
-            The binding version of all of this is in the <Link href="/terms">Terms of Service</Link>.
-          </p>
-        </section>
-
-        {/* ── Who each plan fits ─────────────────────────────────────────── */}
-        <section className="pr-fit" aria-labelledby="fit-heading">
-          <p className="pr-eyebrow">Which plan</p>
-          <h2 id="fit-heading" className="pr-h2">Who each plan fits</h2>
-          <ul className="pr-fit-list">
-            {FIT.map((f) => {
-              const icp = icps.find((i) => i.key === f.icpKey);
-              if (!icp) return null;
-              return (
-                <li key={f.icpKey}>
-                  <h3><Link href={`/${icp.key}`}>{icp.name}</Link></h3>
-                  <p className="pr-fit-plan">{f.plan}</p>
-                  <p>{f.why}</p>
-                </li>
-              );
-            })}
-          </ul>
-        </section>
-
-        {/* ── FAQ ────────────────────────────────────────────────────────── */}
-        <section className="pr-faq" aria-labelledby="faq-heading">
-          <p className="pr-eyebrow">Questions</p>
-          <h2 id="faq-heading" className="pr-h2">Pricing questions, answered</h2>
-          <dl className="pr-faq-list">
-            {FAQ.map((f) => (
-              <div key={f.q}>
-                <dt>{f.q}</dt>
-                <dd>
-                  {f.a}
-                  {f.q.startsWith('Can I buy a single edit') && (
-                    <>
-                      {' '}
-                      Ask on the call and we will quote it.
-                    </>
-                  )}
-                </dd>
-              </div>
-            ))}
-          </dl>
-        </section>
-
-        {/* ── CTA ────────────────────────────────────────────────────────── */}
-        <section className="pr-cta">
-          <h2 className="pr-h2">Not sure which one? Ask.</h2>
-          <p>
-            A free 15-minute call. We look at what you already have, tell you which step makes sense,
-            and if the answer is &quot;none of them yet&quot; we say so.
-          </p>
-          <div className="pr-card-cta">
-            <ICPBookButton label={BOOK_CALL_LABEL} location="pricing_page_final" accent={ACCENT} size="lg" fullWidthMobile />
-            <p className="pr-reassure">{BOOK_CALL_REASSURANCE}</p>
+        {/* ── FAQ ───────────────────────────────────────────────────────── */}
+        <section className="ppg-sec" aria-labelledby="faq-heading">
+          <div className="ppg-wrap ppg-split">
+            <header className="ppg-split-head">
+              <p className="ppg-eyebrow">Questions</p>
+              <h2 id="faq-heading" className="ppg-h2">Pricing questions, answered</h2>
+            </header>
+            <div className="ppg-faq">
+              {FAQ.map((f, i) => (
+                <details key={f.q} className="ppg-faq-item" open={i === 0}>
+                  <summary className="ppg-faq-q">
+                    <span>{f.q}</span>
+                    <span className="ppg-faq-icon" aria-hidden="true" />
+                  </summary>
+                  <div className="ppg-faq-a">
+                    <p>
+                      {f.a}
+                      {f.q.startsWith('Can I buy a single edit') && (
+                        <>
+                          {' '}
+                          Ask on the call and we will quote it.
+                        </>
+                      )}
+                    </p>
+                  </div>
+                </details>
+              ))}
+            </div>
           </div>
         </section>
 
-        <style>{`
-          .pr-page { background: #F2EEE7; color: #0C0C0B; font-family: Inter, sans-serif; }
-          .pr-page > section { max-width: 1040px; margin: 0 auto; padding: 64px 24px; border-top: 1px solid rgba(12,12,11,0.08); }
-          .pr-page p, .pr-page li, .pr-page dd { line-height: 1.7; color: #4A4740; font-size: 16px; }
-          .pr-page a { color: #0C0C0B; font-weight: 600; text-decoration: underline; text-decoration-color: ${ACCENT}; text-underline-offset: 3px; }
-          .pr-page a:hover { color: ${ACCENT}; }
-          .pr-page strong { color: #0C0C0B; }
-          .accent { color: ${ACCENT}; }
-
-          .pr-eyebrow { font-size: 10px !important; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #A8A49B !important; margin: 0 0 12px; }
-          .pr-h1 { font-size: clamp(36px, 5.4vw, 64px); font-weight: 900; letter-spacing: -0.04em; line-height: 1.02; margin: 0 0 24px; max-width: 820px; }
-          .pr-h2 { font-size: clamp(26px, 3.4vw, 40px); font-weight: 800; letter-spacing: -0.03em; line-height: 1.12; margin: 0 0 28px; }
-          .pr-badge { font-size: 11px !important; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: ${ACCENT} !important; margin: 0 0 10px; }
-
-          /* Hero */
-          .pr-hero { padding-top: 140px !important; border-top: none !important; }
-          .pr-crumb { display: flex; gap: 10px; font-size: 13px; color: #A8A49B; margin-bottom: 32px; }
-          .pr-crumb a { color: #6E6B63; text-decoration: none; font-weight: 500; }
-          .pr-lede { font-size: 19px !important; color: #2E2C28 !important; max-width: 720px; margin: 0 0 28px; }
-          .pr-promises { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 10px; }
-          .pr-promises li { font-size: 13.5px !important; font-weight: 600; color: #0C0C0B; padding: 8px 14px; border: 1px solid rgba(12,12,11,0.14); border-radius: 999px; background: rgba(255,255,255,0.5); }
-
-          /* Ladder */
-          .pr-steps { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
-          .pr-steps li { display: flex; gap: 16px; padding: 22px; border: 1px solid rgba(12,12,11,0.1); border-radius: 18px; background: rgba(255,255,255,0.45); }
-          .pr-steps h3 { font-size: 17px; font-weight: 800; letter-spacing: -0.02em; margin: 0 0 6px; color: #0C0C0B; }
-          .pr-steps p { margin: 0; font-size: 15px !important; }
-          .pr-step-num { flex: 0 0 36px; width: 36px; height: 36px; border-radius: 50%; background: #0C0C0B; color: #F2EEE7; font-weight: 800; font-size: 14px; display: inline-flex; align-items: center; justify-content: center; }
-
-          /* Free block */
-          .pr-free-inner { background: #0C0C0B; color: #F2EEE7; border-radius: 24px; padding: 48px; }
-          .pr-free-inner .pr-h2 { color: #F2EEE7; }
-          .pr-free-inner p, .pr-free-inner li { color: rgba(242,238,231,0.78); }
-          .pr-free-tag { font-size: 18px !important; margin: 0 0 20px; }
-          .pr-free-inner .pr-scope li::before { color: ${ACCENT}; }
-
-          /* Cards */
-          .pr-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; align-items: stretch; }
-          .pr-card { display: flex; flex-direction: column; padding: 30px 28px; border-radius: 22px; border: 1px solid rgba(12,12,11,0.12); background: rgba(255,255,255,0.55); }
-          .pr-card-dark { background: #0C0C0B; color: #F2EEE7; border-color: #0C0C0B; }
-          .pr-card-dark p, .pr-card-dark li { color: rgba(242,238,231,0.8); }
-          .pr-card-name { font-size: 24px; font-weight: 800; letter-spacing: -0.02em; margin: 0 0 12px; }
-          .pr-card-dark .pr-card-name { color: #F2EEE7; }
-          .pr-price { margin: 0 0 12px; display: flex; flex-direction: column; gap: 2px; }
-          .pr-price-num { font-size: 40px; font-weight: 900; letter-spacing: -0.04em; color: #0C0C0B; line-height: 1; }
-          .pr-card-dark .pr-price-num { color: #F2EEE7; }
-          .pr-price-per { font-size: 13px; color: #A8A49B; }
-          .pr-tagline { font-size: 15px !important; margin: 0 0 18px; }
-          .pr-scope { list-style: none; padding: 0; margin: 0 0 24px; display: flex; flex-direction: column; gap: 9px; }
-          .pr-scope li { position: relative; padding-left: 22px; font-size: 14.5px !important; line-height: 1.55; }
-          .pr-scope li::before { content: "\\2713"; position: absolute; left: 0; top: 0; color: ${ACCENT}; font-weight: 800; }
-          .pr-card-cta { margin-top: auto; display: flex; flex-direction: column; gap: 12px; align-items: flex-start; }
-          .pr-reassure { font-size: 13.5px !important; margin: 0; }
-          .pr-free-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 52px; padding: 0 28px; border-radius: 100px; background: #E8541A; color: #fff; font: 700 15px Inter, sans-serif; text-decoration: none; }
-          .pr-free-btn:hover { background: #FF6A2B; }
-          .pr-free-btn:focus-visible { outline: 3px solid #0C0C0B; outline-offset: 3px; }
-          @media (max-width: 640px) { .pr-free-btn { width: 100%; } }
-          .pr-order-note { margin: 28px 0 0; font-size: 15px !important; }
-
-          /* Table */
-          .pr-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-          .pr-table { width: 100%; min-width: 760px; border-collapse: collapse; text-align: left; font-size: 14.5px; }
-          .pr-table th, .pr-table td { padding: 12px 14px 12px 0; border-bottom: 1px solid rgba(12,12,11,0.08); vertical-align: top; line-height: 1.5; color: #4A4740; }
-          .pr-table thead th { font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; color: #0C0C0B; font-weight: 800; }
-          .pr-table tbody th { color: #0C0C0B; font-weight: 700; width: 170px; }
-
-          /* Not included */
-          .pr-not-list { margin: 0; display: grid; grid-template-columns: repeat(2, 1fr); gap: 22px 36px; }
-          .pr-not-list dt { font-size: 16.5px; font-weight: 800; letter-spacing: -0.01em; margin: 0 0 6px; }
-          .pr-not-list dd { margin: 0; font-size: 15px !important; }
-
-          /* Billing */
-          .pr-billing-list { padding-left: 20px; margin: 0 0 20px; display: flex; flex-direction: column; gap: 10px; max-width: 760px; }
-          .pr-terms-note { font-size: 14.5px !important; margin: 0; }
-
-          /* Fit */
-          .pr-fit-list { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
-          .pr-fit-list li { padding: 22px; border: 1px solid rgba(12,12,11,0.1); border-radius: 18px; background: rgba(255,255,255,0.45); }
-          .pr-fit-list h3 { font-size: 18px; font-weight: 800; letter-spacing: -0.02em; margin: 0 0 4px; }
-          .pr-fit-list h3 a { text-decoration: none; }
-          .pr-fit-plan { font-size: 13px !important; font-weight: 700; color: ${ACCENT} !important; margin: 0 0 10px; }
-          .pr-fit-list p { margin: 0; font-size: 15px !important; }
-
-          /* FAQ */
-          .pr-faq-list { margin: 0; max-width: 820px; }
-          .pr-faq-list > div { padding: 22px 0; border-bottom: 1px solid rgba(12,12,11,0.08); }
-          .pr-faq-list > div:last-child { border-bottom: none; }
-          .pr-faq-list dt { font-size: 18px; font-weight: 800; letter-spacing: -0.02em; margin: 0 0 8px; }
-          .pr-faq-list dd { margin: 0; }
-
-          /* Proof strip */
-          .pr-proof { padding-top: 0 !important; border-top: none !important; }
-          .pr-proof-list { list-style: none; margin: 0 0 16px; padding: 20px 24px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; border: 1px solid rgba(12,12,11,0.12); border-radius: 16px; background: #F2EEE7; }
-          .pr-proof-item { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
-          .pr-proof-val { font-size: clamp(20px, 2.6vw, 28px); font-weight: 800; letter-spacing: -0.03em; color: #0C0C0B; overflow-wrap: anywhere; }
-          .pr-proof-label { font-size: 13px; color: #6E6B63; line-height: 1.4; }
-          .pr-proof-link { color: ${ACCENT}; font-weight: 700; font-size: 14px; text-decoration: none; }
-          .pr-proof-link:hover { text-decoration: underline; }
-          /* Standalone link: a full 44px row on touch widths. */
-          @media (max-width: 760px) { .pr-proof-link { display: inline-flex; align-items: center; min-height: 44px; font-size: 15px; } }
-
-          /* CTA */
-          .pr-cta { padding-bottom: 128px !important; }
-          .pr-cta p { max-width: 640px; }
-          .pr-cta .pr-card-cta { margin-top: 24px; }
-
-          @media (max-width: 900px) {
-            .pr-cards { grid-template-columns: 1fr; }
-            .pr-proof-list { grid-template-columns: 1fr; }
-          }
-          @media (max-width: 760px) {
-            .pr-page > section { padding: 48px 20px; }
-            .pr-hero { padding-top: 110px !important; }
-            .pr-steps, .pr-not-list, .pr-fit-list { grid-template-columns: 1fr; }
-            .pr-free-inner { padding: 32px 22px; }
-            .pr-card-cta { align-items: stretch; }
-            /* The comparison table is 760px wide inside a 350px column, so it
-               scrolls sideways. On a phone the row labels scrolled away with
-               it and the plan columns lost their meaning. The label column
-               now stays pinned while the plans scroll underneath it. */
-            .pr-table { min-width: 700px; }
-            .pr-table thead th:first-child, .pr-table tbody th {
-              position: sticky; left: 0; z-index: 1; background: #F2EEE7;
-              width: 118px; min-width: 118px; padding-right: 12px;
-              box-shadow: 1px 0 0 rgba(12,12,11,0.10);
-            }
-          }
-        `}</style>
+        {/* ── Closing ask ───────────────────────────────────────────────── */}
+        <section className="ppg-sec ppg-sec-last" aria-labelledby="cta-heading">
+          <div className="ppg-wrap">
+            <Rise className="ppg-cta">
+              <h2 id="cta-heading" className="ppg-cta-title">Not sure which one? Ask.</h2>
+              <p className="ppg-cta-body">
+                A free 15-minute call. We look at what you already have, tell you which step makes sense,
+                and if the answer is &quot;none of them yet&quot; we say so.
+              </p>
+              <div className="ppg-cta-actions">
+                <BookCallButton label={BOOK_CALL_LABEL} location="pricing_page_final" />
+                <p className="ppg-cta-reassure">{BOOK_CALL_REASSURANCE}</p>
+                <Link href={FREE_EDITS_URL} data-track-location="pricing_page_final_free" className="ppg-cta-alt">
+                  Or start with 2 free edits
+                </Link>
+              </div>
+            </Rise>
+          </div>
+        </section>
       </main>
 
       <Footer />
