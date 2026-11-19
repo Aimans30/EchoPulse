@@ -95,14 +95,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.9,
   };
 
-  // /order was indexable but missing from the sitemap, so Google had no path to
-  // it except the nav. It's a conversion page; it belongs here.
-  const order: MetadataRoute.Sitemap[number] = {
-    url: `${SITE_URL}/order`,
-    lastModified: STATIC_PAGES_UPDATED,
-    changeFrequency: 'monthly',
-    priority: 0.7,
-  };
 
   // /pricing is the full price page built from lib/pricing.ts. It answers the
   // query the homepage pricing section cannot rank for on its own.
@@ -314,7 +306,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     freeEdits,
     founderPage,
     ...resourcePages,
-    order,
     terms,
     privacy,
   ];

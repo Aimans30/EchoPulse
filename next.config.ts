@@ -84,6 +84,8 @@ const nextConfig: NextConfig = {
 
       // Guessable audience URLs that used to 404.
       { source: "/agents", destination: "/real-estate", permanent: true },
+      // A la carte /order menu retired Nov 2026; plans and the free sample live on /pricing.
+      { source: "/order", destination: "/pricing", permanent: true },
       { source: "/home-services", destination: "/business-owners", permanent: true },
 
       // 2. Retired duplicate posts -> their cluster survivor.
