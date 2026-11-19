@@ -51,6 +51,8 @@ export const videos: VideoEntry[] = [
   { url: 'https://res.cloudinary.com/dqqd9rq8s/video/upload/v1782372139/2438_fn_z6wry7.mp4',                                    type: 'realestate', brand: 'Listing Reel', label: 'Property',                            icp: ['real-estate'] },
 
   // ─── New clips ───────────────────────────────────────────────────────────
+  // Founder and coach talking-head content, also used by DTC brands.
+  { url: 'https://res.cloudinary.com/dkzhqy2od/video/upload/v1795116227/main_video_x4dgug.mp4',                                   type: 'talking',  brand: 'Founder Reel',   label: 'Talking Head', orientation: 'vertical', icp: ['dtc', 'coaches', 'founders'] },
   // Podcast trailer clip for Instagram, cut from a client episode (DTC).
   { url: 'https://player.cloudinary.com/embed/?cloud_name=dkzhqy2od&public_id=EP5_ig_trailer_rosazz',                             type: 'podcast',  brand: 'Podcast Clip',   label: 'Episode Trailer', orientation: 'vertical', icp: ['dtc', 'founders'] },
   // Founder info reel with motion graphics (MagicBNB, Nov 2026).
