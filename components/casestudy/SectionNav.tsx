@@ -1,5 +1,5 @@
 /**
- * Sticky in-page section nav. Desktop only (hidden under 1000px by the page
+ * In-page section nav (scrolls with the page; a sticky bar floated over the text). Desktop only (hidden under 1000px by the page
  * stylesheet). Plain anchor links, no scroll-spy and no client JavaScript, so
  * it costs nothing and works before hydration. The page only passes sections
  * that actually render for the study.

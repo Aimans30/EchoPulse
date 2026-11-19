@@ -97,10 +97,10 @@ export const CASE_STUDY_CSS = `
 .cs-tldr-text { font-size: 15px; line-height: 1.62; color: var(--black); margin: 0; }
 
 /* Sticky section nav (desktop only) */
-.cs-secnav-wrap { position: sticky; top: 76px; z-index: 40; height: 0; pointer-events: none; display: flex; justify-content: center; align-items: flex-start; }
-.cs-secnav { pointer-events: auto; margin-top: 18px; max-width: calc(100% - 64px); display: flex; gap: 4px; padding: 5px; border-radius: 100px; background: rgba(12,12,11,0.88); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); box-shadow: 0 10px 34px rgba(12,12,11,0.2); overflow-x: auto; scrollbar-width: none; }
+.cs-secnav-wrap { position: relative; z-index: 2; padding: 20px 0 4px; pointer-events: none; display: flex; justify-content: center; align-items: flex-start; }
+.cs-secnav { pointer-events: auto; margin-top: 0; max-width: calc(100% - 64px); display: flex; gap: 4px; padding: 5px; border-radius: 100px; background: rgba(12,12,11,0.88); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); box-shadow: 0 10px 34px rgba(12,12,11,0.2); overflow-x: auto; scrollbar-width: none; }
 .cs-secnav::-webkit-scrollbar { display: none; }
-.cs-secnav a { white-space: nowrap; font-family: Inter, sans-serif; font-size: 12.5px; font-weight: 600; color: rgba(242,238,231,0.86); text-decoration: none; padding: 7px 14px; border-radius: 100px; }
+.cs-secnav a { white-space: nowrap; font-family: Inter, sans-serif; font-size: 13px; font-weight: 600; color: rgba(242,238,231,0.86); text-decoration: none; padding: 7px 14px; border-radius: 100px; }
 .cs-secnav a:hover { background: rgba(242,238,231,0.12); color: #fff; }
 .cs-secnav a:focus-visible { outline-offset: -2px; }
 

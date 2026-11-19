@@ -154,20 +154,16 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
   const tracking = study.tracking;
   const trackingScreens = tracking?.screens ?? [];
 
+  // Six stops at most: a longer bar crowds the page and nobody scans it.
   const sections: SectionNavItem[] = [
     { id: "glance", label: "Key facts" },
-    { id: "situation", label: situationKicker },
     { id: "work", label: workKicker },
     ...(hasNumbers ? [{ id: "numbers", label: "The numbers" }] : []),
     ...(tracking ? [{ id: "tracking", label: "Tracking" }] : []),
     ...(study.pairs ? [{ id: "pages", label: "Before and after" }] : []),
-    ...(study.gallery ? [{ id: "screens", label: "Screens" }] : []),
-    ...(study.proof.length > 0 ? [{ id: "export", label: "The export" }] : []),
-    { id: "measured", label: "How measured" },
     { id: "open", label: openKicker },
-    { id: "scope", label: limitsKicker },
     { id: "fit", label: "Right for you?" },
-  ];
+  ].slice(0, 6);
 
   /**
    * QUESTION HEADINGS
@@ -394,7 +390,7 @@ export default function CaseStudyPage({ study }: { study: CaseStudy }) {
                 <Reveal as="li" key={t.text.slice(0, 40)} delay={i * 0.06}>
                   <div className="cs-tldr-card">
                     {t.label && <p className="cs-tldr-label">{t.label}</p>}
-                    <p className="cs-tldr-text">{t.text}</p>
+                    <p className="cs-tldr-text">{t.text.charAt(0).toUpperCase() + t.text.slice(1)}</p>
                   </div>
                 </Reveal>
               ))}
