@@ -59,7 +59,26 @@ const SLOTS: Array<[number, number, number, number, 'tall' | 'wide' | 'square']>
   [3, 3, 2, 2, 'square'],
 ];
 
-type Tile = { key: string; x: number; y: number; w: number; h: number; clip: WallClip; first: boolean };
+type Tile = { key: string; x: number; y: number; w: number; h: number; clip: WallClip; first: boolean; poster: string; posterSm: string; preview: string };
+
+/**
+ * The wall wraps, so each clip appears several times. To stop repeats reading
+ * as copies, every further appearance of a Cloudinary clip shows a different
+ * moment of the same video: its poster and its hover preview start at another
+ * point of the running time (Cloudinary's percentage start offset). Same real
+ * video, different frame. YouTube tiles are left as they are.
+ */
+const MOMENTS = [0, 30, 55, 78, 15, 42, 66];
+function momentOf(clip: WallClip, n: number) {
+  const pct = MOMENTS[n % MOMENTS.length];
+  if (!pct || clip.youtube) return { poster: clip.poster, posterSm: clip.posterSm, preview: clip.preview };
+  const so = `so_${pct}p`;
+  return {
+    poster: clip.poster.replace(/\/so_[^,/]+,/, `/${so},`),
+    posterSm: clip.posterSm.replace(/\/so_[^,/]+,/, `/${so},`),
+    preview: clip.preview.replace('/video/upload/', `/video/upload/${so},`),
+  };
+}
 type Grid = { tiles: Tile[]; w: number; h: number; vw: number; vh: number; gain: number; mod: number };
 
 function makeGrid(vw: number, vh: number, clips: WallClip[]): Grid | null {
@@ -81,6 +100,26 @@ function makeGrid(vw: number, vh: number, clips: WallClip[]): Grid | null {
 
   const seen = new Set<string>();
   const tiles: Tile[] = [];
+  const seenCount = new Map<string, number>();
+  // Never put the same clip next to itself, including across the wrap edges
+  // and when a filter leaves only a handful of clips: take the next clip in
+  // the pool whose other copies are all at least ~1.2 modules away.
+  const W = mc * mod, H = mr * mod;
+  const placed: Array<{ x: number; y: number; id: string }> = [];
+  const tooClose = (x: number, y: number, id: string) =>
+    placed.some((p) => {
+      if (p.id !== id) return false;
+      const dx = Math.min(Math.abs(p.x - x), W - Math.abs(p.x - x));
+      const dy = Math.min(Math.abs(p.y - y), H - Math.abs(p.y - y));
+      return Math.hypot(dx, dy) < mod * 1.2;
+    });
+  const pick = (pool: WallClip[], start: number, x: number, y: number) => {
+    for (let k = 0; k < pool.length; k++) {
+      const cand = pool[(start + k) % pool.length];
+      if (!tooClose(x, y, cand.id)) return cand;
+    }
+    return pool[start % pool.length];
+  };
   let ti = 0, wi = 0, si = 0;
   // A stride through each pool keeps the same clip from sitting next to itself.
   const stride = (n: number) => {
@@ -93,12 +132,18 @@ function makeGrid(vw: number, vh: number, clips: WallClip[]): Grid | null {
   for (let r = 0; r < mr; r++) {
     for (let c = 0; c < mc; c++) {
       SLOTS.forEach(([sc, sr, cw, ch, shape], k) => {
+        const tx = c * mod + sc * pitch + (cw * pitch) / 2;
+        const ty = r * mod + sr * pitch + (ch * pitch) / 2;
         const clip =
-          shape === 'tall' ? tallPool[(ti++ * ts) % tallPool.length]
-          : shape === 'wide' ? widePool[(wi++ * ws) % widePool.length]
-          : clips[(si++ * ss + 3) % clips.length];
+          shape === 'tall' ? pick(tallPool, (ti++ * ts) % tallPool.length, tx, ty)
+          : shape === 'wide' ? pick(widePool, (wi++ * ws) % widePool.length, tx, ty)
+          : pick(clips, (si++ * ss + 3) % clips.length, tx, ty);
+        placed.push({ x: tx, y: ty, id: clip.id });
         const first = !seen.has(clip.id);
         seen.add(clip.id);
+        const n = (seenCount.get(clip.id) ?? 0);
+        seenCount.set(clip.id, n + 1);
+        const look = momentOf(clip, n);
         tiles.push({
           key: `${r}-${c}-${k}`,
           x: c * mod + sc * pitch,
@@ -107,6 +152,7 @@ function makeGrid(vw: number, vh: number, clips: WallClip[]): Grid | null {
           h: ch * pitch - gap,
           clip,
           first,
+          ...look,
         });
       });
     }
@@ -503,11 +549,11 @@ export default function WorkWall({ clips }: { clips: WallClip[] }) {
               >
                 <span className="ww-in">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={t.clip.poster} srcSet={`${t.clip.posterSm} 320w, ${t.clip.poster} 520w`} sizes="(max-width: 640px) 160px, 390px" alt="" decoding="async" draggable={false} />
+                  <img src={t.poster} srcSet={`${t.posterSm} 320w, ${t.poster} 520w`} sizes="(max-width: 640px) 160px, 390px" alt="" decoding="async" draggable={false} />
                   {t.clip.youtube && <span className="ww-yt" aria-hidden="true">YouTube</span>}
-                  {t.clip.preview && <video
+                  {t.preview && <video
                     ref={(el) => { videoEls.current[i] = el; }}
-                    data-src={t.clip.preview}
+                    data-src={t.preview}
                     muted
                     loop
                     playsInline
