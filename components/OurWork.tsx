@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, useCallback, useMemo, useTransition } from
 import { motion } from 'framer-motion';
 import { videos, previewMp4Src, type Orientation, type VideoEntry } from '@/lib/videos';
 import Link from 'next/link';
+import { trackWorkVideoOpen } from '@/lib/analytics';
 
 // ─── Tab definitions ────────────────────────────────────────────────────────
 const tabs = [
@@ -666,7 +667,7 @@ export default function OurWork() {
                   key={`${video.url}-${i}`}
                   className={`vid-card${orient === 'horizontal' ? ' vid-card-h' : ''}`}
                   style={{ width: `${cardWidth(orient)}px` }}
-                  onClick={() => openModal(video.url)}
+                  onClick={() => { trackWorkVideoOpen(video.label, video.brand); openModal(video.url); }}
                 >
                   <div className="vid-inner">
                     {previewSrc ? (

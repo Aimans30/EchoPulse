@@ -986,7 +986,7 @@ function LinkedInPostBuilder({ accent }: { accent: string }) {
 
   // Master timeline — single rAF-style state machine that drives every phase
   useEffect(() => {
-    let timers: ReturnType<typeof setTimeout>[] = [];
+    const timers: ReturnType<typeof setTimeout>[] = [];
     let cancelled = false;
 
     const cycleHooks = (i: number) => {
@@ -1644,7 +1644,7 @@ function BlogRecognitionPipeline({ accent }: { accent: string }) {
                 maxWidth: '100%',
               }}
             >
-              "Who's the best at this?"
+              &ldquo;Who&rsquo;s the best at this?&rdquo;
             </motion.div>
             <motion.div
               initial={{ opacity: 0, x: 8 }}

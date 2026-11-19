@@ -1,6 +1,6 @@
 'use client';
 
-import { useId, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { track, trackFreeEditsSubmit } from '@/lib/analytics';
 import { getAttribution } from '@/lib/attribution';
 
@@ -90,6 +90,21 @@ export default function FreeEditsForm() {
   const [errors, setErrors] = useState<Errors>({});
   const [status, setStatus] = useState<Status>('idle');
   const [step, setStep] = useState(0);
+  // Each step replaces the one before it in place, so after Continue the
+  // viewport is still where the previous step's button was: on a phone that
+  // is the bottom of the new step, with its first (required) field scrolled
+  // off the top. Bring the top of the form back under the nav on every step
+  // change, but only when it is actually out of view.
+  const formRef = useRef<HTMLFormElement>(null);
+  const firstStep = useRef(true);
+  useEffect(() => {
+    if (firstStep.current) { firstStep.current = false; return; }
+    const el = formRef.current;
+    if (!el) return;
+    const top = el.getBoundingClientRect().top;
+    if (top >= 76 && top < window.innerHeight * 0.5) return;
+    window.scrollTo({ top: Math.max(0, window.scrollY + top - 84) });
+  }, [step]);
 
   const validate = (): Errors => {
     const e: Errors = {};
@@ -218,7 +233,7 @@ export default function FreeEditsForm() {
   });
 
   return (
-    <form className="fe-card" onSubmit={onSubmit} noValidate aria-label="Request 2 free edited videos">
+    <form ref={formRef} className="fe-card" onSubmit={onSubmit} noValidate aria-label="Request 2 free edited videos">
       <ol className="fe-progress" aria-label="Progress">
         {['About you', 'Your footage', 'Editing style'].map((label, i) => (
           <li key={label} className={i === step ? 'is-on' : i < step ? 'is-done' : undefined} aria-current={i === step ? 'step' : undefined}>

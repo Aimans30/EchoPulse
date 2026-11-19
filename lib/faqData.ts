@@ -100,7 +100,7 @@ export const FAQ_GROUPS: FaqGroup[] = [
       },
       {
         q: `What is included in the ${PILOT_PRICE} Pilot?`,
-        a: `The Pilot is ${PILOT_PRICE} one-off for 14 days and includes ${PILOT_INCLUDES}. Every deliverable has a 48-hour turnaround and is revised until you are happy. There is no retainer, nothing recurring behind the payment, and you keep everything we make.`,
+        a: `The Pilot is ${PILOT_PRICE} one-off for 14 days and includes ${PILOT_INCLUDES}. Short-form edits have a 48-hour turnaround, and every deliverable is revised until you are happy. There is no retainer, nothing recurring behind the payment, and you keep everything we make.`,
         link: { href: '/pilot', label: 'See the Pilot' },
       },
       {

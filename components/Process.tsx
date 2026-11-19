@@ -16,7 +16,7 @@ const steps = [
   {
     when: '14 days',
     title: `The ${PILOT.priceLabel} Pilot`,
-    body: 'A recorded 60 minute onboarding session, then 6 short-form video edits, 2 static or carousel posts and 1 long-form SEO blog of 1,500 words. You also get a content audit and a 30-day plan. Each deliverable comes back in 48 hours.',
+    body: 'A recorded 60 minute onboarding session, then 6 short-form video edits, 2 static or carousel posts and 1 long-form SEO blog of 1,500 words. You also get a content audit and a 30-day plan. Short-form edits come back in 48 hours.',
   },
   {
     when: 'After day 14',

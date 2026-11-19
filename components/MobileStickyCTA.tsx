@@ -148,6 +148,14 @@ export default function MobileStickyCTA() {
       <style>{`
         @media (max-width: 767px) {
           body { padding-bottom: ${barHeight}px !important; }
+          /* The footer also reserves 96px for this bar (Footer.tsx and
+             globals.css). With the body padding above that was the room
+             reserved twice: about 200px of blank page under the last line.
+             Where this bar is mounted the body padding is the reservation,
+             so the footer goes back to ordinary spacing. Routes where the
+             bar is suppressed (the blog, which has its own bar) keep the
+             footer's 96px. */
+          body footer.site-footer { padding-bottom: calc(40px + env(safe-area-inset-bottom)) !important; }
         }
       `}</style>
     )}

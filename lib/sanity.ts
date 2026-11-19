@@ -1,5 +1,5 @@
 import { createClient } from 'next-sanity';
-import imageUrlBuilder from '@sanity/image-url';
+import { createImageUrlBuilder } from '@sanity/image-url';
 import type { SanityImageSource } from '@sanity/image-url';
 
 /**
@@ -28,7 +28,7 @@ export const sanityClient = createClient({
   perspective: 'published',
 });
 
-const builder = imageUrlBuilder(sanityClient);
+const builder = createImageUrlBuilder(sanityClient);
 
 /**
  * Use to build URLs for any Sanity image asset (the `mainImage` field, inline

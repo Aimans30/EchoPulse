@@ -1,9 +1,10 @@
 import type { Metadata } from 'next';
 import OrderFlow from '@/components/OrderFlow';
+import Nav from '@/components/Nav';
 
 // /order — McDonald's-style à la carte ordering for clients who don't want
-// a retainer. Sits alongside the existing $299 Pilot / $1,997 Growth /
-// $4,997 Full System retainers on the homepage pricing section.
+// a retainer. Sits alongside the $299 Pilot, the $399/month Presence Engine
+// and the $1,997/month Growth plan (see lib/pricing.ts).
 //
 // Phase 1 ships the UI only. Phase 2 will add /api/checkout for Dodo
 // Payments, webhook handlers for Asana + Resend + Supabase persistence,
@@ -31,8 +32,11 @@ export default function OrderPage() {
   // <main id="main"> so the root layout's skip-to-content link has a target
   // here. /order previously rendered no landmark element at all.
   return (
-    <main id="main">
-      <OrderFlow />
-    </main>
+    <>
+      <Nav />
+      <main id="main">
+        <OrderFlow />
+      </main>
+    </>
   );
 }

@@ -25,13 +25,14 @@ export default function BookCallModal() {
   const [slow, setSlow] = useState(false);
   // Built when the modal opens, so it names the button that opened it (the
   // click every opener records through trackCallClick) and the page it was
-  // on. The iframe is loaded once and then kept, so a second open from
-  // another button reuses the first URL; the booking_confirmed event still
-  // names the latest button.
+  // on. The iframe is kept between opens and only reloads when the URL
+  // changes (a different button or page).
   const [url, setUrl] = useState('');
   const openedAt = useRef(0);
   const wasOpen = useRef(false);
   const loadedRef = useRef(false);
+  const urlRef = useRef('');
+  const closeRef = useRef<HTMLButtonElement>(null);
 
   // Closed without the calendar ever appearing is a different failure from
   // closed after looking at the slots, so the close event says which.
@@ -48,7 +49,18 @@ export default function BookCallModal() {
       // Only trust a click from the last few seconds: an opener that forgot to
       // track must not inherit the name of an older button.
       const location = click && Date.now() - click.at < 5000 ? click.location : 'unknown';
-      setUrl((prev) => prev || bookingUrl({ location: `${location}_modal`, embed: true }));
+      // A reopen from the same button on the same page keeps the loaded
+      // calendar. A different button or page gets its own URL, so Cal.com's
+      // booking record names the button that was actually used; the iframe
+      // reloads once for that, behind the same loading state as a first open.
+      const next = bookingUrl({ location: `${location}_modal`, embed: true });
+      if (next !== urlRef.current) {
+        urlRef.current = next;
+        loadedRef.current = false;
+        setLoaded(false);
+        setSlow(false);
+        setUrl(next);
+      }
       openedAt.current = Date.now();
       setMounted(true);
       setOpen(true);
@@ -78,10 +90,18 @@ export default function BookCallModal() {
     }
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false); };
     document.addEventListener('keydown', onKey);
+    // Keep keyboard focus in this document, on the close button, so Escape
+    // reaches the listener above. Once someone clicks inside the calendar,
+    // focus is in Cal.com's cross-origin iframe and its key presses can never
+    // be seen from here; the close button is the way out from that point.
+    const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    closeRef.current?.focus({ preventScroll: true });
     document.body.style.overflow = 'hidden';
     document.documentElement.style.overflow = 'hidden';
     return () => {
       document.removeEventListener('keydown', onKey);
+      // Hand focus back to the button that opened the modal.
+      if (opener?.isConnected) opener.focus({ preventScroll: true });
       document.body.style.overflow = '';
       document.documentElement.style.overflow = '';
     };
@@ -188,6 +208,7 @@ export default function BookCallModal() {
 
           <button
             type="button"
+            ref={closeRef}
             className="bcm-close"
             onClick={() => setOpen(false)}
             aria-label="Close booking modal"

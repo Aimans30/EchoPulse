@@ -368,7 +368,7 @@ export default function ICPPage({ data, videos, guides = [] }: { data: IcpData; 
                 { t: '$299 Pilot, 14 days', d: 'Real deliverables on your brand before any monthly plan. You keep everything we make, whether you continue or not.' },
                 { t: 'No contracts', d: 'Month to month after the Pilot, cancel with 14 days written notice. We have to earn the next month, every month.' },
                 { t: 'Redone until right', d: 'If a deliverable does not sound like you, we redo it at no charge until you would post it under your own name.' },
-                { t: '48-hour turnaround', d: 'Standard on every deliverable, with senior review before anything reaches you. Owner-operated, 3-hour replies in every workday.' },
+                { t: '48-hour turnaround', d: 'Standard on short-form edits, with senior review before anything reaches you. Owner-operated, 3-hour replies in every workday.' },
                 // Added on the conversion thesis that a studio with no
                 // testimonials should make claims that require checking rather
                 // than trust. Naming the three people who actually touch the

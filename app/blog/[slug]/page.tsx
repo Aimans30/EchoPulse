@@ -1,3 +1,4 @@
+import { cache } from 'react';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -46,14 +47,24 @@ function sanityDims(url?: string | null): { w: number; h: number } | null {
   return w > 0 && h > 0 ? { w, h } : null;
 }
 
+/**
+ * One Sanity fetch per request, shared by generateMetadata and the page, so
+ * the two can never disagree about whether the post loaded.
+ */
+const loadPost = cache((slug: string) => getPostBySlug(slug));
+
 export async function generateStaticParams() {
-  const slugs = await getAllPostSlugs();
+  // If Sanity is unreachable at build time, build anyway: posts are then
+  // rendered on first request instead of failing the whole deploy.
+  const slugs = await getAllPostSlugs().catch(() => [] as string[]);
   return slugs.map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const post = await getPostBySlug(slug);
+  // A failed fetch is not handled here: the page makes the same (shared) call
+  // and throws, which is what shows app/blog/[slug]/error.tsx.
+  const post = await loadPost(slug).catch(() => null);
   if (!post) return {};
 
   const ogImage = post.mainImage?.asset
@@ -98,7 +109,7 @@ export const revalidate = 60;
 
 export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const post = await getPostBySlug(slug);
+  const post = await loadPost(slug);
   if (!post) notFound();
 
   // Headings for the sticky sidebar TOC — derived from the post body so it
@@ -107,7 +118,8 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   const headings = extractHeadings(post.content);
 
   // Related posts for the bottom strip — prefer same category, fill with recent.
-  const related = await getRelatedPosts(slug, post.category, 3);
+  // Related posts are a nice-to-have: a failed fetch must not take the article down.
+  const related = await getRelatedPosts(slug, post.category, 3).catch(() => [] as BlogPostSummary[]);
   // Which ICP + service page this article should send readers to. The `icp`
   // and `service` the publisher stored on the document decide it; the keyword
   // guess from the slug and title is only the fallback for older posts that

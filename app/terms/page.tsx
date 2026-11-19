@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
+import Nav from '@/components/Nav';
 
 // /terms — Comprehensive Terms of Service.
 // EchoPulse is currently a sole proprietorship operated by Lakshya Soni
@@ -22,7 +23,9 @@ const FUTURE_REGISTERED_OFFICE = 'Gurgaon';
 
 export default function TermsPage() {
   return (
-    // id="main" is the target of the layout's skip-to-content link.
+    <>
+    <Nav />
+    {/* id="main" is the target of the layout's skip-to-content link. */}
     <main
       id="main"
       data-dark-bg="true"
@@ -265,6 +268,7 @@ export default function TermsPage() {
         </div>
       </div>
     </main>
+    </>
   );
 }
 

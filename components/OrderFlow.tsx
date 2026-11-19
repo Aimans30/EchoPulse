@@ -1494,7 +1494,7 @@ function StepReview({
         </ReviewRow>
         <ReviewRow label="Footage">
           <a href={client.fileLink} target="_blank" rel="noopener noreferrer" style={{ color: '#E8541A', textDecoration: 'underline', wordBreak: 'break-all', fontSize: '13px' }}>
-            {client.fileLink || '—'}
+            {client.fileLink || 'No link added'}
           </a>
         </ReviewRow>
         {client.brandAssets && <ReviewRow label="Brand assets">{client.brandAssets}</ReviewRow>}

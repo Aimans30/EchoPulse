@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, useSyncExternalStore } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { useParams } from 'next/navigation';
 import { previewMp4Src, type Orientation, type VideoEntry } from '@/lib/videos';
@@ -53,6 +53,8 @@ function VideoModal({ src, onClose }: { src: string; onClose: () => void }) {
  * frozen; larger sets auto-scroll as a seamless marquee. Client island (needs
  * window + RAF); the section heading around it stays server-rendered.
  */
+const subscribeNoop = () => () => {};
+
 export default function ICPWork({ videos, accent }: { videos: VideoEntry[]; accent: string }) {
   const params = useParams<{ icp?: string }>();
   const nicheKey = typeof params?.icp === 'string' ? params.icp : '';
@@ -75,9 +77,8 @@ export default function ICPWork({ videos, accent }: { videos: VideoEntry[]; acce
   const rafRef = useRef<number | undefined>(undefined);
   const xOffsetRef = useRef(0);
 
-  const [scrolls, setScrolls] = useState(false);
+  const [measuredScrolls, setScrolls] = useState(false);
   const scrollsRef = useRef(false);
-  useEffect(() => { scrollsRef.current = scrolls; }, [scrolls]);
 
   /**
    * On a touchscreen the marquee is worse than useless. The outer wrapper is
@@ -88,14 +89,20 @@ export default function ICPWork({ videos, accent }: { videos: VideoEntry[]; acce
    * does the same job with momentum, is what a thumb expects, and costs zero
    * frames when nobody is touching it. Desktop keeps the marquee unchanged.
    */
-  const [swipeRail, setSwipeRail] = useState(false);
-  useEffect(() => {
-    setSwipeRail(window.matchMedia('(pointer: coarse)').matches);
-  }, []);
+  // Read through useSyncExternalStore (server snapshot false) instead of a
+  // mount effect that sets state: same result, no extra cascading render.
+  const swipeRail = useSyncExternalStore(
+    subscribeNoop,
+    () => window.matchMedia('(pointer: coarse)').matches,
+    () => false,
+  );
+
+  // A touch rail never runs the marquee, whatever the last measurement said.
+  const scrolls = !swipeRail && measuredScrolls;
+  useEffect(() => { scrollsRef.current = scrolls; }, [scrolls]);
 
   useEffect(() => {
     if (swipeRail) {
-      setScrolls(false);
       // The marquee may have applied a translate during the first frame,
       // before the pointer test resolved. Clear it or the swipeable rail
       // starts a few pixels off its origin.

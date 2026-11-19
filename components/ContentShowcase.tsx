@@ -119,7 +119,7 @@ export default function ContentShowcase() {
           >
             Your audience can<br />
             tell when content<br />
-            <span style={{ color:'#E8541A', fontStyle:'italic' }}>wasn't written by you.</span>
+            <span style={{ color:'#E8541A', fontStyle:'italic' }}>wasn&apos;t written by you.</span>
           </motion.h2>
 
           <motion.p

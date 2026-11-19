@@ -17,6 +17,9 @@ export const metadata: Metadata = {
   title: 'EchoPulse — Pricing Matrix (Admin)',
   description: 'Internal: all region pricing side-by-side. Edit lib/useGeoPrice.ts to change.',
   robots: { index: false, follow: false },
+  // Own canonical: without it the page inherits the root layout's '/' and tells
+  // crawlers this noindex page is a copy of the homepage.
+  alternates: { canonical: '/pricing-matrix' },
 };
 
 const REGION_NAMES: Record<string, { full: string; flag: string; population: string }> = {

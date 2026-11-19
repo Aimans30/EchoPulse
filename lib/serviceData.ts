@@ -69,7 +69,7 @@ export const services: ServiceData[] = [
     methodTimeline: '48-HOUR TURNAROUND',
     steps: [
       { num: '01', title: 'You Send Footage', body: 'Upload anything: podcast episode, YouTube vlog, course module, drone footage, walkthrough, talking head, ad. Drop it in our shared folder with a 2-line brief on the goal.' },
-      { num: '02', title: 'We Edit and Optimize', body: 'Editor cuts retention-first, applies sound design, color grade, and adds platform-specific captions. Optional motion graphic add-ons. 48-hour standard turnaround.' },
+      { num: '02', title: 'We Edit and Optimize', body: 'Editor cuts retention-first, applies sound design, color grade, and adds platform-specific captions. Optional motion graphic add-ons. 48-hour standard turnaround on short-form edits.' },
       { num: '03', title: 'You Approve and Ship', body: 'Revisions until you are satisfied. We deliver master file plus mobile-optimized exports for every platform you publish to.' },
     ],
     deliverables: [
@@ -84,8 +84,8 @@ export const services: ServiceData[] = [
       client: 'EchoPulse',
       role: 'Production benchmarks',
       stat: '48 hr',
-      statLabel: 'standard turnaround',
-      body: 'Our team learned property reels at Vizionary Focus, a Canadian production studio, before going independent. Standard production cycle is 48 hours per individual deliverable, with revisions until you are satisfied. Rush 24-hour delivery can be arranged directly with us at a 30 percent surcharge when a date genuinely depends on it.',
+      statLabel: 'turnaround on short-form edits',
+      body: 'Our team learned property reels at Vizionary Focus, a Canadian production studio, before going independent. Standard production cycle is 48 hours per short-form edit, with revisions until you are satisfied. Rush 24-hour delivery can be arranged directly with us at a 30 percent surcharge when a date genuinely depends on it.',
     },
     testimonial: {
       quote: 'We are a young studio. Our first client testimonials are still in production. What we will not do is fabricate them. We will let you talk to a real client once we have one to introduce you to.',
@@ -93,7 +93,7 @@ export const services: ServiceData[] = [
       role: 'Founder, EchoPulse',
     },
     faq: [
-      { q: 'How fast is the turnaround?', a: 'Standard is 48 hours per video deliverable. If something is genuinely time-sensitive, a launch date or a listing going live, ask on the call or in the shared folder and we will tell you honestly whether we can hit 24 hours that week. Rush carries a 30 percent surcharge and is arranged directly with us rather than through the self-serve order page.' },
+      { q: 'How fast is the turnaround?', a: 'Standard is 48 hours per short-form edit. Long-form takes longer, depending on the length of the video. If something is genuinely time-sensitive, a launch date or a listing going live, ask on the call or in the shared folder and we will tell you honestly whether we can hit 24 hours that week. Rush carries a 30 percent surcharge and is arranged directly with us rather than through the self-serve order page.' },
       { q: 'How do I send footage?', a: 'We set up a shared Google Drive or Dropbox folder for each client. Upload your raw footage with a brief. We handle the rest.' },
       { q: 'Do you edit for all platforms?', a: 'Yes. Reels, TikTok, YouTube Shorts, YouTube long-form, LinkedIn video, podcast video, and listing-site MP4 exports are all standard.' },
       { q: 'What actually happens on the call?', a: '15 minutes with Lakshya, the founder. He looks at your site and your last few posts and tells you the first three things he would fix. No pitch.' },

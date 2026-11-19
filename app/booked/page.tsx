@@ -6,6 +6,9 @@ export const metadata: Metadata = {
   title: 'You are booked',
   description: 'Your call with EchoPulse Media is confirmed.',
   robots: { index: false, follow: false },
+  // Own canonical: without it the page inherits the root layout's '/' and tells
+  // crawlers this noindex page is a copy of the homepage.
+  alternates: { canonical: '/booked' },
 };
 
 /**

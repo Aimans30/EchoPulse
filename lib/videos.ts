@@ -132,6 +132,8 @@ export type WallClip = {
   /** Declared orientation; when absent the wall reads it off the poster. */
   orientation?: Orientation;
   poster: string;
+  /** Smaller poster (w_320) for phone-sized tiles; used in the wall's srcSet only. */
+  posterSm: string;
   preview: string;
   full: string;
 };
@@ -158,6 +160,7 @@ export function wallClips(): WallClip[] {
       icps: [...(v.icp ?? [])],
       orientation: v.orientation,
       poster: `${base}/so_3,c_scale,w_520,q_auto,f_jpg/${p.path.replace(/\.mp4$/, '.jpg')}`,
+      posterSm: `${base}/so_3,c_scale,w_320,q_auto,f_jpg/${p.path.replace(/\.mp4$/, '.jpg')}`,
       preview: `${base}/c_scale,w_480,q_auto:low,f_mp4,ac_none,du_12/${p.path}`,
       full: `${base}/q_auto:good,f_mp4/${p.path}`,
     });

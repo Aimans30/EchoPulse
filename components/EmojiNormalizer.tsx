@@ -74,13 +74,45 @@ export default function EmojiNormalizer() {
       }
     };
 
-    const parseAll = () => parseNode(document.body);
+    // Twemoji swaps emoji TEXT for <img> tags. Doing that inside markup React
+    // has not hydrated yet (a lazily loaded section, or a route behind
+    // loading.tsx on a slow phone) makes hydration fail with error #418,
+    // because React finds an <img> where the server sent text, and the whole
+    // section is thrown away and rendered again. React tags every element it
+    // has hydrated with a __reactFiber$ key, so wait until each emoji's parent
+    // carries one. After 12 seconds parse anyway: markup React does not own
+    // never gets a key.
+    let emojiRe: RegExp | null = null;
+    try { emojiRe = new RegExp('\\p{Extended_Pictographic}', 'u'); } catch { /* old engine: no gate */ }
+    const isHydrated = (el: Element) =>
+      Object.keys(el).some((k) => k.startsWith('__reactFiber$') || k.startsWith('__reactProps$'));
+    const hasUnhydratedEmoji = (root: HTMLElement): boolean => {
+      if (!emojiRe) return false;
+      const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+      let n: Node | null;
+      while ((n = walker.nextNode())) {
+        const parent = n.parentElement;
+        if (!parent || parent.tagName === 'SCRIPT' || parent.tagName === 'STYLE') continue;
+        if (emojiRe.test(n.nodeValue ?? '') && !isHydrated(parent)) return true;
+      }
+      return false;
+    };
+    const parseWhenHydrated = (node: HTMLElement, tries = 0) => {
+      if (cancelled) return;
+      if (tries < 24 && node.isConnected && hasUnhydratedEmoji(node)) {
+        window.setTimeout(() => parseWhenHydrated(node, tries + 1), 500);
+        return;
+      }
+      parseNode(node);
+    };
+
+    const parseAll = () => parseWhenHydrated(document.body);
 
     const flush = () => {
       scheduled = false;
       const batch = pending;
       pending = new Set();
-      for (const node of batch) parseNode(node);
+      for (const node of batch) parseWhenHydrated(node);
     };
 
     const scheduleParse = () => {

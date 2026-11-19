@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 
 /**
  * Post-checkout kickoff page.
@@ -105,7 +106,7 @@ export default function OnboardingClient() {
                 <li>Fill the kickoff brief (3 minutes)</li>
                 <li>You get a confirmation email + WhatsApp ping from me</li>
                 <li>We deliver draft 1 within 48 hours</li>
-                <li>Two rounds of revisions included &mdash; we redo until it&rsquo;s right</li>
+                <li>Two rounds of revisions included. We redo until it&rsquo;s right</li>
               </ol>
             </div>
 
@@ -255,7 +256,7 @@ export default function OnboardingClient() {
               You&rsquo;ll get an email + WhatsApp ping from me within the hour confirming everything.
               Draft 1 lands within 48 hours. Replies happen within 3 hours during work days.
             </p>
-            <a
+            <Link
               href="/"
               style={{
                 display: 'inline-block',
@@ -269,7 +270,7 @@ export default function OnboardingClient() {
               }}
             >
               Back to EchoPulse
-            </a>
+            </Link>
           </section>
         )}
 

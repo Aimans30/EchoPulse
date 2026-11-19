@@ -4,6 +4,7 @@ export const blog = defineType({
   name: 'blog',
   title: 'Blog',
   type: 'document',
+  fieldsets: [{ name: 'engine', title: 'Engine fields', options: { collapsible: true, collapsed: true } }],
   fields: [
     defineField({
       name: 'title',
@@ -81,6 +82,46 @@ export const blog = defineType({
       title: 'Service slug',
       type: 'string',
       description: 'video-editing | linkedin-ghostwriting | blog-production | ad-creatives | websites-funnels | automations | apps-software',
+    }),
+
+    defineField({
+      name: 'targetQuery',
+      title: 'Target query',
+      type: 'string',
+      description: 'The one search query this post answers.',
+      fieldset: 'engine',
+    }),
+
+    defineField({
+      name: 'moneyPage',
+      title: 'Money page',
+      type: 'string',
+      description: 'The site page this post links to for the sale, e.g. /founders/video-editing.',
+      fieldset: 'engine',
+    }),
+
+    defineField({
+      name: 'whatsNew',
+      title: 'What is new',
+      type: 'string',
+      description: 'One sentence naming the original data in the post, with its count and date.',
+      fieldset: 'engine',
+    }),
+
+    defineField({
+      name: 'lastChecked',
+      title: 'Last checked',
+      type: 'string',
+      description: 'Date (YYYY-MM-DD) the facts were last checked. Set by the publisher.',
+      fieldset: 'engine',
+    }),
+
+    defineField({
+      name: 'coverText',
+      title: 'Cover text',
+      type: 'string',
+      description: 'Text printed on the cover image. Set by the publisher.',
+      fieldset: 'engine',
     }),
 
     defineField({

@@ -58,6 +58,30 @@ const LOG_FILE = join(PUBLISHED_DIR, 'LOG.md');
 const DATA_DIR = join(ROOT, 'content', 'blog-data');
 const THUMBS_DIR = join(ROOT, '.thumbs');
 const SITE_URL = 'https://echopulse.media';
+/** IndexNow key. The matching file public/<key>.txt (containing only the key) must stay deployed. */
+const INDEXNOW_KEY = '5d97392a18c74d6b9fb2d0f2e27035dc';
+
+/** Tell IndexNow a post changed. Fails soft: never throws, never affects the exit code. */
+async function pingIndexNow(slug) {
+  if (process.env.INDEXNOW === 'off') return;
+  try {
+    const res = await fetch('https://api.indexnow.org/indexnow', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json; charset=utf-8' },
+      body: JSON.stringify({
+        host: 'echopulse.media',
+        key: INDEXNOW_KEY,
+        keyLocation: `${SITE_URL}/${INDEXNOW_KEY}.txt`,
+        urlList: [`${SITE_URL}/blog/${slug}`, `${SITE_URL}/blog`],
+      }),
+      signal: AbortSignal.timeout(10000),
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    console.log(`  IndexNow pinged (${res.status})`);
+  } catch (e) {
+    console.log(`IndexNow ping skipped: ${e?.message || e}`);
+  }
+}
 
 const PROJECT_ID = process.env.SANITY_PROJECT_ID || process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || 'qkz53g2a';
 const DATASET = process.env.SANITY_DATASET || process.env.NEXT_PUBLIC_SANITY_DATASET || 'production';
@@ -1266,6 +1290,7 @@ async function runPublish(args) {
   const results = [];
   for (const post of posts) {
     results.push(await publishOne(post, { client, dryRun: args.dryRun, force: args.force, refresh: args.refresh, newCover: args.newCover, now }));
+    if (!args.dryRun) await pingIndexNow(post.slug);
   }
 
   console.log(`\n${args.dryRun ? 'Dry run complete' : args.refresh ? 'Refreshed' : 'Published'}: ${results.length} post(s).`);

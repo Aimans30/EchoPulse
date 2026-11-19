@@ -109,7 +109,7 @@ type ComparisonRow = { feature: string; us: string; them: string };
  */
 const comparisonsByService: Record<string, ComparisonRow[]> = {
   'video-editing': [
-    { feature: 'Turnaround',          us: '48 hours standard',                              them: '5 to 7 business days' },
+    { feature: 'Turnaround',          us: '48 hours on short-form edits',                            them: '5 to 7 business days' },
     { feature: 'Shot grammar',        us: 'Retention-engineered, mobile-first',             them: 'Aesthetic-led, desktop preview' },
     { feature: 'Captions',            us: 'Burned-in, animated, brand-styled',              them: 'Auto-generated CapCut style' },
     { feature: 'Color grade',         us: 'Per-platform tuned LUT',                         them: 'Single grade for everything' },

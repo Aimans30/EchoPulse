@@ -39,7 +39,7 @@ export async function POST(req: Request) {
     const session = await createDodoCheckout({
       amountSmallest,
       currency,
-      productName: tier ? `${service} — ${tier}` : service,
+      productName: tier ? `${service}: ${tier}` : service,
       productDescription: `EchoPulse one-off order: ${service}${tier ? ` (${tier})` : ''}`,
       customer: {
         email: client.email,

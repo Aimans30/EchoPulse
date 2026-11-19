@@ -165,3 +165,9 @@ update that post (above).
    each publish.
 4. The workflow commits with the built-in `GITHUB_TOKEN`. If the branch has protection rules
    that block it, allow the bot or use a PAT.
+
+## IndexNow ping
+
+After a real publish or `--refresh`, the publisher pings IndexNow (api.indexnow.org) with the post URL and `/blog`, so Bing, and ChatGPT search through it, learns of the change at once. It fails soft (one "IndexNow ping skipped" line, exit code unchanged) and is skipped for `--dry-run` or `INDEXNOW=off`.
+The key file lives in `public/` and its name must match `INDEXNOW_KEY` at the top of `scripts/publish-blog.mjs`.
+Owner, once: verify echopulse.media in Bing Webmaster Tools (bing.com/webmasters) so Bing trusts the pings.

@@ -362,7 +362,7 @@ export default function PricingPage() {
             <li><strong>14 days notice.</strong> To cancel, send written notice 14 days before the next billing date. The current month is not refunded, and the work for it is finished.</li>
             <li><strong>Card, through Razorpay or Dodo Payments.</strong> Your card details go to the processor. We never see them. Bank transfer is available on request for monthly plans.</li>
             <li><strong>USD, worldwide.</strong> One price everywhere, in US dollars. Your bank converts at its rate. Taxes your country requires you to self-account for are not included.</li>
-            <li><strong>Work starts when payment clears.</strong> The 48-hour turnaround on each deliverable starts when we have the footage or brief it needs.</li>
+            <li><strong>Work starts when payment clears.</strong> The 48-hour turnaround on short-form edits starts when we have the footage.</li>
             <li><strong>The Pilot is one payment.</strong> Nothing recurs after it unless you choose a monthly plan.</li>
           </ul>
           <p className="pr-terms-note">

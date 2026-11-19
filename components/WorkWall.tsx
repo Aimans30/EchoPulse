@@ -498,7 +498,7 @@ export default function WorkWall({ clips }: { clips: WallClip[] }) {
               >
                 <span className="ww-in">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={t.clip.poster} alt="" decoding="async" draggable={false} />
+                  <img src={t.clip.poster} srcSet={`${t.clip.posterSm} 320w, ${t.clip.poster} 520w`} sizes="(max-width: 640px) 160px, 390px" alt="" decoding="async" draggable={false} />
                   <video
                     ref={(el) => { videoEls.current[i] = el; }}
                     data-src={t.clip.preview}

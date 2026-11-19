@@ -160,11 +160,19 @@ export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
     mainImageUrl,
     content
   }`;
-  const post = await sanityClient.fetch<BlogPost | null>(
-    query,
-    { slug },
-    { next: { revalidate: 60 } },
-  );
+  let post: BlogPost | null;
+  try {
+    post = await sanityClient.fetch<BlogPost | null>(query, { slug }, { next: { revalidate: 60 } });
+  } catch {
+    // One retry, against Sanity's live API instead of its CDN (a different
+    // host), for a transient network or CDN failure. A second failure is
+    // rethrown on purpose: during a background revalidation Next keeps serving
+    // the last good copy of the page when the render throws, whereas returning
+    // null here would replace a live article with a cached 404.
+    post = await sanityClient
+      .withConfig({ useCdn: false })
+      .fetch<BlogPost | null>(query, { slug }, { next: { revalidate: 60 } });
+  }
   return post ?? null;
 }
 

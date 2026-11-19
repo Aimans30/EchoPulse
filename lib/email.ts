@@ -143,7 +143,7 @@ What happens next:
 
 Anything urgent? WhatsApp me directly: ${args.phone} (yes I'll text you, you can save my number)
 
-— Lakshya
+Lakshya
 EchoPulse Media · Pune onsite
 `,
   };
@@ -169,9 +169,9 @@ Your order is locked in.
 • Total: ${args.total}
 • Delivery: ${deliveryLabel} from now
 
-Watch for the first deliverable in your inbox within ${deliveryLabel}. Reply to this email anytime — it comes straight to me.
+Watch for the first deliverable in your inbox within ${deliveryLabel}. Reply to this email anytime. It comes straight to me.
 
-— Lakshya
+Lakshya
 EchoPulse Media
 `,
   };
