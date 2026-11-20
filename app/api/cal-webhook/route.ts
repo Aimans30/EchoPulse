@@ -85,6 +85,18 @@ export async function POST(req: Request) {
   // Where the visitor came from and which button they booked with, when the
   // booking link carried it. Empty for links shared by hand.
   const cameFrom = formatBookingOrigin(p.metadata);
+  // Answers to any extra questions on the Cal.com booking form (phone,
+  // company, budget, whatever the event type asks), minus the fields
+  // already shown above.
+  const skip = new Set(['name', 'email', 'notes', 'guests', 'location', 'rescheduleReason']);
+  const answers = Object.entries(p.responses ?? {})
+    .filter(([k, r]) => !skip.has(k) && r && r.value !== undefined && r.value !== null && r.value !== '')
+    .map(([k, r]) => {
+      const v = r.value;
+      const text = Array.isArray(v) ? v.join(', ') : typeof v === 'object' ? JSON.stringify(v) : String(v);
+      return `*${(r.label || k).slice(0, 60)}:* ${text.slice(0, 300)}`;
+    })
+    .join('\n');
 
   // ── BOOKING_CREATED — the meaty path ─────────────────────────────────
   if (event.triggerEvent === 'BOOKING_CREATED') {
@@ -92,7 +104,7 @@ export async function POST(req: Request) {
       fullName, email,
       source: 'Cal.com',
       serviceInterest: eventTypeName,
-      notes: `Meeting: ${eventTypeName}\nWhen: ${startStr}\n${notes ? `Notes from attendee: ${notes}` : ''}`,
+      notes: `Meeting: ${eventTypeName}\nWhen: ${startStr}\n${notes ? `Notes from attendee: ${notes}` : ''}${answers ? `\n${answers.replace(/\*/g, '')}` : ''}`,
       originNotes: cameFrom ? `Where this booking came from\n${cameFrom.split(' · ').join('\n')}` : undefined,
     });
 
@@ -118,7 +130,7 @@ export async function POST(req: Request) {
           type: 'section',
           text: {
             type: 'mrkdwn',
-            text: `*${fullName}*  ·  ${email}\n*When:* ${startStr} (IST)\n*Type:* ${eventTypeName}${cameFrom ? `\n*Came from:* ${cameFrom}` : ''}${notes ? `\n*Notes:* ${notes}` : ''}`,
+            text: `*${fullName}*  ·  ${email}\n*When:* ${startStr} (IST)\n*Type:* ${eventTypeName}${cameFrom ? `\n*Came from:* ${cameFrom}` : ''}${notes ? `\n*Notes:* ${notes}` : ''}${answers ? `\n${answers}` : ''}`,
           },
         },
         ...(asanaTask ? [{
