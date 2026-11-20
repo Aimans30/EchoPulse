@@ -146,6 +146,174 @@ const AREAS: {
   },
 ];
 
+/**
+ * "What each area includes". Deliverables are condensed from the deliverables
+ * arrays in lib/serviceData.ts; each group links to its service page. Keep the
+ * numbers (8 to 12 clips, 4 to 8 weeks, 14 days of fixes) in step with that file.
+ */
+const INCLUDES: {
+  key: string;
+  title: string;
+  groups: { href: string; label: string; items: { name: string; text: string }[] }[];
+}[] = [
+  {
+    key: 'content',
+    title: 'Content and personal brand',
+    groups: [
+      {
+        href: '/services/video-editing',
+        label: 'Video editing',
+        items: [
+          { name: 'Short-form edits', text: 'Reels, TikToks and Shorts with hooks and captions burned in.' },
+          { name: 'Long-form and podcasts', text: 'YouTube videos, plus full episode polish and 8 to 12 highlight clips per episode.' },
+          { name: 'Course modules', text: 'Lecture cuts, lower thirds, chapter markers and branded intros.' },
+          { name: 'Brand films and motion', text: 'Property tours, listing reels, animated logos, music and sound design.' },
+        ],
+      },
+      {
+        href: '/services/linkedin-ghostwriting',
+        label: 'LinkedIn and social',
+        items: [
+          { name: 'Posts and carousels', text: '8 a month on Presence Engine, 20 social posts a month on Growth.' },
+          { name: 'A brand brief', text: 'Interview transcript, audience map, offer breakdown and story bank. Yours even if you cancel.' },
+          { name: 'Profile rewrite and review', text: 'Headline, About and Featured section once a quarter, and a monthly performance review.' },
+        ],
+      },
+      {
+        href: '/services/blog-production',
+        label: 'Blogs',
+        items: [
+          { name: 'Long-form blogs', text: '1,500 to 2,500 words, with a working source link on every statistic.' },
+          { name: 'SEO and meta pack', text: 'Title, meta description, slug, internal link suggestions and schema recommendation.' },
+          { name: 'Distribution pack', text: 'A LinkedIn post, thread, newsletter blurb, cold email pitch and 3 quote graphics per blog.' },
+        ],
+      },
+      {
+        href: '/services/ad-creatives',
+        label: 'Ad creatives',
+        items: [
+          { name: 'Static, video and motion ads', text: 'On Growth, 4 static and 2 video ads a month. Video ads run 15 to 60 seconds.' },
+          { name: 'Hook variations', text: '3 to 5 variations for each top-performing ad, plus a monthly report on what won.' },
+        ],
+      },
+    ],
+  },
+  {
+    key: 'web',
+    title: 'Websites and funnels',
+    groups: [
+      {
+        href: '/services/websites-funnels',
+        label: 'Websites and funnels',
+        items: [
+          { name: 'Sites and stores', text: 'Brand websites, e-commerce stores, listing and property sites.' },
+          { name: 'Funnels and landing pages', text: 'Opt-in pages, sales pages, checkout flows, webinar pages and launch pages.' },
+          { name: 'Copy written with the design', text: 'Conversion copy is part of every project.' },
+          { name: 'Integrations', text: 'Stripe, Calendly, Kajabi, Teachable, GoHighLevel, ActiveCampaign, Shopify or your CRM.' },
+          { name: 'Analytics and tracking', text: 'GA4, Meta Pixel, conversion events and a dashboard.' },
+        ],
+      },
+    ],
+  },
+  {
+    key: 'software',
+    title: 'Custom software and CRMs',
+    groups: [
+      {
+        href: '/services/apps-software',
+        label: 'Apps and software',
+        items: [
+          { name: 'Client portal', text: 'Onboarding, deliverables, billing, project status, file sharing and support behind one login.' },
+          { name: 'Internal dashboard or CRM', text: 'A CRM, project tracker, reporting dashboard or ops console built around how your team works.' },
+          { name: 'SaaS MVP', text: 'A working product with logins, payments and dashboards in 4 to 8 weeks.' },
+          { name: 'Web app that installs like an app', text: 'A progressive web app with push notifications and offline mode.' },
+          { name: 'Handover', text: 'Code transfer, documentation and 14 days of free fixes after launch.' },
+        ],
+      },
+    ],
+  },
+  {
+    key: 'ai',
+    title: 'AI and automation',
+    groups: [
+      {
+        href: '/services/automations',
+        label: 'Automations',
+        items: [
+          { name: 'DM automation', text: 'ManyChat flows that answer comments and DMs, qualify leads and drive them to book.' },
+          { name: 'Email sequences', text: 'Welcome, nurture, sales and re-engagement emails that send on their own.' },
+          { name: 'Booking and qualification', text: 'Calendar booking flows, application forms and scoring rules so only serious buyers reach your calls.' },
+          { name: 'CRM setup', text: 'GoHighLevel, HubSpot, ActiveCampaign or your platform, wired so every lead is tracked.' },
+          { name: 'Analytics dashboard', text: 'Open rates, booking rates and revenue attributed to each automation.' },
+        ],
+      },
+      {
+        href: '/services/apps-software',
+        label: 'AI tools',
+        items: [
+          { name: 'AI tools in the background', text: 'A chatbot in your brand voice, an assistant that drafts email replies, and lead scoring.' },
+        ],
+      },
+    ],
+  },
+  {
+    key: 'search',
+    title: 'Search and AI visibility',
+    groups: [
+      {
+        href: '/services/seo-aeo',
+        label: 'SEO and AI search',
+        items: [
+          { name: 'Pages built to be quoted', text: 'A clear definition near the top, question-style headings and short sourced answers.' },
+          { name: 'Sourced writing', text: 'Every statistic has a working source link, and a person edits each post.' },
+          { name: 'Technical fixes', text: 'Titles, structured data and a Google Business Profile that matches the site.' },
+          { name: 'A monthly performance review', text: 'What the numbers did and what changes next.' },
+        ],
+      },
+    ],
+  },
+];
+
+/**
+ * "How working with EchoPulse goes". Every timing is one the site already
+ * states: lib/pricing.ts (48 hours, 14 days, 3 hours), ServicePageClient
+ * (Build Blueprint, Automation Audit), lib/serviceData.ts (10 to 14 business
+ * days, 4 to 8 weeks), app/terms/page.tsx (targets, clock starts at payment
+ * and footage).
+ */
+const FLOW: { title: string; what: string; you: string; time: string }[] = [
+  {
+    title: 'First contact',
+    what: 'Two ways in, and neither needs a card. Book a free 15-minute call with Lakshya, or send footage you already have and get 2 edited videos back.',
+    you: 'Pick a time on the booking page. Or share a Google Drive, Dropbox or WeTransfer link to raw footage with your name, email and type of business.',
+    time: 'The call is 15 minutes. The 2 free edits come back within 48 hours of EchoPulse receiving the footage.',
+  },
+  {
+    title: 'A paid first step: Pilot, Build Blueprint or Automation Audit',
+    what: `The ${PILOT.priceLabel} Pilot is a recorded 60-minute strategy session and brand brief, 6 video edits, 2 posts, 1 blog, a content audit and a 30-day plan. For software, the Build Blueprint is a 30-minute scoping call and a written fixed-price scope. For automation, the Automation Audit maps your lead flow and ships the first automation. The Blueprint and the Audit are one-off payments at the Pilot price. None of them is a retainer.`,
+    you: 'Pay up front, join the onboarding session and send your footage and answers.',
+    time: 'The Pilot runs 14 days from when payment clears and EchoPulse has what it needs. The Blueprint scope and prototype direction, and the first live automation from the Audit, come within 14 days.',
+  },
+  {
+    title: 'Scope in writing',
+    what: 'For anything bigger than a listed plan, you get a written scope, a fixed price and a delivery date before you pay. If a build does not fit your stage, Lakshya says so.',
+    you: 'Read it, ask questions and approve it. Nothing starts until you do.',
+    time: 'This happens before any money moves. The delivery date is set in the written scope.',
+  },
+  {
+    title: 'Delivery and revisions',
+    what: 'Work arrives by link or upload. Send revision notes together, in writing. Each piece is revised until you would publish it under your own name.',
+    you: 'Send footage and access when asked, review each delivery and send one set of notes.',
+    time: 'Short-form edits take 48 hours. An automation stack is typically live in 10 to 14 business days. A SaaS MVP takes 4 to 8 weeks. These are targets, and the clock pauses while EchoPulse waits on you.',
+  },
+  {
+    title: 'Monthly work or handover',
+    what: 'On a monthly plan, Presence Engine has a 20 to 30 minute call every week and Growth has a monthly strategy call and performance review. After a build, the code moves to your GitHub with documentation and a walkthrough.',
+    you: 'Keep going, change plan, or stop. For a build, take over the code and accounts.',
+    time: 'Plans are month-to-month with no contract. Cancel with 14 days written notice. Builds include 14 days of free fixes after launch.',
+  },
+];
+
 const STEPS: { price: string; name: string; detail: string }[] = [
   {
     price: FREE_SAMPLE.priceLabel,
@@ -268,7 +436,31 @@ const FAQ: { q: string; a: string }[] = [
   },
   {
     q: 'Which time zones do you work in?',
-    a: 'The working day in India overlaps UK and Western European mornings and US East Coast mornings. Replies come within 3 hours in the workday, and turnaround is counted in calendar hours, so a 48-hour edit is 48 hours whatever the time difference.',
+    a: 'EchoPulse works India working hours, which overlap UK and Western European mornings and US East Coast mornings. Clients are in the United States, the United Kingdom, Canada, Australia, Western Europe and India. Replies come within 3 hours in the workday. Turnaround times such as 48 hours are targets that start when payment has cleared and EchoPulse has your footage. If you need someone reachable in your own time zone late in your day, say so on the call.',
+  },
+  {
+    q: 'Who owns the videos and code EchoPulse makes?',
+    a: 'You do. Your raw footage and anything else you supply always stays yours. Final deliverables, such as the edited video, written content, designs, website and code, become yours once they are delivered and paid for in full. Before full payment you can review them but not publish them. The 2 free edits and everything made in the Pilot are yours to keep whether or not you hire EchoPulse. EchoPulse keeps its own tools and templates, and may show the work in its portfolio unless you ask it not to.',
+  },
+  {
+    q: 'How do I pay?',
+    a: 'By card, through Razorpay or Dodo Payments depending on how you check out. Card details go to the processor and never reach EchoPulse. Prices are in US dollars and the same everywhere, and clients in India may be charged in rupees. Bank transfer is available on request against an invoice. Plans, the Pilot and one-off orders are paid in advance, and work starts when payment clears. The 2 free edits need no card.',
+  },
+  {
+    q: 'Can I see work before paying?',
+    a: 'Yes. Send footage you already have and EchoPulse returns 2 edited videos within 48 hours, with no card and no call. You keep the files. You can also book a free 15-minute call, where Lakshya tells you the first three things he would fix, with no obligation. The case studies link to live client work you can open yourself.',
+  },
+  {
+    q: 'Can I cancel a monthly plan?',
+    a: 'Yes. Plans are month-to-month with no contract. Send written notice, and email is fine, at least 14 days before your next billing date. The plan then ends after the month you have paid for. The Pilot is a one-off payment, so there is nothing to cancel after it.',
+  },
+  {
+    q: 'Why did Lakshya Soni start EchoPulse Media?',
+    a: 'He was a video editor at a Canadian real estate media company and edited for more than 200 Canadian real estate agents there. He saw agents paying premium prices for average edits, edits going out that he would not have signed, and editors treated as replaceable. He started EchoPulse in 2025 to do the opposite: the price is on the page, the person who hears the brief does the work, and nothing ships until you would post it under your own name.',
+  },
+  {
+    q: 'How long does a project take?',
+    a: 'Short-form edits take 48 hours. The Pilot runs 14 days. A Build Blueprint or Automation Audit delivers within 14 days. A typical automation stack is live in 10 to 14 business days and a SaaS MVP takes 4 to 8 weeks. Custom build dates are set in the written scope before you pay. These are targets, and they start when payment has cleared and EchoPulse has what it needs from you.',
   },
 ];
 
@@ -395,6 +587,27 @@ export default function WhatIsEchoPulseMediaPage() {
           </table>
         </section>
 
+        {/* ── Why EchoPulse exists ───────────────────────────────────────── */}
+        <section className="wi-why" id="why" aria-labelledby="why-heading">
+          <p className="wi-eyebrow">Why it exists</p>
+          <h2 id="why-heading" className="wi-h2">Why EchoPulse exists</h2>
+          <p>
+            Before EchoPulse, Lakshya Soni was a video editor at a Canadian real estate media company. He edited
+            listing tours, agent brand videos and ads for more than 200 Canadian real estate agents. They were
+            that company&apos;s clients, not EchoPulse clients. From the editing desk he saw agents paying premium
+            prices for average edits, edits going out that he would not have signed, and editors treated as
+            replaceable.
+          </p>
+          <p>
+            He started EchoPulse in 2025 to do the opposite. The price is on the page. The person who hears the
+            brief does the work. Nothing ships until you would post it under your own name. He had also seen
+            founders manage five vendors who never talk to each other, so one small team now covers the content,
+            the website, the software and the search work.{' '}
+            <Link href="/case-studies/founder-200-real-estate-agents">Read the founder story</Link> or{' '}
+            <Link href="/about">the About page</Link>.
+          </p>
+        </section>
+
         {/* ── 2. What we do ──────────────────────────────────────────────── */}
         <section className="wi-do" aria-labelledby="do-heading">
           <p className="wi-eyebrow">What we do</p>
@@ -419,6 +632,31 @@ export default function WhatIsEchoPulseMediaPage() {
                     <Link key={l.href + l.label} href={l.href}>{l.label} <span aria-hidden="true">&rarr;</span></Link>
                   ))}
                 </div>
+              </article>
+            ))}
+          </div>
+
+          <h3 className="wi-h3">What each area includes</h3>
+          <p className="wi-intro">
+            These are the deliverables, taken from the service pages. Each heading links to the page with the full
+            scope and its questions.
+          </p>
+          <div className="wi-incl-grid">
+            {INCLUDES.map((a) => (
+              <article key={a.key} className="wi-incl">
+                <h4>{a.title}</h4>
+                {a.groups.map((g) => (
+                  <div key={g.href + g.label} className="wi-incl-group">
+                    <p className="wi-incl-svc">
+                      <Link href={g.href}>{g.label} <span aria-hidden="true">&rarr;</span></Link>
+                    </p>
+                    <ul>
+                      {g.items.map((it) => (
+                        <li key={it.name}><strong>{it.name}.</strong> {it.text}</li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
               </article>
             ))}
           </div>
@@ -476,6 +714,27 @@ export default function WhatIsEchoPulseMediaPage() {
               <a href={staticBookingUrl('what_is_verify')} data-track-location="what_is_verify" target="_blank" rel="noopener noreferrer">Book a free 15-minute call</a>{' '}
               and ask anything. When a client agrees to speak on the record, we introduce you.
             </li>
+          </ol>
+        </section>
+
+        {/* ── How working with EchoPulse goes ────────────────────────────── */}
+        <section className="wi-flow-sec" id="process" aria-labelledby="flow-heading">
+          <p className="wi-eyebrow">The process</p>
+          <h2 id="flow-heading" className="wi-h2">How working with EchoPulse goes</h2>
+          <p className="wi-intro">
+            Five steps, from first contact to ongoing work. Each one says what you do and how long it takes.
+          </p>
+          <ol className="wi-flow">
+            {FLOW.map((f) => (
+              <li key={f.title}>
+                <h3>{f.title}</h3>
+                <p>{f.what}</p>
+                <dl>
+                  <div><dt>You</dt><dd>{f.you}</dd></div>
+                  <div><dt>How long</dt><dd>{f.time}</dd></div>
+                </dl>
+              </li>
+            ))}
           </ol>
         </section>
 
@@ -550,18 +809,60 @@ export default function WhatIsEchoPulseMediaPage() {
           <ul className="wi-people">
             <li>
               <span className="wi-person-name"><Link href="/about/lakshya-soni">Lakshya Soni</Link></span>
-              <span className="wi-person-role">Founder. Strategy, editing, writing and code.</span>
-              <span className="wi-person-note">Leads every account and reviews every deliverable before you see it.</span>
+              <span className="wi-person-role">Founder and owner. Strategy, editing, writing and code.</span>
+              <span className="wi-person-note">Takes the free 15-minute calls and the weekly calls. Edits, writes, runs the marketing and ships the code. Leads every account and reviews every deliverable before you see it, so the person checking your work has done the work.</span>
             </li>
             <li>
               <span className="wi-person-name">Shaurya</span>
               <span className="wi-person-role">Partner and design lead</span>
-              <span className="wi-person-note">Leads design across content, websites and builds. Also a director of WNB Cleantech, the company behind Whites &amp; Brights, which is disclosed on those case studies.</span>
+              <span className="wi-person-note">Leads design across content, websites and builds, from marketing creative to app design. Also a director of WNB Cleantech, the company behind Whites &amp; Brights, which is disclosed on those case studies.</span>
             </li>
             <li>
               <span className="wi-person-name">Aiman</span>
               <span className="wi-person-role">Delivery</span>
-              <span className="wi-person-note">Leads delivery across every account.</span>
+              <span className="wi-person-note">Leads delivery across every account, so work arrives as scoped.</span>
+            </li>
+          </ul>
+        </section>
+
+        {/* ── Communication and payment ──────────────────────────────────── */}
+        <section className="wi-comm" id="communication" aria-labelledby="comm-heading">
+          <p className="wi-eyebrow">Working together</p>
+          <h2 id="comm-heading" className="wi-h2">How we communicate and get paid</h2>
+          <table className="wi-table">
+            <tbody>
+              <tr><th scope="row">Time zones</th><td>EchoPulse works India working hours, which overlap UK and Western European mornings and US East Coast mornings. Clients are in the United States, the United Kingdom, Canada, Australia, Western Europe and India.</td></tr>
+              <tr><th scope="row">Reply time</th><td>{PROMISES.replies}.</td></tr>
+              <tr>
+                <th scope="row">Channels</th>
+                <td>
+                  Email at <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>. A free 15-minute call booked on the{' '}
+                  <a href={staticBookingUrl('what_is_comm')} data-track-location="what_is_comm" target="_blank" rel="noopener noreferrer">booking page</a>.
+                  On Presence Engine, a 20 to 30 minute call every week. On Growth, a monthly strategy call. You share footage by Google Drive, Dropbox or WeTransfer link.
+                </td>
+              </tr>
+              <tr><th scope="row">Currency</th><td>US dollars, the same price everywhere. Your bank or card issuer converts at its own rate. Clients in India may be charged in rupees.</td></tr>
+              <tr><th scope="row">Payment methods</th><td>Card, through Razorpay (mainly India) or Dodo Payments (clients outside India). Card details go to the processor, never to EchoPulse. Bank transfer is available on request against an invoice.</td></tr>
+              <tr><th scope="row">When you pay</th><td>In advance. Work starts when payment has cleared. The 2 free edits need no card.</td></tr>
+              <tr><th scope="row">Cancelling</th><td>Month-to-month, no contract. Send written notice at least 14 days before your next billing date. Email is fine.</td></tr>
+              <tr><th scope="row">Who owns the work</th><td>You do. Final deliverables are yours once delivered and paid for in full. Your raw materials are always yours. EchoPulse keeps its own tools and templates.</td></tr>
+              <tr><th scope="row">Your files</th><td>EchoPulse keeps footage and project files for 90 days after final delivery, then deletes them, so download what you need within that time.</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        {/* ── Policies ───────────────────────────────────────────────────── */}
+        <section className="wi-policies" id="policies" aria-labelledby="policies-heading">
+          <p className="wi-eyebrow">Policies</p>
+          <h2 id="policies-heading" className="wi-h2">Terms and privacy</h2>
+          <ul className="wi-policy-list">
+            <li>
+              <Link href="/terms">Terms of Service</Link>
+              <span>Plain-language terms for plans, payment, revisions, ownership and disputes, with regional terms for the US, EU, UK, Canada, Australia and India.</span>
+            </li>
+            <li>
+              <Link href="/privacy">Privacy Policy</Link>
+              <span>What is collected, which tools process it, how long it is kept, and your rights under GDPR, CCPA and PIPEDA. Analytics load only after you allow them.</span>
             </li>
           </ul>
         </section>
@@ -709,7 +1010,39 @@ export default function WhatIsEchoPulseMediaPage() {
           .wi-page .wi-text-link-dark, .wi-page .wi-reassure-dark a { color: #F2EEE7; }
           .wi-page .wi-reassure-dark { color: rgba(242,238,231,0.6) !important; margin: 16px 0 0; }
 
+          .wi-why p { max-width: 720px; margin: 0 0 16px; }
+          .wi-why p:last-child { margin-bottom: 0; }
+
+          .wi-incl-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+          .wi-incl { padding: 24px; border: 1px solid rgba(12,12,11,0.1); border-radius: 20px; background: rgba(255,255,255,0.5); }
+          .wi-incl:last-child:nth-child(odd) { grid-column: 1 / -1; }
+          .wi-incl h4 { font-size: 18px; font-weight: 800; letter-spacing: -0.02em; margin: 0 0 8px; color: #0C0C0B; }
+          .wi-incl-group { border-top: 1px solid rgba(12,12,11,0.08); padding-top: 8px; margin-top: 8px; }
+          .wi-incl-svc { margin: 0 !important; }
+          .wi-incl-svc a { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; font-size: 15px; text-decoration: none; }
+          .wi-incl ul { margin: 0 0 8px; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; }
+          .wi-incl li { position: relative; padding-left: 16px; font-size: 14.5px; line-height: 1.55; }
+          .wi-incl li::before { content: ''; position: absolute; left: 0; top: 0.6em; width: 6px; height: 6px; border-radius: 2px; background: ${ACCENT}; }
+          .wi-incl li strong { color: #0C0C0B; }
+
+          .wi-flow { margin: 0; padding: 0; list-style: none; counter-reset: flow; display: flex; flex-direction: column; gap: 16px; max-width: 780px; }
+          .wi-flow li { counter-increment: flow; position: relative; padding: 24px 24px 24px 72px; border: 1px solid rgba(12,12,11,0.1); border-radius: 18px; background: rgba(255,255,255,0.5); }
+          .wi-flow li::before { content: counter(flow); position: absolute; left: 24px; top: 24px; width: 32px; height: 32px; border-radius: 50%; background: #0C0C0B; color: #F2EEE7; font-weight: 800; font-size: 14px; display: inline-flex; align-items: center; justify-content: center; }
+          .wi-flow h3 { font-size: 18px; font-weight: 800; letter-spacing: -0.02em; margin: 0 0 8px; color: #0C0C0B; line-height: 1.3; }
+          .wi-flow p { margin: 0 0 16px; font-size: 15.5px; }
+          .wi-flow dl { margin: 0; display: flex; flex-direction: column; gap: 8px; }
+          .wi-flow dl > div { display: grid; grid-template-columns: 80px minmax(0, 1fr); gap: 16px; padding-top: 8px; border-top: 1px solid rgba(12,12,11,0.08); }
+          .wi-flow dt { font-size: 12px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: ${ACCENT}; line-height: 1.9; }
+          .wi-flow dd { margin: 0; font-size: 15px; line-height: 1.6; }
+
+          .wi-policy-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+          .wi-policy-list li { display: flex; flex-direction: column; gap: 8px; padding: 24px; border: 1px solid rgba(12,12,11,0.1); border-radius: 18px; background: rgba(255,255,255,0.5); }
+          .wi-policy-list a { font-size: 18px; font-weight: 800; letter-spacing: -0.02em; text-decoration-thickness: 2px; }
+          .wi-policy-list span { font-size: 15px; line-height: 1.6; color: #4A4740; }
+
           @media (max-width: 860px) {
+            .wi-incl-grid, .wi-policy-list { grid-template-columns: 1fr; }
+            .wi-incl:last-child:nth-child(odd) { grid-column: auto; }
             .wi-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
             .wi-people { grid-template-columns: 1fr; }
           }
@@ -729,6 +1062,10 @@ export default function WhatIsEchoPulseMediaPage() {
             .wi-table th { font-size: 12px; letter-spacing: 0.6px; text-transform: uppercase; color: #8A867D; margin-bottom: 2px; }
             .wi-table td { padding-bottom: 0; }
             .wi-table a { display: inline-block; padding: 10px 0; margin: -10px 0; }
+            .wi-flow li { padding: 24px 16px 16px; }
+            .wi-flow li::before { position: static; margin-bottom: 8px; }
+            .wi-flow dl > div { grid-template-columns: 1fr; gap: 0; }
+            .wi-incl { padding: 16px; }
             .wi-verify-list li { padding: 14px 14px 14px 56px; }
             .wi-verify-list li::before { left: 14px; top: 14px; }
             .wi-cases li:last-child:nth-child(odd) { grid-column: auto; }
