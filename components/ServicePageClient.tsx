@@ -127,7 +127,7 @@ const comparisonsByService: Record<string, ComparisonRow[]> = {
     { feature: 'Stack flexibility',   us: 'Next.js, Framer, Webflow, GoHighLevel, custom',  them: 'WordPress only' },
     { feature: 'Conversion tracking', us: 'GA4 + Meta Pixel + events configured',           them: 'Basic GA4 install' },
     { feature: 'Pre-launch QA',       us: 'Real-device testing + accessibility audit',      them: 'Desktop preview only' },
-    { feature: 'Post-launch support', us: '30-day monitoring included',                     them: 'Not included' },
+    { feature: 'Post-launch support', us: '14 days of free fixes after launch',             them: 'Not included' },
     { feature: 'Revisions',           us: 'Unlimited until you are satisfied',              them: 'One round, then per-hour' },
   ],
   'automations': [

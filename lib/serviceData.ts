@@ -276,7 +276,7 @@ export const services: ServiceData[] = [
     steps: [
       { num: '01', title: 'Strategy and Wireframe', body: 'We map your visitor journey, define the single most important action, and wireframe a conversion-optimized layout before a single pixel is designed.' },
       { num: '02', title: 'Design and Copywriting', body: 'Copy and design developed simultaneously so the message reinforces the visual hierarchy. Conversion-driven copywriting included on every project.' },
-      { num: '03', title: 'Build, Launch, Optimize', body: 'Built in Next.js, Framer, Webflow, or your platform of choice. Pre-launch testing on real devices. 30-day post-launch performance monitoring with conversion tracking.' },
+      { num: '03', title: 'Build, Launch, Optimize', body: 'Built in Next.js, Framer, Webflow, or your platform of choice. Pre-launch testing on real devices. Conversion tracking set up, then 14 days of free fixes after launch.' },
     ],
     deliverables: [
       { icon: '🌐', title: 'Brand Websites', desc: 'Full marketing sites with home, about, services, and contact pages designed around your buyer journey, not a template.' },
