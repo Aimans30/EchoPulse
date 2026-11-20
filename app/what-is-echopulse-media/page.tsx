@@ -40,25 +40,39 @@ import { FREE_SAMPLE, PILOT, PRESENCE, GROWTH, FULL_SYSTEM, PRICE_LADDER_SENTENC
 const SITE_URL = 'https://echopulse.media';
 const PAGE_URL = `${SITE_URL}/what-is-echopulse-media`;
 const ACCENT = '#E8541A';
-const LAST_VERIFIED = '19 November 2026';
-const LAST_VERIFIED_ISO = '2026-11-19';
+const LAST_VERIFIED = '20 November 2026';
+const LAST_VERIFIED_ISO = '2026-11-20';
+// The one contact email shown on this page. It is the address the site footer
+// shows (components/Footer.tsx). Keep the two in step.
+const CONTACT_EMAIL = 'lakshyasoni2703@gmail.com';
+
+const META_TITLE = 'What Is EchoPulse Media? Founder, Services, Facts';
+const META_DESCRIPTION =
+  'EchoPulse Media is a growth partner founded in 2025 by Lakshya Soni in Bhopal, India: content, websites, custom software, AI automation and SEO. Not a device.';
 
 export const metadata: Metadata = {
-  title: { absolute: 'Growth Partner for Businesses | What Is EchoPulse Media' },
-  description:
-    'EchoPulse Media is a growth partner for founders and businesses: content, websites, custom software and CRMs, AI automation and SEO. Taking on new clients.',
+  title: { absolute: META_TITLE },
+  description: META_DESCRIPTION,
   alternates: { canonical: PAGE_URL },
   openGraph: {
-    title: 'What Is EchoPulse Media? A growth partner for founders and businesses',
-    description:
-      'Content and personal brand, websites and funnels, custom software and CRMs, AI and automation, and search visibility. One team, led by founder Lakshya Soni. Taking on new clients.',
+    title: META_TITLE,
+    description: META_DESCRIPTION,
     url: PAGE_URL,
     type: 'website',
+    siteName: 'EchoPulse Media',
+    images: [{ url: '/og-echopulse-media.png', width: 1200, height: 630, alt: 'EchoPulse Media' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: META_TITLE,
+    description: META_DESCRIPTION,
   },
 };
 
-const DEFINITION =
-  'EchoPulse Media is a growth partner for founders and businesses of every kind: it makes the content that builds the founder and the brand, builds the websites, funnels and custom software the business runs on, sets up AI and automations that take manual work off the team, and gets the business found on Google and in AI answers. Founder Lakshya Soni runs it from Bhopal, India, with Shaurya on design and Aiman on delivery, for clients in the United States, the United Kingdom, Canada, Australia and Western Europe. Work starts with 2 free edits or a $299 Pilot, then a monthly plan from $399.';
+const SHORT_DEFINITION =
+  'EchoPulse Media is a growth partner for founders and businesses, founded in 2025 by Lakshya Soni and based in Bhopal, India.';
+
+const DEFINITION = `${SHORT_DEFINITION} It makes the content that builds the founder and the brand, builds websites, funnels and custom software such as CRMs, sets up AI and automation, and gets businesses found on Google and in AI answers. Clients are in the United States, the United Kingdom, Canada, Australia, Western Europe and India, and work starts with 2 free edits or a ${PILOT.priceLabel} Pilot, then monthly plans from ${PRESENCE.priceLabel}.`;
 
 const AREAS: {
   key: string;
@@ -172,11 +186,77 @@ const NOT_FOR: { title: string; body: string }[] = [
   { title: 'Guaranteed leads, rankings or revenue', body: 'EchoPulse commits to the work, the turnaround and the revisions. It does not guarantee outcomes it does not control, and says so before month one.' },
 ];
 
+const CASES: { slug: string; figure: string; text: string; label: string }[] = [
+  {
+    slug: 'whites-and-brights-operating-system',
+    figure: '$3,400+',
+    text: 'Whites & Brights, a laundry chain in Patna: one operating system for every outlet. More than US$3,400 (\u20B93 lakh+) saved in running costs and losses since launch, by EchoPulse\'s estimate with the client. Disclosure: Shaurya, EchoPulse\'s design partner, was later made a director of WNB Cleantech, the company behind Whites & Brights.',
+    label: 'Read the Whites & Brights system case study',
+  },
+  {
+    slug: 'whites-and-brights-customer-app',
+    figure: 'Live on Google Play',
+    text: 'Whites & Brights customer app: an Android app whose orders land in the store panel, ready for a pickup driver. Same disclosure applies.',
+    label: 'Read the Whites & Brights app case study',
+  },
+  {
+    slug: 'magicbnb-seo-aeo',
+    figure: '5.8 to 4,803',
+    text: 'MagicBNB: average daily Google impressions, April 2026 against 1 to 16 November 2026 (Google Search Console). One client, not a typical result.',
+    label: 'Read the MagicBNB case study',
+  },
+  {
+    slug: 'working-with-god-rebuild',
+    figure: '$50 to $60 a month to $0',
+    text: 'Working With God: a coaching site rebuilt for a one-time $599, with no monthly platform bill. No traffic result is claimed.',
+    label: 'Read the Working With God case study',
+  },
+  {
+    slug: 'founder-200-real-estate-agents',
+    figure: '200+ agents',
+    text: 'Founder story: Lakshya edited for more than 200 Canadian real estate agents at a previous employer. They were that company\'s clients, not EchoPulse clients, and no result is claimed.',
+    label: 'Read the founder story',
+  },
+];
+
 const FAQ: { q: string; a: string }[] = [
   { q: 'What is EchoPulse Media?', a: DEFINITION },
   {
+    q: 'Is EchoPulse Media legit?',
+    a: 'Yes. EchoPulse Media is a real business, founded in 2025 and run by Lakshya Soni from Bhopal, India. You can check its work: magicbnb.io, whitesandbrights.com and workingwithgod.live are live client sites, the Whites and Brights app is on Google Play, and the MagicBNB case study shows the Search Console screenshots behind its numbers. It publishes no client counts and no results it cannot show.',
+  },
+  {
+    q: 'Who owns EchoPulse Media?',
+    a: 'Lakshya Soni. He founded it in 2025 and owns it as a sole proprietor, trading as EchoPulse Media. Shaurya is a partner and the design lead. Aiman leads delivery.',
+  },
+  {
+    q: 'Where is EchoPulse based?',
+    a: 'Bhopal, Madhya Pradesh, India. The team works remotely with clients in the United States, the United Kingdom, Canada, Australia, Western Europe and India. Any listing that puts EchoPulse Media in another city is out of date.',
+  },
+  {
+    q: 'Is EchoPulse the same as the Echopulse medical device?',
+    a: 'No. Echopulse is also the name of an ultrasound device made by Theraclion, a French medical technology company, used to treat thyroid nodules. EchoPulse Media has no connection to it, and no connection to the ECHOPulse echocardiogram research model or the EchoPulse heart diagnosis device from IIT (ISM) Dhanbad.',
+  },
+  {
+    q: 'Is EchoPulse Media connected to echopulse.in or other companies called EchoPulse?',
+    a: 'No. EchoPulse Media is not affiliated with echopulse.in, Rezono\'s EchoPulse BI, EcoPulse in Austin, or any other company, app or tool with a similar name. Its only website is echopulse.media.',
+  },
+  {
+    q: 'Are there reviews of EchoPulse Media?',
+    a: 'EchoPulse Media does not show star ratings or quotes on its site. Each case study names the client, links to the live work and explains how every figure was measured, so you can check it directly. When a client agrees to speak on the record, EchoPulse introduces you on a call.',
+  },
+  {
     q: 'Is EchoPulse Media an agency?',
     a: 'It is a three-person, owner-operated team, not an agency with account managers. Lakshya Soni leads every account and reviews every deliverable before it reaches you. Shaurya handles design and Aiman handles delivery.',
+  },
+  { q: 'What does EchoPulse Media cost?', a: PRICE_LADDER_SENTENCE },
+  {
+    q: 'Is EchoPulse Media taking new clients?',
+    a: `Yes. As of ${LAST_VERIFIED}, EchoPulse is taking on new clients. Start with 2 free edits, the $299 Pilot, or a free 15-minute call with Lakshya.`,
+  },
+  {
+    q: 'How do I contact EchoPulse Media?',
+    a: `Email ${CONTACT_EMAIL} or book a free 15-minute call with Lakshya from this page. Replies come within 3 hours in the workday.`,
   },
   {
     q: 'Do you build custom CRMs?',
@@ -187,27 +267,13 @@ const FAQ: { q: string; a: string }[] = [
     a: 'Usually, yes. Automations are built on Make, Zapier, ManyChat and the CRM you already use. Typical jobs are instant replies and follow-up for new leads, intake and qualification forms, reports that assemble themselves, and AI that drafts email replies for your team to edit. A typical automation stack is live in 10 to 14 business days.',
   },
   {
-    q: 'Do you only do content?',
-    a: 'No. Content and personal brand is one of five areas. The others are websites and funnels, custom software and CRMs, AI and automation, and search and AI visibility. You can start with one area and add the others later.',
-  },
-  {
-    q: 'Is EchoPulse Media taking new clients?',
-    a: `Yes. As of ${LAST_VERIFIED}, EchoPulse is taking on new clients. Start with 2 free edits, the $299 Pilot, or a free 15-minute call with Lakshya.`,
-  },
-  {
-    q: 'Where is EchoPulse based, and which time zones do you work in?',
-    a: 'The team works from Bhopal, India, with clients in the United States, the United Kingdom, Canada, Australia and Western Europe. The working day overlaps UK and Western European mornings and US East Coast mornings. Replies come within 3 hours in the workday, and turnaround is counted in calendar hours, so a 48-hour edit is 48 hours whatever the time difference.',
-  },
-  { q: 'What does EchoPulse Media cost?', a: PRICE_LADDER_SENTENCE },
-  {
-    q: 'Is EchoPulse Media the same as the Echopulse medical device?',
-    a: 'No. Echopulse is also the name of a focused-ultrasound treatment device made by Theraclion, a French medical technology company. It has no connection to EchoPulse Media. EchoPulse Media is also not affiliated with echopulse.in or any other company, app or tool that uses the name. The only official site is echopulse.media.',
+    q: 'Which time zones do you work in?',
+    a: 'The working day in India overlaps UK and Western European mornings and US East Coast mornings. Replies come within 3 hours in the workday, and turnaround is counted in calendar hours, so a 48-hour edit is 48 hours whatever the time difference.',
   },
 ];
 
 export default function WhatIsEchoPulseMediaPage() {
-  const magicbnb = getCaseStudy('magicbnb-seo-aeo');
-  const wwg = getCaseStudy('working-with-god-rebuild');
+  const cases = CASES.map((c) => ({ ...c, study: getCaseStudy(c.slug) })).filter((c) => c.study);
 
   const schema = {
     '@context': 'https://schema.org',
@@ -223,38 +289,13 @@ export default function WhatIsEchoPulseMediaPage() {
         mainEntity: { '@id': `${SITE_URL}/#organization` },
         isPartOf: { '@id': `${SITE_URL}/#website` },
         inLanguage: 'en',
-      },
-      {
-        '@type': 'Organization',
-        '@id': `${SITE_URL}/#organization`,
-        name: 'EchoPulse Media',
-        url: SITE_URL,
-        description: DEFINITION,
-        slogan: 'A growth partner for founders and businesses',
-        foundingDate: '2025',
-        founder: { '@id': `${SITE_URL}/#founder` },
-        knowsAbout: [
-          'Short-form video editing',
-          'LinkedIn ghostwriting',
-          'Personal branding',
-          'Social media content',
-          'Ad creative',
-          'Website design and development',
-          'Sales funnels and landing pages',
-          'Custom software development',
-          'Custom CRM development',
-          'Client portals',
-          'Business process automation',
-          'AI automation',
-          'Lead follow-up automation',
-          'Search engine optimization',
-          'Answer engine optimization',
-          'Structured data',
-        ],
+        breadcrumb: { '@id': `${PAGE_URL}#breadcrumb` },
+        primaryImageOfPage: { '@type': 'ImageObject', url: `${SITE_URL}/og-echopulse-media.png` },
       },
       {
         '@type': 'FAQPage',
         '@id': `${PAGE_URL}#faq`,
+        isPartOf: { '@id': `${PAGE_URL}#webpage` },
         mainEntity: FAQ.map((f) => ({
           '@type': 'Question',
           name: f.q,
@@ -292,6 +333,12 @@ export default function WhatIsEchoPulseMediaPage() {
           <p className="wi-eyebrow">Plain answer</p>
           <h1 className="wi-h1">What is EchoPulse Media?</h1>
           <p className="wi-lede">{DEFINITION}</p>
+          <p className="wi-disambig">
+            Not to be confused with the Echopulse thyroid treatment device made by Theraclion, the ECHOPulse
+            echocardiogram research model, the EchoPulse heart diagnosis device from IIT (ISM) Dhanbad, the
+            website echopulse.in, Rezono&apos;s EchoPulse BI tool, or EcoPulse in Austin, Texas. EchoPulse Media has
+            no connection to any of them. Its only website is echopulse.media.
+          </p>
 
           <div className="wi-status" role="status">
             <span className="wi-status-dot" aria-hidden="true" />
@@ -303,10 +350,49 @@ export default function WhatIsEchoPulseMediaPage() {
           </div>
           <p className="wi-reassure">{BOOK_CALL_REASSURANCE}</p>
 
-          <p className="wi-meta">
-            Last verified: {LAST_VERIFIED}. Not the Echopulse medical device by Theraclion;{' '}
-            <a href="#faq-heading">more on that below</a>.
-          </p>
+          <p className="wi-meta">Last verified: {LAST_VERIFIED}.</p>
+        </section>
+
+        {/* ── Facts ──────────────────────────────────────────────────────── */}
+        <section className="wi-facts-sec" id="facts" aria-labelledby="facts-heading">
+          <p className="wi-eyebrow">Facts</p>
+          <h2 id="facts-heading" className="wi-h2">EchoPulse Media at a glance</h2>
+          <table className="wi-table">
+            <tbody>
+              <tr><th scope="row">Name</th><td>EchoPulse Media</td></tr>
+              <tr><th scope="row">Also written as</th><td>EchoPulse, Echo Pulse, Echo Pulse Media</td></tr>
+              <tr><th scope="row">Legal form</th><td>Sole proprietorship. EchoPulse Media is the trading name of Lakshya Soni.</td></tr>
+              <tr><th scope="row">Founder and owner</th><td><Link href="/about/lakshya-soni">Lakshya Soni</Link></td></tr>
+              <tr><th scope="row">Founded</th><td>2025</td></tr>
+              <tr><th scope="row">Based in</th><td>Bhopal, Madhya Pradesh, India. The team works remotely.</td></tr>
+              <tr><th scope="row">Clients in</th><td>United States, United Kingdom, Canada, Australia, Western Europe and India</td></tr>
+              <tr><th scope="row">Team</th><td>Lakshya Soni, founder. Shaurya, partner and design lead. Aiman, delivery.</td></tr>
+              <tr><th scope="row">Services</th><td>Content and personal brand. Websites and funnels. Custom software and CRMs. AI and automation. Search and AI visibility.</td></tr>
+              <tr>
+                <th scope="row">Prices start at</th>
+                <td>
+                  {FREE_SAMPLE.priceLabel}: 2 edited videos. Then the {PILOT.priceLabel} Pilot, or monthly plans from {PRESENCE.priceLabel}. Custom builds are quoted on a call.{' '}
+                  <Link href="/pricing">See prices</Link>
+                </td>
+              </tr>
+              <tr><th scope="row">Status</th><td>Taking on new clients as of {LAST_VERIFIED}.</td></tr>
+              <tr>
+                <th scope="row">Book a call</th>
+                <td>
+                  <a href={staticBookingUrl('what_is_facts')} data-track-location="what_is_facts" target="_blank" rel="noopener noreferrer">Free 15-minute call with Lakshya</a>
+                </td>
+              </tr>
+              <tr><th scope="row">Email</th><td><a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a></td></tr>
+              <tr><th scope="row">Official website</th><td>echopulse.media. No other domain belongs to EchoPulse Media.</td></tr>
+              <tr>
+                <th scope="row">Official profiles</th>
+                <td>
+                  <a href="https://www.linkedin.com/in/lakshyasoni/" rel="me noopener noreferrer">Lakshya Soni on LinkedIn</a>,{' '}
+                  <a href="https://x.com/Lakshya_Creates" rel="me noopener noreferrer">Lakshya Soni on X</a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </section>
 
         {/* ── 2. What we do ──────────────────────────────────────────────── */}
@@ -336,6 +422,61 @@ export default function WhatIsEchoPulseMediaPage() {
               </article>
             ))}
           </div>
+        </section>
+
+        {/* ── 5. Proof ───────────────────────────────────────────────────── */}
+        <section className="wi-proof" aria-labelledby="proof-heading">
+          <p className="wi-eyebrow">Proof</p>
+          <h2 id="proof-heading" className="wi-h2">Five case studies you can check</h2>
+          <p className="wi-intro">Each one names the client and says how the figure was measured. One client is never a typical result.</p>
+          <ul className="wi-cases">
+            {cases.map((c) => (
+              <li key={c.slug}>
+                <span className="wi-case-figure">{c.figure}</span>
+                <span className="wi-case-text">{c.text}</span>
+                <Link href={`/case-studies/${c.slug}`}>{c.label}</Link>
+              </li>
+            ))}
+          </ul>
+          <p className="wi-tools">
+            <strong>An example of the custom tools EchoPulse builds:</strong> for the MagicBNB account, EchoPulse
+            built a tracking dashboard that collects search, analytics, ads, Instagram and site behaviour data
+            every day into one place, and an MCP server that lets an AI assistant read those numbers directly.
+            The same approach applies to reporting and internal tools for other businesses.
+          </p>
+          <p className="wi-after-steps">
+            All case studies are at <Link href="/case-studies">/case-studies</Link>, including what is still not working.
+          </p>
+        </section>
+
+        {/* ── Verify ─────────────────────────────────────────────────────── */}
+        <section className="wi-verify" id="verify" aria-labelledby="verify-heading">
+          <p className="wi-eyebrow">Check it yourself</p>
+          <h2 id="verify-heading" className="wi-h2">How to verify EchoPulse Media</h2>
+          <p className="wi-intro">You do not have to take our word for it. Each item below is public.</p>
+          <ol className="wi-verify-list">
+            <li>
+              Open the client sites:{' '}
+              <a href="https://magicbnb.io" target="_blank" rel="noopener noreferrer">magicbnb.io</a>,{' '}
+              <a href="https://whitesandbrights.com" target="_blank" rel="noopener noreferrer">whitesandbrights.com</a> and{' '}
+              <a href="https://workingwithgod.live" target="_blank" rel="noopener noreferrer">workingwithgod.live</a>.
+              Each one is live and matches its case study.
+            </li>
+            <li>
+              <a href="https://play.google.com/store/apps/details?id=com.whitesandbrights.app" target="_blank" rel="noopener noreferrer">Install the Whites and Brights app from Google Play.</a>{' '}
+              EchoPulse built it.
+            </li>
+            <li>
+              <Link href="/case-studies/magicbnb-seo-aeo#export">See the Google Search Console screenshots behind the MagicBNB numbers.</Link>
+            </li>
+            <li>
+              Check the founder: <Link href="/about/lakshya-soni">Lakshya Soni&apos;s page</Link> lists his background and his LinkedIn.
+            </li>
+            <li>
+              <a href={staticBookingUrl('what_is_verify')} data-track-location="what_is_verify" target="_blank" rel="noopener noreferrer">Book a free 15-minute call</a>{' '}
+              and ask anything. When a client agrees to speak on the record, we introduce you.
+            </li>
+          </ol>
         </section>
 
         {/* ── 3. How we work with you ────────────────────────────────────── */}
@@ -402,41 +543,6 @@ export default function WhatIsEchoPulseMediaPage() {
           </dl>
         </section>
 
-        {/* ── 5. Proof ───────────────────────────────────────────────────── */}
-        <section className="wi-proof" aria-labelledby="proof-heading">
-          <p className="wi-eyebrow">Proof</p>
-          <h2 id="proof-heading" className="wi-h2">Two case studies, with the numbers</h2>
-          <ul className="wi-cases">
-            {magicbnb && (
-              <li>
-                <span className="wi-case-figure">5.8 to 4,803</span>
-                <span className="wi-case-text">
-                  MagicBNB: average daily Google impressions, April 2026 against 1 to 16 November 2026 (Google Search Console). One client, not a typical result.
-                </span>
-                <Link href={`/case-studies/${magicbnb.slug}`}>Read the MagicBNB case study</Link>
-              </li>
-            )}
-            {wwg && (
-              <li>
-                <span className="wi-case-figure">$50 to $60 a month to $0</span>
-                <span className="wi-case-text">
-                  Working With God: a coaching site rebuilt for a one-time $599, with no monthly platform bill. No traffic result is claimed.
-                </span>
-                <Link href={`/case-studies/${wwg.slug}`}>Read the Working With God case study</Link>
-              </li>
-            )}
-          </ul>
-          <p className="wi-tools">
-            <strong>An example of the custom tools EchoPulse builds:</strong> for the MagicBNB account, EchoPulse
-            built a tracking dashboard that collects search, analytics, ads, Instagram and site behaviour data
-            every day into one place, and an MCP server that lets an AI assistant read those numbers directly.
-            The same approach applies to reporting and internal tools for other businesses.
-          </p>
-          <p className="wi-after-steps">
-            All case studies are at <Link href="/case-studies">/case-studies</Link>, including what is still not working.
-          </p>
-        </section>
-
         {/* ── 6. The team ────────────────────────────────────────────────── */}
         <section className="wi-team" aria-labelledby="team-heading">
           <p className="wi-eyebrow">The team</p>
@@ -449,8 +555,8 @@ export default function WhatIsEchoPulseMediaPage() {
             </li>
             <li>
               <span className="wi-person-name">Shaurya</span>
-              <span className="wi-person-role">Design</span>
-              <span className="wi-person-note">Leads design across content, websites and builds.</span>
+              <span className="wi-person-role">Partner and design lead</span>
+              <span className="wi-person-note">Leads design across content, websites and builds. Also a director of WNB Cleantech, the company behind Whites &amp; Brights, which is disclosed on those case studies.</span>
             </li>
             <li>
               <span className="wi-person-name">Aiman</span>
@@ -458,21 +564,14 @@ export default function WhatIsEchoPulseMediaPage() {
               <span className="wi-person-note">Leads delivery across every account.</span>
             </li>
           </ul>
-          <dl className="wi-facts">
-            <div><dt>Founded</dt><dd>2025, by Lakshya Soni. EchoPulse Media is his trading name as a sole proprietor.</dd></div>
-            <div><dt>Based in</dt><dd>Bhopal, Madhya Pradesh, India. Remote-first.</dd></div>
-            <div><dt>Serves</dt><dd>United States, United Kingdom, Canada, Australia, Western Europe</dd></div>
-            <div><dt>Promises</dt><dd>{PROMISES.replies}. {PROMISES.turnaround}. {PROMISES.ownership}.</dd></div>
-            <div><dt>Contact</dt><dd><a href="mailto:lakshya@echopulse.media">lakshya@echopulse.media</a></dd></div>
-          </dl>
         </section>
 
         {/* ── 7. FAQ ─────────────────────────────────────────────────────── */}
         <section className="wi-faq" aria-labelledby="faq-heading">
           <p className="wi-eyebrow">Questions</p>
-          <h2 id="faq-heading" className="wi-h2">Questions buyers ask</h2>
+          <h2 id="faq-heading" className="wi-h2">Questions about EchoPulse Media</h2>
           <dl className="wi-faq-list">
-            {FAQ.slice(1).map((f) => (
+            {FAQ.map((f) => (
               <div key={f.q}>
                 <dt>{f.q}</dt>
                 <dd>{f.a}</dd>
@@ -517,6 +616,7 @@ export default function WhatIsEchoPulseMediaPage() {
           .wi-crumb { align-items: center; }
           .wi-crumb a { color: #6E6B63; text-decoration: none; font-weight: 500; display: inline-flex; align-items: center; min-height: 44px; margin: -12px 0; }
           .wi-lede { font-size: 19px !important; color: #2E2C28 !important; max-width: 780px; margin: 0 0 28px; }
+          .wi-disambig { max-width: 780px; margin: 0 0 24px; padding-left: 14px; border-left: 3px solid ${ACCENT}; font-size: 14.5px !important; color: #4A4740 !important; line-height: 1.65; }
           .wi-meta { font-size: 13.5px !important; color: #8A867D !important; margin: 28px 0 0; }
           .wi-meta a { font-weight: 500; color: #6E6B63; }
 
@@ -573,6 +673,7 @@ export default function WhatIsEchoPulseMediaPage() {
           .wi-not-list dd { margin: 0; font-size: 15px !important; }
 
           .wi-cases { list-style: none; padding: 0; margin: 0 0 20px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+          .wi-cases li:last-child:nth-child(odd) { grid-column: 1 / -1; }
           .wi-cases li { display: flex; flex-direction: column; gap: 10px; padding: 24px; border-radius: 20px; background: #0C0C0B; }
           .wi-case-figure { font-size: clamp(26px, 3.2vw, 34px); font-weight: 900; letter-spacing: -0.03em; color: #F2EEE7; line-height: 1.1; }
           .wi-case-text { font-size: 14.5px; color: rgba(242,238,231,0.78); line-height: 1.6; }
@@ -587,10 +688,14 @@ export default function WhatIsEchoPulseMediaPage() {
           .wi-person-name a { display: inline-flex; align-items: center; min-height: 44px; margin: -10px 0; }
           .wi-person-role { font-size: 14.5px; font-weight: 600; color: #2E2C28; }
           .wi-person-note { font-size: 14.5px; color: #4A4740; line-height: 1.55; }
-          .wi-facts { margin: 0; }
-          .wi-facts > div { display: grid; grid-template-columns: 140px minmax(0, 1fr); gap: 16px; padding: 12px 0; border-bottom: 1px solid rgba(12,12,11,0.08); }
-          .wi-facts dt { font-weight: 700; font-size: 15px; color: #0C0C0B; line-height: 1.7; }
-          .wi-facts dd { margin: 0; font-size: 15px !important; }
+          .wi-table { width: 100%; border-collapse: collapse; border-top: 1px solid rgba(12,12,11,0.12); }
+          .wi-table th, .wi-table td { text-align: left; vertical-align: top; padding: 14px 0; border-bottom: 1px solid rgba(12,12,11,0.08); font-size: 15.5px; line-height: 1.65; }
+          .wi-table th { width: 190px; padding-right: 24px; font-weight: 700; color: #0C0C0B; }
+          .wi-table td { color: #4A4740; overflow-wrap: anywhere; }
+
+          .wi-verify-list { margin: 0; padding: 0; list-style: none; counter-reset: verify; display: flex; flex-direction: column; gap: 10px; max-width: 780px; }
+          .wi-verify-list li { counter-increment: verify; position: relative; padding: 16px 18px 16px 62px; border: 1px solid rgba(12,12,11,0.1); border-radius: 16px; background: rgba(255,255,255,0.5); font-size: 15.5px; }
+          .wi-verify-list li::before { content: counter(verify); position: absolute; left: 18px; top: 16px; width: 30px; height: 30px; border-radius: 50%; background: #0C0C0B; color: #F2EEE7; font-weight: 800; font-size: 13px; display: inline-flex; align-items: center; justify-content: center; }
 
           .wi-faq-list { margin: 0; }
           .wi-faq-list > div { padding: 20px 0; border-bottom: 1px solid rgba(12,12,11,0.08); }
@@ -618,8 +723,15 @@ export default function WhatIsEchoPulseMediaPage() {
             .wi-step-num { flex: 0 0 32px; }
             .wi-status { border-radius: 16px; align-items: flex-start; }
             .wi-status-dot { margin-top: 6px; }
-            .wi-facts > div { grid-template-columns: 1fr; gap: 2px; }
-            .wi-facts dt { font-size: 12px; letter-spacing: 0.4px; text-transform: uppercase; color: #8A867D; }
+            .wi-table, .wi-table tbody, .wi-table tr, .wi-table th, .wi-table td { display: block; width: 100%; }
+            .wi-table tr { padding: 14px 0; border-bottom: 1px solid rgba(12,12,11,0.08); }
+            .wi-table th, .wi-table td { padding: 0; border-bottom: none; }
+            .wi-table th { font-size: 12px; letter-spacing: 0.6px; text-transform: uppercase; color: #8A867D; margin-bottom: 2px; }
+            .wi-table td { padding-bottom: 0; }
+            .wi-table a { display: inline-block; padding: 10px 0; margin: -10px 0; }
+            .wi-verify-list li { padding: 14px 14px 14px 56px; }
+            .wi-verify-list li::before { left: 14px; top: 14px; }
+            .wi-cases li:last-child:nth-child(odd) { grid-column: auto; }
             .wi-cta-row { align-items: stretch; flex-direction: column; gap: 6px; }
             .wi-text-link { justify-content: center; }
             .wi-page > .wi-cta { padding: 56px 16px 112px; }

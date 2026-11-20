@@ -89,9 +89,14 @@ export default function Testimonials() {
             </p>
           </div>
           <p className="fl-sign">Lakshya</p>
-          <Link href="/case-studies" className="fl-more" data-cursor-hover>
-            Read the case studies
-          </Link>
+          <div className="fl-links">
+            <Link href="/case-studies" className="fl-more" data-cursor-hover>
+              Read the case studies
+            </Link>
+            <Link href="/what-is-echopulse-media" className="fl-more" data-cursor-hover>
+              What is EchoPulse Media?
+            </Link>
+          </div>
         </article>
       </div>
 
@@ -114,6 +119,7 @@ export default function Testimonials() {
         .fl-body p:last-child { margin-bottom: 0; }
         .fl-sign { font-size: 24px; font-weight: 800; font-style: italic; letter-spacing: -0.03em; margin: 20px 0 0; }
 
+        .fl-links { display: flex; flex-wrap: wrap; gap: 0 24px; }
         .fl-more { display: inline-flex; align-items: center; min-height: 44px; margin-top: 10px; color: #B23A0C; font-size: 15px; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
         .fl-more:hover { color: #0C0C0B; }
         .fl-more:focus-visible { outline: 2px solid #E8541A; outline-offset: 3px; }

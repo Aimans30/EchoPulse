@@ -81,7 +81,7 @@ const TIMELINE: { period: string; title: string; body: string }[] = [
 const FACTS: { label: string; value: string }[] = [
   { label: 'Founded', value: '2025' },
   { label: 'Founder', value: 'Lakshya Soni' },
-  { label: 'Model', value: 'Done-for-you content and website studio' },
+  { label: 'Model', value: 'Growth partner: content, websites, custom software, AI automation and search' },
   { label: 'Serves', value: 'Founders, coaches, course creators, business owners, real estate agents' },
   { label: 'Markets', value: 'United States, United Kingdom, Canada, Australia, Western Europe' },
   { label: 'Starts at', value: '2 free edits, then $299 for a 14-day paid Pilot, no contract' },
@@ -109,9 +109,9 @@ export default function AboutPage() {
         url: `${SITE_URL}/about`,
         name: 'About EchoPulse Media',
         description:
-          'EchoPulse Media is a done-for-you content studio for founders, coaches, and business owners, founded by Lakshya Soni.',
+          'EchoPulse Media is a growth partner for founders and businesses, founded in 2025 by Lakshya Soni and based in Bhopal, India.',
         about: { '@id': `${SITE_URL}/#organization` },
-        mainEntity: { '@id': `${SITE_URL}/#founder` },
+        mainEntity: { '@id': `${SITE_URL}/about/lakshya-soni#person` },
         isPartOf: { '@id': `${SITE_URL}/#website` },
       },
       {
@@ -161,11 +161,12 @@ export default function AboutPage() {
           before any storytelling.
         */}
         <p className="about-lede">
-          EchoPulse Media is a done-for-you content and website studio for founders,
-          coaches, real estate agents and business owners. You record; we handle the
+          EchoPulse Media is a growth partner for founders and businesses, founded in 2025
+          by Lakshya Soni and based in Bhopal, India. You record; we handle the
           video editing, LinkedIn posts, blogs, ad creative, and the website and funnel
-          they point at. One team, one bill. It was founded in 2025 by Lakshya Soni.
-          You can start with 2 free edits, then a $299, 14-day Pilot with no contract.
+          they point at. One team, one bill.
+          You can start with 2 free edits, then a $299, 14-day Pilot with no contract.{' '}
+          Here are the <Link href="/what-is-echopulse-media">EchoPulse Media facts</Link> in one table.
         </p>
       </section>
 
@@ -224,7 +225,7 @@ export default function AboutPage() {
               </a>
             </li>
             <li>
-              <a href="mailto:lakshya@echopulse.media">lakshya@echopulse.media</a>
+              <a href="mailto:lakshyasoni2703@gmail.com">lakshyasoni2703@gmail.com</a>
             </li>
           </ul>
 

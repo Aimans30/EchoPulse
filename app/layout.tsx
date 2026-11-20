@@ -141,15 +141,25 @@ const structuredData = {
       // impressions are people looking for them, not us. Declaring the spaced
       // variant as an alternateName is how you tell Google the two-word string
       // is also this entity. Table stakes: you must be #1 for your own name.
-      alternateName: ["EchoPulse", "Echo Pulse", "EchoPulse Studio", "Echo Pulse Media"],
+      alternateName: ["EchoPulse", "Echo Pulse", "Echo Pulse Media"],
       url: "https://echopulse.media",
-      logo: "https://echopulse.media/logo-512.png",
+      logo: {
+        "@type": "ImageObject",
+        url: "https://echopulse.media/logo-512.png",
+        width: 512,
+        height: 512,
+      },
+      image: "https://echopulse.media/logo-512.png",
       description:
-        // Opens with the same sentence as public/llms.txt so every machine
-        // reader gets one definition of the company. No results claims here.
-        "EchoPulse Media is a small, owner-operated growth partner founded in 2025 by Lakshya Soni. It makes the content that builds the founder and the brand, builds websites, funnels and custom software including CRMs, sets up AI and automations, and handles search and AI visibility, for founders and businesses of every kind. One team, one bill.",
+        // Matches the first two sentences of the entity page lede
+        // (/what-is-echopulse-media) and the opening block of public/llms.txt.
+        // No results claims here.
+        "EchoPulse Media is a growth partner for founders and businesses, founded in 2025 by Lakshya Soni and based in Bhopal, India. It makes the content that builds the founder and the brand, builds websites, funnels and custom software such as CRMs, sets up AI and automation, and gets businesses found on Google and in AI answers.",
+      disambiguatingDescription:
+        "EchoPulse Media (echopulse.media) is a growth partner for businesses run by Lakshya Soni from Bhopal, India. It is not the Echopulse thyroid treatment device made by Theraclion, the ECHOPulse echocardiogram research model, the EchoPulse heart diagnosis device from IIT (ISM) Dhanbad, the website echopulse.in or Rezono's EchoPulse BI.",
+      slogan: "A growth partner for founders and businesses",
       foundingDate: "2025",
-      founder: { "@id": "https://echopulse.media/#founder" },
+      founder: { "@id": "https://echopulse.media/about/lakshya-soni#person" },
       // Where we operate FROM (Bhopal, India) vs which markets we SELL INTO
       // (US/CA/UK/AU/Western Europe) are two different properties. India was
       // removed from areaServed in Sept 2026 because declaring it as a served
@@ -158,9 +168,24 @@ const structuredData = {
       // lib/schema.ts for the Search Console numbers behind that decision.
       address: BUSINESS_ADDRESS,
       areaServed: AREA_SERVED,
-      // No sameAs yet. It used to list the founder's personal LinkedIn and X,
-      // which describe the Person below, not the company. Add the company's
-      // own profiles here when they exist.
+      knowsAbout: [
+        "Short-form video editing",
+        "LinkedIn ghostwriting",
+        "Personal branding",
+        "Ad creative",
+        "Website design and development",
+        "Sales funnels and landing pages",
+        "Custom software development",
+        "Custom CRM development",
+        "Client portals",
+        "Business process automation",
+        "AI automation",
+        "Search engine optimization",
+        "Answer engine optimization",
+        "Structured data",
+      ],
+      // sameAs: add only company profiles the owner controls and has checked (Clutch after the city is fixed, LinkedIn company page, Instagram). See entity plan 20 Nov 2026.
+      mainEntityOfPage: "https://echopulse.media/what-is-echopulse-media",
       makesOffer: pricingOffers(),
       contactPoint: {
         "@type": "ContactPoint",
@@ -175,7 +200,7 @@ const structuredData = {
     },
     {
       "@type": "Person",
-      "@id": "https://echopulse.media/#founder",
+      "@id": "https://echopulse.media/about/lakshya-soni#person",
       name: "Lakshya Soni",
       jobTitle: "Founder",
       description:
@@ -208,7 +233,7 @@ const structuredData = {
       "@type": "Person",
       "@id": "https://echopulse.media/#shaurya",
       name: "Shaurya",
-      jobTitle: "Design",
+      jobTitle: "Partner and design lead",
       worksFor: { "@id": "https://echopulse.media/#organization" },
     },
     {
@@ -223,9 +248,9 @@ const structuredData = {
       "@id": "https://echopulse.media/#website",
       url: "https://echopulse.media",
       name: "EchoPulse Media",
-      alternateName: "EchoPulse",
+      alternateName: ["EchoPulse", "Echo Pulse Media"],
       description:
-        "EchoPulse Media is a small, owner-operated growth partner founded in 2025 by Lakshya Soni. Content, websites, custom software and CRMs, AI automation and search visibility for founders and businesses of every kind.",
+        "EchoPulse Media is a growth partner for founders and businesses, founded in 2025 by Lakshya Soni and based in Bhopal, India. It makes the content that builds the founder and the brand, builds websites, funnels and custom software such as CRMs, sets up AI and automation, and gets businesses found on Google and in AI answers.",
       publisher: { "@id": "https://echopulse.media/#organization" },
       inLanguage: "en",
     },

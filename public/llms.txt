@@ -1,19 +1,22 @@
 # EchoPulse Media
 
-> EchoPulse Media (echopulse.media) is a growth partner for founders and businesses of every kind, founded in 2025 by Lakshya Soni and run by a three-person team (Lakshya Soni, Shaurya on design, Aiman on delivery) from Bhopal, India. It makes the content that builds the founder and the brand (short-form video, LinkedIn, social, blogs, ad creative), builds websites, funnels and custom software including custom CRMs and client portals, sets up AI and automations that take manual work off the team (lead follow-up, intake, reporting, internal tools), and gets businesses found on Google and in AI answers (SEO and AEO). Clients are in the United States, United Kingdom, Canada, Australia and Western Europe; founders, coaches and course creators, real estate agents, business owners and DTC brands have dedicated pages. It is taking on new clients. Every deliverable is reviewed by the owner before the client sees it.
+> EchoPulse Media (echopulse.media) is a growth partner for founders and businesses, founded in 2025 by Lakshya Soni and based in Bhopal, India. It makes the content that builds the founder and the brand (short-form video, LinkedIn, social, blogs, ad creative), builds websites, funnels and custom software such as CRMs and client portals, sets up AI and automation (lead follow-up, intake, reporting, internal tools), and gets businesses found on Google and in AI answers (SEO and AEO). The team is Lakshya Soni (founder and owner), Shaurya (partner and design lead) and Aiman (delivery). Clients are in the United States, the United Kingdom, Canada, Australia, Western Europe and India. Work starts with 2 free edits or a $299 Pilot, then monthly plans from $399. It is taking on new clients.
 
-Facts on this page are the canonical entity facts for EchoPulse Media. They match https://echopulse.media/what-is-echopulse-media, https://echopulse.media/pricing and the Organization schema on every page. Last verified: 19 November 2026.
+Also written as: EchoPulse, Echo Pulse, Echo Pulse Media. Not to be confused with the Echopulse thyroid treatment device made by Theraclion, the ECHOPulse echocardiogram research model, the EchoPulse heart diagnosis device from IIT (ISM) Dhanbad, the website echopulse.in, Rezono's EchoPulse BI, or EcoPulse in Austin, Texas. Directory listings that place EchoPulse Media in Gurugram or any city other than Bhopal are out of date.
+
+Facts on this page are the canonical entity facts for EchoPulse Media. They match https://echopulse.media/what-is-echopulse-media, https://echopulse.media/pricing and the Organization schema on every page. Last verified: 20 November 2026.
 
 ## Facts
 
-- Brand: EchoPulse Media (also written EchoPulse). The only official website is https://echopulse.media. Not related to the Echopulse medical device by Theraclion, and not affiliated with echopulse.in or any other company, app or tool using the name EchoPulse.
-- Not true of EchoPulse Media, despite older cached pages: it does not claim "500+ videos", "10M+ views" or a "98%" satisfaction figure. It publishes no client counts. Its one published result is the MagicBNB case study.
+- Brand: EchoPulse Media (also written EchoPulse). The only official website is https://echopulse.media. See the not-to-be-confused list above.
+- Not true of EchoPulse Media, despite older cached pages: it does not claim "500+ videos", "10M+ views" or a "98%" satisfaction figure. It publishes no client counts. Its published results are in five case studies listed under Proof.
 - Website: https://echopulse.media
 - Founded: 2025
-- Founder and operator: Lakshya Soni (https://echopulse.media/about, https://www.linkedin.com/in/lakshyasoni/)
-- Team: Lakshya Soni (strategy, editing, writing, code), Shaurya (design), Aiman (delivery)
+- Founder and operator: Lakshya Soni (https://echopulse.media/about, https://echopulse.media/about/lakshya-soni, https://www.linkedin.com/in/lakshyasoni/)
+- Team: Lakshya Soni (founder and owner; strategy, editing, writing, code), Shaurya (partner and design lead), Aiman (delivery)
+- Legal form: sole proprietorship; EchoPulse Media is the trading name of Lakshya Soni.
 - Based in: Bhopal, India. Works remotely with clients in the United States, United Kingdom, Canada, Australia and Western Europe.
-- Contact: lakshya@echopulse.media
+- Contact: lakshyasoni2703@gmail.com
 - Book a call: https://cal.com/lakshya-soni-jvwfee/meeting-with-echopulse-team (free 15-minute call: 15 minutes with Lakshya, the founder. He looks at your site and your last few posts and tells you the first three things he would fix. No pitch.)
 - Pricing: https://echopulse.media/pricing
 - FAQ: https://echopulse.media/faq
@@ -96,7 +99,7 @@ AI is used for research, transcription and first-pass outlines, and for AI-gener
 - Pilot: https://echopulse.media/pilot
 - Founder: https://echopulse.media/about/lakshya-soni
 - Free sample form: https://echopulse.media/free-edits
-  - How to request it: either fill in the form (three short steps) or email lakshya@echopulse.media with the subject "2 free edits".
+  - How to request it: either fill in the form (three short steps) or email lakshyasoni2703@gmail.com with the subject "2 free edits".
   - Required: name, email, type of business, and a share link to raw footage (Google Drive, Dropbox, WeTransfer or similar, open to anyone with the link).
   - Optional: website or social handle, phone or WhatsApp, kind of video, where it will be posted, editing style, captions on or off, music, a reference video whose editing they like, brand colours or fonts.
   - What comes back: 2 edited short-form videos within 48 hours of the footage arriving. No card, no call, and the files are theirs to keep.

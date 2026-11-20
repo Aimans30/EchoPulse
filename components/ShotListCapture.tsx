@@ -83,7 +83,7 @@ export default function ShotListCapture() {
       {error && <p className="slc-err" id={errId}>{error}</p>}
       {status === 'error' && (
         <p className="slc-err" role="alert">
-          That did not go through. Email <a href="mailto:lakshya@echopulse.media">lakshya@echopulse.media</a> and we will send it.
+          That did not go through. Email <a href="mailto:lakshyasoni2703@gmail.com">lakshyasoni2703@gmail.com</a> and we will send it.
         </p>
       )}
       <style>{`

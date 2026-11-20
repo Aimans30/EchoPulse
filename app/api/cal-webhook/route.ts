@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { createLead, addAsanaSubtask } from '@/lib/asana';
 import { postToSlack } from '@/lib/slack';
+import { notifyOwner } from '@/lib/email';
 import { formatBookingOrigin } from '@/lib/attribution';
 
 /**
@@ -138,6 +139,23 @@ export async function POST(req: Request) {
           elements: [{ type: 'button' as const, text: { type: 'plain_text' as const, text: 'Open Pipeline Card' }, url: asanaTask.permalink_url, style: 'primary' as const }],
         }] : []),
         { type: 'context', elements: [{ type: 'mrkdwn' as const, text: '✅ Prep checklist pre-seeded in Asana — 15min before, do the research subtask.' }] },
+      ],
+    });
+
+    await notifyOwner({
+      subject: `Call booked: ${fullName}, ${startStr} IST`,
+      replyTo: email,
+      lines: [
+        'New call booked',
+        '',
+        `Name: ${fullName}`,
+        `Email: ${email}`,
+        `When: ${startStr} (IST)`,
+        `Type: ${eventTypeName}`,
+        cameFrom && `Came from: ${cameFrom}`,
+        notes && `Notes: ${notes}`,
+        answers && `\n${answers.replace(/\*/g, '')}`,
+        asanaTask?.permalink_url && `\nAsana: ${asanaTask.permalink_url}`,
       ],
     });
 

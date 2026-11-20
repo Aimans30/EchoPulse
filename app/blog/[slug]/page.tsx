@@ -215,7 +215,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
       authorName === 'Lakshya Soni'
         ? {
             '@type': 'Person',
-            '@id': `${SITE_URL}/#founder`,
+            '@id': `${SITE_URL}/about/lakshya-soni#person`,
             name: 'Lakshya Soni',
             url: `${SITE_URL}/about/lakshya-soni`,
           }

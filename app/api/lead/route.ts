@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createLead } from '@/lib/asana';
 import { postToSlack, buildLeadMessage } from '@/lib/slack';
+import { notifyOwner } from '@/lib/email';
 import { rateLimit } from '@/lib/rateLimit';
 import { countryFromHeaders, formatCameFromLine, formatOriginNotes, sanitizeAttribution } from '@/lib/attribution';
 
@@ -67,6 +68,26 @@ export async function POST(req: Request) {
         title: started ? '🟡 Free edits started (not finished)' : source === 'free_edits_form' ? '🎬 Free edits request' : source === 'plan_intake' ? '📦 Plan request' : undefined,
       }),
     );
+
+    // 3. Email copy to the owner (no-op until RESEND_API_KEY is set)
+    const kind = started ? 'Free edits started (not finished)' : source === 'free_edits_form' ? 'Free edits request' : source === 'plan_intake' ? 'Plan request' : 'New lead';
+    await notifyOwner({
+      subject: `${kind}: ${fullName}`,
+      replyTo: email,
+      lines: [
+        `${kind}`,
+        '',
+        `Name: ${fullName}`,
+        `Email: ${email}`,
+        phone && `Phone: ${phone}`,
+        company && `Company: ${company}`,
+        serviceInterest && `Interest: ${serviceInterest}`,
+        `Source: ${source}`,
+        leadNotes && `\n${leadNotes}`,
+        cameFrom && `\nCame from: ${cameFrom}`,
+        asanaTask?.permalink_url && `Asana: ${asanaTask.permalink_url}`,
+      ],
+    });
 
     return NextResponse.json({
       ok: true,

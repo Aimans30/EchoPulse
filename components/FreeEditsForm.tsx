@@ -44,7 +44,7 @@ function Chips({
 
 const SOURCE = 'free_edits_form';
 const STARTED_SOURCE = 'free_edits_started';
-const CONTACT_EMAIL = 'lakshya@echopulse.media';
+const CONTACT_EMAIL = 'lakshyasoni2703@gmail.com';
 
 type Status = 'idle' | 'submitting' | 'sent' | 'error';
 type Errors = Partial<Record<'name' | 'email' | 'footage' | 'business', string>>;

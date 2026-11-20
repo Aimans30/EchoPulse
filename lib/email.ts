@@ -31,11 +31,20 @@ interface SendEmailOptions {
   html?: string;
   /** Optional friendly sender name. Defaults to "Lakshya at EchoPulse". */
   fromName?: string;
-  /** Optional reply-to. Defaults to lakshya@echopulse.media. */
+  /** Optional reply-to. Defaults to the owner's inbox (OWNER_EMAIL). */
   replyTo?: string;
 }
 
-const FROM_EMAIL = 'lakshya@echopulse.media';
+/** The inbox every lead and booking is copied to, and the site's public contact. */
+export const OWNER_EMAIL = process.env.LEAD_NOTIFY_EMAIL || 'lakshyasoni2703@gmail.com';
+
+/**
+ * Sender address. Resend only sends from a domain you have verified with it.
+ * Until echopulse.media is verified, leave RESEND_FROM unset: Resend's shared
+ * test sender (onboarding@resend.dev) can still deliver to the address the
+ * Resend account was created with, which is all the owner notifications need.
+ */
+const FROM_EMAIL = process.env.RESEND_FROM || 'onboarding@resend.dev';
 const FROM_NAME_DEFAULT = 'Lakshya · EchoPulse';
 
 /**
@@ -58,7 +67,7 @@ const FROM_NAME_DEFAULT = 'Lakshya · EchoPulse';
  *     body: JSON.stringify({
  *       from: `${opts.fromName ?? FROM_NAME_DEFAULT} <${FROM_EMAIL}>`,
  *       to: opts.to,
- *       reply_to: opts.replyTo ?? FROM_EMAIL,
+ *       reply_to: opts.replyTo ?? OWNER_EMAIL,
  *       subject: opts.subject,
  *       text: opts.text,
  *       html: opts.html,
@@ -90,7 +99,7 @@ export async function sendEmail(opts: SendEmailOptions): Promise<boolean> {
         body: JSON.stringify({
           from: `${opts.fromName ?? FROM_NAME_DEFAULT} <${FROM_EMAIL}>`,
           to: opts.to,
-          reply_to: opts.replyTo ?? FROM_EMAIL,
+          reply_to: opts.replyTo ?? OWNER_EMAIL,
           subject: opts.subject,
           text: opts.text,
           html: opts.html,
@@ -111,6 +120,25 @@ export async function sendEmail(opts: SendEmailOptions): Promise<boolean> {
 
   // TODO: Postmark/Mailgun paths — wire when needed
   return false;
+}
+
+/**
+ * Copy a lead or booking to the owner's inbox, alongside the Slack post.
+ * `lines` are "Label: value" pairs; the email is plain text so it reads well
+ * on a phone. Reply-to is the lead, so hitting Reply answers them directly.
+ * No-op (returns false) until RESEND_API_KEY is set.
+ */
+export async function notifyOwner(args: { subject: string; lines: Array<string | false | undefined | null>; replyTo?: string }): Promise<boolean> {
+  if (!process.env.RESEND_API_KEY) return false;
+  const body = args.lines.filter(Boolean).join('\n');
+  const valid = args.replyTo && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(args.replyTo) ? args.replyTo : undefined;
+  return sendEmail({
+    to: OWNER_EMAIL,
+    subject: args.subject.slice(0, 180),
+    text: `${body}\n\nSent by echopulse.media`,
+    fromName: 'EchoPulse Site',
+    replyTo: valid,
+  });
 }
 
 // ── Templates ─────────────────────────────────────────────────────────

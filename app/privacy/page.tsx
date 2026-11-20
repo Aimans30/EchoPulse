@@ -23,7 +23,7 @@ import Footer from '@/components/Footer';
  */
 
 const SITE_URL = 'https://echopulse.media';
-const CONTACT_EMAIL = 'lakshya@echopulse.media';
+const CONTACT_EMAIL = 'lakshyasoni2703@gmail.com';
 const LAST_UPDATED = '10 November 2026';
 const LAST_UPDATED_ISO = '2026-11-10';
 

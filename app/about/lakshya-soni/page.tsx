@@ -20,7 +20,7 @@ const LINKEDIN = 'https://www.linkedin.com/in/lakshyasoni/';
 export const metadata: Metadata = {
   title: { absolute: 'Lakshya Soni, Founder of EchoPulse Media' },
   description:
-    'Lakshya Soni is the founder of EchoPulse Media, a done-for-you content and website studio based in Bhopal, India. Background, facts, work and contact.',
+    'Lakshya Soni is the founder and owner of EchoPulse Media, a growth partner for founders and businesses in Bhopal, India. Background, facts, work and contact.',
   alternates: { canonical: `${SITE_URL}/about/lakshya-soni` },
   openGraph: {
     title: 'Lakshya Soni, Founder of EchoPulse Media',
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
 };
 
 const DEFINITION =
-  'Lakshya Soni is the founder of EchoPulse Media, a done-for-you content and website studio based in Bhopal, India.';
+  'Lakshya Soni is the founder and owner of EchoPulse Media, a growth partner for founders and businesses based in Bhopal, India.';
 
 export default function LakshyaSoniPage() {
   const FACTS: { label: string; value: React.ReactNode }[] = [
@@ -46,7 +46,7 @@ export default function LakshyaSoniPage() {
       value:
         'Before EchoPulse, an editor at a Canadian real estate media company, where he edited listing tours, agent brand videos and ads for more than 200 Canadian real estate agents. Those agents were that company\'s clients, not EchoPulse clients.',
     },
-    { label: 'Email', value: <a href="mailto:lakshya@echopulse.media">lakshya@echopulse.media</a> },
+    { label: 'Email', value: <a href="mailto:lakshyasoni2703@gmail.com">lakshyasoni2703@gmail.com</a> },
     { label: 'LinkedIn', value: <a href={LINKEDIN} rel="noopener noreferrer" target="_blank">{LINKEDIN}</a> },
     { label: 'Company', value: <Link href="/what-is-echopulse-media">EchoPulse Media</Link> },
   ];
@@ -63,7 +63,7 @@ export default function LakshyaSoniPage() {
         isPartOf: { '@id': `${SITE_URL}/#website` },
         inLanguage: 'en',
         mainEntity: {
-          '@id': `${SITE_URL}/#founder`,
+          '@id': `${SITE_URL}/about/lakshya-soni#person`,
           '@type': 'Person',
           name: 'Lakshya Soni',
           jobTitle: 'Founder',
@@ -138,7 +138,8 @@ export default function LakshyaSoniPage() {
           <h2 id="not-heading" className="au-h2">Not to be confused with</h2>
           <p>
             This is the Lakshya Soni who founded EchoPulse Media. He is not connected to other people or
-            companies of the same name.
+            companies of the same name. For the company, see{' '}
+            <Link href="/what-is-echopulse-media">what EchoPulse Media is</Link>.
           </p>
         </section>
 
@@ -163,7 +164,7 @@ export default function LakshyaSoniPage() {
 
         <section className="au-cta">
           <h2 className="au-h2">Talk to the person who runs it</h2>
-          <p>Email <a href="mailto:lakshya@echopulse.media">lakshya@echopulse.media</a> or book a call.</p>
+          <p>Email <a href="mailto:lakshyasoni2703@gmail.com">lakshyasoni2703@gmail.com</a> or book a call.</p>
           <div className="au-cta-row">
             <ICPBookButton label={BOOK_CALL_LABEL} location="author_page" accent={ACCENT} size="lg" fullWidthMobile />
             <Link href="/about" className="au-cta-alt">About EchoPulse Media</Link>

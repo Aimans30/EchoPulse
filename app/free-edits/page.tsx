@@ -55,7 +55,7 @@ export default function FreeEditsPage() {
       {
         '@type': 'CommunicateAction',
         name: 'Request 2 free edits by email',
-        target: 'mailto:lakshya@echopulse.media?subject=2%20free%20edits',
+        target: 'mailto:lakshyasoni2703@gmail.com?subject=2%20free%20edits',
         description: 'Email a share link to the raw footage with your name and type of business.',
       },
     ],
@@ -117,7 +117,7 @@ export default function FreeEditsPage() {
 
             <p className="fe-alt">
               Prefer email? Send a link to your footage to{' '}
-              <a href="mailto:lakshya@echopulse.media?subject=2%20free%20edits">lakshya@echopulse.media</a> with your
+              <a href="mailto:lakshyasoni2703@gmail.com?subject=2%20free%20edits">lakshyasoni2703@gmail.com</a> with your
               name and what kind of business you run. Same offer, same 48 hours, {FREE_SAMPLE.per}.
             </p>
           </div>

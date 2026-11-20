@@ -129,7 +129,7 @@ export default async function CaseStudyRoute({ params }: { params: Promise<{ slu
     // already declares, so this block is complete if it is read on its own.
     author: {
       '@type': 'Person',
-      '@id': `${SITE_URL}/#founder`,
+      '@id': `${SITE_URL}/about/lakshya-soni#person`,
       name: CASE_STUDY_AUTHOR.name,
       url: CASE_STUDY_AUTHOR.url,
     },
@@ -157,7 +157,7 @@ export default async function CaseStudyRoute({ params }: { params: Promise<{ slu
     // Organization.
     about:
       study.kind === 'founder'
-        ? { '@type': 'Person', '@id': `${SITE_URL}/#founder`, name: CASE_STUDY_AUTHOR.name, url: CASE_STUDY_AUTHOR.url }
+        ? { '@type': 'Person', '@id': `${SITE_URL}/about/lakshya-soni#person`, name: CASE_STUDY_AUTHOR.name, url: CASE_STUDY_AUTHOR.url }
         : clientLd,
     ...(datasetLd ? { citation: { '@id': datasetId } } : {}),
     // What the work produced, as plain named things. Only where the study
