@@ -147,7 +147,7 @@ export const FAQ_GROUPS: FaqGroup[] = [
       {
         home: 9,
         q: 'Where is the team based, and what hours do you actually cover?',
-        a: "EchoPulse is run from Bhopal, India, by Lakshya Soni, with Shaurya on design and Aiman on delivery; the About page lists the team. Our working day overlaps comfortably with UK and Western European mornings and with US East Coast mornings. Replies come within 3 hours in the workday, and a message sent late on a US evening is answered the next morning your time. Turnaround times are targets that start once payment has cleared and we have your footage or brief.",
+        a: "EchoPulse is run from Bhopal, India, by Lakshya Soni, with Shaurya on design and Aiman on delivery; the About page lists the team. Our working day overlaps comfortably with UK and Western European mornings and with US East Coast mornings. Replies come within 3 hours in the workday, and a message sent late on a US evening is answered the next morning your time. Turnaround times are targets that start once payment has cleared and we have your footage or brief. If you need someone reachable in your own timezone at 5pm on a Friday, say so on the call and we will tell you honestly whether we are the right fit.",
         link: { href: '/about', label: 'Meet the team' },
       },
     ],
