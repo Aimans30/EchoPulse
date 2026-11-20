@@ -1983,7 +1983,7 @@ const whitesBrights: CaseStudy = {
   heroLede:
     'Counter billing, orders, delivery, customers, reports, monthly plans, a customer app channel and a head-office command centre, with Brighty, an assistant that answers staff in Hindi, Hinglish or English, built in. EchoPulse also runs the website and the brand\'s AI-led marketing.',
   indexTags: ['Custom software', 'POS and multi-outlet HQ', 'AI video and social', 'Website'],
-  indexLead: { value: '₹3 lakh+', label: 'saved in running costs and losses, by EchoPulse\'s estimate with the client' },
+  indexLead: { value: '$3,400+ (₹3 lakh+)', label: 'saved in running costs and losses, by EchoPulse\'s estimate with the client' },
   heroShot: {
     src: '/case-studies/wb-hq.webp',
     alt: 'The Whites & Brights HQ Command Centre: outlets, collections, outstanding money and orders for the month, an alerts list per outlet, and a side-by-side outlet comparison. Sample data.',
@@ -1993,10 +1993,10 @@ const whitesBrights: CaseStudy = {
     caption: 'The HQ Command Centre, from the delivered product. Sample data.',
   },
   resultLine:
-    'Result: more than ₹3 lakh (over US$3,000) saved in running costs and losses since launch, by EchoPulse\'s estimate with the client.',
+    'Result: more than US$3,400 (₹3 lakh+) saved in running costs and losses since launch, by EchoPulse\'s estimate with the client.',
   answer: [
     'EchoPulse Media built and runs the technology and marketing behind Whites & Brights, a premium laundry and dry-cleaning chain in Patna, India, run by WNB Cleantech Pvt Ltd: one operating system for every outlet, the public website, and an AI-led content programme on Instagram and Facebook. Lakshya Soni, EchoPulse\'s founder, led the product and engineering; his partner Shaurya, EchoPulse\'s design lead, led the design and marketing creative.',
-    'The result: more than ₹3 lakh (over US$3,000) saved in running costs and losses since launch, by EchoPulse\'s estimate with the client. Managing the outlets is no longer a daily headache for the owners, and ordering at the counter and between shops is simpler.',
+    'The result: more than US$3,400 (₹3 lakh+) saved in running costs and losses since launch, by EchoPulse\'s estimate with the client. Managing the outlets is no longer a daily headache for the owners, and ordering at the counter and between shops is simpler.',
     'The operating system has 13 store screens across 2 panels (store and head office), a price list of more than 240 items per outlet, and Brighty, an in-browser assistant that answers staff in Hindi, Hinglish and English at 0 monthly AI fees. The website is live at whitesandbrights.com, and the reels and posts are public on Instagram, @whitesandbrights.in.',
   ],
   keyFacts: [
@@ -2012,12 +2012,12 @@ const whitesBrights: CaseStudy = {
     { label: 'Marketing', value: 'Run by EchoPulse with AI: AI-generated video reels, animated explainers, Hindi and English campaign posters, festival and seasonal content, branch and franchise launch content, all pointing to WhatsApp and the website. Public on Instagram (@whitesandbrights.in) and Facebook.', href: 'https://www.instagram.com/whitesandbrights.in/' },
     { label: 'Stack', value: 'React and Vite web app for PC and phone. Supabase: Postgres, sign-in, file storage, real-time updates and row-level security per outlet. Netlify, deployed from GitHub. An on-device vision model in the browser.' },
     { label: 'Period', value: 'Delivered in 2026, with marketing running alongside. Product screens, the live site and the public social posts were read on 19 November 2026.' },
-    { label: 'Result', value: 'More than ₹3 lakh (over US$3,000) saved in running costs and losses since launch, by EchoPulse\'s estimate with the client. Managing the outlets is no longer a daily headache for the owners, and ordering at the counter and between shops is simpler. Also delivered: one system for every outlet (13 store screens, an HQ panel and Brighty at 0 monthly AI fees), a live website with a booking path on every page, and a running content programme on Instagram and Facebook.' },
+    { label: 'Result', value: 'More than US$3,400 (₹3 lakh+) saved in running costs and losses since launch, by EchoPulse\'s estimate with the client. Managing the outlets is no longer a daily headache for the owners, and ordering at the counter and between shops is simpler. Also delivered: one system for every outlet (13 store screens, an HQ panel and Brighty at 0 monthly AI fees), a live website with a booking path on every page, and a running content programme on Instagram and Facebook.' },
     { label: 'Data source', value: 'The delivered product (EchoPulse\'s walkthrough for the owner, with screens on sample data), the savings estimate shared by the founder, the client\'s live site whitesandbrights.com, the outlets\' Google Business Profiles, the app\'s Google Play listing, the IndiaFilings company record, and the brand\'s public Instagram and Facebook posts, read 19 November 2026.' },
     { label: 'Last updated', value: '19 November 2026' },
   ],
   indexResult:
-    'For Whites & Brights, a laundry chain in Patna, EchoPulse built one operating system for every outlet and runs the website and AI-led marketing: more than ₹3 lakh (over US$3,000) saved in running costs and losses, by EchoPulse\'s estimate with the client.',
+    'For Whites & Brights, a laundry chain in Patna, EchoPulse built one operating system for every outlet and runs the website and AI-led marketing: more than US$3,400 (₹3 lakh+) saved in running costs and losses, by EchoPulse\'s estimate with the client.',
   measurement: {
     tool: 'The delivered product, from the walkthrough document EchoPulse wrote for the owner and the screenshots inside it; the savings estimate shared by Lakshya Soni, EchoPulse\'s founder, on 19 November 2026; the client\'s live website, crawled and captured on 19 November 2026; and the outlets\' Google Business Profiles, the app\'s Google Play listing, the IndiaFilings company record and the brand\'s public Instagram and Facebook pages, read the same day.',
     dateRanges:
@@ -2027,7 +2027,7 @@ const whitesBrights: CaseStudy = {
     notCounted:
       'Figures visible inside the product screenshots (takings, orders, Brighty usage) are sample data and are not quoted. Sample names, phone numbers and localities are blurred. The savings estimate is not broken down by line item, and no other result figure is published.',
     extra: [
-      { label: 'Savings figure', value: 'More than ₹3 lakh (over US$3,000) saved in running costs and losses, by EchoPulse\'s estimate with the client. Basis: estimate of operating costs and losses avoided since launch, shared by the founder; the breakdown is not published.' },
+      { label: 'Savings figure', value: 'More than US$3,400 (₹3 lakh+) saved in running costs and losses, by EchoPulse\'s estimate with the client. Basis: estimate of operating costs and losses avoided since launch, shared by the founder; the breakdown is not published.' },
       { label: 'Disclosure', value: 'An EchoPulse partner is a director of the client company. Shaurya, EchoPulse\'s design partner, was later made a director of WNB Cleantech, the company behind Whites & Brights, in recognition of his work on the business.' },
       { label: 'Public facts about the client', value: 'Company record, services, hours, ratings, the app and the franchise programme are each taken from a public page, listed with its read date under "About Whites & Brights". Ratings are as shown on each outlet\'s Google Business Profile on 19 November 2026 and will change.' },
     ],
@@ -2052,15 +2052,15 @@ const whitesBrights: CaseStudy = {
 
   metaTitle: 'Whites & Brights: One System for Every Outlet',
   metaDescription:
-    'How EchoPulse built one operating system for a Patna laundry chain, saving over ₹3 lakh by its estimate with the client, and runs its website and AI-led marketing.',
+    'How EchoPulse built one operating system for a Patna laundry chain, saving over US$3,400 (₹3 lakh) by its estimate with the client, and runs its website and AI-led marketing.',
 
   eyebrow: 'Case study',
   headline: 'One operating system',
   headlineAccent: 'for every outlet.',
   summary:
-    'Whites & Brights is a premium laundry and dry-cleaning chain in Patna with more than one outlet, a head office, pickup and delivery riders, monthly plans and business customers. Bills were slow, prices varied between counters, staff phoned head office for every unusual item, and each outlet was a black box to the owners until month-end. EchoPulse built one system for all of it: a store panel for every outlet, an HQ panel that sees them all live, and Brighty, an assistant that answers staff in the language they type in and runs on the shop\'s own PC. EchoPulse also built the public website, whitesandbrights.com, and runs the brand\'s marketing with AI: AI-generated video, animated explainers, Hindi and English posts and content for new branches. By EchoPulse\'s estimate with the client, the system has saved more than ₹3 lakh (over US$3,000) in running costs and losses since launch.',
+    'Whites & Brights is a premium laundry and dry-cleaning chain in Patna with more than one outlet, a head office, pickup and delivery riders, monthly plans and business customers. Bills were slow, prices varied between counters, staff phoned head office for every unusual item, and each outlet was a black box to the owners until month-end. EchoPulse built one system for all of it: a store panel for every outlet, an HQ panel that sees them all live, and Brighty, an assistant that answers staff in the language they type in and runs on the shop\'s own PC. EchoPulse also built the public website, whitesandbrights.com, and runs the brand\'s marketing with AI: AI-generated video, animated explainers, Hindi and English posts and content for new branches. By EchoPulse\'s estimate with the client, the system has saved more than US$3,400 (₹3 lakh+) in running costs and losses since launch.',
   tldr: [
-    'The result: more than ₹3 lakh (over US$3,000) saved in running costs and losses, by EchoPulse\'s estimate with the client. Managing the outlets is no longer a daily headache for the owners.',
+    'The result: more than US$3,400 (₹3 lakh+) saved in running costs and losses, by EchoPulse\'s estimate with the client. Managing the outlets is no longer a daily headache for the owners.',
     'The problem: slow bills, prices that varied by counter, staff phoning head office, and no single view of what was due, overdue or unpaid.',
     'What we built: a store panel with 13 screens, an HQ command centre, and Brighty, an assistant in Hindi, Hinglish and English with photo recognition.',
     'What it costs to run: no monthly AI bill. Brighty runs in the browser on the shop\'s PC, and garment photos never leave the shop.',
@@ -2086,7 +2086,7 @@ const whitesBrights: CaseStudy = {
   ],
 
   heroMetrics: [
-    { value: '₹3 lakh+', label: 'saved in running costs and losses', note: 'Over US$3,000, by EchoPulse\'s estimate with the client' },
+    { value: '$3,400+', label: 'saved in running costs and losses', note: '₹3 lakh+, by EchoPulse\'s estimate with the client' },
     { value: '13', label: 'store screens', note: 'From the dashboard to app orders' },
     { value: '2', label: 'panels: store and HQ', note: 'Each outlet in its own store panel' },
     { value: '240+', label: 'items in each outlet\'s price list', note: 'Searchable by name, nickname or Hindi word' },
@@ -2921,8 +2921,8 @@ const whitesBrights: CaseStudy = {
       source: { label: 'How the apps and software service works', href: '/services/apps-software' },
     },
     result: {
-      figure: '₹3 lakh+',
-      label: 'saved in running costs and losses since launch, by EchoPulse\'s estimate with the client (over US$3,000)',
+      figure: '$3,400+',
+      label: 'saved in running costs and losses since launch, by EchoPulse\'s estimate with the client (₹3 lakh+)',
       basis: 'Estimate of operating costs and losses avoided since launch, shared by the founder; the breakdown is not published.',
       lines: [
         'Managing the outlets is no longer a daily headache for the owners.',
@@ -2973,7 +2973,7 @@ const whitesBrights: CaseStudy = {
     },
     faq: [
       { q: 'Who built the Whites & Brights system?', a: 'EchoPulse Media built it: Lakshya Soni, EchoPulse\'s founder, as product and engineering lead, with his partner Shaurya, EchoPulse\'s design lead, on design and marketing creative. The system has 13 store screens, an HQ panel and Brighty, an in-browser assistant in Hindi, Hinglish and English. EchoPulse also built the website, whitesandbrights.com, and runs the brand\'s AI-led marketing. Shaurya, EchoPulse\'s design partner, was later made a director of WNB Cleantech, the company behind Whites & Brights, in recognition of his work on the business.' },
-      { q: 'What did the system save Whites & Brights?', a: 'More than ₹3 lakh (over US$3,000) in running costs and losses since launch, by EchoPulse\'s estimate with the client. The figure is an estimate of operating costs and losses avoided, shared by EchoPulse\'s founder; the breakdown is not published. The owners also say managing the outlets is no longer a daily headache, and ordering at the counter and between shops is simpler.' },
+      { q: 'What did the system save Whites & Brights?', a: 'More than US$3,400 (₹3 lakh+) in running costs and losses since launch, by EchoPulse\'s estimate with the client. The figure is an estimate of operating costs and losses avoided, shared by EchoPulse\'s founder; the breakdown is not published. The owners also say managing the outlets is no longer a daily headache, and ordering at the counter and between shops is simpler.' },
       { q: 'Can EchoPulse build a custom POS or CRM for my business?', a: 'Yes. The Whites & Brights system includes a point of sale, a customer directory with history and important dates, monthly plans, delivery lists and reports. EchoPulse builds the same kind of system around how your counters and branches work.' },
       { q: 'Does it work on phones?', a: 'Yes. It is one responsive web app for the shop PC and the phone. It opens in the browser, can be added to the home screen, and has large tap targets and a full-screen assistant.' },
       { q: 'Does the assistant cost money every month?', a: 'No. Brighty and its garment photo recognition run inside the browser on the shop\'s own PC, so there is no per-question charge from an AI provider.' },
@@ -3419,7 +3419,7 @@ const whitesBrightsApp: CaseStudy = {
   },
 };
 
-export const caseStudies: CaseStudy[] = [magicbnb, whitesBrights, whitesBrightsApp, workingWithGod, founderStory];
+export const caseStudies: CaseStudy[] = [whitesBrights, whitesBrightsApp, workingWithGod, magicbnb, founderStory];
 
 const SITE_ORIGIN = 'https://echopulse.media';
 const MONTH_NAMES = [
