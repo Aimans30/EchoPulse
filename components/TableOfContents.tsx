@@ -284,11 +284,18 @@ export default function TableOfContents({
           max-height: calc(100vh - 230px);
           overflow-y: auto;
           overscroll-behavior: contain;
-          scrollbar-width: thin;
-          scrollbar-color: rgba(12,12,11,0.18) transparent;
+          /* No visible scrollbar: on Windows even a "thin" one renders as a
+             grey rail with arrow buttons inside the card. The list still
+             scrolls (wheel, touch, keyboard), the active item is kept in view
+             by the effect above, and soft fades at the edges show there is
+             more above or below. */
+          scrollbar-width: none;
+          -ms-overflow-style: none;
+          padding: 4px 0 12px;
+          -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 12px, #000 calc(100% - 28px), transparent 100%);
+          mask-image: linear-gradient(to bottom, transparent 0, #000 12px, #000 calc(100% - 28px), transparent 100%);
         }
-        .blog-toc-list::-webkit-scrollbar { width: 4px; }
-        .blog-toc-list::-webkit-scrollbar-thumb { background: rgba(12,12,11,0.18); border-radius: 4px; }
+        .blog-toc-list::-webkit-scrollbar { display: none; width: 0; height: 0; }
         .blog-toc-item-sub { margin-left: 16px; }
         .blog-toc-link {
           display: flex;
