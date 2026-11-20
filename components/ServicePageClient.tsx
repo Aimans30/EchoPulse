@@ -708,7 +708,7 @@ export default function ServicePageClient({ service, guides = [] }: { service: S
         .svc-related-dot { width: 10px; height: 10px; border-radius: 50%; margin-bottom: 16px; }
         .svc-related-more { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 700; }
 
-        .svc-sticky-cta { position: fixed; bottom: 24px; left: 50%; margin-left: -170px; width: 340px; z-index: 480; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 8px 8px 8px 24px; background: #0C0C0B; border: 1px solid rgba(255,255,255,0.12); border-radius: 999px; box-shadow: 0 16px 48px rgba(12,12,11,0.4); }
+        .svc-sticky-cta { position: fixed; bottom: 24px; left: 0; right: 0; margin: 0 auto; width: max-content; max-width: calc(100vw - 32px); z-index: 480; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 8px 8px 8px 24px; background: #0C0C0B; border: 1px solid rgba(255,255,255,0.12); border-radius: 999px; box-shadow: 0 16px 48px rgba(12,12,11,0.4); }
         .svc-sticky-text { font-size: 14px; font-weight: 600; color: #F2EEE7; white-space: nowrap; }
         .svc-sticky-btn { min-height: 44px !important; padding: 0 20px !important; font-size: 14px !important; box-shadow: none !important; }
 

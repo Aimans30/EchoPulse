@@ -225,6 +225,7 @@ export default function BookCallModal() {
                 <a
                   href={url}
                   data-track-location="book_modal_slow_fallback"
+                  data-no-modal
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{ fontSize: '14px', fontWeight: 700, color: '#0C0C0B', textDecoration: 'underline', textDecorationColor: '#E8541A', textUnderlineOffset: '4px', minHeight: '44px', display: 'inline-flex', alignItems: 'center' }}
@@ -252,6 +253,21 @@ export default function BookCallModal() {
           <span style={{ fontSize: '12px', color: '#6E6B63', fontFamily: 'Inter, sans-serif' }}>
             No pitch. You keep the notes whether or not you hire us.
           </span>
+          {/* Always visible: a blocked iframe (ad blocker, strict network)
+              still fires onLoad with an empty page, so the spinner's slow
+              fallback alone can miss it. */}
+          {url && (
+            <a
+              href={url}
+              data-no-modal
+              data-track-location="book_modal_footer_fallback"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ marginLeft: '12px', fontSize: '12px', fontWeight: 600, color: '#0C0C0B', textDecoration: 'underline', textDecorationColor: '#E8541A', textUnderlineOffset: '3px', fontFamily: 'Inter, sans-serif' }}
+            >
+              Calendar not showing? Open it in a new tab
+            </a>
+          )}
         </div>
       </div>
 

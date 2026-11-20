@@ -134,13 +134,33 @@ export default function AttributionTracker() {
       }
     };
 
+    // A plain click on any cal.com link opens the calendar in the on-site
+    // modal instead of leaving the site. Modifier clicks, middle clicks and
+    // links marked data-no-modal (the modal's own "open in a new tab"
+    // fallback) keep normal link behaviour, and if the modal is not mounted
+    // the link simply works as a link. Registered after `record`, and the
+    // modal opens a tick later, so the click is tracked first and the modal
+    // names the button that opened it.
+    const intercept = (e: Event) => {
+      const me = e as MouseEvent;
+      if (me.defaultPrevented || me.button !== 0 || me.metaKey || me.ctrlKey || me.shiftKey || me.altKey) return;
+      const a = anchorOf(e);
+      if (!a || !isBookingUrl(a.href) || a.closest('[data-no-modal]')) return;
+      const w = window as unknown as { openBookCallModal?: () => void };
+      if (typeof w.openBookCallModal !== 'function') return;
+      e.preventDefault();
+      window.setTimeout(() => w.openBookCallModal?.(), 0);
+    };
+
     const captureEvents = ['pointerdown', 'click', 'auxclick', 'contextmenu', 'keydown'] as const;
     captureEvents.forEach((n) => document.addEventListener(n, decorate, true));
     document.addEventListener('click', record, true);
+    document.addEventListener('click', intercept, true);
     document.addEventListener('auxclick', record, true);
     return () => {
       captureEvents.forEach((n) => document.removeEventListener(n, decorate, true));
       document.removeEventListener('click', record, true);
+      document.removeEventListener('click', intercept, true);
       document.removeEventListener('auxclick', record, true);
     };
   }, []);
