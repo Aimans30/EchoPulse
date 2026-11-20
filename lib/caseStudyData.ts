@@ -2916,7 +2916,7 @@ const whitesBrights: CaseStudy = {
         { title: 'Standard, well-known tools', detail: 'React, Supabase and Netlify. Any competent developer can pick the code up.' },
         { title: 'Each branch\'s data kept apart', detail: 'Row-level security in the database: an outlet reads and changes only its own data.' },
         { title: 'No monthly AI fees', detail: 'The assistant runs in the browser, so there is no per-question bill from an AI provider.' },
-        { title: 'You own the code', detail: 'On every apps and software build, the code transfers to your GitHub on launch day.' },
+        { title: 'You own the code', detail: 'On every apps and software build, the code lives in your GitHub and is yours once paid.' },
       ],
       source: { label: 'How the apps and software service works', href: '/services/apps-software' },
     },
@@ -3389,7 +3389,7 @@ const whitesBrightsApp: CaseStudy = {
       risks: [
         { title: 'One back end, not two', detail: 'The app and the counter share one catalogue and one order list, so nothing is copied across by hand.' },
         { title: 'Privacy declared', detail: 'For this app: no data shared with third parties, encrypted in transit, and a deletion path in the app and on the site.' },
-        { title: 'You own the code', detail: 'On every apps and software build, the code transfers to your GitHub on launch day.' },
+        { title: 'You own the code', detail: 'On every apps and software build, the code lives in your GitHub and is yours once paid.' },
         { title: 'Fixed price, in writing', detail: 'A written scope, a fixed price and a delivery date before any work starts.' },
       ],
       source: { label: 'How the apps and software service works', href: '/services/apps-software' },

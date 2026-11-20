@@ -316,7 +316,7 @@ const RAW_PAGES: NichePageRaw[] = [
       },
       {
         q: 'Who owns the site?',
-        a: 'You do. You own the code and the domain.',
+        a: 'You do. The domain is always yours, and the code is yours once paid.',
       },
       {
         q: 'What does a real estate agent website cost?',
@@ -731,7 +731,7 @@ const RAW_PAGES: NichePageRaw[] = [
       },
       {
         q: 'Who owns the pages?',
-        a: 'You do. You own the code and the domain.',
+        a: 'You do. The domain is always yours, and the code is yours once paid.',
       },
     ],
     posts: [
@@ -1455,7 +1455,7 @@ const RAW_PAGES: NichePageRaw[] = [
       },
       {
         q: 'Who owns the site?',
-        a: 'You do. You own the code and the domain.',
+        a: 'You do. The domain is always yours, and the code is yours once paid.',
       },
     ],
     posts: [

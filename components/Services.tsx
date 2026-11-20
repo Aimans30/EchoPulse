@@ -23,7 +23,7 @@ const services = [
   { name: 'Ad Creatives', slug: 'ad-creatives', desc: 'Static and video ads for your campaigns. New ones arrive every month, so your budget is not spent showing people an ad they have already seen.', from: `Included from Growth, ${GROWTH.priceLabel} a month` },
   { name: 'Websites & Funnels', slug: 'websites-funnels', desc: 'Tune-ups to the site you have now, or a new site and funnel built from scratch. The work is aimed at one thing: more visitors getting in touch.', from: `Tune-ups from Presence Engine, ${PRESENCE.priceLabel} a month. New builds are scoped on a call` },
   { name: 'Automations', slug: 'automations', desc: 'DM flows, email sequences and CRM connections. A new lead gets a reply while you are busy with a client, and their details are saved in your CRM.', from: 'Scoped on a call' },
-  { name: 'Apps & Software', slug: 'apps-software', desc: 'Custom MVPs, AI tools and client portals, built at a fixed price. When the build is finished, you own the code.', from: 'Scoped on a call. 20% off on the Growth plan' },
+  { name: 'Apps & Software', slug: 'apps-software', desc: 'Custom MVPs, AI tools and client portals, built at a fixed price. The code is yours once paid.', from: 'Scoped on a call. 20% off on the Growth plan' },
 ];
 
 export default function Services() {

@@ -21,10 +21,10 @@ import { BOOK_CALL_LABEL, BOOK_CALL_REASSURANCE, FREE_EDITS_LABEL, FREE_EDITS_UR
 import { PROMISES } from '@/lib/pricing';
 import { PAGES_UPDATED_LABEL, PAGES_UPDATED_ISO } from '@/lib/siteMeta';
 
-// ServiceHeroVisual is 2.4K lines of SVG / animation code per service.
-// Lazy-loading it strips ~80KB of JS off the initial chunk so the route
-// renders fast, then the visual fades in. A skeleton placeholder keeps
-// layout stable during the swap.
+// ServiceHeroVisual holds the animated product mock for each service.
+// Lazy-loading it keeps that code off the initial chunk so the route renders
+// fast, then the visual fades in. The placeholder has the frame's exact
+// height (440px) and radius so nothing moves during the swap.
 const ServiceHeroVisual = dynamic(() => import('./ServiceHeroVisual'), {
   ssr: false,
   loading: () => (
@@ -32,8 +32,8 @@ const ServiceHeroVisual = dynamic(() => import('./ServiceHeroVisual'), {
       aria-hidden="true"
       style={{
         width: '100%',
-        height: '380px',
-        borderRadius: '20px',
+        height: '440px',
+        borderRadius: '16px',
         background:
           'linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 100%)',
         backgroundSize: '200% 100%',
@@ -146,7 +146,7 @@ const comparisonsByService: Record<string, ComparisonRow[]> = {
     { feature: 'Scoping',             us: 'Fixed price and delivery date in writing before work starts', them: 'Hourly billing, scope grows as it goes' },
     { feature: 'Build visibility',    us: 'Working screens you can click, every week',      them: 'Status decks and Figma mockups' },
     { feature: 'Feedback loop',       us: 'Slack, with updates shipped in days',            them: 'Weekly call, changes next sprint' },
-    { feature: 'Code ownership',      us: 'Transferred to your GitHub on launch day',       them: 'Stays in the agency repo' },
+    { feature: 'Code ownership',      us: 'In your GitHub, yours once paid',       them: 'Stays in the agency repo' },
     { feature: 'Hosting',             us: 'Your account, no lock-in, no monthly rent',      them: 'Their platform, monthly fee forever' },
     { feature: 'Post-launch',         us: '14 days of free fixes, then your call',          them: 'Handover, then per-hour support' },
     { feature: 'Honest scoping',      us: 'We say so when a build will not pay for itself', them: 'Quotes the biggest build the budget allows' },
@@ -248,7 +248,7 @@ const promisesWebsites: Promise[] = [
     stat: '14d',
     statLabel: 'Free fixes after launch',
     headline: 'We do not ghost after handoff.',
-    body: 'Two weeks of free fixes after the site goes live so any rough edges get cleaned while you are still publishing. After that, hire any developer in the world to extend it, or keep us on a small monthly retainer. The code is yours from day one.',
+    body: 'Two weeks of free fixes after the site goes live so any rough edges get cleaned while you are still publishing. After that, hire any developer in the world to extend it, or keep us on a small monthly retainer. The code sits in your own GitHub from day one and is yours once paid.',
   },
 ];
 
