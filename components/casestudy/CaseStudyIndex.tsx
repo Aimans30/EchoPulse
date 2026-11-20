@@ -80,7 +80,7 @@ function Visual({ study }: { study: CaseStudy }) {
         {[a, b, c].map((m, i) =>
           m ? (
             <span key={m.src} className={`csi-app-phone csi-app-phone-${i}`}>
-              <Image src={m.src} alt={i === 1 ? m.alt : ''} width={m.width} height={m.height} sizes="(max-width: 1000px) 30vw, 150px" className="csi-img" />
+              <Image src={m.src} alt={m.alt} width={m.width} height={m.height} sizes="(max-width: 1000px) 30vw, 150px" className="csi-img" />
             </span>
           ) : null,
         )}
@@ -112,7 +112,7 @@ function Visual({ study }: { study: CaseStudy }) {
           <span className="csi-phone">
             <Image
               src={study.product.heroPhone.src}
-              alt=""
+              alt={`${study.client} app on a phone`}
               width={study.product.heroPhone.width}
               height={study.product.heroPhone.height}
               sizes="96px"
@@ -129,7 +129,7 @@ function Visual({ study }: { study: CaseStudy }) {
         <div className="csi-split-half">
           <Image
             src={study.comparison.afterSrc}
-            alt={study.comparison.afterAlt ?? ''}
+            alt={study.comparison.afterAlt ?? `${study.client} after EchoPulse`}
             width={study.comparison.afterWidth ?? 1200}
             height={study.comparison.afterHeight ?? 2500}
             sizes="(max-width: 1000px) 50vw, 200px"

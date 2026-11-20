@@ -69,7 +69,7 @@ export default function AdCreativesVisual({ accent }: { accent: string }) {
                     <Clip className="ad-media" src={preview(x)} poster={poster(x)} play={v.active && decided} reduce={v.reduce} />
                   ) : (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img className="ad-media" src={poster(x)} alt="" loading="lazy" decoding="async" />
+                    <img className="ad-media" src={poster(x)} alt={`Ad creative variation ${LETTERS[i]}`} loading="lazy" decoding="async" />
                   )}
                   <span className="ad-letter">{LETTERS[i]}</span>
                   {win && (

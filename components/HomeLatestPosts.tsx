@@ -47,7 +47,7 @@ export default async function HomeLatestPosts() {
               <li key={post._id} className="hlp-card">
                 <Link href={`/blog/${post.slug}`} className="hlp-link">
                   {img && (
-                    <Image className="hlp-img" src={img} alt="" width={800} height={420} sizes="(max-width: 760px) 100vw, 360px" loading="lazy" />
+                    <Image className="hlp-img" src={img} alt={`Cover image for ${post.title}`} width={800} height={420} sizes="(max-width: 760px) 100vw, 360px" loading="lazy" />
                   )}
                   <span className="hlp-body">
                     {date && <span className="hlp-date">{date}</span>}

@@ -113,7 +113,7 @@ export default function VideoEditingVisual({ accent }: { accent: string }) {
               <div className="ve-clip ve-broll" style={{ left: pct(BROLL.from), width: pct(BROLL.to - BROLL.from) }}>
                 {BROLL.frames.map((f) => (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img key={f} src={frame(f)} alt="" loading="lazy" decoding="async" />
+                  <img key={f} src={frame(f)} alt="Frame from a founder reel edit" loading="lazy" decoding="async" />
                 ))}
               </div>
             </div>
@@ -125,7 +125,7 @@ export default function VideoEditingVisual({ accent }: { accent: string }) {
                 <div key={c.from} className="ve-clip" style={{ left: pct(c.from), width: `calc(${pct(c.to - c.from)} - 2px)` }}>
                   {c.frames.map((f) => (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img key={f} src={frame(f)} alt="" loading="lazy" decoding="async" />
+                    <img key={f} src={frame(f)} alt="Frame from a founder reel edit" loading="lazy" decoding="async" />
                   ))}
                 </div>
               ))}

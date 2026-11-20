@@ -520,7 +520,7 @@ export default function Nav({
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/logo-128.png"
-            alt=""
+            alt="EchoPulse Media logo"
             aria-hidden="true"
             width={126}
             height={28}

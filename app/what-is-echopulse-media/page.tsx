@@ -358,7 +358,7 @@ const CASES: { slug: string; figure: string; text: string; label: string }[] = [
   {
     slug: 'whites-and-brights-operating-system',
     figure: '$3,400+',
-    text: 'Whites & Brights, a laundry chain in Patna: one operating system for every outlet. More than US$3,400 (\u20B93 lakh+) saved in running costs and losses since launch, by EchoPulse\'s estimate with the client. Disclosure: Shaurya, EchoPulse\'s design partner, was later made a director of WNB Cleantech, the company behind Whites & Brights.',
+    text: 'Whites & Brights, a laundry chain in Patna: one operating system for every outlet. More than US$3,400 saved in running costs and losses since launch, by EchoPulse\'s estimate with the client. Disclosure: Shaurya, EchoPulse\'s design partner, was later made a director of WNB Cleantech, the company behind Whites & Brights.',
     label: 'Read the Whites & Brights system case study',
   },
   {

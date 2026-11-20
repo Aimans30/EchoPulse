@@ -333,7 +333,7 @@ export default function HeroWipe({
           sizes="360px"
           width={360}
           height={640}
-          alt=""
+          alt="Founder talking to camera in a vertical reel edited by EchoPulse Media"
           fetchPriority="high"
           loading="eager"
         />
@@ -362,7 +362,7 @@ export default function HeroWipe({
         <div className="hs-rawI" data-raw-i>
           {playing && <canvas className="hs-canvas" />}
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img className="hs-ph" src={STILL_SRC} srcSet={STILL_SRCSET} sizes="360px" width={360} height={640} alt="" />
+          <img className="hs-ph" src={STILL_SRC} srcSet={STILL_SRCSET} sizes="360px" width={360} height={640} alt="Still from a founder reel edited by EchoPulse Media" />
           <div className="hs-guides">
             <i />
             <i />

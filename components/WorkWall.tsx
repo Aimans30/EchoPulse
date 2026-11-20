@@ -563,7 +563,7 @@ export default function WorkWall({ clips }: { clips: WallClip[] }) {
               >
                 <span className="ww-in">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={t.poster} srcSet={`${t.posterSm} 320w, ${t.poster} 520w`} sizes="(max-width: 640px) 160px, 390px" alt="" decoding="async" draggable={false} />
+                  <img src={t.poster} srcSet={`${t.posterSm} 320w, ${t.poster} 520w`} sizes="(max-width: 640px) 160px, 390px" alt={`${t.clip.label} for ${t.clip.brand}, edited by EchoPulse Media`} decoding="async" draggable={false} />
                   {t.clip.youtube && <span className="ww-yt" aria-hidden="true">YouTube</span>}
                   {t.preview && <video
                     ref={(el) => { videoEls.current[i] = el; }}
@@ -593,7 +593,7 @@ export default function WorkWall({ clips }: { clips: WallClip[] }) {
       <div className="ww-top">
         <Link href="/" className="ww-home" aria-label="EchoPulse Media home">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo-128.png" alt="" width={28} height={28} />
+          <img src="/logo-128.png" alt="EchoPulse Media logo" width={28} height={28} />
           <span>EchoPulse</span>
         </Link>
         <div className="ww-chips" role="tablist" aria-label="Filter work by audience">

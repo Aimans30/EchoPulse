@@ -191,7 +191,7 @@ export default function BookCallModal() {
             <img
               className="bcm-mark"
               src="/logo-128.png"
-              alt=""
+              alt="EchoPulse Media logo"
               width={40}
               height={40}
               style={{ width: '40px', height: '40px', borderRadius: '10px', flexShrink: 0, display: 'block' }}

@@ -465,7 +465,7 @@ export default function ProductStory({ study }: { study: CaseStudy }) {
 
           <Rise className="wb-nobill">
             <p className="wb-nobill-figure" aria-hidden="true">
-              ₹0
+              $0
               <small>a month</small>
             </p>
             <div>
