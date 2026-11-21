@@ -20,7 +20,7 @@ const SITE_URL = 'https://echopulse.media';
 const canonical = `${SITE_URL}/book`;
 const TITLE = BOOK_CALL_LABEL;
 const DESCRIPTION =
-  'Pick a time for a free 15-minute call with Lakshya Soni, the founder of EchoPulse Media. No pitch.';
+  'Book a free 15-minute call with Lakshya Soni, founder of EchoPulse Media. Tell him how your business runs and get the first three things he would fix. No pitch.';
 
 export const metadata: Metadata = {
   title: TITLE,

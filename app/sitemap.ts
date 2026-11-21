@@ -284,7 +284,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
           lastModified: modified ? new Date(modified) : now,
           changeFrequency: 'monthly' as const,
           priority: 0.75,
-          ...(image ? { images: [image] } : {}),
+          // Next writes image URLs into the XML without escaping, so a raw
+          // "&" in the Sanity query string made the whole sitemap unreadable
+          // to Google ("not well-formed", 21 Nov 2026). Escape it here.
+          ...(image ? { images: [image.replace(/&/g, '&amp;')] } : {}),
         };
       });
   } catch {
