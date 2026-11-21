@@ -6,6 +6,7 @@ import Footer from '@/components/Footer';
 import OffcutUpdatesCapture from '@/components/OffcutUpdatesCapture';
 import { OFFCUT, OFFCUT_READY, OFFCUT_AGENT_PROMPT } from '@/lib/offcut';
 import CopyText from '@/components/CopyText';
+import AgentCopyPill from '@/components/AgentCopyPill';
 import { ogImages } from '@/lib/ogImages';
 
 /**
@@ -156,6 +157,11 @@ export default function OffcutPage() {
             <p className="oc-lead">
               A free Windows tool for video editors, content creators and scriptwriters. Save the transcript of a video you want to learn from, and see it split into hook, body and call to action. It runs on your PC, with no account and no uploads.
             </p>
+            <AgentCopyPill
+              label="Install Offcut with your AI agent"
+              instruction="Install Offcut on this Windows PC by following the instructions at https://echopulse.media/resources/offcut/agent.md"
+              fileLabel="echopulse.media/resources/offcut/agent.md"
+            />
             <div className="oc-cta">
               {OFFCUT_READY ? (
                 <>
@@ -215,7 +221,7 @@ export default function OffcutPage() {
           <section className="oc-sec" aria-labelledby="oc-agent">
             <h2 id="oc-agent">Install it with Claude or another AI agent</h2>
             <p>
-              If you use an AI assistant that can run commands on your PC (Claude, ChatGPT, Cursor and similar), copy this prompt and paste it in. It downloads Offcut only from this page, checks the file against our SHA-256 before running it, and never touches your security settings.
+              The one-line instruction at the top of this page is all most agents need. If your assistant cannot open web pages, paste this full prompt instead. It downloads Offcut only from this page, checks the file against our SHA-256 before running it, and never touches your security settings.
             </p>
             <CopyText value={OFFCUT_AGENT_PROMPT} label="Copy prompt" block />
           </section>
@@ -290,7 +296,7 @@ export default function OffcutPage() {
         .oc-crumbs a { color: #0C0C0B; text-decoration: underline; text-decoration-color: #E8541A; text-underline-offset: 3px; }
         .oc-h1 { margin: 0 0 20px; font-size: clamp(36px, 5.2vw, 58px); font-weight: 900; letter-spacing: -0.035em; line-height: 1.04; text-wrap: balance; }
         .oc-lead { margin: 0 0 32px; font-size: 19px; line-height: 1.6; color: #3E3D3A; max-width: 680px; }
-        .oc-cta { margin-bottom: 64px; }
+        .oc-cta { margin: 28px 0 64px; }
         .oc-btn { display: inline-flex; align-items: center; min-height: 52px; padding: 0 28px; border-radius: 100px; background: #0C0C0B; color: #F2EEE7; font-weight: 800; font-size: 16px; text-decoration: none; }
         .oc-btn:hover { background: #E8541A; }
         .oc-btn:focus-visible, .oc-page a:focus-visible { outline: 3px solid #E8541A; outline-offset: 3px; }
