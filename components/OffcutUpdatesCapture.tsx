@@ -90,21 +90,26 @@ export default function OffcutUpdatesCapture({ ready }: { ready: boolean }) {
         </p>
       )}
       <style>{`
-        .slc { box-sizing: border-box; max-width: 100%; padding: 32px; border-radius: 20px; background: #0C0C0B; color: #F2EEE7; font-family: Inter, sans-serif; }
-        .slc h2 { margin: 0 0 10px; font-size: clamp(22px, 3vw, 28px); font-weight: 800; letter-spacing: -0.02em; line-height: 1.15; color: #F2EEE7; }
-        .slc-copy { margin: 0 0 20px; font-size: 16px; line-height: 1.6; color: rgba(242,238,231,0.72); max-width: 560px; }
-        .slc-form { display: flex; gap: 10px; flex-wrap: wrap; }
+        /* Sits on the ink closing band of /resources/offcut. Doubled class
+           beats the global phone padding on every <section>. */
+        .slc.slc { box-sizing: border-box; max-width: 100%; margin: 0; padding: 32px !important; border: 1px solid rgba(242,238,231,0.12); border-radius: 16px; background: rgba(255,255,255,0.03); color: #F2EEE7; font-family: var(--font-inter), Inter, sans-serif; }
+        .slc.slc h2 { margin: 0 0 8px; font-size: 24px !important; font-weight: 700; letter-spacing: -0.02em !important; line-height: 1.2 !important; color: #F2EEE7; }
+        .slc .slc-copy { margin: 0 0 24px; font-size: 16px !important; line-height: 1.6 !important; color: rgba(242,238,231,0.68); max-width: 520px; }
+        .slc-form { display: flex; gap: 8px; flex-wrap: wrap; }
         .slc-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-        .slc-form input { flex: 1 1 240px; min-width: 0; min-height: 48px; box-sizing: border-box; padding: 11px 18px; font: 400 16px Inter, sans-serif; color: #F2EEE7; background: rgba(255,255,255,0.06); border: 1px solid rgba(242,238,231,0.22); border-radius: 100px; }
-        .slc-form input::placeholder { color: rgba(242,238,231,0.4); }
+        .slc-form input { flex: 1 1 240px; min-width: 0; min-height: 52px; box-sizing: border-box; padding: 12px 20px; font: 400 16px var(--font-inter), Inter, sans-serif; color: #F2EEE7; background: rgba(255,255,255,0.05); border: 1px solid rgba(242,238,231,0.2); border-radius: 999px; transition: border-color .2s ease, background-color .2s ease; }
+        .slc-form input:hover { border-color: rgba(242,238,231,0.34); }
+        .slc-form input:focus { background: rgba(255,255,255,0.08); }
+        .slc-form input::placeholder { color: rgba(242,238,231,0.42); }
         .slc-form input[aria-invalid="true"] { border-color: #FF8A5C; }
-        .slc-form button { min-height: 48px; padding: 12px 26px; border: none; border-radius: 100px; background: #E8541A; color: #fff; font: 800 15px Inter, sans-serif; cursor: pointer; }
+        .slc-form button { min-height: 52px; padding: 0 28px; border: none; border-radius: 999px; background: #E8541A; color: #fff; font: 700 16px var(--font-inter), Inter, sans-serif; cursor: pointer; transition: background-color .2s ease; }
+        .slc-form button:hover { background: #D14812; }
         .slc-form button:disabled { opacity: 0.65; cursor: progress; }
         .slc-form input:focus-visible, .slc-form button:focus-visible, .slc a:focus-visible { outline: 3px solid #E8541A; outline-offset: 2px; }
-        .slc-ok { margin: 0; font-size: 17px; font-weight: 700; }
-        .slc-err { margin: 10px 0 0; font-size: 14px; line-height: 1.5; color: #FF8A5C; }
+        .slc .slc-ok { margin: 0; font-size: 17px; font-weight: 700; }
+        .slc .slc-err { margin: 12px 0 0; font-size: 14px; line-height: 1.5; color: #FF8A5C; }
         .slc-err a { color: #F2EEE7; font-weight: 700; overflow-wrap: anywhere; }
-        @media (max-width: 480px) { .slc { padding: 24px 18px; } .slc-form button { width: 100%; } }
+        @media (max-width: 480px) { .slc.slc { padding: 24px 20px !important; } .slc-form button { width: 100%; } }
       `}</style>
     </section>
   );
