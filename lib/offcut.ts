@@ -37,7 +37,26 @@ export const OFFCUT = {
    * /resources/offcut, keyed by use case. Files go in public/resources/offcut/.
    * Absent keys show a plain skeleton sketch instead (no invented UI).
    */
-  useCaseShots: {} as Partial<Record<'youtube' | 'instagram' | 'breakdown' | 'library', { src: string; alt: string; width: number; height: number }>>,
+  useCaseShots: {
+    youtube: {
+      src: '/resources/offcut/offcut-reader-youtube-sample.webp',
+      alt: 'The Offcut app showing a saved YouTube transcript with the hook pulled out, views, length and a Copy button. Sample data: the creator, title and numbers are made up.',
+      width: 2000,
+      height: 1250,
+    },
+    breakdown: {
+      src: '/resources/offcut/offcut-reader-instagram-sample.webp',
+      alt: 'The Offcut app showing a saved Instagram reel script, with the hook from the first 15 seconds highlighted above the full transcript. Sample data: the creator, title and numbers are made up.',
+      width: 2000,
+      height: 1250,
+    },
+    library: {
+      src: '/resources/offcut/offcut-library.webp',
+      alt: 'The Offcut library listing six saved scripts from Instagram, YouTube, TikTok, LinkedIn and Facebook with views, dates, length and word counts, plus Export CSV. Sample data: the creators, titles and numbers are made up.',
+      width: 2000,
+      height: 775,
+    },
+  } as Partial<Record<'youtube' | 'instagram' | 'breakdown' | 'library', { src: string; alt: string; width: number; height: number }>>,
 };
 
 /**

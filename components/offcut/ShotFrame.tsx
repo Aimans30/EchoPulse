@@ -129,7 +129,7 @@ export default function ShotFrame({ kind, shot }: { kind: FrameKind; shot?: Shot
       <div className="sf-chrome" aria-hidden="true">
         <span className="sf-dots"><i /><i /><i /></span>
         {browser ? <span className="sf-addr" /> : <span className="sf-apptitle" />}
-        <span className="sf-tag">{shot ? 'Real screenshot' : 'Sketch'}</span>
+        <span className="sf-tag">{shot ? 'Real app, sample data' : 'Sketch'}</span>
       </div>
       {browser ? <BrowserBody kind={kind} shot={shot} /> : <AppBody kind={kind} shot={shot} />}
       <style href="offcut-shotframe" precedence="default">{SHOTFRAME_CSS}</style>
@@ -205,8 +205,8 @@ const SHOTFRAME_CSS = `
 .sf-panel-head .sf-line { height: 7px; background: rgba(12,12,11,0.16); }
 .sf-panel-shot { max-height: 88%; }
 .sf-panel-shot img, .sf-fill img { display: block; width: 100%; height: auto; }
-.sf-fill { position: absolute; inset: 0; z-index: 2; background: #FFFFFF; }
-.sf-fill img { height: 100%; object-fit: cover; object-position: top left; }
+.sf-fill { position: absolute; inset: 0; z-index: 2; background: #141312; }
+.sf-fill img { height: 100%; object-fit: contain; object-position: center; }
 
 /* shimmer: one compositor-only band per frame, only while on screen */
 .sf-shimmer { position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(100deg, transparent 35%, rgba(255,255,255,0.7) 50%, transparent 65%); transform: translate3d(-100%, 0, 0); }

@@ -93,7 +93,7 @@ const PARTS = [
  */
 const USE_CASES: { key: keyof typeof OFFCUT.useCaseShots; frame: FrameKind; tag: string; title: string; text: string }[] = [
   { key: 'instagram', frame: 'reel', tag: 'Instagram Reels', title: 'Save Instagram Reels for inspiration', text: 'Keep the reels you want to learn from in one place on your PC, with their scripts.' },
-  { key: 'youtube', frame: 'video', tag: 'YouTube', title: "Read any YouTube video's script", text: 'See the transcript laid out so you can read how the creator wrote it.' },
+  { key: 'youtube', frame: 'split', tag: 'YouTube', title: "Read any YouTube video's script", text: 'See the transcript laid out so you can read how the creator wrote it.' },
   { key: 'breakdown', frame: 'split', tag: 'Hook, body, call to action', title: "Learn from other creators' scripts", text: 'See each script split into hook, body and call to action.' },
   { key: 'library', frame: 'library', tag: 'Your saved scripts', title: 'Teach your AI writer', text: 'Use your saved scripts as examples when you ask Claude, ChatGPT or your own writing agent to write scripts in a style you like.' },
 ];
