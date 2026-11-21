@@ -59,12 +59,6 @@ export default function FreeEditsPage() {
         description:
           'Fill in name, email, type of business and a share link to the raw footage (Google Drive, Dropbox or WeTransfer). Editing style, captions, music, a reference video and brand details are optional.',
       },
-      {
-        '@type': 'CommunicateAction',
-        name: 'Request 2 free edits by email',
-        target: 'mailto:lakshyasoni2703@gmail.com?subject=2%20free%20edits',
-        description: 'Email a share link to the raw footage with your name and type of business.',
-      },
     ],
   };
 
@@ -122,11 +116,6 @@ export default function FreeEditsPage() {
               </ol>
             </div>
 
-            <p className="fe-alt">
-              Prefer email? Send a link to your footage to{' '}
-              <a href="mailto:lakshyasoni2703@gmail.com?subject=2%20free%20edits">lakshyasoni2703@gmail.com</a> with your
-              name and what kind of business you run. Same offer, same 48 hours, {FREE_SAMPLE.per}.
-            </p>
           </div>
         </div>
       </main>
@@ -153,8 +142,6 @@ export default function FreeEditsPage() {
         .fe-step-n { width: 32px; height: 32px; border-radius: 50%; background: #0C0C0B; color: #F2EEE7; font-size: 14px; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; }
         .fe-steps h3 { margin: 4px 0 4px; font-size: 16px !important; line-height: 1.4 !important; font-weight: 800; letter-spacing: -0.01em; color: #0C0C0B; }
         .fe-steps p { margin: 0; font-size: 15px; line-height: 1.55; color: #6E6B63; }
-        .fe-alt { margin: 0; font-size: 15px; line-height: 1.6; color: #4A4740; max-width: 46ch; }
-        .fe-alt a { color: #0C0C0B; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; overflow-wrap: anywhere; }
         @media (max-width: 1024px) {
           .fe-page { column-gap: 48px; }
         }
