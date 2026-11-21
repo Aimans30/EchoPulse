@@ -84,7 +84,15 @@ const FAQ = [
   },
   {
     q: 'Do I need the browser extension?',
-    a: 'No, it is optional. The app works on its own; the extension makes saving from your browser quicker.',
+    a: 'No, it is optional. The app works on its own. The extension adds a Transcribe button on the video you are watching, so you never paste a link.',
+  },
+  {
+    q: 'How do I add the extension?',
+    a: 'Open your browser\'s extensions page, turn on Developer mode, click Load unpacked and choose the Offcut extension folder. It takes about a minute, once. The full guide is at echopulse.media/resources/offcut/extension.',
+  },
+  {
+    q: 'What is the "Disable developer mode extensions" message?',
+    a: 'Chrome shows it at startup for any extension added with Developer mode, not just Offcut. Close it or click the X. Do not click Disable, or the extension turns off.',
   },
   {
     q: 'Who made Offcut?',
@@ -180,7 +188,7 @@ export default function OffcutPage() {
           <section className="oc-sec" aria-labelledby="oc-how">
             <h2 id="oc-how">How it works</h2>
             <p>
-              Offcut has three parts. The app is where you read and organise saved scripts. A small helper starts only when you need it, for example to turn speech into text, and stops afterwards. An optional browser extension lets you send a video to Offcut while you watch. Updates are signed.
+              Offcut has three parts. The app is where you read and organise saved scripts. A small helper starts only when you need it, for example to turn speech into text, and stops afterwards. An optional browser extension (Chrome, Edge or Brave) adds a Transcribe button on the video you are watching. Updates are signed.
             </p>
           </section>
 
@@ -194,7 +202,7 @@ export default function OffcutPage() {
                 <strong>If Windows shows &quot;Windows protected your PC&quot;, click &quot;More info&quot;, then &quot;Run anyway&quot;.</strong> It appears because the installer is not code-signed yet. You can check the file yourself first (see below).
               </li>
               <li>
-                <strong>Optional: add the browser extension.</strong> It takes four clicks.
+                <strong>Optional: add the browser extension.</strong> It takes about a minute, once. <Link href="/resources/offcut/extension">Follow the extension guide</Link>.
               </li>
             </ol>
           </section>
@@ -287,6 +295,7 @@ export default function OffcutPage() {
         .oc-list { list-style: disc outside !important; margin: 0; padding: 0 0 0 20px !important; display: grid; gap: 10px; font-size: 17px; line-height: 1.6; color: #3E3D3A; }
         .oc-steps { list-style: decimal outside !important; margin: 0; padding: 0 0 0 22px !important; display: grid; gap: 16px; font-size: 17px; line-height: 1.6; color: #3E3D3A; }
         .oc-steps strong { color: #0C0C0B; }
+        .oc-steps a { color: #0C0C0B; font-weight: 700; text-decoration: underline; text-decoration-color: #E8541A; text-underline-offset: 3px; }
         .oc-table, .oc-faq { margin: 0; }
         .oc-table > div { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 16px; padding: 14px 0; border-bottom: 1px solid rgba(12,12,11,0.1); }
         .oc-table dt { font-weight: 700; font-size: 16px; }
