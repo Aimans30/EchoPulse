@@ -92,8 +92,8 @@ export default function BookPageEmbed() {
       )}
       <style>{`
         .bk-embed { position: relative; }
-        .bk-frame { display: block; width: 100%; height: 760px; border: 0; background: #F2EEE7; color-scheme: light; border-radius: 20px; transition: opacity 0.3s ease; }
-        .bk-loading { position: absolute; top: 0; left: 0; right: 0; height: 760px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 24px; text-align: center; font-size: 14px; color: #4A4740; }
+        .bk-frame { display: block; width: 100%; height: 680px; border: 0; background: #F2EEE7; color-scheme: light; border-radius: 20px; transition: opacity 0.3s ease; }
+        .bk-loading { position: absolute; top: 0; left: 0; right: 0; height: 680px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 24px; text-align: center; font-size: 14px; color: #4A4740; }
         .bk-spin { width: 36px; height: 36px; border-radius: 50%; border: 3px solid rgba(12,12,11,0.1); border-top-color: #E8541A; animation: bk-spin 0.8s linear infinite; }
         .bk-link { font-size: 14px; font-weight: 700; color: #0C0C0B; text-decoration: underline; text-decoration-color: #E8541A; text-underline-offset: 4px; min-height: 44px; display: inline-flex; align-items: center; }
         .bk-fallback { margin: 12px 0 0; text-align: center; font-size: 13px; color: #6E6B63; }

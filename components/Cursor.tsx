@@ -101,7 +101,12 @@ export default function Cursor() {
       const x = clientX ?? mx, y = clientY ?? my;
       const el = (x >= 0 && y >= 0) ? document.elementFromPoint(x, y) : null;
       const overText = !!(el && (el as Element).closest?.(TEXT_INPUT));
-      if (!overText) {
+      // Over an embedded frame (the Cal.com calendar on /book and in the
+      // booking modal): the parent page stops receiving mouse events, so the
+      // custom cursor would freeze at the frame's edge. Keep it hidden there;
+      // the frame shows its own native cursor.
+      const overFrame = !!(el && (el as Element).tagName === 'IFRAME');
+      if (!overText && !overFrame) {
         dot.style.opacity = '';
         ring.style.opacity = '';
       }
@@ -126,6 +131,13 @@ export default function Cursor() {
 
     const over = (e: MouseEvent) => {
       const target = e.target as Element;
+      // Entering an iframe → hide, for the reason given in reveal().
+      if (target?.tagName === 'IFRAME') {
+        dot.style.opacity = '0';
+        ring.style.opacity = '0';
+        snap = true;
+        return;
+      }
       // Over a text input → hide the custom cursor entirely so the native
       // I-beam shows. Users see exactly where they'll type.
       if (target?.closest?.(TEXT_INPUT)) {
