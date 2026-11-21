@@ -38,6 +38,12 @@ export const OFFCUT = {
    * Absent keys show a plain skeleton sketch instead (no invented UI).
    */
   useCaseShots: {
+    instagram: {
+      src: '/resources/offcut/offcut-instagram-panel-sample.webp',
+      alt: 'The Offcut panel open beside a reel in the browser, with the transcript ready to copy, save or open in the app. The page around it is a plain sketch. Sample data: the creator and numbers are made up.',
+      width: 1576,
+      height: 984,
+    },
     youtube: {
       src: '/resources/offcut/offcut-reader-youtube-sample.webp',
       alt: 'The Offcut app showing a saved YouTube transcript with the hook pulled out, views, length and a Copy button. Sample data: the creator, title and numbers are made up.',
