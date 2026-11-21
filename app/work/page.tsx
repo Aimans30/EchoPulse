@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { ogImages } from '@/lib/ogImages';
 import WorkWall from '@/components/WorkWall';
 import { wallClips, youtubeWallClips } from '@/lib/videos';
 
@@ -17,7 +18,13 @@ export const metadata: Metadata = {
     url: canonical,
     siteName: 'EchoPulse Media',
     type: 'website',
-    images: ['/og-echopulse-media.png'],
+    images: ogImages('work'),
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Work | EchoPulse Media',
+    description: DESCRIPTION,
+    images: ogImages('work'),
   },
 };
 

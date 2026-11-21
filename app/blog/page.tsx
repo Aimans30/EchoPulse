@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { ogImages } from '@/lib/ogImages';
 import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
 import BlogIndexClient, { type IndexPost } from '@/components/BlogIndexClient';
@@ -19,7 +20,14 @@ export const metadata: Metadata = {
     description:
       'Real agency pricing, honest comparisons, and the systems behind founder-led content. Every number sourced.',
     url: 'https://echopulse.media/blog',
+    siteName: 'EchoPulse Media',
     type: 'website',
+    images: ogImages('blog'),
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Content Agency Pricing, Guides & Comparisons | EchoPulse',
+    images: ogImages('blog'),
   },
 };
 

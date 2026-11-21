@@ -13,6 +13,7 @@ import { GeoProvider } from "@/components/GeoProvider";
 import { pricingOffers } from "@/lib/pricing";
 import { BOOK_CALL_URL } from "@/lib/links";
 import { AREA_SERVED, BUSINESS_ADDRESS } from "@/lib/schema";
+import { ogImages } from "@/lib/ogImages";
 
 const GA_ID = 'G-3PPKSJLR7F';
 /** Microsoft Clarity project. Both tags are gated by ConsentGate. */
@@ -77,30 +78,23 @@ export const metadata: Metadata = {
     // searches, but the OG and Twitter titles were left behind. They drive
     // every social share, Slack unfurl and link preview, and several AI
     // browsing tools prefer og:title over <title> when summarising a page.
-    title: "EchoPulse Media | Done-For-You Content and Website Studio",
+    title: "EchoPulse Media | Growth Partner for Founders and Businesses",
     description:
-      "Done-for-you content and website studio for founders, coaches, real estate agents and business owners. Video, LinkedIn, blogs, ads and websites by one owner-operated team. 2 free edits, then a $299 Pilot.",
+      "A growth partner for founders and businesses: content and personal brand, websites and funnels, custom software and CRMs, AI and automation, and SEO and AI search visibility. Start with 2 free edits or a $299 Pilot.",
     url: "https://echopulse.media",
     siteName: "EchoPulse Media",
     type: "website",
     locale: "en_US",
-    images: [
-      {
-        url: "/og-echopulse-media.png",
-        width: 1200,
-        height: 630,
-        alt: "EchoPulse Media: you run the business, we run the content. Done-for-you video, posts, blogs and websites.",
-      },
-    ],
+    images: ogImages("default"),
   },
   twitter: {
     card: "summary_large_image",
-    title: "EchoPulse Media | Done-For-You Content and Website Studio",
+    title: "EchoPulse Media | Growth Partner for Founders and Businesses",
     description:
-      "Done-for-you content and website studio. Video, LinkedIn, blogs, ads and websites by one owner-operated team. 2 free edits, then a $299 Pilot.",
+      "A growth partner for founders and businesses: content, websites, custom software, AI and automation, and SEO. Start with 2 free edits or a $299 Pilot.",
     creator: "@Lakshya_Creates",
     site: "@Lakshya_Creates",
-    images: ["/og-echopulse-media.png"],
+    images: ogImages("default"),
   },
   robots: {
     index: true,

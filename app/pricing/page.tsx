@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { ogImages } from '@/lib/ogImages';
 import type { ReactNode } from 'react';
 import Link from 'next/link';
 import Nav from '@/components/Nav';
@@ -58,7 +59,16 @@ export const metadata: Metadata = {
     description:
       'Free sample, $299 Pilot, $399 a month Presence Engine, $1,997 a month Growth. What each includes, what it does not, and how billing works.',
     url: `${SITE_URL}/pricing`,
+    siteName: 'EchoPulse Media',
     type: 'website',
+    images: ogImages('pricing'),
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'EchoPulse Media Pricing: $299 Pilot, $399 and $1,997 a Month',
+    description:
+      'Free sample, $299 Pilot, $399 a month Presence Engine, $1,997 a month Growth. What each includes, what it does not, and how billing works.',
+    images: ogImages('pricing'),
   },
 };
 

@@ -1,4 +1,6 @@
 import { getService, services } from '@/lib/serviceData';
+import { ogImages } from '@/lib/ogImages';
+
 import { notFound } from 'next/navigation';
 import ServicePageClient from '@/components/ServicePageClient';
 import { getGuidesFor, type ServiceSlug } from '@/lib/blogLinks';
@@ -40,12 +42,15 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       title: pageTitle,
       description: service.metaDescription,
       url: canonical,
+      siteName: 'EchoPulse Media',
       type: 'article',
+      images: ogImages(`service-${slug}`),
     },
     twitter: {
       card: 'summary_large_image',
       title: pageTitle,
       description: service.metaDescription,
+      images: ogImages(`service-${slug}`),
     },
   };
 }

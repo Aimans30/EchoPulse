@@ -43,7 +43,7 @@ const KEYBOARD_HEIGHT_THRESHOLD = 0.75;
  * top of the /free-edits "Continue" button while the form was being filled in,
  * and its second line would link to the page the visitor is on.
  */
-const SUPPRESSED_PREFIXES = ['/blog', '/free-edits', '/order', '/onboard', '/booked'];
+const SUPPRESSED_PREFIXES = ['/blog', '/free-edits', '/order', '/onboard', '/booked', '/book'];
 
 export default function MobileStickyCTA() {
   const pathname = usePathname();

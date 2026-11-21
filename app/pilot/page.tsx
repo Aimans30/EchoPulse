@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { ogImages } from '@/lib/ogImages';
 import Link from 'next/link';
 import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
@@ -26,6 +27,7 @@ export const metadata: Metadata = {
     description: PILOT.tagline,
     url: `${SITE_URL}/pilot`,
     type: 'website',
+    images: ogImages(),
   },
 };
 

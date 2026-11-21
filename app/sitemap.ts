@@ -132,6 +132,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   };
 
+  // /book is the booking calendar inline. It exists so there is a link with
+  // our own preview image to share; a direct cal.com link unfurls as Cal.com's.
+  const book: MetadataRoute.Sitemap[number] = {
+    url: `${SITE_URL}/book`,
+    lastModified: STATIC_PAGES_UPDATED,
+    changeFrequency: 'monthly',
+    priority: 0.7,
+  };
+
   const freeEdits: MetadataRoute.Sitemap[number] = {
     url: `${SITE_URL}/free-edits`,
     lastModified: STATIC_PAGES_UPDATED,
@@ -304,6 +313,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     faq,
     pilot,
     freeEdits,
+    book,
     founderPage,
     ...resourcePages,
     terms,

@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
+import { ogImages } from '@/lib/ogImages';
 import {
   caseStudies,
   getCaseStudy,
@@ -24,7 +25,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   if (!study) return {};
   const canonical = `${SITE_URL}/case-studies/${study.slug}`;
   const fullTitle = `${study.metaTitle} | EchoPulse Media`;
-  const share = heroImageFor(study)?.src ?? '/og-echopulse-media.png';
+  // Its own 1200 x 627 card (public/og/case-<slug>.png), not the raw screenshot.
+  const share = ogImages(`case-${study.slug}`);
   return {
     title: study.metaTitle,
     description: study.metaDescription,
@@ -37,13 +39,13 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       type: 'article',
       publishedTime: study.publishedISO,
       modifiedTime: study.updatedISO ?? study.publishedISO,
-      images: [share],
+      images: share,
     },
     twitter: {
       card: 'summary_large_image',
       title: fullTitle,
       description: study.metaDescription,
-      images: [share],
+      images: share,
     },
   };
 }

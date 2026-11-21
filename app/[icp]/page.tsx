@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
+import { ogImages } from '@/lib/ogImages';
 import { getIcp, icps } from '@/lib/icpData';
 import { videosForIcp } from '@/lib/videos';
 import ICPPage from '@/components/icp/ICPPage';
@@ -37,13 +38,13 @@ export async function generateMetadata({ params }: { params: Promise<{ icp: stri
       url: canonical,
       siteName: 'EchoPulse Media',
       type: 'website',
-      images: ['/og-echopulse-media.png'],
+      images: ogImages(),
     },
     twitter: {
       card: 'summary_large_image',
       title: fullTitle,
       description: data.metaDescription,
-      images: ['/og-echopulse-media.png'],
+      images: ogImages(),
     },
   };
 }

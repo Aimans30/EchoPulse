@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { ogImages } from '@/lib/ogImages';
 import Link from 'next/link';
 import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
@@ -18,7 +19,7 @@ export const metadata: Metadata = {
     url: canonical,
     siteName: 'EchoPulse Media',
     type: 'website',
-    images: ['/og-echopulse-media.png'],
+    images: ogImages(),
   },
 };
 

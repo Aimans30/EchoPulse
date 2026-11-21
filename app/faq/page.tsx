@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { ogImages } from '@/lib/ogImages';
 import Link from 'next/link';
 import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
@@ -37,6 +38,7 @@ export const metadata: Metadata = {
       'Pricing, the free sample and Pilot, how the work happens, who runs EchoPulse Media and what results it has published.',
     url: `${SITE_URL}/faq`,
     type: 'website',
+    images: ogImages(),
   },
 };
 

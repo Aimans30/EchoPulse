@@ -45,6 +45,12 @@ export default function BookCallModal() {
 
   useEffect(() => {
     (window as unknown as { openBookCallModal?: () => void; closeBookCallModal?: () => void }).openBookCallModal = () => {
+      // /book already shows the calendar inline: bring it into view instead of
+      // opening a second one on top of it.
+      if (window.location.pathname === '/book') {
+        document.getElementById('book-calendar')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        return;
+      }
       const click = lastBookingClick();
       // Only trust a click from the last few seconds: an opener that forgot to
       // track must not inherit the name of an older button.

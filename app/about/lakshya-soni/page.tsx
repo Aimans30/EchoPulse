@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { ogImages } from '@/lib/ogImages';
 import Link from 'next/link';
 import Image from 'next/image';
 import Nav from '@/components/Nav';
@@ -27,7 +28,14 @@ export const metadata: Metadata = {
     description:
       'Founder and operator of EchoPulse Media: strategy, editing, writing and code. Based in Bhopal, India.',
     url: `${SITE_URL}/about/lakshya-soni`,
+    siteName: 'EchoPulse Media',
     type: 'profile',
+    images: ogImages('about-lakshya-soni'),
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Lakshya Soni, Founder of EchoPulse Media',
+    images: ogImages('about-lakshya-soni'),
   },
 };
 

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { ogImages } from '@/lib/ogImages';
 import Link from 'next/link';
 import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
@@ -60,12 +61,13 @@ export const metadata: Metadata = {
     url: PAGE_URL,
     type: 'website',
     siteName: 'EchoPulse Media',
-    images: [{ url: '/og-echopulse-media.png', width: 1200, height: 630, alt: 'EchoPulse Media' }],
+    images: ogImages('what-is-echopulse-media'),
   },
   twitter: {
     card: 'summary_large_image',
     title: META_TITLE,
     description: META_DESCRIPTION,
+    images: ogImages('what-is-echopulse-media'),
   },
 };
 
@@ -482,7 +484,7 @@ export default function WhatIsEchoPulseMediaPage() {
         isPartOf: { '@id': `${SITE_URL}/#website` },
         inLanguage: 'en',
         breadcrumb: { '@id': `${PAGE_URL}#breadcrumb` },
-        primaryImageOfPage: { '@type': 'ImageObject', url: `${SITE_URL}/og-echopulse-media.png` },
+        primaryImageOfPage: { '@type': 'ImageObject', url: `${SITE_URL}/og/what-is-echopulse-media.png` },
       },
       {
         '@type': 'FAQPage',

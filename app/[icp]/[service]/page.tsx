@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
+import { ogImages } from '@/lib/ogImages';
 import NichePage from '@/components/niche/NichePage';
 import { getIcp } from '@/lib/icpData';
 import { NICHE_PAGES, NICHE_PLAN_ROWS, getNichePage } from '@/lib/nicheServiceData';
@@ -46,13 +47,13 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
       url: canonical,
       siteName: 'EchoPulse Media',
       type: 'website',
-      images: ['/og-echopulse-media.png'],
+      images: ogImages(),
     },
     twitter: {
       card: 'summary_large_image',
       title,
       description: page.metaDescription,
-      images: ['/og-echopulse-media.png'],
+      images: ogImages(),
     },
   };
 }

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { ogImages } from '@/lib/ogImages';
 import Link from 'next/link';
 import Image from 'next/image';
 import Nav from '@/components/Nav';
@@ -54,7 +55,14 @@ export const metadata: Metadata = {
     description:
       'A done-for-you content studio for founders, coaches, and business owners. Video editing, LinkedIn, blogs, and ads under one team.',
     url: `${SITE_URL}/about`,
+    siteName: 'EchoPulse Media',
     type: 'profile',
+    images: ogImages('about'),
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'About EchoPulse Media: Lakshya Soni, Founder',
+    images: ogImages('about'),
   },
 };
 

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { ogImages } from '@/lib/ogImages';
 import Link from 'next/link';
 import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
@@ -39,6 +40,7 @@ export const metadata: Metadata = {
       'What we collect, which tools process it, how long it is kept, and your rights.',
     url: `${SITE_URL}/privacy`,
     type: 'website',
+    images: ogImages(),
   },
 };
 

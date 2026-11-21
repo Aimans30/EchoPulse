@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { ogImages } from '@/lib/ogImages';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import Nav from '@/components/Nav';
@@ -46,6 +47,7 @@ export const metadata: Metadata = {
     url: `${SITE_URL}/terms`,
     siteName: 'EchoPulse Media',
     type: 'website',
+    images: ogImages(),
   },
 };
 
