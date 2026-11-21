@@ -32,6 +32,12 @@ export const OFFCUT = {
   extensionShots: {} as Partial<Record<'1' | '2' | '3' | '4' | '5' | '6' | 'prompt', { src: string; alt: string; width: number; height: number }>>,
   /** Optional ~20 second screen recording of the six steps (mp4 in public/ or an outside host). */
   extensionVideo: '',
+  /**
+   * Real screenshots for the "What people use it for" frames on
+   * /resources/offcut, keyed by use case. Files go in public/resources/offcut/.
+   * Absent keys show a plain skeleton sketch instead (no invented UI).
+   */
+  useCaseShots: {} as Partial<Record<'youtube' | 'instagram' | 'breakdown' | 'library', { src: string; alt: string; width: number; height: number }>>,
 };
 
 /**

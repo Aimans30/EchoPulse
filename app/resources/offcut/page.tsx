@@ -26,6 +26,8 @@ import OffcutUpdatesCapture from '@/components/OffcutUpdatesCapture';
 import { OFFCUT, OFFCUT_READY, OFFCUT_AGENT_PROMPT } from '@/lib/offcut';
 import CopyText from '@/components/CopyText';
 import AgentCopyPill from '@/components/AgentCopyPill';
+import Reveal from '@/components/offcut/Reveal';
+import ShotFrame, { type FrameKind } from '@/components/offcut/ShotFrame';
 import { ogImages } from '@/lib/ogImages';
 
 /**
@@ -83,6 +85,17 @@ const PARTS = [
   { icon: Puzzle, name: 'Browser extension', tag: 'Optional', text: 'An optional browser extension (Chrome, Edge or Brave) adds a Transcribe button on the video you are watching.' },
   { icon: Cpu, name: 'Helper', tag: 'Only when needed', text: 'A small helper starts only when you need it, for example to turn speech into text, and stops afterwards.' },
   { icon: AppWindow, name: 'App', tag: 'Your scripts', text: 'The app is where you read and organise saved scripts.' },
+];
+
+/**
+ * Use cases the owner has stated. Phrase "Teach your AI writer" as using saved
+ * scripts as examples: there is no built-in export or integration.
+ */
+const USE_CASES: { key: keyof typeof OFFCUT.useCaseShots; frame: FrameKind; tag: string; title: string; text: string }[] = [
+  { key: 'instagram', frame: 'reel', tag: 'Instagram Reels', title: 'Save Instagram Reels for inspiration', text: 'Keep the reels you want to learn from in one place on your PC, with their scripts.' },
+  { key: 'youtube', frame: 'video', tag: 'YouTube', title: "Read any YouTube video's script", text: 'See the transcript laid out so you can read how the creator wrote it.' },
+  { key: 'breakdown', frame: 'split', tag: 'Hook, body, call to action', title: "Learn from other creators' scripts", text: 'See each script split into hook, body and call to action.' },
+  { key: 'library', frame: 'library', tag: 'Your saved scripts', title: 'Teach your AI writer', text: 'Use your saved scripts as examples when you ask Claude, ChatGPT or your own writing agent to write scripts in a style you like.' },
 ];
 
 const NEEDS = [
@@ -200,6 +213,9 @@ export default function OffcutPage() {
       <Nav />
       <main id="main" className="oc-page">
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }} />
+        <noscript>
+          <style>{'.rv, .rv .sf-line, .rv .sf-panel { opacity: 1 !important; transform: none !important; animation: none !important; }'}</style>
+        </noscript>
 
         {/* ── Hero ─────────────────────────────────────────────────────── */}
         <header className="oc-hero" data-dark-bg="true">
@@ -298,11 +314,37 @@ export default function OffcutPage() {
           <div className="oc-wrap">
             <h2 id="oc-not" className="oc-trust-h">What it does not do</h2>
             <ul className="oc-trust-row">
-              {DOES_NOT.map(({ icon: Icon, title, text }) => (
+              {DOES_NOT.map(({ icon: Icon, title, text }, i) => (
                 <li key={title}>
-                  <span className="oc-ico" aria-hidden="true"><Icon size={20} strokeWidth={1.75} /></span>
-                  <p className="oc-trust-t">{title}</p>
-                  <p className="oc-trust-d">{text}</p>
+                  <Reveal className="oc-trust-in" delay={i * 80}>
+                    <span className="oc-ico" aria-hidden="true"><Icon size={20} strokeWidth={1.75} /></span>
+                    <p className="oc-trust-t">{title}</p>
+                    <p className="oc-trust-d">{text}</p>
+                  </Reveal>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+
+        {/* ── Use cases ───────────────────────────────────────────────── */}
+        <section className="oc-band" aria-labelledby="oc-uses">
+          <div className="oc-wrap">
+            <Reveal className="oc-head">
+              <p className="oc-kicker">Use cases</p>
+              <h2 id="oc-uses" className="oc-h2">What people use it for</h2>
+            </Reveal>
+            <ul className="oc-uses">
+              {USE_CASES.map((u, i) => (
+                <li key={u.key}>
+                  <Reveal className="oc-use" delay={(i % 2) * 100} track>
+                    <ShotFrame kind={u.frame} shot={OFFCUT.useCaseShots[u.key]} />
+                    <div className="oc-use-copy">
+                      <span className="oc-chip">{u.tag}</span>
+                      <h3>{u.title}</h3>
+                      <p>{u.text}</p>
+                    </div>
+                  </Reveal>
                 </li>
               ))}
             </ul>
@@ -331,11 +373,12 @@ export default function OffcutPage() {
         {/* ── What it does ────────────────────────────────────────────── */}
         <section className="oc-band" aria-labelledby="oc-what">
           <div className="oc-wrap oc-split">
-            <div className="oc-split-head">
+            <Reveal className="oc-split-head">
               <p className="oc-kicker">Overview</p>
               <h2 id="oc-what" className="oc-h2">What it does</h2>
               <p className="oc-sub">For video editors, content creators and scriptwriters.</p>
-            </div>
+            </Reveal>
+            <Reveal delay={100}>
             <ol className="oc-does">
               {DOES.map(({ icon: Icon, text }, i) => (
                 <li key={text}>
@@ -345,20 +388,22 @@ export default function OffcutPage() {
                 </li>
               ))}
             </ol>
+            </Reveal>
           </div>
         </section>
 
         {/* ── How it works ────────────────────────────────────────────── */}
         <section className="oc-band oc-band-line" aria-labelledby="oc-how">
           <div className="oc-wrap">
-            <div className="oc-head">
+            <Reveal className="oc-head">
               <p className="oc-kicker">Three parts</p>
               <h2 id="oc-how" className="oc-h2">How it works</h2>
               <p className="oc-sub">Offcut has three parts.</p>
-            </div>
+            </Reveal>
             <ol className="oc-parts">
               {PARTS.map(({ icon: Icon, name, tag, text }, i) => (
-                <li key={name} className="oc-part-card">
+                <li key={name}>
+                  <Reveal className="oc-part-card" delay={i * 100}>
                   <div className="oc-part-top">
                     <span className="oc-ico" aria-hidden="true"><Icon size={20} strokeWidth={1.75} /></span>
                     <span className="oc-chip">{tag}</span>
@@ -368,6 +413,7 @@ export default function OffcutPage() {
                   {i < PARTS.length - 1 && (
                     <span className="oc-link-arrow" aria-hidden="true"><ArrowRight size={16} strokeWidth={2} /></span>
                   )}
+                  </Reveal>
                 </li>
               ))}
             </ol>
@@ -384,10 +430,11 @@ export default function OffcutPage() {
         <section className="oc-band oc-band-line" aria-labelledby="oc-install">
           <div className="oc-wrap oc-install">
             <div>
-              <div className="oc-head">
+              <Reveal className="oc-head">
                 <p className="oc-kicker">Setup</p>
                 <h2 id="oc-install" className="oc-h2">Install in three steps</h2>
-              </div>
+              </Reveal>
+              <Reveal delay={80}>
               <ol className="oc-steps">
                 <li>
                   <span className="oc-step-n" aria-hidden="true">1</span>
@@ -418,8 +465,10 @@ export default function OffcutPage() {
                   </div>
                 </li>
               </ol>
+              </Reveal>
             </div>
 
+            <Reveal delay={160}>
             <div className="oc-agent" aria-labelledby="oc-agent" role="region">
               <h2 id="oc-agent">Install it with Claude or another AI agent</h2>
               <p>
@@ -427,16 +476,18 @@ export default function OffcutPage() {
               </p>
               <CopyText value={OFFCUT_AGENT_PROMPT} label="Copy prompt" title="Full prompt" block />
             </div>
+            </Reveal>
           </div>
         </section>
 
         {/* ── PC needs ────────────────────────────────────────────────── */}
         <section className="oc-band oc-band-line" aria-labelledby="oc-needs">
           <div className="oc-wrap">
-            <div className="oc-head">
+            <Reveal className="oc-head">
               <p className="oc-kicker">Specs</p>
               <h2 id="oc-needs" className="oc-h2">What your PC needs</h2>
-            </div>
+            </Reveal>
+            <Reveal delay={80}>
             <dl className="oc-spec">
               {NEEDS.map((n) => (
                 <div key={n.k} className={n.wide ? 'oc-spec-wide' : undefined}>
@@ -445,13 +496,14 @@ export default function OffcutPage() {
                 </div>
               ))}
             </dl>
+            </Reveal>
           </div>
         </section>
 
         {/* ── Verify ──────────────────────────────────────────────────── */}
         <section className="oc-band oc-band-line" aria-labelledby="oc-verify">
           <div className="oc-wrap oc-split">
-            <div className="oc-split-head">
+            <Reveal className="oc-split-head">
               <p className="oc-kicker">Checksum</p>
               <h2 id="oc-verify" className="oc-h2">Check the file yourself</h2>
               {OFFCUT_READY ? (
@@ -459,7 +511,8 @@ export default function OffcutPage() {
               ) : (
                 <p className="oc-sub">The SHA-256 checksum will be published here with the download, so you can confirm the file has not been changed.</p>
               )}
-            </div>
+            </Reveal>
+            <Reveal delay={100}>
             <div className="oc-term">
               <div className="oc-term-bar" aria-hidden="true">
                 <span className="oc-demo-dots"><i /><i /><i /></span>
@@ -480,13 +533,14 @@ export default function OffcutPage() {
                 </div>
               )}
             </div>
+            </Reveal>
           </div>
         </section>
 
         {/* ── Limits ──────────────────────────────────────────────────── */}
         <section className="oc-band oc-band-tight" aria-labelledby="oc-limits">
           <div className="oc-wrap">
-            <div className="oc-limits">
+            <Reveal className="oc-limits">
               <div className="oc-limits-head">
                 <p className="oc-kicker">Honest limits</p>
                 <h2 id="oc-limits">Honest limits</h2>
@@ -494,18 +548,18 @@ export default function OffcutPage() {
               <ul>
                 {LIMITS.map((l) => <li key={l}>{l}</li>)}
               </ul>
-            </div>
+            </Reveal>
           </div>
         </section>
 
         {/* ── FAQ ─────────────────────────────────────────────────────── */}
         <section className="oc-band oc-band-line" aria-labelledby="oc-faq">
           <div className="oc-wrap oc-split">
-            <div className="oc-split-head">
+            <Reveal className="oc-split-head">
               <p className="oc-kicker">FAQ</p>
               <h2 id="oc-faq" className="oc-h2">Questions</h2>
-            </div>
-            <div className="oc-faq">
+            </Reveal>
+            <Reveal className="oc-faq" delay={100}>
               {FAQ.map((f) => (
                 <details key={f.q}>
                   <summary>
@@ -515,7 +569,7 @@ export default function OffcutPage() {
                   <p>{f.a}</p>
                 </details>
               ))}
-            </div>
+            </Reveal>
           </div>
         </section>
 
@@ -523,7 +577,9 @@ export default function OffcutPage() {
         <div className="oc-close" data-dark-bg="true">
           <div className="oc-wrap oc-close-grid">
             <div id="oc-updates" className="oc-close-form">
-              <OffcutUpdatesCapture ready={OFFCUT_READY} />
+              <Reveal>
+                <OffcutUpdatesCapture ready={OFFCUT_READY} />
+              </Reveal>
             </div>
             <section className="oc-by" aria-labelledby="oc-by">
               <p className="oc-kicker oc-kicker-dark">The studio</p>
@@ -634,6 +690,19 @@ export default function OffcutPage() {
         .oc-part-label { display: block; margin-bottom: 6px; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--on-ink-3); }
         .oc-part-hook .oc-part-label { color: #F08A5D; }
         .oc-part p { font-size: 14px; line-height: 1.6; color: rgba(242,238,231,0.86); }
+        /* Hero example: segments arrive in order on load. CSS only, so it runs
+           without waiting for hydration; reduced motion shows the end state. */
+        .oc-demo-win { animation: oc-rise .8s cubic-bezier(0.16, 1, 0.3, 1) .1s both; }
+        .oc-demo-bar span { transform-origin: left center; animation: oc-grow .7s cubic-bezier(0.16, 1, 0.3, 1) both; }
+        .oc-demo-bar span:nth-child(1), .oc-part-hook { animation-delay: .45s; }
+        .oc-demo-bar span:nth-child(2), .oc-part-body { animation-delay: .8s; }
+        .oc-demo-bar span:nth-child(3), .oc-part-cta { animation-delay: 1.15s; }
+        .oc-part { animation: oc-seg .7s cubic-bezier(0.16, 1, 0.3, 1) both; }
+        .oc-part::before { transform-origin: center top; animation: oc-mark .6s cubic-bezier(0.16, 1, 0.3, 1) both; animation-delay: inherit; }
+        @keyframes oc-rise { from { opacity: 0; transform: translate3d(0, 24px, 0); } to { opacity: 1; transform: none; } }
+        @keyframes oc-grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+        @keyframes oc-seg { from { opacity: 0; transform: translate3d(0, 10px, 0); } to { opacity: 1; transform: none; } }
+        @keyframes oc-mark { from { transform: scaleY(0); } to { transform: scaleY(1); } }
         .oc-demo figcaption { margin-top: 16px; font-size: 13px; line-height: 1.5; color: var(--on-ink-3); text-align: center; }
 
         /* Trust band */
@@ -652,6 +721,14 @@ export default function OffcutPage() {
         .oc-shot-grid img { display: block; width: 100%; height: auto; border-radius: 16px; border: 1px solid var(--line); background: var(--white); }
         .oc-shot-grid figcaption { margin-top: 12px; font-size: 14px; color: var(--muted); }
 
+        /* Use cases */
+        .oc-uses { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+        .oc-uses > li { display: flex; }
+        .oc-use { flex: 1; display: flex; flex-direction: column; padding: 16px; border-radius: 16px; border: 1px solid var(--line); background: var(--card); transition: transform .3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow .3s ease, border-color .3s ease, opacity .7s cubic-bezier(0.16, 1, 0.3, 1); }
+        .oc-use-copy { padding: 24px 8px 8px; }
+        .oc-page .oc-use h3 { margin-top: 16px !important; font-size: 22px !important; font-weight: 700; line-height: 1.25 !important; letter-spacing: -0.02em; color: var(--ink); }
+        .oc-use p { margin-top: 8px !important; font-size: 16px; line-height: 1.6; color: var(--text); max-width: 480px; }
+
         /* What it does */
         .oc-does { display: grid; }
         .oc-does li { display: grid; grid-template-columns: 40px 44px minmax(0, 1fr); gap: 24px; align-items: center; padding: 32px 0; border-top: 1px solid var(--line); }
@@ -660,7 +737,12 @@ export default function OffcutPage() {
 
         /* How it works */
         .oc-parts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
-        .oc-part-card { position: relative; padding: 32px; border-radius: 16px; border: 1px solid var(--line); background: var(--card); }
+        .oc-parts > li { display: flex; }
+        .oc-part-card { position: relative; flex: 1; padding: 32px; border-radius: 16px; border: 1px solid var(--line); background: var(--card); transition: transform .3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow .3s ease, border-color .3s ease, opacity .7s cubic-bezier(0.16, 1, 0.3, 1); }
+        @media (hover: hover) {
+          .oc-part-card.is-in:hover, .oc-use.is-in:hover { transform: translate3d(0, -4px, 0); border-color: var(--line-2); box-shadow: 0 24px 48px -28px rgba(12,12,11,0.35); }
+          .oc-use.is-in:hover .sf { border-color: rgba(12,12,11,0.16); }
+        }
         .oc-part-top { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 32px; }
         .oc-page .oc-part-card h3 { font-size: 22px !important; font-weight: 700; line-height: 1.2 !important; letter-spacing: -0.02em; }
         .oc-part-card p { margin-top: 8px !important; font-size: 16px; line-height: 1.6; color: var(--text); }
@@ -758,6 +840,7 @@ export default function OffcutPage() {
           .oc-split-head { position: static; }
           .oc-limits { gap: 24px; }
           .oc-parts { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+          .oc-uses { grid-template-columns: minmax(0, 1fr); gap: 16px; }
           .oc-link-arrow { top: auto; right: auto; bottom: -24px; left: 32px; margin-top: 0; transform: rotate(90deg); }
           .oc-part-top { margin-bottom: 24px; }
         }
@@ -782,6 +865,9 @@ export default function OffcutPage() {
           .oc-does-n { display: none; }
           .oc-does p { font-size: 18px; padding-top: 8px; }
           .oc-part-card { padding: 24px; }
+          .oc-use { padding: 12px; }
+          .oc-use-copy { padding: 20px 8px 8px; }
+          .oc-page .oc-use h3 { font-size: 20px !important; }
           .oc-steps li { gap: 16px; }
           .oc-step-t { font-size: 17px; }
           .oc-agent { padding: 24px 20px; }
@@ -793,7 +879,8 @@ export default function OffcutPage() {
         }
         @media (max-width: 560px) {
           .oc-trust-row { grid-template-columns: minmax(0, 1fr); }
-          .oc-trust-row li, .oc-trust-row li:nth-child(odd) { display: grid; grid-template-columns: 40px minmax(0, 1fr); column-gap: 16px; padding: 20px 0; border-left: 0; border-top: 1px solid var(--line); }
+          .oc-trust-row li, .oc-trust-row li:nth-child(odd) { padding: 20px 0; border-left: 0; border-top: 1px solid var(--line); }
+          .oc-trust-in { display: grid; grid-template-columns: 40px minmax(0, 1fr); column-gap: 16px; }
           .oc-trust-row li:first-child { border-top: 0; }
           .oc-trust-row .oc-ico { grid-row: span 2; }
           .oc-trust-t { margin-top: 0 !important; font-size: 16px; }
@@ -811,6 +898,8 @@ export default function OffcutPage() {
         }
         @media (prefers-reduced-motion: reduce) {
           .oc-page *, .oc-page *::before, .oc-page *::after { transition: none !important; }
+          .oc-demo-win, .oc-demo-bar span, .oc-part, .oc-part::before { animation: none !important; }
+          .oc-part-card.is-in:hover, .oc-use.is-in:hover { transform: none !important; }
         }
       `}</style>
     </>
