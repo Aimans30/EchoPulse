@@ -42,7 +42,7 @@ export const OFFCUT = {
  */
 export const OFFCUT_AGENT_PROMPT = `Help me install Offcut, a free Windows app from EchoPulse Media, on this PC. Explain each step in plain words and ask me before anything that needs my click.
 
-1. Open https://echopulse.media/resources/offcut and read the official download link and the SHA-256 checksum on that page. Only use the download link from that page. If the page says the download is not live yet, stop and tell me.
+1. Read https://echopulse.media/resources/offcut/agent.md (plain text). It has the official download link, the SHA-256 checksum and the exact commands. Only use the download link from that file. If it says the download is not live yet, stop and tell me.
 2. Check this PC: Windows 10 or 11, 64-bit, and at least 1 GB of free disk space.
 3. Download the installer to my Downloads folder.
 4. Verify it in PowerShell: Get-FileHash "<path to the installer>" -Algorithm SHA256. Compare the result with the checksum on the page. If they do not match exactly, stop, delete the file and tell me. Do not run it.

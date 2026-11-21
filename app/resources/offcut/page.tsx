@@ -159,7 +159,7 @@ export default function OffcutPage() {
             </p>
             <AgentCopyPill
               label="Install Offcut with your AI agent"
-              instruction="Install Offcut on this Windows PC by following the instructions at https://echopulse.media/resources/offcut/agent.md"
+              instruction="Read https://echopulse.media/resources/offcut/agent.md and follow it to install Offcut on this Windows PC. Walk me through anything I need to click."
               fileLabel="echopulse.media/resources/offcut/agent.md"
             />
             <div className="oc-cta">
