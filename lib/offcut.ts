@@ -34,4 +34,22 @@ export const OFFCUT = {
   extensionVideo: '',
 };
 
+/**
+ * Prompt people paste into Claude, ChatGPT agents, Cursor or any assistant
+ * that can run commands on their PC. It always points the agent at the
+ * official page for the link and checksum, so it never goes stale, and it
+ * forbids touching security settings.
+ */
+export const OFFCUT_AGENT_PROMPT = `Help me install Offcut, a free Windows app from EchoPulse Media, on this PC. Explain each step in plain words and ask me before anything that needs my click.
+
+1. Open https://echopulse.media/resources/offcut and read the official download link and the SHA-256 checksum on that page. Only use the download link from that page. If the page says the download is not live yet, stop and tell me.
+2. Check this PC: Windows 10 or 11, 64-bit, and at least 1 GB of free disk space.
+3. Download the installer to my Downloads folder.
+4. Verify it in PowerShell: Get-FileHash "<path to the installer>" -Algorithm SHA256. Compare the result with the checksum on the page. If they do not match exactly, stop, delete the file and tell me. Do not run it.
+5. If it matches, run the installer. It does not need admin rights. If Windows shows "Windows protected your PC", tell me to click "More info" and then "Run anyway" (the installer is not code-signed yet).
+6. Optional browser extension: walk me through https://echopulse.media/resources/offcut/extension one step at a time. Copy this folder path to my clipboard with Set-Clipboard and tell me when to paste it: ${OFFCUT.extensionFolder}
+7. When done, tell me what was installed and where.
+
+Rules: never disable antivirus, Windows Defender, SmartScreen or any other security setting; never download from any other website; never run anything except this installer; never change browser settings for me unless I ask.`;
+
 export const OFFCUT_READY = Boolean(OFFCUT.downloadUrl && OFFCUT.sha256);

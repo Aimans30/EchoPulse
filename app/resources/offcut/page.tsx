@@ -4,7 +4,8 @@ import Image from 'next/image';
 import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
 import OffcutUpdatesCapture from '@/components/OffcutUpdatesCapture';
-import { OFFCUT, OFFCUT_READY } from '@/lib/offcut';
+import { OFFCUT, OFFCUT_READY, OFFCUT_AGENT_PROMPT } from '@/lib/offcut';
+import CopyText from '@/components/CopyText';
 import { ogImages } from '@/lib/ogImages';
 
 /**
@@ -93,6 +94,10 @@ const FAQ = [
   {
     q: 'What is the "Disable developer mode extensions" message?',
     a: 'Chrome shows it at startup for any extension added with Developer mode, not just Offcut. Close it or click the X. Do not click Disable, or the extension turns off.',
+  },
+  {
+    q: 'Can an AI agent install Offcut for me?',
+    a: 'Yes. Copy the prompt in the "Install it with Claude or another AI agent" section into any assistant that can run commands on your PC. It downloads only from this page, checks the SHA-256 first and never changes security settings.',
   },
   {
     q: 'Who made Offcut?',
@@ -205,6 +210,14 @@ export default function OffcutPage() {
                 <strong>Optional: add the browser extension.</strong> It takes about a minute, once. <Link href="/resources/offcut/extension">Follow the extension guide</Link>.
               </li>
             </ol>
+          </section>
+
+          <section className="oc-sec" aria-labelledby="oc-agent">
+            <h2 id="oc-agent">Install it with Claude or another AI agent</h2>
+            <p>
+              If you use an AI assistant that can run commands on your PC (Claude, ChatGPT, Cursor and similar), copy this prompt and paste it in. It downloads Offcut only from this page, checks the file against our SHA-256 before running it, and never touches your security settings.
+            </p>
+            <CopyText value={OFFCUT_AGENT_PROMPT} label="Copy prompt" block />
           </section>
 
           <section className="oc-sec" aria-labelledby="oc-needs">

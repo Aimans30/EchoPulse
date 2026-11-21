@@ -174,6 +174,12 @@ export default function OffcutExtensionPage() {
             <p>Open chrome://extensions and click Remove on Offcut. Uninstalling the app (Windows Settings, Apps, Offcut) does not remove the extension from the browser, so do both.</p>
           </section>
 
+          <section className="ex-sec" aria-labelledby="ex-agent">
+            <h2 id="ex-agent">Prefer an AI agent to guide you?</h2>
+            <p>Paste this into Claude or any assistant that can run commands on your PC. It copies the folder path for you and walks you through each click.</p>
+            <CopyText block label="Copy prompt" value={`Help me add the Offcut browser extension (from EchoPulse Media) to my browser on this Windows PC. Offcut is already installed. Follow https://echopulse.media/resources/offcut/extension one step at a time and wait for me after each step. Copy this folder path to my clipboard with Set-Clipboard when I reach the folder step: ${OFFCUT.extensionFolder}. If something fails, use the troubleshooting table on that page. Never change security settings or browser settings for me, and never install anything else.`} />
+          </section>
+
           <p className="ex-back"><Link href="/resources/offcut">Back to Offcut</Link></p>
         </div>
       </main>
