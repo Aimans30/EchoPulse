@@ -25,6 +25,12 @@ export const metadata: Metadata = {
 
 const RESOURCES = [
   {
+    href: '/resources/offcut',
+    title: 'Offcut: save and study the scripts behind videos',
+    forWho: 'Editors, creators and scriptwriters',
+    blurb: 'A free Windows tool that saves the transcript of a video and splits it into hook, body and call to action. Runs on your PC, no account.',
+  },
+  {
     href: '/resources/listing-video-shot-list',
     title: 'Listing video shot list: 24 shots to film on your phone',
     forWho: 'Real estate agents',
@@ -66,7 +72,7 @@ export default function ResourcesPage() {
           <p className="rs-eyebrow">Resources</p>
           <h1 className="rs-h1">Free resources</h1>
           <p className="rs-lede">
-            Shot lists and checklists for people who film their own video. Each one is complete on the page, with no sign-up needed. More are planned.
+            Tools, shot lists and checklists for people who make their own video. Each one is complete on the page, with no sign-up needed. More are planned.
           </p>
           <ul className="rs-list">
             {RESOURCES.map((r) => (

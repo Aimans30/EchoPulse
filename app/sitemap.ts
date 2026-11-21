@@ -150,7 +150,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Free resources (lead magnets). Each is complete on the page, with an
   // email box for the printable version.
-  const resourcePages: MetadataRoute.Sitemap = ['/resources', '/resources/listing-video-shot-list'].map((path) => ({
+  const resourcePages: MetadataRoute.Sitemap = ['/resources', '/resources/listing-video-shot-list', '/resources/offcut'].map((path) => ({
     url: `${SITE_URL}${path}`,
     lastModified: new Date('2026-11-17'),
     changeFrequency: 'monthly' as const,

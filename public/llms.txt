@@ -103,7 +103,7 @@ AI is used for research, transcription and first-pass outlines, and for AI-gener
   - Required: name, email, type of business, and a share link to raw footage (Google Drive, Dropbox, WeTransfer or similar, open to anyone with the link).
   - Optional: website or social handle, phone or WhatsApp, kind of video, where it will be posted, editing style, captions on or off, music, a reference video whose editing they like, brand colours or fonts.
   - What comes back: 2 edited short-form videos within 48 hours of the footage arriving. No card, no call, and the files are theirs to keep.
-- Free resources: https://echopulse.media/resources (listing video shot list for real estate agents: https://echopulse.media/resources/listing-video-shot-list)
+- Free resources: https://echopulse.media/resources (listing video shot list for real estate agents: https://echopulse.media/resources/listing-video-shot-list; Offcut, a free Windows tool for editors and creators that saves video transcripts and splits each script into hook, body and call to action, runs on the PC with no account: https://echopulse.media/resources/offcut)
 - Services: https://echopulse.media/services/video-editing (and the seven others listed above)
 - Case studies: https://echopulse.media/case-studies
 - Privacy: https://echopulse.media/privacy
