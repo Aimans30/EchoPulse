@@ -3,10 +3,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { motion } from 'framer-motion';
-import Link from 'next/link';
-import { BOOK_CALL_LABEL, FREE_EDITS_URL } from '@/lib/links';
+import { BOOK_CALL_LABEL, FREE_EDITS_LABEL, FREE_EDITS_URL } from '@/lib/links';
 import { PRESENCE } from '@/lib/pricing';
-import HeroStage from '@/components/hero/HeroStage';
+import HeroReel from '@/components/HeroReel';
 import { trackPilotClick, trackCallClick } from '@/lib/analytics';
 
 /* ──────────────────────────────────────────────────────────
@@ -135,6 +134,7 @@ export default function Hero() {
   // homepage's only keyword-bearing heading), so the ref type follows the tag.
   const subRef       = useRef<HTMLHeadingElement>(null);
   const actionsRef   = useRef<HTMLDivElement>(null);
+  const rightRef     = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // PHONES SKIP THE TIMELINE ENTIRELY.
@@ -154,9 +154,8 @@ export default function Hero() {
     tl.fromTo('#grid-bg',      { opacity: 0 }, { opacity: 1, duration: 0.6 })
       .fromTo(eyebrowRef.current,  { y: 12, opacity: 0 }, { y: 0, opacity: 1, duration: 0.35, ease: 'power2.out' }, '-=0.5')
       .fromTo(lines ?? [],         { y: '105%' },          { y: '0%', duration: 0.5, ease: 'power3.out', stagger: 0.05 }, '-=0.25')
-      .fromTo([subRef.current, actionsRef.current], { y: 10, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4, ease: 'power2.out', stagger: 0.06 }, '-=0.25');
-    // The hero graphic is not faded in: its founder still is the LCP image,
-    // and an element that starts at opacity 0 delays LCP until it is shown.
+      .fromTo([subRef.current, actionsRef.current], { y: 10, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4, ease: 'power2.out', stagger: 0.06 }, '-=0.25')
+      .fromTo(rightRef.current,    { x: 16, opacity: 0 }, { x: 0, opacity: 1, duration: 0.5, ease: 'power2.out' }, '-=0.55');
     return () => { tl.kill(); };
   }, []);
 
@@ -196,27 +195,14 @@ export default function Hero() {
         @media (hover: hover) and (pointer: fine) {
           .btn-p, .btn-o { cursor: none; }
         }
-        .hero-proof{margin:24px 0 0;display:inline-flex;align-items:center;gap:12px;padding:8px 8px 8px 14px;border-radius:100px;background:#fff;border:1px solid rgba(12,12,11,0.08);box-shadow:0 6px 18px -10px rgba(12,12,11,0.25);font-family:Inter,sans-serif;font-size:13px;color:#4A4740;text-decoration:none;transition:border-color .2s, box-shadow .2s, transform .2s;max-width:100%;}
-        .hero-proof:hover{border-color:rgba(232,84,26,0.45);box-shadow:0 10px 24px -12px rgba(232,84,26,0.45);transform:translateY(-1px);}
-        .hero-proof-dot{width:8px;height:8px;border-radius:50%;background:#22c55e;box-shadow:0 0 0 4px rgba(34,197,94,0.15);flex:0 0 auto;}
-        .hero-proof-text{display:inline-flex;align-items:baseline;gap:6px;flex-wrap:wrap;line-height:1.35;}
-        .hero-proof-text strong{color:#0C0C0B;font-weight:700;}
-        .hero-proof-num{color:#E8541A;font-weight:800;letter-spacing:-0.01em;}
-        .hero-proof-cta{flex:0 0 auto;padding:6px 12px;border-radius:100px;background:#0C0C0B;color:#F2EEE7;font-weight:700;font-size:12px;white-space:nowrap;}
         .scroll-hint{position:absolute;bottom:24px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:6px;color:#A8A49B;font-size:9px;letter-spacing:3px;text-transform:uppercase;font-weight:600;}
         .scroll-line{width:1px;height:28px;background:linear-gradient(to bottom,#E8541A,transparent);animation:sline 1.8s ease-in-out infinite;}
         @keyframes sline{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
         /* Mobile-only elements are hidden on desktop by default */
         .hero-mobile-only { display: none; }
-        /* One primary ask. The free sample is a quiet text link under the
-           button, never a second button beside it. */
-        .hero-alt{display:inline-flex;align-items:center;margin-top:14px;font-family:Inter,sans-serif;font-size:13px;font-weight:500;color:#6E6B63;text-decoration:underline;text-decoration-color:rgba(12,12,11,0.22);text-underline-offset:3px;transition:color .2s,text-decoration-color .2s;}
-        .hero-alt:hover{color:#0C0C0B;text-decoration-color:#E8541A;}
-        @media (hover: hover) and (pointer: fine) { .hero-alt { cursor: none; } }
-        @media(max-width:1099.98px){ .hero-inner{gap:48px!important;} }
-        /* Tablet and phone: stack — text on top, the hero graphic below */
-        @media(max-width:959.98px){
-          .hero-inner{flex-direction:column!important;gap:40px!important;align-items:stretch!important;}
+        /* Tablet: stack vertically — text on top, orbital graphic below, both centered */
+        @media(max-width:860px){
+          .hero-inner{flex-direction:column!important;gap:36px!important;align-items:stretch!important;}
           .hero-right{width:100%!important;display:flex!important;justify-content:center!important;}
         }
         /* ── Phone redesign ──
@@ -354,12 +340,9 @@ export default function Hero() {
             justify-content:center !important;
             gap:6px !important;
           }
-          .hero-proof{ margin:20px auto 0 !important; display:flex !important; width:fit-content; max-width:100% !important; font-size:12.5px !important; text-align:left !important; }
           .scroll-hint{ display:none !important; }
-          /* The hero graphic stacks under the copy (see HeroStage). */
-          .hero-right{ margin-top:36px; }
-          .hero-actions{ align-items:center !important; }
-          .hero-alt{ margin-top:4px; font-size:14px; }
+          /* Hide the orbital entirely — replaced by mobile service grid below */
+          .hero-right{ display:none !important; }
 
           /* Mobile-only blocks: service chips + trust strip */
           .hero-mobile-only{ display:block; }
@@ -514,7 +497,7 @@ export default function Hero() {
         <div
           ref={wrapRef}
           className="hero-inner"
-          style={{ width: '100%', maxWidth: '1360px', margin: '0 auto', padding: '120px 56px 72px', display: 'flex', alignItems: 'center', gap: '64px', position: 'relative', zIndex: 1, flex: '1 1 auto' }}
+          style={{ width: '100%', maxWidth: '1280px', margin: '0 auto', padding: '120px 56px 72px', display: 'flex', alignItems: 'center', gap: '96px', position: 'relative', zIndex: 1, flex: '1 1 auto' }}
         >
           <div style={{ flex: '1 1 0', minWidth: 0 }}>
             <div ref={eyebrowRef} />
@@ -523,7 +506,7 @@ export default function Hero() {
             <h1
               ref={headlineRef}
               className="hero-h1 hero-h1-desktop"
-              style={{ fontFamily: 'Inter, sans-serif', fontSize: 'clamp(36px, 3.8vw, 56px)', fontWeight: 900, lineHeight: 1.04, letterSpacing: 'clamp(-1px, -0.035em, -2.4px)', margin: '0 0 24px' }}
+              style={{ fontFamily: 'Inter, sans-serif', fontSize: 'clamp(36px, 3.9vw, 56px)', fontWeight: 900, lineHeight: 1.04, letterSpacing: 'clamp(-1px, -0.035em, -2.4px)', margin: '0 0 24px' }}
             >
               {[
                 <>You run the business.</>,
@@ -565,7 +548,7 @@ export default function Hero() {
               <strong style={{ color: '#0C0C0B', fontWeight: 600 }}>Start with 2 free edits.</strong>
             </h2>
 
-            <div ref={actionsRef} className="hero-actions" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginBottom: '0' }}>
+            <div ref={actionsRef} className="hero-actions" style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '0', alignItems: 'center' }}>
               {/* PRIMARY — opens the BookCallModal (Calendly iframe) so visitors
                  stay on the page instead of getting yanked to a new tab. */}
               <button
@@ -590,35 +573,22 @@ export default function Hero() {
                 <span>{BOOK_CALL_LABEL}</span>
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
               </button>
-              {/* The free sample, as a quiet text link: one primary ask per
-                  hero. Same tracking location as the old secondary button
-                  (track() reports it as free_edits_click). */}
-              <Link
+              {/* WARM — explore packages */}
+              <a
                 href={FREE_EDITS_URL}
-                className="hero-alt"
+                className="btn-o"
                 data-cursor-hover
                 onClick={() => trackPilotClick('hero_secondary_free_edits')}
               >
-                Or start with 2 free edits, no card
-              </Link>
+                {FREE_EDITS_LABEL}
+              </a>
             </div>
 
-            {/* The one published result, straight under the buttons on both
-                sizes. Figures are the ones on the case study page. */}
-            <Link href="/case-studies/magicbnb-seo-aeo" className="hero-proof" data-cursor-hover>
-              <span className="hero-proof-dot" aria-hidden="true" />
-              <span className="hero-proof-text">
-                <strong>MagicBNB</strong>
-                <span className="hero-proof-num">5.8 &rarr; 4,803</span>
-                <span>daily Google impressions in 7 months</span>
-              </span>
-              <span className="hero-proof-cta">Case study <span aria-hidden="true">&rarr;</span></span>
-            </Link>
 
           </div>
 
-          <div className="hero-right" style={{ flexShrink: 0 }}>
-            <HeroStage />
+          <div ref={rightRef} className="hero-right" style={{ flexShrink: 0, width: '420px' }}>
+            <HeroReel />
           </div>
         </div>
 
