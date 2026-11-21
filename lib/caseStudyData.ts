@@ -3419,7 +3419,7 @@ const whitesBrightsApp: CaseStudy = {
   },
 };
 
-export const caseStudies: CaseStudy[] = [whitesBrights, whitesBrightsApp, workingWithGod, magicbnb, founderStory];
+export const caseStudies: CaseStudy[] = [magicbnb, whitesBrights, whitesBrightsApp, workingWithGod, founderStory];
 
 const SITE_ORIGIN = 'https://echopulse.media';
 const MONTH_NAMES = [
