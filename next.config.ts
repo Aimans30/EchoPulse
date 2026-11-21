@@ -87,6 +87,8 @@ const nextConfig: NextConfig = {
       // A la carte /order menu retired Nov 2026; plans and the free sample live on /pricing.
       { source: "/order", destination: "/pricing", permanent: true },
       { source: "/home-services", destination: "/business-owners", permanent: true },
+      // /contact is what buyers and directories guess; booking is how we take contact.
+      { source: "/contact", destination: "/book", permanent: true },
 
       // 2. Retired duplicate posts -> their cluster survivor.
       ...deadSlugRedirects,

@@ -209,6 +209,8 @@ export default function Footer() {
             { label: 'Work', href: '/work' },
             { label: 'Case studies', href: '/case-studies' },
             { label: 'See pricing', href: '/pricing' },
+            { label: 'Book a call', href: '/book' },
+            { label: '2 free edits', href: '/free-edits' },
             { label: 'Pilot', href: '/pilot' },
             { label: 'FAQ', href: '/faq' },
             { label: 'Free resources', href: '/resources' },

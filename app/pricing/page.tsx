@@ -103,7 +103,7 @@ const NOT_INCLUDED: { title: string; body: string }[] = [
   { title: 'Filming on location', body: 'We send shot lists and get on a call while you film. We do not fly a crew to you. If you need one, we can recommend local videographers and we will brief them.' },
   { title: 'Paid tools and licences', body: 'Your domain, hosting, email platform, CRM, scheduling tool, premium fonts and any stock footage beyond the standard libraries are billed to you at cost by the vendor.' },
   { title: 'Community management', body: 'Replying to comments and DMs on your behalf is not in any plan. Automations that route them to you are scoped separately on a call.' },
-  { title: 'Long-form editing on Pilot and Presence', body: 'Those plans cover short-form. Long-form edits are in Growth, or can be ordered one at a time from the order page.' },
+  { title: 'Long-form editing on Pilot and Presence', body: 'Those plans cover short-form. Long-form edits are in Growth, or a single long-form edit can be quoted at a fixed price on a call.' },
   { title: 'Custom software', body: 'Apps and software builds are quoted separately after a scoping call. Growth clients get 20% off the quote.' },
   { title: 'Results', body: 'We guarantee the output, the turnaround and the revisions. We do not guarantee leads, followers or sales, because too much of that sits with your offer and your market. Anyone who guarantees those is guessing.' },
 ];
@@ -148,7 +148,7 @@ const FAQ: { q: string; a: string }[] = [
   },
   {
     q: 'Can I buy a single edit without a plan?',
-    a: 'Yes. The order page sells one-off edits: reels, long-form YouTube, podcast episodes and repurposing, each at a fixed price with no retainer. It is the right option if you have one project rather than a monthly need.',
+    a: 'Yes. Book a free 15-minute call and tell us the project: a reel, a long-form YouTube video, a podcast episode or repurposing. We quote it at a fixed price with no retainer. It is the right option if you have one project rather than a monthly need.',
   },
 ];
 
