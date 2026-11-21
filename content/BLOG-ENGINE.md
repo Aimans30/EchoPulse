@@ -91,6 +91,11 @@ order. The first line that applies is today's work.
    of 1 or 2, and it has a Tier P or Tier A row marked `DUE` whose `icp`
    equals today's `icp`, refresh the highest such row (section 8) instead of
    writing a new post. If that post cannot be pulled, take the next such row.
+   **If the refresh fails any gate (for example a second G9 fail), do not end
+   the run:** drop the refresh, note it in the report, and continue with rule 4
+   then rule 5 as if no refresh was due, so a failed refresh never costs a
+   whole day. The failed refresh does not count against the weekly refresh
+   limit.
 4. **Weekly cap:** if the list prints `WEEKLY CAP REACHED`, write no new post.
    Refresh the first `DUE` Tier P or A row of any `icp` if weekday refreshes
    are left; otherwise publish nothing.
