@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   if (!study) return {};
   const canonical = `${SITE_URL}/case-studies/${study.slug}`;
   const fullTitle = `${study.metaTitle} | EchoPulse Media`;
-  // Its own 1200 x 627 card (public/og/case-<slug>.png), not the raw screenshot.
+  // Its own 1200 x 627 preview: a real screenshot of this page (public/og/case-<slug>.png, made by scripts/og/screenshot.mjs).
   const share = ogImages(`case-${study.slug}`);
   return {
     title: study.metaTitle,

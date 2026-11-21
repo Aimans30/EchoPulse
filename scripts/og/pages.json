@@ -1,273 +1,119 @@
 [
   {
     "name": "default",
-    "headline": "Content, websites, software and AI *for founders.*",
-    "sub": "Video, LinkedIn, funnels, CRMs, automation and SEO from one growth partner.",
-    "alt": "EchoPulse Media: content, websites, software and AI for founders. Video, LinkedIn, funnels, CRMs, automation and SEO from one growth partner.",
-    "visual": {
-      "type": "mark"
-    }
+    "path": "/",
+    "alt": "The EchoPulse Media homepage: \"You run the business. We run the content.\" beside a founder reel shown raw and edited, the weekly pipeline from footage to booked call, and MagicBNB going from 5.8 to 4,803 daily Google impressions.",
+    "reducedMotion": true
   },
   {
     "name": "case-studies",
-    "eyebrow": "Case studies",
-    "headline": "Results you can *check yourself.*",
-    "sub": "Named clients and live sites: search growth, a website rebuild and an operating system for a laundry chain.",
-    "alt": "EchoPulse Media case studies: results you can check yourself, with named clients and live sites.",
-    "visual": {
-      "type": "mark"
-    }
+    "path": "/case-studies",
+    "alt": "The EchoPulse Media case studies page: \"Client results, with the receipts.\", opening on Whites & Brights with the HQ Command Centre and more than US$3,400 saved."
   },
   {
     "name": "case-magicbnb-seo-aeo",
-    "eyebrow": "Case study · MagicBNB",
-    "headline": "5.8 impressions a day to *4,803.*",
-    "sub": "Google Search Console, April 2026 to 16 November 2026.",
-    "alt": "EchoPulse Media case study: MagicBNB went from 5.8 to 4,803 Google impressions a day, with the Search Console export.",
-    "visual": {
-      "type": "shot",
-      "src": "../../public/case-studies/magicbnb-gsc-proof.png",
-      "pos": "0% 0%",
-      "zoom": 1.3
-    }
+    "path": "/case-studies/magicbnb-seo-aeo",
+    "alt": "The MagicBNB case study on echopulse.media: \"5.8 impressions a day to 4,803 in seven months.\", with the live site and the Google Search Console chart."
   },
   {
     "name": "case-founder-200-real-estate-agents",
-    "eyebrow": "Founder story",
-    "headline": "I edited for *200+ real estate agents.*",
-    "sub": "Lakshya Soni on his work history, and why he built the studio. No client result is claimed.",
-    "alt": "EchoPulse Media founder story: Lakshya Soni edited for more than 200 Canadian real estate agents before building the studio.",
-    "visual": {
-      "type": "mark"
-    }
+    "path": "/case-studies/founder-200-real-estate-agents",
+    "alt": "The founder story on echopulse.media: \"I edited for 200+ Canadian real estate agents. Then I built the studio I wished they had hired.\", with his photo and two listing videos on phones."
   },
   {
     "name": "case-working-with-god-rebuild",
-    "eyebrow": "Case study · Working With God",
-    "headline": "From $50 to $60 a month *down to $0.*",
-    "sub": "A GoDaddy site replaced for a one-time $599. No traffic result is claimed.",
-    "alt": "EchoPulse Media case study: Working With God's monthly platform bill went from $50 to $60 down to $0, with the new homepage.",
-    "visual": {
-      "type": "shot",
-      "src": "../../public/case-studies/wwg-live-home-desktop.webp",
-      "pos": "0% 0%",
-      "zoom": 1.0
-    }
+    "path": "/case-studies/working-with-god-rebuild",
+    "alt": "The Working With God case study on echopulse.media: \"Two businesses were sharing one website. Neither was winning.\", with the old GoDaddy site and the new site side by side."
   },
   {
     "name": "case-whites-and-brights-operating-system",
-    "eyebrow": "Case study · Whites & Brights",
-    "headline": "More than *US$3,400 saved.*",
-    "sub": "One operating system for every outlet. By EchoPulse's estimate with the client.",
-    "alt": "EchoPulse Media case study: Whites & Brights saved more than US$3,400 with one operating system for every outlet, shown with the HQ panel.",
-    "visual": {
-      "type": "shot",
-      "src": "../../public/case-studies/wb-hq.webp",
-      "pos": "0% 0%",
-      "zoom": 1.1
-    }
+    "path": "/case-studies/whites-and-brights-operating-system",
+    "alt": "The Whites & Brights case study on echopulse.media: \"One operating system for every outlet.\", with the HQ Command Centre and the store dashboard on a phone."
   },
   {
     "name": "case-whites-and-brights-customer-app",
-    "eyebrow": "Case study · Whites & Brights",
-    "headline": "Book a pickup *in a tap.*",
-    "sub": "The customer app, live on Google Play. Orders land in the store panel.",
-    "alt": "EchoPulse Media case study: the Whites & Brights customer app, live on Google Play, shown on a phone.",
-    "visual": {
-      "type": "phone",
-      "src": "../../public/case-studies/wba-home.webp"
-    }
+    "path": "/case-studies/whites-and-brights-customer-app",
+    "alt": "The Whites & Brights customer app case study on echopulse.media: \"Book a pickup in a tap. The store already knows.\", with the Android app on phones."
   },
   {
     "name": "work",
-    "eyebrow": "Work",
-    "headline": "Every edit, *in one wall.*",
-    "sub": "Listing reels, founder videos, podcast clips and brand films.",
-    "alt": "EchoPulse Media work: stills from founder videos, reels and listing films cut by the studio.",
-    "visual": {
-      "type": "phones",
-      "srcs": [
-        "assets/work-1.jpg",
-        "assets/work-2.jpg",
-        "assets/work-4.jpg"
-      ]
-    }
+    "path": "/work",
+    "alt": "The EchoPulse Media work wall: a grid of video edits, from podcast clips and founder reels to listing videos, filterable by real estate, founders, coaches, business owners and DTC."
   },
   {
     "name": "free-edits",
-    "eyebrow": "Free sample",
-    "headline": "2 free edited videos, *no card.*",
-    "sub": "Send raw footage. Back within 48 hours. You keep the files.",
-    "alt": "EchoPulse Media free sample: 2 free edited videos, no card, back within 48 hours.",
-    "visual": {
-      "type": "mark"
-    }
+    "path": "/free-edits",
+    "alt": "The EchoPulse Media free edits page: \"Get 2 free edits\", with the sign-up form beside it. Send raw footage, get 2 edited videos back within 48 hours."
   },
   {
     "name": "what-is-echopulse-media",
-    "eyebrow": "About the studio",
-    "headline": "What is *EchoPulse Media?*",
-    "sub": "A growth partner for founders and businesses: content, websites, software, AI and SEO.",
-    "alt": "What is EchoPulse Media? A growth partner for founders and businesses: content, websites, software, AI and SEO.",
-    "visual": {
-      "type": "mark"
-    }
+    "path": "/what-is-echopulse-media",
+    "alt": "The \"What is EchoPulse Media?\" page: a growth partner for founders and businesses, founded in 2025 by Lakshya Soni and based in Bhopal, India."
   },
   {
     "name": "pricing",
-    "eyebrow": "Pricing",
-    "headline": "Every price, *on one page.*",
-    "sub": "Free sample, $299 Pilot, $399 and $1,997 a month, and what each includes.",
-    "alt": "EchoPulse Media pricing: free sample, $299 Pilot, $399 a month Presence Engine, $1,997 a month Growth.",
-    "visual": {
-      "type": "plans",
-      "rows": [
-        [
-          "Free sample",
-          "Free"
-        ],
-        [
-          "Pilot",
-          "$299"
-        ],
-        [
-          "Presence Engine",
-          "$399/mo"
-        ],
-        [
-          "Growth",
-          "$1,997/mo"
-        ]
-      ]
-    }
+    "path": "/pricing",
+    "alt": "The EchoPulse Media pricing page: \"Start free. Step up when you are ready.\", with every price in US dollars."
   },
   {
     "name": "about",
-    "eyebrow": "About",
-    "headline": "One team, one bill, *every channel.*",
-    "sub": "Who runs EchoPulse Media and how the work gets done.",
-    "alt": "About EchoPulse Media: one team, one bill, every channel, founded in 2025 by Lakshya Soni.",
-    "visual": {
-      "type": "mark"
-    }
+    "path": "/about",
+    "alt": "The EchoPulse Media about page: \"We are the content team you would have hired, if you had time to hire one.\""
   },
   {
     "name": "about-lakshya-soni",
-    "eyebrow": "Founder",
-    "headline": "Lakshya Soni, *founder of EchoPulse Media.*",
-    "sub": "Strategy, editing, writing and code. Based in Bhopal, India.",
-    "alt": "Lakshya Soni, founder of EchoPulse Media, with a portrait.",
-    "visual": {
-      "type": "mark"
-    }
+    "path": "/about/lakshya-soni",
+    "alt": "The page about Lakshya Soni, founder and owner of EchoPulse Media, with his photo.",
+    "scroll": 48
   },
   {
     "name": "blog",
-    "eyebrow": "Blog",
-    "headline": "Guides, pricing *and comparisons.*",
-    "sub": "Real agency pricing and the systems behind founder-led content. Every number sourced.",
-    "alt": "The EchoPulse Media blog: guides, pricing and comparisons for founder-led content.",
-    "visual": {
-      "type": "mark"
-    }
+    "path": "/blog",
+    "alt": "The EchoPulse Media blog: content pricing, comparisons and guides, filterable by topic, with the latest post."
   },
   {
     "name": "book",
-    "eyebrow": "Book a call",
-    "headline": "Book a free *15-minute call.*",
-    "sub": "15 minutes with Lakshya, the founder. No pitch.",
-    "pill": "echopulse.media/book",
-    "alt": "Book a free 15-minute call with Lakshya, the founder of EchoPulse Media. No pitch.",
-    "visual": {
-      "type": "mark"
-    }
+    "path": "/book",
+    "alt": "The EchoPulse Media booking page: \"Book a free 15-minute call\" with Lakshya, the founder, and the calendar to pick a time."
   },
   {
     "name": "service-video-editing",
-    "eyebrow": "Service · Video editing",
-    "accent": "#E8541A",
-    "headline": "Every format. *One editor.*",
-    "sub": "Reels, YouTube, podcasts and course modules. Short-form edits back in 48 hours.",
-    "alt": "EchoPulse Media video editing: every format, one editor. Short-form edits back in 48 hours.",
-    "visual": {
-      "type": "mark"
-    }
+    "path": "/services/video-editing",
+    "alt": "The EchoPulse Media video editing service page: \"Every Format. One Editor at Your Disposal.\", beside an edit timeline."
   },
   {
     "name": "service-linkedin-ghostwriting",
-    "eyebrow": "Service · LinkedIn and social",
-    "accent": "#8b5cf6",
-    "headline": "LinkedIn posts *that sound like you.*",
-    "sub": "Written from a recorded interview of about an hour. You approve every draft.",
-    "alt": "EchoPulse Media LinkedIn and social: posts that sound like you, written from a recorded interview.",
-    "visual": {
-      "type": "mark"
-    }
+    "path": "/services/linkedin-ghostwriting",
+    "alt": "The EchoPulse Media LinkedIn and social service page: \"Posts your buyers actually stop scrolling for.\", beside a LinkedIn post draft in review."
   },
   {
     "name": "service-blog-production",
-    "eyebrow": "Service · Blog production",
-    "accent": "#f59e0b",
-    "headline": "Sourced blogs for *Google and AI answers.*",
-    "sub": "Every statistic has a working source link. A person edits every draft.",
-    "alt": "EchoPulse Media blog production: sourced blogs written for Google and AI answers.",
-    "visual": {
-      "type": "mark"
-    }
+    "path": "/services/blog-production",
+    "alt": "The EchoPulse Media blog production service page: \"Sourced blogs written for Google and AI answers.\", beside an article draft with its outline and sources."
   },
   {
     "name": "service-ad-creatives",
-    "eyebrow": "Service · Ad creatives",
-    "accent": "#3b82f6",
-    "headline": "Ad creative *built for returns.*",
-    "sub": "6 ads a month on Growth, 4 static and 2 video, with 48-hour turnaround.",
-    "alt": "EchoPulse Media ad creatives: ad creative built for returns, 6 ads a month on Growth.",
-    "visual": {
-      "type": "mark"
-    }
+    "path": "/services/ad-creatives",
+    "alt": "The EchoPulse Media ad creatives service page: \"Ad creative built for returns, not design awards.\", beside a hook test of four ad variants."
   },
   {
     "name": "service-websites-funnels",
-    "eyebrow": "Service · Websites and funnels",
-    "accent": "#10b981",
-    "headline": "Websites that turn *visitors into enquiries.*",
-    "sub": "Sub-2-second mobile load, with conversion copywriting on every build.",
-    "alt": "EchoPulse Media websites and funnels: websites that turn visitors into enquiries.",
-    "visual": {
-      "type": "mark"
-    }
+    "path": "/services/websites-funnels",
+    "alt": "The EchoPulse Media websites and funnels service page: \"Websites built to turn visitors into enquiries.\", beside a sample clinic site and its page check scores."
   },
   {
     "name": "service-automations",
-    "eyebrow": "Service · Automations",
-    "accent": "#E8541A",
-    "headline": "Catch and qualify *every lead.*",
-    "sub": "Automation stacks on Make.com, ManyChat and your CRM, live in 10 to 14 business days.",
-    "alt": "EchoPulse Media automations: catch and qualify every lead, and book only serious buyers.",
-    "visual": {
-      "type": "mark"
-    }
+    "path": "/services/automations",
+    "alt": "The EchoPulse Media automations service page: \"A system that catches every lead. So you stop losing them.\", beside a new-enquiry workflow running step by step."
   },
   {
     "name": "service-apps-software",
-    "eyebrow": "Service · Apps and software",
-    "accent": "#06b6d4",
-    "headline": "Software that *runs your business.*",
-    "sub": "Custom apps, client portals and AI tools at a fixed price, in weeks. The code is yours once paid.",
-    "alt": "EchoPulse Media apps and software: custom software that runs your business, at a fixed price.",
-    "visual": {
-      "type": "mark"
-    }
+    "path": "/services/apps-software",
+    "alt": "The EchoPulse Media apps and software service page: \"Software that runs your business, not the other way around.\", beside a jobs pipeline board."
   },
   {
     "name": "service-seo-aeo",
-    "eyebrow": "Service · SEO and AI search",
-    "accent": "#f59e0b",
-    "headline": "Found on Google *and in AI answers.*",
-    "sub": "SEO and AI search for founders, with the MagicBNB numbers and what is still broken.",
-    "alt": "EchoPulse Media SEO and AI search: be found on Google and in AI answers.",
-    "visual": {
-      "type": "mark"
-    }
+    "path": "/services/seo-aeo",
+    "alt": "The EchoPulse Media SEO and AI search service page: \"Be the page Google shows and the answer AI tools read out.\", beside a search result ranked first."
   }
 ]

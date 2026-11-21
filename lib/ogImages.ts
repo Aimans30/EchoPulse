@@ -3,13 +3,15 @@ import pages from '../scripts/og/pages.json';
 /**
  * Link preview images (Open Graph and Twitter cards).
  *
- * One static PNG per key page in public/og/<name>.png, 1200 x 627, rendered from
- * scripts/og/template.html with the copy in scripts/og/pages.json:
+ * One static PNG per key page in public/og/<name>.png, 1200 x 627: a real
+ * screenshot of the top of that page, taken from the dev server by
+ * scripts/og/screenshot.mjs (pages and alt text in scripts/og/pages.json):
  *
- *   NODE_USE_ENV_PROXY=1 NODE_EXTRA_CA_CERTS=/root/.ccr/ca-bundle.crt node scripts/og/render.mjs [name ...]
+ *   NODE_USE_ENV_PROXY=1 NODE_EXTRA_CA_CERTS=/root/.ccr/ca-bundle.crt node scripts/og/screenshot.mjs [name ...]
  *
- * pages.json is also where the alt text lives, so the image and its alt never
- * drift apart. A page that has no image of its own uses OG_DEFAULT.
+ * Re-run it after a page's hero changes. pages.json is also where the alt
+ * text lives, so update the alt when the screenshot changes. A page that has
+ * no image of its own uses OG_DEFAULT.
  *
  * Next.js replaces a segment's whole `openGraph` / `twitter` object when a page
  * defines its own, so every page that sets `openGraph` must also set `images`
