@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useConsent } from '@/lib/consent';
 import { captureAttribution } from '@/lib/attribution';
 import { decorateBookingUrl, isBookingUrl, FREE_EDITS_URL } from '@/lib/links';
-import { firedRecently, track, trackCallClick, trackFreeEditsClick } from '@/lib/analytics';
+import { firedRecently, track, trackCallClick, trackFreeEditsClick, trackPilotClick } from '@/lib/analytics';
 
 /**
  * Mounted once, from components/AnalyticsProvider (which app/layout.tsx
@@ -114,15 +114,19 @@ export default function AttributionTracker() {
     const recordLink = (a: HTMLAnchorElement) => {
       const booking = isBookingUrl(a.href);
       let freeEdits = false;
+      let pilot = false;
       if (!booking) {
         try {
           const u = new URL(a.href);
-          freeEdits = u.origin === window.location.origin && u.pathname === FREE_EDITS_URL;
+          const same = u.origin === window.location.origin;
+          freeEdits = same && u.pathname === FREE_EDITS_URL;
+          pilot = same && u.pathname === '/pilot';
         } catch { /* not a URL we track */ }
       }
       const extra = a.closest<HTMLElement>('[data-track]')?.dataset.track;
-      if (!booking && !freeEdits && !extra) return;
+      if (!booking && !freeEdits && !pilot && !extra) return;
       const location = locationFor(a);
+      if (pilot && !firedRecently('cta_pilot_click')) trackPilotClick(location);
       if (booking && !firedRecently('book_call_click')) trackCallClick(location);
       if (freeEdits && !firedRecently('free_edits_click')) trackFreeEditsClick(location);
       if (extra && /^[a-z0-9_]{3,40}$/.test(extra) && !firedRecently(extra)) {

@@ -123,6 +123,9 @@ export default function ConsentGate({
   const gpc = useGpc();
 
   if (!ready || gpc) return null;
+  // Only the live site reports to GA4 and Clarity: local dev, Vercel previews
+  // and other hosts were inflating sessions (localhost showed up in Clarity).
+  if (typeof window !== 'undefined' && !/^(www\.)?echopulse\.media$/.test(window.location.hostname)) return null;
 
   const needsConsent = CONSENT_REGIONS.has(region);
   const load = needsConsent ? choice === 'granted' : choice !== 'denied';

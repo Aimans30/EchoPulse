@@ -15,6 +15,7 @@ import { audienceFor, blogAskFor, blogBookUrl } from '@/lib/blogLinks';
 import { FREE_EDITS_URL } from '@/lib/links';
 import TableOfContents from '@/components/TableOfContents';
 import { getPostBySlug, getAllPostSlugs, getRelatedPosts, resolveCategory, resolveAuthor, type BlogPostSummary } from '@/lib/blog';
+import { BLOG_SEO } from '@/lib/seoOverrides';
 import { sanityClient, urlFor } from '@/lib/sanity';
 import { extractHeadings } from '@/lib/toc';
 import { extractFaqPairs, buildFaqPageLd } from '@/lib/faqSchema';
@@ -66,6 +67,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   // and throws, which is what shows app/blog/[slug]/error.tsx.
   const post = await loadPost(slug).catch(() => null);
   if (!post) return {};
+  const seo = BLOG_SEO[slug];
 
   const ogImage = post.mainImage?.asset
     ? urlFor(post.mainImage).width(1200).height(630).fit('crop').auto('format').url()
@@ -82,12 +84,12 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     //
     // This is the same bug already fixed on /about, /services/* and /[icp];
     // blog posts were the one route type missed.
-    title: { absolute: post.title },
-    description: post.excerpt || `Read "${post.title}" on the EchoPulse blog.`,
+    title: { absolute: seo?.title || post.title },
+    description: seo?.description || post.excerpt || `Read "${post.title}" on the EchoPulse blog.`,
     alternates: { canonical: `${SITE_URL}/blog/${slug}` },
     openGraph: {
-      title: post.title,
-      description: post.excerpt || '',
+      title: seo?.title || post.title,
+      description: seo?.description || post.excerpt || '',
       url: `${SITE_URL}/blog/${slug}`,
       type: 'article',
       publishedTime: post.publishedAt,
@@ -98,8 +100,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     },
     twitter: {
       card: 'summary_large_image',
-      title: post.title,
-      description: post.excerpt || '',
+      title: seo?.title || post.title,
+      description: seo?.description || post.excerpt || '',
       images: ogImage ? [ogImage] : undefined,
     },
   };
