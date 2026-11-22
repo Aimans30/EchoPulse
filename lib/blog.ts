@@ -1,5 +1,6 @@
 import { sanityClient } from './sanity';
 import type { PortableTextBlock } from '@portabletext/types';
+import { DEAD_SLUGS } from './redirects';
 
 /**
  * Shape of a blog post returned by the GROQ queries below. Matches the
@@ -118,7 +119,8 @@ export async function getRelatedPosts(
   const query = `*[
     _type == "blog" &&
     defined(slug.current) &&
-    slug.current != $currentSlug
+    slug.current != $currentSlug &&
+    !(slug.current in $dead)
   ] | order(
     select(category == $category => 0, 1),
     coalesce(publishedAt, _createdAt) desc
@@ -134,11 +136,15 @@ export async function getRelatedPosts(
     mainImage,
     mainImageUrl
   }`;
-  return sanityClient.fetch(
+  // Redirected slugs are dropped in GROQ and again here, so a stale cached
+  // response can never put a link that 308s into the Related strip.
+  const dead = new Set(DEAD_SLUGS);
+  const rows = await sanityClient.fetch<BlogPostSummary[]>(
     query,
-    { currentSlug, category: category ?? null, limit },
+    { currentSlug, category: category ?? null, limit: limit + 5, dead: DEAD_SLUGS },
     { next: { revalidate: 60 } },
   );
+  return rows.filter((r) => !dead.has(r.slug)).slice(0, limit);
 }
 
 /**

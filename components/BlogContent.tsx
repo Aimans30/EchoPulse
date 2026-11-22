@@ -3,6 +3,24 @@ import { PortableText, type PortableTextComponents } from '@portabletext/react';
 import type { PortableTextBlock } from '@portabletext/types';
 import { urlFor } from '@/lib/sanity';
 import { slugifyHeading, blockToPlainText } from '@/lib/toc';
+import { BLOG_REDIRECTS } from '@/lib/redirects';
+
+/**
+ * Links inside post bodies come from Sanity and can point at slugs that now
+ * redirect (consolidated posts, the case study moved out of /blog). Resolve
+ * those to their final URL so readers and crawlers never hop through a 308,
+ * and keep same-site links in the same tab.
+ */
+function resolveHref(href: string | undefined): { href: string | undefined; internal: boolean } {
+  if (!href) return { href, internal: false };
+  let path = href;
+  const abs = href.match(/^https?:\/\/(?:www\.)?echopulse\.media(\/.*)?$/i);
+  if (abs) path = abs[1] || '/';
+  if (!path.startsWith('/')) return { href, internal: false };
+  const m = path.match(/^\/blogs?\/([^/?#]+)(.*)$/);
+  if (m && BLOG_REDIRECTS[m[1]]) return { href: BLOG_REDIRECTS[m[1]] + (m[2] || ''), internal: true };
+  return { href: path, internal: true };
+}
 
 /**
  * Intrinsic size of a Sanity asset, read off the id it is already carrying.
@@ -332,11 +350,12 @@ function buildComponents(): PortableTextComponents {
       <strong style={{ fontWeight: 700, color: '#0C0C0B' }}>{children}</strong>
     ),
     em: ({ children }) => <em style={{ fontStyle: 'italic' }}>{children}</em>,
-    link: ({ value, children }) => (
+    link: ({ value, children }) => {
+      const { href, internal } = resolveHref(value?.href);
+      return (
       <a
-        href={value?.href}
-        target="_blank"
-        rel="noopener noreferrer"
+        href={href}
+        {...(internal ? {} : { target: '_blank', rel: 'noopener noreferrer' })}
         style={{
           color: '#E8541A',
           textDecoration: 'underline',
@@ -346,7 +365,8 @@ function buildComponents(): PortableTextComponents {
       >
         {children}
       </a>
-    ),
+      );
+    },
     code: ({ children }) => (
       <code
         style={{

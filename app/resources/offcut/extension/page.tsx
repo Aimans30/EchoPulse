@@ -22,7 +22,7 @@ import { ogImages } from '@/lib/ogImages';
 
 const SITE_URL = 'https://echopulse.media';
 const canonical = `${SITE_URL}/resources/offcut/extension`;
-const TITLE = 'Add the Offcut Extension to Chrome, Edge or Brave';
+const TITLE = 'Offcut Extension for Chrome, Edge and Brave';
 const DESCRIPTION =
   'Six short steps, about a minute, once: add the free Offcut extension to Chrome, Edge or Brave so a Transcribe button appears on the video you are watching.';
 

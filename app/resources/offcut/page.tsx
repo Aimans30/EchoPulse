@@ -50,7 +50,7 @@ const SITE_URL = 'https://echopulse.media';
 const canonical = `${SITE_URL}/resources/offcut`;
 const TITLE = 'Offcut: Free Script Saver for Video Editors';
 const DESCRIPTION =
-  'Offcut is a free Windows tool from EchoPulse Media that saves the transcript of videos you study and splits each script into hook, body and call to action. Runs on your PC, no account.';
+  'Offcut is a free Windows tool from EchoPulse Media that saves video transcripts and splits each script into hook, body and call to action. Runs on your PC.';
 
 export const metadata: Metadata = {
   title: TITLE,
