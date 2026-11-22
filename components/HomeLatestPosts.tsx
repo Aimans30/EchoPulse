@@ -74,7 +74,7 @@ export default async function HomeLatestPosts() {
         .hlp-date { font-size: 12px; color: #6E6B63; }
         .hlp-title { font-size: 18px; font-weight: 700; line-height: 1.3; letter-spacing: -0.01em; overflow-wrap: anywhere; }
         .hlp-link:hover .hlp-title { color: #E8541A; }
-        .hlp-all { display: inline-flex; align-items: center; min-height: 44px; color: #E8541A; font-weight: 700; font-size: 15px; text-decoration: none; }
+        .hlp-all { display: inline-flex; align-items: center; min-height: 44px; color: #C9440F; font-weight: 700; font-size: 15px; text-decoration: none; }
         .hlp-all:hover { text-decoration: underline; }
         @media (max-width: 900px) { .hlp-grid { grid-template-columns: 1fr; } }
         @media (max-width: 760px) { .hlp { padding: 56px 20px; } }

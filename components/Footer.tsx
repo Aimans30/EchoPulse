@@ -122,18 +122,19 @@ export default function Footer() {
       </div>
 
       <div>
-        <h4
+        <h2
           style={{
             fontSize: '10px',
             fontWeight: 700,
             letterSpacing: '3px',
             textTransform: 'uppercase',
-            color: '#A8A49B',
+            color: '#6B665E',
             marginBottom: '20px',
+            margin: '0 0 20px',
           }}
         >
           Services
-        </h4>
+        </h2>
         <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {serviceLinks.map((s) => (
             <li key={s.href}>
@@ -151,18 +152,19 @@ export default function Footer() {
       </div>
 
       <div>
-        <h4
+        <h2
           style={{
             fontSize: '10px',
             fontWeight: 700,
             letterSpacing: '3px',
             textTransform: 'uppercase',
-            color: '#A8A49B',
+            color: '#6B665E',
             marginBottom: '20px',
+            margin: '0 0 20px',
           }}
         >
           Who We Work With
-        </h4>
+        </h2>
         <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {audienceLinks.map((a) => (
             <li key={a.href}>
@@ -180,18 +182,19 @@ export default function Footer() {
       </div>
 
       <div>
-        <h4
+        <h2
           style={{
             fontSize: '10px',
             fontWeight: 700,
             letterSpacing: '3px',
             textTransform: 'uppercase',
-            color: '#A8A49B',
+            color: '#6B665E',
             marginBottom: '20px',
+            margin: '0 0 20px',
           }}
         >
           Quick Links
-        </h4>
+        </h2>
         <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {[
             // "Order a service" (/order) was removed from site-wide nav. The
@@ -234,18 +237,19 @@ export default function Footer() {
       </div>
 
       <div>
-        <h4
+        <h2
           style={{
             fontSize: '10px',
             fontWeight: 700,
             letterSpacing: '3px',
             textTransform: 'uppercase',
-            color: '#A8A49B',
+            color: '#6B665E',
             marginBottom: '20px',
+            margin: '0 0 20px',
           }}
         >
           Contact
-        </h4>
+        </h2>
         <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {[
             // Was { label: 'echopulse.media', href: 'https://echopulse.media' },
@@ -283,10 +287,10 @@ export default function Footer() {
           alignItems: 'center',
         }}
       >
-        <p style={{ fontSize: '13px', color: '#A8A49B', margin: 0 }}>
+        <p style={{ fontSize: '13px', color: '#6B665E', margin: 0 }}>
           © 2026 EchoPulse Media. All rights reserved.
         </p>
-        <p style={{ fontSize: '13px', color: '#A8A49B', margin: 0 }}>
+        <p style={{ fontSize: '13px', color: '#6B665E', margin: 0 }}>
           Your growth partner: content, websites, software and AI.
         </p>
       </div>

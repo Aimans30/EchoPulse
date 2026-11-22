@@ -593,7 +593,7 @@ export default function WorkWall({ clips }: { clips: WallClip[] }) {
       <div className="ww-top">
         <Link href="/" className="ww-home" aria-label="EchoPulse Media home">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo-128.png" alt="EchoPulse Media logo" width={28} height={28} />
+          <img src="/logo-64.png" alt="EchoPulse Media logo" width={28} height={28} />
           <span>EchoPulse</span>
         </Link>
         <div className="ww-chips" role="tablist" aria-label="Filter work by audience">

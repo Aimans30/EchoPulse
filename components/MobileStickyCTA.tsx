@@ -162,6 +162,9 @@ export default function MobileStickyCTA() {
     <div
       ref={barRef}
       aria-hidden={!visible}
+      // inert takes the hidden bar's links out of the tab order too, so it is
+      // never "hidden but focusable" (an accessibility failure).
+      inert={!visible}
       style={{
         position: 'fixed',
         bottom: 0,

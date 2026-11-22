@@ -284,6 +284,8 @@ export default function RootLayout({
             behind the modal's own open animation. */}
         <link rel="dns-prefetch" href="https://cal.com" />
         <link rel="dns-prefetch" href="https://app.cal.com" />
+        {/* The hero reel and work cards stream from Cloudinary on first paint. */}
+        <link rel="preconnect" href="https://res.cloudinary.com" crossOrigin="" />
         {/* NOTE: the unpkg preconnect and the Shery.css <link> used to live
             here. A stylesheet with a non-matching `media` is still DOWNLOADED
             by every browser (just at low priority and without blocking

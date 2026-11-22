@@ -196,7 +196,7 @@ export default function BookCallModal() {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               className="bcm-mark"
-              src="/logo-128.png"
+              src="/logo-64.png"
               alt="EchoPulse Media logo"
               width={40}
               height={40}

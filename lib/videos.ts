@@ -202,7 +202,7 @@ export function wallClips(): WallClip[] {
       types: [v.type],
       icps: [...(v.icp ?? [])],
       orientation: v.orientation,
-      poster: `${base}/so_3,c_scale,w_520,q_auto,f_jpg/${p.path.replace(/\.mp4$/, '.jpg')}`,
+      poster: `${base}/so_3,c_scale,w_400,q_auto,f_auto/${p.path.replace(/\.mp4$/, '.jpg')}`,
       posterSm: `${base}/so_3,c_scale,w_320,q_auto,f_jpg/${p.path.replace(/\.mp4$/, '.jpg')}`,
       preview: `${base}/c_scale,w_480,q_auto:low,f_mp4,ac_none,du_12/${p.path}`,
       full: `${base}/q_auto:good,f_mp4/${p.path}`,

@@ -331,7 +331,7 @@ export default function HeroReel() {
         .hr-funnel { right: -46px; top: ${Math.round(WIDE_H * 0.78)}px; animation-duration: 9s; animation-delay: -3s; }
         .hr-steps { position: relative; display: flex; align-items: center; gap: 18px; }
         .hr-steps b { position: relative; z-index: 1; font-size: 11.5px; font-weight: 700; padding: 5px 9px; border-radius: 100px; background: #0C0C0B; color: #F2EEE7; white-space: nowrap; }
-        .hr-steps b:last-of-type { background: #E8541A; color: #fff; }
+        .hr-steps b:last-of-type { background: #C9440F; color: #fff; }
         .hr-steps::before { content: ''; position: absolute; left: 8px; right: 8px; top: 50%; height: 1.5px; background: rgba(12,12,11,0.18); }
         .hr-steps em {
           position: absolute; top: 50%; left: 0; width: 7px; height: 7px; margin-top: -3.5px; border-radius: 50%;
