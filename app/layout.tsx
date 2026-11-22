@@ -9,6 +9,7 @@ import EmojiNormalizer from "@/components/EmojiNormalizer";
 import AnalyticsProvider from "@/components/AnalyticsProvider";
 import BookCallModal from "@/components/BookCallModal";
 import MobileStickyCTA from "@/components/MobileStickyCTA";
+import AgentTools from "@/components/AgentTools";
 import { GeoProvider } from "@/components/GeoProvider";
 import { pricingOffers } from "@/lib/pricing";
 import { BOOK_CALL_URL } from "@/lib/links";
@@ -282,6 +283,11 @@ export default function RootLayout({
             networks (100-300ms) and dns-prefetch is nearly free, so we keep
             that and let the TLS handshake happen on click, where it is hidden
             behind the modal's own open animation. */}
+        {/* WebMCP origin trial (Chrome). Register the domain at
+            developer.chrome.com/origintrials, then set NEXT_PUBLIC_WEBMCP_OT_TOKEN in Vercel. */}
+        {process.env.NEXT_PUBLIC_WEBMCP_OT_TOKEN && (
+          <meta httpEquiv="origin-trial" content={process.env.NEXT_PUBLIC_WEBMCP_OT_TOKEN} />
+        )}
         <link rel="dns-prefetch" href="https://cal.com" />
         <link rel="dns-prefetch" href="https://app.cal.com" />
         {/* The hero reel and work cards stream from Cloudinary on first paint. */}
@@ -325,6 +331,7 @@ export default function RootLayout({
               component no-ops above 768px and stays hidden until 600px of
               scroll, so desktop and above-the-fold are untouched. */}
           <MobileStickyCTA />
+          <AgentTools />
           {/* The Pune-only on-site inquiry modal was removed in July 2026 with
               the India rate card. components/PuneInquiryModal.tsx and
               /api/pune-inquiry are now unused. */}
