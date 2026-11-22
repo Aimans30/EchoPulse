@@ -89,6 +89,8 @@ const nextConfig: NextConfig = {
       { source: "/home-services", destination: "/business-owners", permanent: true },
       // /contact is what buyers and directories guess; booking is how we take contact.
       { source: "/contact", destination: "/book", permanent: true },
+      // A stray "&" got crawled as its own URL (from the old unescaped sitemap); send it home.
+      { source: "/&", destination: "/", permanent: true },
 
       // 2. Retired duplicate posts -> their cluster survivor.
       ...deadSlugRedirects,
