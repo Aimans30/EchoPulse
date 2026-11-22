@@ -6,7 +6,7 @@
  * SAFETY RULE: never host the installer on echopulse.media. It is unsigned, so
  * Windows SmartScreen and Chrome warn on it; a flagged file on our own domain
  * could get echopulse.media itself flagged by Google Safe Browsing. The file
- * lives on GitHub Releases (or another separate host) and this page links out.
+ * lives on a separate host (Google Drive for 1.0.0) and this page links out.
  *
  * Until `downloadUrl` and `sha256` are both set, the page shows a "notify me"
  * form instead of a download button, so nothing half-finished ships.
@@ -16,10 +16,15 @@ export const OFFCUT = {
   version: '1.0.0',
   installerName: 'Offcut-Setup-1.0.0.exe',
   extensionFolder: '%LOCALAPPDATA%\\Programs\\Offcut\\extension',
-  releasedISO: '', // e.g. '2026-11-25'
-  downloadUrl: '', // GitHub Releases asset URL for the installer (.exe)
-  sha256: '', // SHA-256 of that exact installer file, uppercase or lowercase hex
-  downloadSizeLabel: 'about 200 MB',
+  releasedISO: '2026-11-22',
+  /** Page people open in the browser (Google Drive file page with its Download button). */
+  downloadUrl: 'https://drive.google.com/file/d/1V-THVCI44dtWuo1SbltFumA4-LXahcv_/view?usp=sharing',
+  /** Direct file URL for agents and PowerShell (skips the Drive page). Same file. */
+  directDownloadUrl: 'https://drive.usercontent.google.com/download?id=1V-THVCI44dtWuo1SbltFumA4-LXahcv_&export=download&confirm=t',
+  /** Where the file is hosted, shown next to the button. */
+  hostLabel: 'Google Drive',
+  sha256: '7C103FF74D2C075BEEDAF17B447E27647E2908D10449CD60836AAE08ADBA5F7A', // SHA-256 of Offcut-Setup-1.0.0.exe (206,598,116 bytes)
+  downloadSizeLabel: 'about 197 MB',
   installedSizeLabel: 'about 0.8 GB',
   speechModelLabel: 'about 140 MB, downloaded once',
   /** Real screenshots only (no mockups), placed in public/resources/offcut/. */

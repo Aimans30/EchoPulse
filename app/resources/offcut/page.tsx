@@ -205,7 +205,7 @@ export default function OffcutPage() {
     ],
   };
 
-  const installerFile = OFFCUT_READY ? OFFCUT.downloadUrl.split('/').pop() : '';
+  const installerFile = OFFCUT.installerName;
   const shots = OFFCUT.screenshots;
 
   return (
@@ -244,12 +244,12 @@ export default function OffcutPage() {
                 <div className="oc-cta">
                   {OFFCUT_READY ? (
                     <>
-                      <a href={OFFCUT.downloadUrl} className="oc-dl" rel="noopener" data-track="offcut_download_click" data-track-location="offcut_hero">
+                      <a href={OFFCUT.downloadUrl} className="oc-dl" target="_blank" rel="noopener noreferrer" data-track="offcut_download_click" data-track-location="offcut_hero">
                         <Download size={18} strokeWidth={2} aria-hidden="true" />
                         Download for Windows
                       </a>
                       <p className="oc-meta">
-                        {OFFCUT.version && <>Version {OFFCUT.version}. </>}Windows 10 or 11, 64-bit. Download {OFFCUT.downloadSizeLabel}. Free.
+                        {OFFCUT.version && <>Version {OFFCUT.version}. </>}Windows 10 or 11, 64-bit. Download {OFFCUT.downloadSizeLabel}. Free. Opens {OFFCUT.hostLabel}; if it says it can&apos;t scan the file for viruses (normal for large files), click &quot;Download anyway&quot;.
                       </p>
                     </>
                   ) : (
@@ -439,8 +439,8 @@ export default function OffcutPage() {
                 <li>
                   <span className="oc-step-n" aria-hidden="true">1</span>
                   <div>
-                    <p className="oc-step-t">Run the installer.</p>
-                    <p className="oc-step-d">No admin rights needed and nothing else to install first.</p>
+                    <p className="oc-step-t">Open {OFFCUT.installerName}.</p>
+                    <p className="oc-step-d">If Chrome says the file isn&apos;t commonly downloaded, open the menu on the download and click &quot;Keep&quot;. No admin rights needed and nothing else to install first.</p>
                   </div>
                 </li>
                 <li>

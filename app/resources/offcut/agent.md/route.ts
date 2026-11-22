@@ -43,7 +43,8 @@ This file is the source of truth. Follow it exactly. Talk to the person in short
 
 - Version: ${OFFCUT.version}
 - Installer file name: ${file}
-- Official download URL (the only allowed source): ${OFFCUT.downloadUrl}
+- Official download URL (the only allowed source, direct file on Google Drive): ${OFFCUT.directDownloadUrl}
+- Same file, as a page a person opens in the browser: ${OFFCUT.downloadUrl}
 - SHA-256 of that exact file: ${hash}
 - Needs: Windows 10 or 11, 64-bit, no admin rights, about 1 GB free disk space (download ${OFFCUT.downloadSizeLabel}, ${OFFCUT.installedSizeLabel} after install, plus a speech model of ${OFFCUT.speechModelLabel})
 - The installer is not code-signed yet, so Windows SmartScreen shows "Windows protected your PC". That is expected for this file. The SHA-256 check below is how the person knows the file is the genuine one.
@@ -75,7 +76,9 @@ It must be 64-bit Windows 10 or 11 with at least 1 GB free. If not, stop and exp
 Step 2. Download to the person's Downloads folder:
 
     $dl = Join-Path $env:USERPROFILE "Downloads\\${file}"
-    Invoke-WebRequest -Uri "${OFFCUT.downloadUrl}" -OutFile $dl -UseBasicParsing
+    Invoke-WebRequest -Uri "${OFFCUT.directDownloadUrl}" -OutFile $dl -UseBasicParsing
+
+If the saved file is much smaller than ${OFFCUT.downloadSizeLabel} (Google Drive sometimes returns a web page instead of the file), delete it and use Path B step 1 instead.
 
 Step 3. Verify the file:
 
@@ -113,7 +116,7 @@ Step 6. Finish by telling the person: Offcut ${OFFCUT.version} is installed for 
 ## Path B: you cannot run commands
 
 Give the person these steps, one at a time, and wait for them after each:
-1. Open ${PAGE} and click "Download for Windows". Save the file.
+1. Open ${PAGE} and click "Download for Windows". It opens Google Drive: click Download, and if Drive says it can't scan the file for viruses (normal for large files), click "Download anyway". If Chrome says the file isn't commonly downloaded, open the menu on the download and click "Keep".
 2. Optional check: open PowerShell in the Downloads folder and run Get-FileHash .\\${file} -Algorithm SHA256. The result must be ${hash}. If it is different, delete the file and do not run it.
 3. Double-click ${file}. If Windows says "Windows protected your PC", click More info, then Run anyway. Follow the installer.
 4. Optional browser extension (adds a Transcribe button on videos):
