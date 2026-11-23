@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { wallClips, type WallClip } from '@/lib/videos';
+import { localMedia } from '@/lib/localMedia';
 
 /**
  * Hero visual: the studio's own edits, cutting fast, in the two shapes the
@@ -147,8 +148,8 @@ function ReelFrame({
           return (
             <video
               key={clip.id}
-              src={clip.preview}
-              poster={clip.poster}
+              src={localMedia(clip.preview)}
+              poster={localMedia(clip.poster)}
               muted
               loop
               playsInline

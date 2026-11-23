@@ -5,6 +5,7 @@ import { AnimatePresence } from 'framer-motion';
 import { useParams } from 'next/navigation';
 import { previewMp4Src, type Orientation, type VideoEntry } from '@/lib/videos';
 import { trackWorkVideoOpen } from '@/lib/analytics';
+import { localMedia } from '@/lib/localMedia';
 
 // Card sizing (mirrors OurWork proportions, slightly smaller for the ICP rail).
 const CARD_H = 360;
@@ -177,7 +178,7 @@ export default function ICPWork({ videos, accent }: { videos: VideoEntry[]; acce
         >
           {railVideos.map((video, i) => {
             const orient = orientationOf(video);
-            const previewSrc = previewMp4Src(video.url, orient);
+            const previewSrc = localMedia(previewMp4Src(video.url, orient));
             return (
               <div
                 key={`${video.url}-${i}`}

@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { videos, previewMp4Src, type Orientation, type VideoEntry } from '@/lib/videos';
 import Link from 'next/link';
 import { trackWorkVideoOpen } from '@/lib/analytics';
+import { localMedia } from '@/lib/localMedia';
 
 // ─── Tab definitions ────────────────────────────────────────────────────────
 const tabs = [
@@ -658,8 +659,8 @@ export default function OurWork() {
               // → vertical-fallback so newly-added videos auto-fit their cards.
               const orient = orientationOf(video);
               const previewSrc = caps.isPhone
-                ? mobileSrc(previewMp4Src(video.url, orient), orient)
-                : previewMp4Src(video.url, orient);
+                ? localMedia(mobileSrc(previewMp4Src(video.url, orient), orient))
+                : localMedia(previewMp4Src(video.url, orient));
               // Duplicate items (second half) use preload="none" — browser
               // caches the src from the first copy so playback is instant.
               return (

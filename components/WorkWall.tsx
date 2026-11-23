@@ -5,6 +5,7 @@ import Link from 'next/link';
 import type { WallClip, IcpKey } from '@/lib/videos';
 import { staticBookingUrl, FREE_EDITS_LABEL, FREE_EDITS_URL } from '@/lib/links';
 import { trackWorkVideoOpen } from '@/lib/analytics';
+import { localMedia } from '@/lib/localMedia';
 
 /**
  * The /work wall: a full-screen bento of every edit, shot like a camera move.
@@ -563,11 +564,11 @@ export default function WorkWall({ clips }: { clips: WallClip[] }) {
               >
                 <span className="ww-in">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={t.poster} srcSet={`${t.posterSm} 320w, ${t.poster} 520w`} sizes="(max-width: 640px) 160px, 390px" alt={`${t.clip.label} for ${t.clip.brand}, edited by EchoPulse Media`} decoding="async" draggable={false} />
+                  <img src={localMedia(t.poster)} srcSet={`${localMedia(t.posterSm)} 320w, ${localMedia(t.poster)} 520w`} sizes="(max-width: 640px) 160px, 390px" alt={`${t.clip.label} for ${t.clip.brand}, edited by EchoPulse Media`} decoding="async" draggable={false} />
                   {t.clip.youtube && <span className="ww-yt" aria-hidden="true">YouTube</span>}
                   {t.preview && <video
                     ref={(el) => { videoEls.current[i] = el; }}
-                    data-src={t.preview}
+                    data-src={localMedia(t.preview)}
                     muted
                     loop
                     playsInline

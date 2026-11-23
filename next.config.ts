@@ -104,6 +104,12 @@ const nextConfig: NextConfig = {
   // Set correct Content-Type + cache headers for the AI-readable files.
   async headers() {
     return [
+      // Local copies of the video previews and posters (see lib/localMedia.ts).
+      // File names are content hashes of the source URL, so they never change.
+      {
+        source: "/media/:path*",
+        headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }],
+      },
       {
         source: "/llms.txt",
         headers: [

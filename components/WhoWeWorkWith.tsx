@@ -2,6 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { icps } from '@/lib/icpData';
 import { wallClips, type WallClip } from '@/lib/videos';
+import { localMedia } from '@/lib/localMedia';
 
 /**
  * Who we work with: one plain card per niche in lib/icpData.ts, in that order,
@@ -85,7 +86,7 @@ export default function WhoWeWorkWith() {
                   {clip && (
                     <div className="ww-poster">
                       <Image
-                        src={clip.poster}
+                        src={localMedia(clip.poster)}
                         alt={`A frame from a ${icp.name.toLowerCase()} sample edit`}
                         fill
                         sizes="(max-width: 760px) 112px, (max-width: 1100px) 33vw, 224px"

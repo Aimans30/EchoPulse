@@ -17,6 +17,7 @@ import {
 import { PROMISES } from '@/lib/pricing';
 import { NICHE_PAGES, NICHE_PLAN_ROWS, NICHE_PROMISES, type NichePage as NichePageData } from '@/lib/nicheServiceData';
 import { NICHE_PAGES_UPDATED_LABEL, NICHE_PAGES_UPDATED_ISO } from '@/lib/siteMeta';
+import { localMedia } from '@/lib/localMedia';
 
 const ACCENT = '#E8541A';
 
@@ -135,7 +136,7 @@ export default function NichePage({ page }: { page: NichePageData }) {
                   <li key={c.id}>
                     <Link href={`/work?niche=${page.icp}`} className="np-clip" aria-label={`${c.brand}, ${c.label}: open the work page`}>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={c.poster} srcSet={`${c.posterSm} 320w, ${c.poster} 520w`} sizes="(max-width: 768px) 160px, 180px" alt={`Still from a ${c.brand.toLowerCase()} edit, ${c.label.toLowerCase()}`} loading="lazy" width={260} height={462} />
+                      <img src={localMedia(c.poster)} srcSet={`${localMedia(c.posterSm)} 320w, ${localMedia(c.poster)} 520w`} sizes="(max-width: 768px) 160px, 180px" alt={`Still from a ${c.brand.toLowerCase()} edit, ${c.label.toLowerCase()}`} loading="lazy" width={260} height={462} />
                       <span className="np-clip-cap">{c.brand}, {c.label}</span>
                     </Link>
                   </li>
