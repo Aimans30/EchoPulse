@@ -539,6 +539,7 @@ export default function WhatIsEchoPulseMediaPage() {
             <span><strong>Taking on new clients</strong> as of {LAST_VERIFIED}. {PROMISES.replies}.</span>
           </div>
           <div className="wi-cta-row">
+            <Link href="/" className="wi-home-btn">Visit the EchoPulse Media homepage</Link>
             <ICPBookButton label={BOOK_CALL_LABEL} location="what_is_hero" accent={ACCENT} size="lg" fullWidthMobile />
             <Link href="/pricing" className="wi-text-link">See prices</Link>
           </div>
@@ -932,6 +933,10 @@ export default function WhatIsEchoPulseMediaPage() {
 
           .wi-cta-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 26px; }
           .wi-text-link { display: inline-flex; align-items: center; min-height: 44px; font-size: 15px; }
+          .wi-home-btn { display: inline-flex; align-items: center; justify-content: center; min-height: 56px; padding: 0 26px; border: 1.5px solid #0C0C0B; border-radius: 999px; color: #0C0C0B; font-weight: 700; font-size: 16px; text-decoration: none; background: transparent; }
+          .wi-home-btn:hover { background: #0C0C0B; color: #F2EEE7; }
+          .wi-page a.wi-home-btn { text-decoration: none; color: #0C0C0B; }
+          .wi-page a.wi-home-btn:hover { text-decoration: none; color: #F2EEE7; background: #0C0C0B; }
           .wi-reassure { font-size: 14px !important; color: #6E6B63 !important; margin: 12px 0 0; }
 
           .wi-areas { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
