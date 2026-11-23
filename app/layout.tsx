@@ -179,7 +179,8 @@ const structuredData = {
         "Answer engine optimization",
         "Structured data",
       ],
-      // sameAs: add only company profiles the owner controls and has checked (Clutch after the city is fixed, LinkedIn company page, Instagram). See entity plan 20 Nov 2026.
+      // sameAs: only company profiles the owner controls and has checked. Add Clutch once its city is fixed, and Instagram / Google Business Profile when live.
+      sameAs: ["https://www.linkedin.com/company/echopulse-media/"],
       mainEntityOfPage: "https://echopulse.media/what-is-echopulse-media",
       makesOffer: pricingOffers(),
       contactPoint: {
