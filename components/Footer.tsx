@@ -73,7 +73,7 @@ export default function Footer() {
           Echo<span style={{ color: '#E8541A' }}>Pulse</span>
         </Link>
         <p style={{ fontSize: '14px', color: '#6E6B63', lineHeight: 1.7, marginBottom: '28px', margin: '0 0 28px' }}>
-          A growth partner for founders and businesses. Content and personal brand, websites and funnels, custom software and CRMs, AI and automation, and search visibility. One team, one bill.
+          EchoPulse Media is a growth partner for founders and businesses, based in Bhopal, India: content and personal brand, websites and funnels, custom software and CRMs, AI and automation, and search visibility. One team, one bill.
         </p>
         <div style={{ display: 'flex', gap: '10px' }}>
           {[

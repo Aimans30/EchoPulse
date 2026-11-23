@@ -536,6 +536,27 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               </p>
             )}
 
+            {/* Author box: a named author and the canonical entity sentence on
+                every post, so answer engines tie the article to a real person
+                and to what EchoPulse Media is. Facts match public/llms.txt. */}
+            <aside className="blog-author" aria-label="About the author">
+              <Image src="/founder-avatar.jpg" alt="Lakshya Soni" width={56} height={56} />
+              <p>
+                <b>Written by Lakshya Soni</b>, founder of EchoPulse Media. EchoPulse Media is a
+                done-for-you content, website and AI search studio based in Bhopal, India, working with
+                founders, coaches and service businesses in the US, UK, Canada and Australia. Plans start
+                at $399 a month, with <Link href="/free-edits">2 free edits</Link> to try the work first.{' '}
+                <Link href="/about/lakshya-soni">About Lakshya</Link>.
+              </p>
+            </aside>
+            <style>{`
+              .blog-author { display:flex; gap:16px; align-items:flex-start; margin:40px 0 8px; padding:20px; background:#fff; border:1px solid rgba(12,12,11,0.1); border-radius:16px; }
+              .blog-author img { width:56px; height:56px; border-radius:50%; object-fit:cover; flex:none; }
+              .blog-author p { margin:0; font-size:15px; line-height:1.55; color:#3a3732; }
+              .blog-author b { color:#0C0C0B; }
+              .blog-author a { color:#C9440F; font-weight:600; }
+            `}</style>
+
             {/* Closing card: one offer, above the newsletter form and Related
                 Articles. See components/BlogFooterCTA. */}
             <BlogFooterCTA ask={ask} bookUrl={blogBookUrl('blog_footer', slug)} category={resolveCategory(post)} />
