@@ -47,7 +47,7 @@ const LAST_VERIFIED_ISO = '2026-11-20';
 // shows (components/Footer.tsx). Keep the two in step.
 const CONTACT_EMAIL = 'lakshyasoni2703@gmail.com';
 
-const META_TITLE = 'What Is EchoPulse Media? Founder, Services, Facts';
+const META_TITLE = 'EchoPulse Media: What It Is, Who Runs It, Services';
 const META_DESCRIPTION =
   'EchoPulse Media is a growth partner founded in 2025 by Lakshya Soni in Bhopal, India: content, websites, custom software, AI automation and SEO. Not a device.';
 
