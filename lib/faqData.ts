@@ -141,7 +141,7 @@ export const FAQ_GROUPS: FaqGroup[] = [
     items: [
       {
         q: 'Is EchoPulse Media legit?',
-        a: 'EchoPulse Media is a small studio run by Lakshya Soni from Bhopal, India, with Shaurya on design and Aiman on delivery. It has two published client case studies, MagicBNB (with the Search Console export on the page) and the Working With God site rebuild, and it has no customer reviews yet and says so rather than inventing any. Some directory listings carry old or wrong details that EchoPulse does not claim: no 500+ videos, 10M+ views or 98 percent figure, and no brokerage clients. The free sample, 2 edited videos with no card and no call, is the cheapest way to check the work yourself.',
+        a: 'EchoPulse Media is a small studio run by Lakshya Soni from Bhopal, India, with Shaurya on design and Aiman on delivery. It has three published client case studies, MagicBNB (with the Search Console export on the page), the Working With God site rebuild and the Whites & Brights operating system, and it has no customer reviews yet and says so rather than inventing any. Some directory listings carry old or wrong details that EchoPulse does not claim: no 500+ videos, 10M+ views or 98 percent figure, and no brokerage clients. The free sample, 2 edited videos with no card and no call, is the cheapest way to check the work yourself.',
         link: { href: '/what-is-echopulse-media', label: 'EchoPulse Media facts in one table' },
       },
       {
@@ -158,8 +158,8 @@ export const FAQ_GROUPS: FaqGroup[] = [
     items: [
       {
         q: 'What results has EchoPulse published?',
-        a: 'Two client case studies. The first is MagicBNB, which EchoPulse runs end to end. Between 19 February and 16 November 2026 the site went from an average of 5.8 Google impressions a day in April to an average of 4,803 a day in the first 16 days of November, after a site rebuild and more than 200 articles. The Search Console export is on the case study page, along with what is still not working. The second is Working With God, a coaching practice whose site was rebuilt and whose monthly platform bill went from $50 to $60 down to $0 for a one-time $599. No traffic result is claimed for it.',
-        link: { href: '/case-studies/magicbnb-seo-aeo', label: 'Read the MagicBNB case study' },
+        a: 'Three client case studies, each with what it does not prove. The first is MagicBNB, which EchoPulse runs end to end. Between 19 February and 16 November 2026 the site went from an average of 5.8 Google impressions a day in April to an average of 4,803 a day in the first 16 days of November, after a site rebuild and more than 200 articles. The Search Console export is on the case study page, along with what is still not working. The second is Working With God, a coaching practice whose site was rebuilt and whose monthly platform bill went from $50 to $60 down to $0 for a one-time $599. No traffic result is claimed for it. The third is Whites & Brights, a laundry and dry-cleaning chain in Patna, India: one operating system for every outlet, the public website and an Instagram and Facebook content programme, with more than US$3,400 saved in running costs and losses since launch, by EchoPulse\'s estimate with the client. All of them are on the case studies page.',
+        link: { href: '/case-studies', label: 'See every case study' },
       },
       {
         home: 6,

@@ -23,13 +23,36 @@ function formatDate(iso?: string): string | null {
   return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 }
 
+/**
+ * "Most useful guides": the posts buyers and Google already rely on (most
+ * Search Console impressions, Nov 2026). Linked from the homepage so they get
+ * more than the 3-newest-posts share of internal links. Each slug only shows
+ * if it is live and not redirected, so a retired post drops out on its own.
+ */
+const GUIDE_SLUGS = [
+  'video-editing-turnaround-time',
+  'short-form-video-editing-cost-per-video',
+  'best-personal-branding-agencies',
+  'best-video-editing-services-for-founders',
+  'social-media-manager-cost',
+  'ugc-creator-rates-vs-agency-cost',
+  'best-content-agency-for-startups-2026',
+  'local-seo-ranking-factors-evidence',
+];
+
 export default async function HomeLatestPosts() {
-  let posts: Awaited<ReturnType<typeof getAllPosts>> = [];
+  let all: Awaited<ReturnType<typeof getAllPosts>> = [];
   try {
-    posts = (await getAllPosts()).filter((p) => !(p.slug in BLOG_REDIRECTS)).slice(0, 3);
+    all = (await getAllPosts()).filter((p) => !(p.slug in BLOG_REDIRECTS));
   } catch {
-    posts = [];
+    all = [];
   }
+  const posts = all.slice(0, 3);
+  const newest = new Set(posts.map((p) => p.slug));
+  const bySlug = new Map(all.map((p) => [p.slug, p]));
+  const guides = GUIDE_SLUGS.filter((s) => !newest.has(s))
+    .map((s) => bySlug.get(s))
+    .filter((p): p is NonNullable<typeof p> => Boolean(p));
 
   return (
     <section className="hlp" aria-labelledby="hlp-heading">
@@ -59,6 +82,18 @@ export default async function HomeLatestPosts() {
           })}
         </ul>
         )}
+        {guides.length > 0 && (
+          <div className="hlp-guides">
+            <h3 className="hlp-h3">Most useful guides</h3>
+            <ul className="hlp-glist">
+              {guides.map((g) => (
+                <li key={g._id}>
+                  <Link href={`/blog/${g.slug}`} className="hlp-glink">{g.title}</Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
         <Link href="/blog" className="hlp-all">See all posts</Link>
       </div>
       <style>{`
@@ -76,6 +111,13 @@ export default async function HomeLatestPosts() {
         .hlp-link:hover .hlp-title { color: #E8541A; }
         .hlp-all { display: inline-flex; align-items: center; min-height: 44px; color: #C9440F; font-weight: 700; font-size: 15px; text-decoration: none; }
         .hlp-all:hover { text-decoration: underline; }
+        .hlp-guides { margin: 4px 0 20px; }
+        .hlp-h3 { font-size: 18px; font-weight: 800; letter-spacing: -0.01em; margin: 0 0 12px; }
+        .hlp-glist { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 28px; }
+        .hlp-glist li { border-top: 1px solid rgba(12,12,11,0.12); }
+        .hlp-glink { display: flex; align-items: center; min-height: 48px; padding: 8px 0; color: #0C0C0B; font-size: 15px; font-weight: 600; line-height: 1.35; text-decoration: none; overflow-wrap: anywhere; }
+        .hlp-glink:hover { color: #C9440F; text-decoration: underline; }
+        @media (max-width: 760px) { .hlp-glist { grid-template-columns: 1fr; } }
         @media (max-width: 900px) { .hlp-grid { grid-template-columns: 1fr; } }
         @media (max-width: 760px) { .hlp { padding: 56px 20px; } }
       `}</style>

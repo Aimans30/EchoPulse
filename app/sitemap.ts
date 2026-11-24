@@ -49,7 +49,7 @@ const BRAND_PAGE_UPDATED = new Date('2026-11-10');
 type SitemapPost = {
   slug: string;
   publishedAt?: string;
-  _updatedAt?: string;
+  lastChecked?: string | null;
   mainImage?: { asset?: { _ref?: string } };
   mainImageUrl?: string;
 };
@@ -62,7 +62,7 @@ type SitemapPost = {
 const SITEMAP_POSTS_QUERY = `*[_type == "blog" && defined(slug.current) && !(slug.current in $dead)]{
   "slug": slug.current,
   publishedAt,
-  _updatedAt,
+  lastChecked,
   mainImage,
   mainImageUrl
 }`;
@@ -260,11 +260,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Cheap guard against a failure mode that is invisible until Search Console
   // reports it months later.
   //
-  // lastModified uses Sanity's `_updatedAt`, which moves whenever the document
-  // is edited, with `publishedAt` as the fallback. publishedAt alone never
-  // changes after the first publish, so an edited post looked untouched to the
-  // crawler. The query is local to this file rather than lib/blog.ts because
-  // the index does not need `_updatedAt` and this file needs nothing else.
+  // lastModified is the post's real content date (see below). The query is
+  // local to this file because the index does not need `lastChecked`.
   let blogPosts: MetadataRoute.Sitemap = [];
   try {
     const posts = await sanityClient.fetch<SitemapPost[]>(
@@ -278,7 +275,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         const image = post.mainImage?.asset
           ? urlFor(post.mainImage).width(1200).height(630).fit('crop').auto('format').url()
           : post.mainImageUrl || undefined;
-        const modified = post._updatedAt || post.publishedAt;
+        // Same rule as the post's dateModified schema: the stored "Last
+        // checked" date when it is newer than the publish date, else the
+        // publish date. Never _updatedAt: a bulk field edit on 18 Nov 2026
+        // stamped 97 of 159 URLs with the same day, a false freshness signal.
+        const checked = post.lastChecked || '';
+        const published = post.publishedAt || '';
+        const modified =
+          checked && published && checked > published.slice(0, 10) ? checked : published || checked;
         return {
           url: `${SITE_URL}/blog/${post.slug}`,
           lastModified: modified ? new Date(modified) : now,
