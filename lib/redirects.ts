@@ -39,7 +39,7 @@
 export const SURVIVORS = {
   aiPipeline: "how-to-build-ai-content-pipeline-measurable-roi-2026",
   thoughtLeadership: "how-to-build-thought-leadership-system-high-ticket-clients-2026",
-  paidMediaFunnel: "why-paid-media-roi-is-declining-funnel-architecture-fix-2026",
+  paidMediaFunnel: "ad-creative-agency-pricing",
   batchProduction: "batch-production-blueprint-b2b-video-content-system-2026",
   realEstateSocial: "real-estate-social-media-marketing-cost",
 } as const;
@@ -48,7 +48,20 @@ export const SURVIVORS = {
  * dead slug -> destination path.
  * Destination is a full path so off-topic posts can point at "/" rather than a post.
  */
+/**
+ * Slug renames in flight: new slug -> the slug Sanity may still hold. The post
+ * page looks up both, so the new URL works before and after the Sanity slug is
+ * changed, and the old URL can 301 at deploy time with no 404 window. Remove an
+ * entry once Sanity holds the new slug.
+ */
+export const SLUG_ALIASES: Record<string, string> = {
+  "ad-creative-agency-pricing": "why-paid-media-roi-is-declining-funnel-architecture-fix-2026",
+};
+
 export const BLOG_REDIRECTS: Record<string, string> = {
+  // Nov 24 2026 audit: the post at this slug was rewritten as "Ad Creative
+  // Agency Pricing 2026", so the URL now matches the topic.
+  "why-paid-media-roi-is-declining-funnel-architecture-fix-2026": "/blog/ad-creative-agency-pricing",
   // Dead slug that outside pages still link to (Nov 2026 audit). Same title
   // as the live post, which sits at the longer slug.
   "linkedin-ghostwriting-pricing": "/blog/how-much-does-linkedin-ghostwriting-cost-2026",
@@ -220,4 +233,7 @@ export const BLOG_REDIRECTS: Record<string, string> = {
 };
 
 /** Slugs that are still live. Used to avoid redirect chains from /blogs/*. */
-export const DEAD_SLUGS = Object.keys(BLOG_REDIRECTS);
+// A renamed post's old slug redirects but is not dead: its Sanity document is
+// the live post (SLUG_ALIASES), so queries must still return it.
+const RENAMED_FROM = new Set(Object.values(SLUG_ALIASES));
+export const DEAD_SLUGS = Object.keys(BLOG_REDIRECTS).filter((s) => !RENAMED_FROM.has(s));

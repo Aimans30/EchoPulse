@@ -2,7 +2,7 @@ import type { MetadataRoute } from 'next';
 import { services } from '@/lib/serviceData';
 import { icps } from '@/lib/icpData';
 import { urlFor, sanityClient } from '@/lib/sanity';
-import { BLOG_REDIRECTS, DEAD_SLUGS } from '@/lib/redirects';
+import { BLOG_REDIRECTS, DEAD_SLUGS, SLUG_ALIASES } from '@/lib/redirects';
 import { caseStudies, heroImageFor } from '@/lib/caseStudyData';
 import { NICHE_PAGES } from '@/lib/nicheServiceData';
 import { NICHE_PAGES_UPDATED_ISO } from '@/lib/siteMeta';
@@ -269,7 +269,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       { dead: DEAD_SLUGS },
       { next: { revalidate: 600 } },
     );
+    // A post still at its old slug in Sanity is listed under its new one.
+    const renamed = Object.fromEntries(Object.entries(SLUG_ALIASES).map(([n, o]) => [o, n]));
     blogPosts = posts
+      .map((post) => (renamed[post.slug] ? { ...post, slug: renamed[post.slug] } : post))
       .filter((post) => !(post.slug in BLOG_REDIRECTS))
       .map((post) => {
         const image = post.mainImage?.asset

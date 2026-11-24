@@ -1152,7 +1152,7 @@ const RAW_PAGES: NichePageRaw[] = [
     posts: [
       { slug: 'ad-creative-fatigue-meta-ads-2026', title: 'Meta Ad Creative Fatigue: How Many New Ads You Need a Month' },
       { slug: 'ad-creative-subscription-published-prices', title: 'Ad Creative Subscriptions: Who Publishes a Price' },
-      { slug: 'why-paid-media-roi-is-declining-funnel-architecture-fix-2026', title: 'Ad Creative Pricing in 2026: What DTC Brands Pay' },
+      { slug: 'ad-creative-agency-pricing', title: 'Ad Creative Pricing in 2026: What DTC Brands Pay' },
       { slug: 'ugc-ad-hook-scripts-by-product-category', title: '20 UGC Ad Hook Scripts by Product Category' },
     ],
   },

@@ -1,6 +1,6 @@
 import { sanityClient } from './sanity';
 import type { PortableTextBlock } from '@portabletext/types';
-import { DEAD_SLUGS } from './redirects';
+import { DEAD_SLUGS, SLUG_ALIASES } from './redirects';
 
 /**
  * Shape of a blog post returned by the GROQ queries below. Matches the
@@ -152,7 +152,9 @@ export async function getRelatedPosts(
  * Returns null if not found.
  */
 export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
-  const query = `*[_type == "blog" && slug.current == $slug][0]{
+  // A renamed post may still sit at its old slug in Sanity (SLUG_ALIASES).
+  const slugs = SLUG_ALIASES[slug] ? [slug, SLUG_ALIASES[slug]] : [slug];
+  const query = `*[_type == "blog" && slug.current in $slugs] | order(select(slug.current == $slug => 0, 1) asc)[0]{
     _id,
     title,
     "slug": slug.current,
@@ -168,7 +170,7 @@ export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
   }`;
   let post: BlogPost | null;
   try {
-    post = await sanityClient.fetch<BlogPost | null>(query, { slug }, { next: { revalidate: 60 } });
+    post = await sanityClient.fetch<BlogPost | null>(query, { slug, slugs }, { next: { revalidate: 60 } });
   } catch {
     // One retry, against Sanity's live API instead of its CDN (a different
     // host), for a transient network or CDN failure. A second failure is
@@ -177,9 +179,9 @@ export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
     // null here would replace a live article with a cached 404.
     post = await sanityClient
       .withConfig({ useCdn: false })
-      .fetch<BlogPost | null>(query, { slug }, { next: { revalidate: 60 } });
+      .fetch<BlogPost | null>(query, { slug, slugs }, { next: { revalidate: 60 } });
   }
-  return post ?? null;
+  return post ? { ...post, slug } : null;
 }
 
 /**

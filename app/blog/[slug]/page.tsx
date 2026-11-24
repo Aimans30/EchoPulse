@@ -16,6 +16,7 @@ import { FREE_EDITS_URL } from '@/lib/links';
 import TableOfContents from '@/components/TableOfContents';
 import { getPostBySlug, getAllPostSlugs, getRelatedPosts, resolveCategory, resolveAuthor, type BlogPostSummary } from '@/lib/blog';
 import { BLOG_SEO } from '@/lib/seoOverrides';
+import { SLUG_ALIASES } from '@/lib/redirects';
 import { sanityClient, urlFor } from '@/lib/sanity';
 import { extractHeadings } from '@/lib/toc';
 import { extractFaqPairs, buildFaqPageLd } from '@/lib/faqSchema';
@@ -129,8 +130,8 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   // have neither. A failed read falls back the same way, never a 500.
   const stored = await sanityClient
     .fetch<{ icp?: string | null; service?: string | null; lastChecked?: string | null } | null>(
-      `*[_type == "blog" && slug.current == $slug][0]{ icp, service, lastChecked }`,
-      { slug },
+      `*[_type == "blog" && slug.current in $slugs] | order(select(slug.current == $slug => 0, 1) asc)[0]{ icp, service, lastChecked }`,
+      { slug, slugs: SLUG_ALIASES[slug] ? [slug, SLUG_ALIASES[slug]] : [slug] },
       { next: { revalidate: 60 } },
     )
     .catch(() => null);
