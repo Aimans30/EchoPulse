@@ -48,12 +48,12 @@ import { ogImages } from '@/lib/ogImages';
 
 const SITE_URL = 'https://echopulse.media';
 const canonical = `${SITE_URL}/resources/offcut`;
-const TITLE = 'Offcut: Free Script Saver for Video Editors';
+const TITLE = 'Offcut: Free Video Transcript Tool for Reels and YouTube';
 const DESCRIPTION =
-  'Offcut is a free Windows tool from EchoPulse Media that saves video transcripts and splits each script into hook, body and call to action. Runs on your PC.';
+  'Free Windows app that saves the transcript of any Instagram Reel, YouTube or TikTok video and splits the script into hook, body and CTA. No account.';
 
 export const metadata: Metadata = {
-  title: TITLE,
+  title: { absolute: TITLE },
   description: DESCRIPTION,
   alternates: { canonical },
   robots: { index: true, follow: true },
@@ -177,9 +177,11 @@ export default function OffcutPage() {
         '@type': 'SoftwareApplication',
         '@id': `${canonical}#app`,
         name: OFFCUT.name,
+        alternateName: ['Offcut by EchoPulse Media', 'Offcut transcript app', 'Offcut video transcript tool'],
         url: canonical,
         description: DESCRIPTION,
         applicationCategory: 'MultimediaApplication',
+        keywords: 'video transcript, Instagram Reels transcript, YouTube transcript, TikTok transcript, script breakdown, hook body call to action, free Windows app',
         operatingSystem: 'Windows 10, Windows 11 (64-bit)',
         isAccessibleForFree: true,
         offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },

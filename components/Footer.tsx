@@ -217,6 +217,7 @@ export default function Footer() {
             { label: 'Pilot', href: '/pilot' },
             { label: 'FAQ', href: '/faq' },
             { label: 'Free resources', href: '/resources' },
+            { label: 'Offcut (free tool)', href: '/resources/offcut' },
             { label: 'What is EchoPulse Media', href: '/what-is-echopulse-media' },
             { label: 'Blog', href: '/blog' },
             { label: 'Terms of Service', href: '/terms' },

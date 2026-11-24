@@ -91,6 +91,8 @@ const nextConfig: NextConfig = {
       { source: "/contact", destination: "/book", permanent: true },
       // A stray "&" got crawled as its own URL (from the old unescaped sitemap); send it home.
       { source: "/&", destination: "/", permanent: true },
+      // Short, memorable address for the free tool (shared in videos and posts).
+      { source: "/offcut", destination: "/resources/offcut", permanent: true },
 
       // 2. Retired duplicate posts -> their cluster survivor.
       ...deadSlugRedirects,
