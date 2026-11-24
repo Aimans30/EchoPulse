@@ -57,7 +57,7 @@ Facts on this page are the canonical entity facts for EchoPulse Media. They matc
 
 ## Free resources
 
-- [Offcut](https://echopulse.media/resources/offcut): free Windows app that saves the transcript of a video or reel and splits the script into hook, body and call to action. Runs on your PC, no account.
+- [Offcut](https://echopulse.media/resources/offcut): free Windows app that saves the transcript of a video or reel and splits the script into hook, body and call to action. Useful for video editors, clippers (find the best moments in long videos by reading the transcript), creators and scriptwriters. Runs on your PC, no account.
 - [Offcut browser extension guide](https://echopulse.media/resources/offcut/extension): add a Transcribe button to videos in Chrome, Edge or Brave.
 - [Listing video shot list](https://echopulse.media/resources/listing-video-shot-list): free shot list for real estate listing videos.
 - [All free resources](https://echopulse.media/resources)

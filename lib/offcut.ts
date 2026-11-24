@@ -67,7 +67,13 @@ export const OFFCUT = {
       width: 2000,
       height: 775,
     },
-  } as Partial<Record<'youtube' | 'instagram' | 'breakdown' | 'library', { src: string; alt: string; width: number; height: number }>>,
+    clips: {
+      src: '/resources/offcut/offcut-reader-youtube-sample.webp',
+      alt: 'The Offcut app showing a full saved transcript, read line by line to pick the moments worth clipping. Sample data: the creator, title and numbers are made up.',
+      width: 2000,
+      height: 1250,
+    },
+  } as Partial<Record<'youtube' | 'instagram' | 'breakdown' | 'library' | 'clips', { src: string; alt: string; width: number; height: number }>>,
 };
 
 /**

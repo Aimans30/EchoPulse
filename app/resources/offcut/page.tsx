@@ -91,11 +91,12 @@ const PARTS = [
  * Use cases the owner has stated. Phrase "Teach your AI writer" as using saved
  * scripts as examples: there is no built-in export or integration.
  */
-const USE_CASES: { key: keyof typeof OFFCUT.useCaseShots; frame: FrameKind; tag: string; title: string; text: string }[] = [
+const USE_CASES: { key: keyof typeof OFFCUT.useCaseShots; frame: FrameKind; tag: string; title: string; text: string; wide?: boolean }[] = [
   { key: 'instagram', frame: 'split', tag: 'Instagram Reels', title: 'Save Instagram Reels for inspiration', text: 'Keep the reels you want to learn from in one place on your PC, with their scripts.' },
   { key: 'youtube', frame: 'split', tag: 'YouTube', title: "Read any YouTube video's script", text: 'See the transcript laid out so you can read how the creator wrote it.' },
   { key: 'breakdown', frame: 'split', tag: 'Hook, body, call to action', title: "Learn from other creators' scripts", text: 'See each script split into hook, body and call to action.' },
   { key: 'library', frame: 'library', tag: 'Your saved scripts', title: 'Teach your AI writer', text: 'Use your saved scripts as examples when you ask Claude, ChatGPT or your own writing agent to write scripts in a style you like.' },
+  { key: 'clips', frame: 'split', tag: 'Clippers', title: 'Find the best moments to clip, fast', text: 'Clipping a long podcast or stream? Read the whole transcript in minutes instead of scrubbing through hours of footage. Turn on timestamps to see exactly when each line is said, copy the moments worth clipping, and keep the hooks that worked for next time.', wide: true },
 ];
 
 const NEEDS = [
@@ -181,7 +182,7 @@ export default function OffcutPage() {
         url: canonical,
         description: DESCRIPTION,
         applicationCategory: 'MultimediaApplication',
-        keywords: 'video transcript, Instagram Reels transcript, YouTube transcript, TikTok transcript, script breakdown, hook body call to action, free Windows app',
+        keywords: 'video transcript, transcript for clippers, podcast clipping, Instagram Reels transcript, YouTube transcript, TikTok transcript, script breakdown, hook body call to action, free Windows app',
         operatingSystem: 'Windows 10, Windows 11 (64-bit)',
         isAccessibleForFree: true,
         offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
@@ -233,7 +234,7 @@ export default function OffcutPage() {
                 <span className="oc-promise">Save and study the scripts behind videos.</span>
               </h1>
               <p className="oc-lead">
-                A free Windows tool for video editors, content creators and scriptwriters. Save the transcript of a video you want to learn from, and see it split into hook, body and call to action. It runs on your PC, with no account and no uploads.
+                A free Windows tool for video editors, clippers, content creators and scriptwriters. Save the transcript of a video you want to learn from, and see it split into hook, body and call to action. It runs on your PC, with no account and no uploads.
               </p>
 
               <div className="oc-actions">
@@ -338,7 +339,7 @@ export default function OffcutPage() {
             </Reveal>
             <ul className="oc-uses">
               {USE_CASES.map((u, i) => (
-                <li key={u.key}>
+                <li key={u.key} className={u.wide ? 'oc-use-wide' : undefined}>
                   <Reveal className="oc-use" delay={(i % 2) * 100} track>
                     <ShotFrame kind={u.frame} shot={OFFCUT.useCaseShots[u.key]} />
                     <div className="oc-use-copy">
@@ -378,7 +379,7 @@ export default function OffcutPage() {
             <Reveal className="oc-split-head">
               <p className="oc-kicker">Overview</p>
               <h2 id="oc-what" className="oc-h2">What it does</h2>
-              <p className="oc-sub">For video editors, content creators and scriptwriters.</p>
+              <p className="oc-sub">For video editors, clippers, content creators and scriptwriters.</p>
             </Reveal>
             <Reveal delay={100}>
             <ol className="oc-does">
@@ -726,6 +727,13 @@ export default function OffcutPage() {
         /* Use cases */
         .oc-uses { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
         .oc-uses > li { display: flex; }
+        .oc-uses > li.oc-use-wide { grid-column: 1 / -1; }
+        @media (min-width: 900px) {
+          .oc-use-wide .oc-use { flex-direction: row; align-items: center; gap: 32px; }
+          .oc-use-wide .oc-use > :first-child { flex: 1.2 1 0; min-width: 0; }
+          .oc-use-wide .oc-use-copy { flex: 1 1 0; min-width: 0; padding-right: 16px; }
+          .oc-use-wide .oc-use h3 { margin-top: 12px !important; }
+        }
         .oc-use { flex: 1; display: flex; flex-direction: column; padding: 16px; border-radius: 16px; border: 1px solid var(--line); background: var(--card); transition: transform .3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow .3s ease, border-color .3s ease, opacity .7s cubic-bezier(0.16, 1, 0.3, 1); }
         .oc-use-copy { padding: 24px 8px 8px; }
         .oc-page .oc-use h3 { margin-top: 16px !important; font-size: 22px !important; font-weight: 700; line-height: 1.25 !important; letter-spacing: -0.02em; color: var(--ink); }
