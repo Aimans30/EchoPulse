@@ -39,6 +39,11 @@ The verdict block(s) exactly as the reviewer returned them, review 1 and,
 if there was one, review 2. Then `Fixes applied:` with each fix and what was
 changed, or `not applied: <why>`.
 
+## 6b. Fact check (gate G9F)
+
+The Sonnet fact checker's verdict block(s) exactly as returned, check 1 and,
+if there was one, check 2. Then `Fixes applied:` with each fix.
+
 ## 7. Founder note
 
 `Founder note: <date> "<first 8 words>" in <heading>` or `Founder note: none

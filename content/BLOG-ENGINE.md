@@ -1,12 +1,13 @@
 # EchoPulse blog engine
 
-Spec version: 2026-11-19
+Spec version: 2026-11-24
 
 This is the spec for the daily unattended run that researches, writes and
 publishes blog posts to echopulse.media. The run reads, in full, this file,
 `content/blog-queue/README.md`, `lib/pricing.ts` and, in
 `content/blog-data/`: `cluster-map.md`, `style-guide.md` and
-`founder-notes.md`. It reads `editor-rubric.md` at gate G9 and
+`founder-notes.md`. It reads `editor-rubric.md` at gate G9,
+`fact-check-rubric.md` at gate G9F and
 `run-report.md` before reporting. Then it follows this file top to bottom.
 To change what gets written, edit these files, not the scheduled task prompt.
 
@@ -398,6 +399,7 @@ failed gate means the post is not published.
 | G7 Live links | `curl -s -o /dev/null -w '%{http_code}' https://echopulse.media<path>` for every internal link that is not a /blog/ link | `G7: <path> 200, <path> 200, ...` |
 | G8 Self-edit | Cut about 10% (intro lines, restated points, sentences that announce the next one). Then quote from the post | `G8: answer "<sentence from paragraph 1>"; asset "<what it is>"; recommendation "<the sentence>"; cut "<what was removed>"` |
 | G9 Editor | An independent review by `content/blog-data/editor-rubric.md` (a fresh subagent where the Task or Agent tool exists). Pass mark there. On a fail: one rewrite applying every fix, re-run G6, then a fresh review. A second fail: publish nothing | `G9: PASS review <1 or 2>, total n/30, accuracy 5, reviewer <subagent or self>` plus the verdict block(s) in the report |
+| G9F Fact check | After G9 passes, on the final file: an independent Sonnet subagent (`model: "sonnet"`) runs `content/blog-data/fact-check-rubric.md`: every claim re-checked against a source opened today, EchoPulse claims against `lib/pricing.ts`, and Google's spam policies and helpful content guidance. Any non-confirmed claim or guideline problem is a fail. On a fail: apply every fix, re-run G6, fresh Sonnet check. A second fail: publish nothing | `G9F: PASS check <1 or 2>, claims n, confirmed n, guidelines clean, model sonnet` plus the verdict block(s) in the report |
 | G10 Published | Publish, then check the URL | `G10: <url> 200, title matches` |
 
 Notes:
@@ -470,7 +472,7 @@ refresh a row marked `SKIP`. Skip a Tier P or C row that would fail the ban list
 5. Leave `slug` and the `refresh: true` line as they are. Leave
    `thumbnailText` as pulled unless the title changed. `category` and
    `author` are not updated by a refresh.
-6. Pass gates G2 to G9, then:
+6. Pass gates G2 to G9F, then:
 
        npm run blog:publish -- --refresh --dry-run --file content/blog-queue/<file>.md
        SANITY_WRITE_TOKEN=proxy-injected npm run blog:publish -- --refresh --file content/blog-queue/<file>.md
@@ -500,8 +502,8 @@ addresses; give the page's own contact or author URL if it shows one.
 ## 9. The run report
 
 End every run with the report in `content/blog-data/run-report.md`, in its
-order. It must include: the G1 to G10 evidence lines, the top 5 gap table,
-the editor verdict block(s) and every fix applied, the founder note used (or
+order. It must include: the G1 to G10 evidence lines (including G9F), the top 5 gap table,
+the editor verdict block(s), the fact check verdict block(s) and every fix applied, the founder note used (or
 "none"), the one line "Why Google should rank this over the current #1", and
 the distribution kit (a LinkedIn draft, a 2-sentence forum answer, up to 3
 people or sites the post cites). The kit is for the owner; the run posts and
