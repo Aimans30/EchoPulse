@@ -125,6 +125,46 @@ export const blog = defineType({
     }),
 
     defineField({
+      name: 'chartColumn',
+      title: 'Chart column',
+      type: 'string',
+      description: 'The table column the publisher draws as a bar chart, with its unit and date.',
+      fieldset: 'engine',
+    }),
+
+    defineField({
+      name: 'chartLabel',
+      title: 'Chart label column',
+      type: 'string',
+      description: 'The table column used for the bar labels.',
+      fieldset: 'engine',
+    }),
+
+    defineField({
+      name: 'chartSource',
+      title: 'Chart source',
+      type: 'string',
+      description: 'Source line printed under the chart (max 80 characters).',
+      validation: (Rule) => Rule.max(80),
+      fieldset: 'engine',
+    }),
+
+    defineField({
+      name: 'featured',
+      title: 'Featured',
+      type: 'boolean',
+      description: 'Legacy flag from older posts. Not used by the site.',
+      hidden: ({ value }) => value === undefined,
+    }),
+
+    defineField({
+      name: 'imageAlt',
+      title: 'Cover image alt text',
+      type: 'string',
+      description: 'Describes the cover image for screen readers.',
+    }),
+
+    defineField({
       name: 'mainImage',
       title: 'Main Image',
       type: 'image',
