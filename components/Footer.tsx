@@ -17,10 +17,14 @@ import { icps } from '@/lib/icpData';
  * Now derived from serviceData, so the footer always links to the real URLs and
  * stays in sync automatically when a service is added or renamed.
  */
-const serviceLinks = services.map((s) => ({
-  label: s.name,
-  href: `/services/${s.slug}`,
-}));
+const serviceLinks = [
+  ...services.map((s) => ({
+    label: s.name,
+    href: `/services/${s.slug}`,
+  })),
+  // The overview page (all services and what each plan includes).
+  { label: 'All services', href: '/services' },
+];
 
 /**
  * Audience pages, derived from icpData the same way services are.

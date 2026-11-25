@@ -318,9 +318,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.85,
   }));
 
+  const servicesIndex: MetadataRoute.Sitemap[number] = {
+    url: `${SITE_URL}/services`,
+    lastModified: new Date('2026-11-25'),
+    changeFrequency: 'monthly',
+    priority: 0.85,
+  };
+
   return [
     home,
     about,
+    servicesIndex,
     ...landingPages,
     workPage,
     caseStudyIndex,

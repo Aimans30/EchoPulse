@@ -8,6 +8,7 @@ import Footer from '@/components/Footer';
 import BlogContent from '@/components/BlogContent';
 import BlogFooterCTA from '@/components/BlogFooterCTA';
 import BlogInlineCTA from '@/components/BlogInlineCTA';
+import BlogOfferNote from '@/components/BlogOfferNote';
 import BlogSideCTA from '@/components/BlogSideCTA';
 import BlogEmailCapture from '@/components/BlogEmailCapture';
 import BlogStickyBar from '@/components/BlogStickyBar';
@@ -536,6 +537,8 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                 This post is being written. Check back soon.
               </p>
             )}
+
+            <BlogOfferNote slug={slug} />
 
             {/* Author box: a named author and the canonical entity sentence on
                 every post, so answer engines tie the article to a real person

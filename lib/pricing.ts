@@ -38,6 +38,8 @@ export interface Plan {
   cta: string;
   /** True for the card that gets the dark/featured treatment. */
   featured?: boolean;
+  /** One line of terms under the plan's button. Must match the Terms page. */
+  terms?: string;
   /** Hidden plans are never rendered. */
   hidden?: boolean;
 }
@@ -76,6 +78,7 @@ export const PILOT: Plan = {
     '48-hour turnaround on short-form edits, revised until you are happy',
     'No retainer commitment. You keep everything made.',
   ],
+  terms: 'One-off payment. No monthly plan unless you choose one.',
   cta: 'Start the $299 Pilot',
 };
 
@@ -98,6 +101,7 @@ export const PRESENCE: Plan = {
     'Pages, Google Business Profile and structured data so you show up on Google and ChatGPT',
     'Replies within 3 hours in the workday',
   ],
+  terms: 'No card to book. Month to month, 14 days notice to cancel.',
   cta: 'Book a free 15-minute call',
   featured: true,
 };
@@ -122,6 +126,7 @@ export const GROWTH: Plan = {
     'Monthly performance review',
     '20% off any custom app or software build',
   ],
+  terms: 'No card to book. Month to month, 14 days notice to cancel.',
   cta: 'Book a free 15-minute call',
 };
 
@@ -139,6 +144,7 @@ export const FULL_SYSTEM: Plan = {
     'A website, funnel or app build alongside the content',
     'Written scope, fixed price and a delivery date before you pay',
   ],
+  terms: 'Scope, fixed price and delivery date in writing before you pay.',
   cta: 'Book a free 15-minute call',
   // The old "Full System" at $4,997 promised a dedicated account lead and a
   // quarterly app build, which an owner-operated studio cannot staff. It is

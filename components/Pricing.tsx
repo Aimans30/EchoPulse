@@ -110,6 +110,7 @@ export default function Pricing({ pricingCopy }: { pricingCopy?: PricingCopy } =
     features: pricingCopy?.[p.key] ?? p.scope,
     cta: p.key === 'free' ? p.cta : PLAN_BUTTON_LABEL[p.key],
     featured: !!p.featured,
+    terms: p.terms,
   }));
 
   return (
@@ -260,7 +261,7 @@ export default function Pricing({ pricingCopy }: { pricingCopy?: PricingCopy } =
                       days written notice per the Terms. Overstating it by one
                       word is the kind of thing that turns into a dispute, and
                       the real terms are good enough to state plainly. */}
-                  <p className="pms-cta-fine">No card to book. No long contracts. 14 days notice to cancel.</p>
+                  {plan.terms && <p className="pms-cta-fine">{plan.terms}</p>}
                 </article>
               ))}
             </div>
@@ -449,6 +450,11 @@ export default function Pricing({ pricingCopy }: { pricingCopy?: PricingCopy } =
               >
                 {plan.cta}
               </button>
+              {plan.terms && (
+                <p style={{ margin: '10px 0 0', fontSize: '11.5px', lineHeight: 1.45, textAlign: 'center', color: plan.featured ? 'rgba(242,238,231,0.62)' : '#6E6B63' }}>
+                  {plan.terms}
+                </p>
+              )}
             </motion.div>
           ))}
         </div>
