@@ -298,6 +298,8 @@ const CATEGORY_ICON = {
 
 /** Choose an icon: service, then ICP, then title keywords, then category, else document. */
 export function pickIcon({ category, icp, service, title } = {}) {
+  // A post about AI answers gets the AI mark whatever service it sells.
+  if (/\b(chatgpt|perplexity|ai overviews?|ai mode|ai search|generative ai|llms?)\b/i.test(String(title || ''))) return 'sparkle';
   if (service && SERVICE_ICON[service]) return SERVICE_ICON[service];
   if (icp && ICP_ICON[icp]) return ICP_ICON[icp];
   const t = String(title || '').toLowerCase();

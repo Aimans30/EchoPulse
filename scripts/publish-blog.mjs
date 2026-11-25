@@ -373,6 +373,10 @@ export function repoFacts() {
     }
   }
   for (const s of SERVICES) routes.add(`/services/${s}`);
+  // Every real service page, including ones that are not an engine service
+  // value (e.g. /services/seo-aeo), read from the same data the site renders.
+  for (const m of read('lib/serviceData.ts').matchAll(/\n    slug: '([a-z-]+)'/g)) routes.add(`/services/${m[1]}`);
+  routes.add('/services');
   for (const i of ENGINE_ICPS) routes.add(`/${i}`);
   const niche = new Set();
   for (const m of read('lib/nicheIndex.ts').matchAll(/\{\s*icp:\s*'([a-z-]+)',\s*service:\s*'([a-z-]+)'/g)) {
