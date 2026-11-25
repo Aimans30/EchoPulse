@@ -93,7 +93,7 @@ export const PRESENCE: Plan = {
     '8 to 9 short-form videos a month, edited to perform',
     '8 photo or carousel posts a month, captions ready',
     'Up to 5 extra clips a month cut from footage you already have, free',
-    'A posting plan: what goes where and when',
+    'A posting plan, and we schedule and post every approved piece for you',
     'Free website tune-up in month one, then ongoing upgrades',
     'Pages, Google Business Profile and structured data so you show up on Google and ChatGPT',
     'Replies within 3 hours in the workday',

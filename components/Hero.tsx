@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { gsap } from 'gsap';
 import { motion } from 'framer-motion';
 import { BOOK_CALL_LABEL, FREE_EDITS_LABEL, FREE_EDITS_URL } from '@/lib/links';
@@ -28,13 +28,13 @@ const BAND_STATS = [
   { value: '$299',  label: 'Pilot, keep everything made' },
 ];
 
-function StatsBand() {
+function StatsBand({ stats = BAND_STATS }: { stats?: { value: string; label: string }[] }) {
   const [activeIdx, setActiveIdx] = useState(0);
 
   useEffect(() => {
-    const id = setInterval(() => setActiveIdx((i) => (i + 1) % BAND_STATS.length), 2400);
+    const id = setInterval(() => setActiveIdx((i) => (i + 1) % stats.length), 2400);
     return () => clearInterval(id);
-  }, []);
+  }, [stats.length]);
 
   return (
     <motion.div
@@ -71,7 +71,7 @@ function StatsBand() {
         }}
       >
         <div className="stats-band-items" style={{ display: 'flex', alignItems: 'center', gap: '36px', flexWrap: 'wrap', justifyContent: 'center', width: '100%' }}>
-          {BAND_STATS.map((s, i) => {
+          {stats.map((s, i) => {
             const isActive = i === activeIdx;
             return (
               <motion.div
@@ -126,7 +126,24 @@ function StatsBand() {
   );
 }
 
-export default function Hero() {
+/**
+ * Optional copy for landing pages that reuse the homepage hero (same reel,
+ * same animation, same layout). Omit it and the homepage renders unchanged.
+ * Accent words go in <span className="hl-accent">.
+ */
+export interface HeroCopy {
+  /** Small pill above the H1, e.g. "Personal branding for founders". */
+  eyebrow?: string;
+  /** The two H1 lines. */
+  lines: [ReactNode, ReactNode];
+  /** The keyword-bearing subline under the H1. */
+  sub: ReactNode;
+  /** Prefix for click tracking, e.g. "pb" gives pb_hero_primary. */
+  trackPrefix: string;
+  stats?: { value: string; label: string }[];
+}
+
+export default function Hero({ copy }: { copy?: HeroCopy } = {}) {
   const wrapRef      = useRef<HTMLDivElement>(null);
   const eyebrowRef   = useRef<HTMLDivElement>(null);
   const headlineRef  = useRef<HTMLHeadingElement>(null);
@@ -180,6 +197,9 @@ export default function Hero() {
         .badge-dot  { width:6px;height:6px;border-radius:50%;background:#E8541A;animation:bdot 2s ease-in-out infinite; }
         @keyframes bdot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.6)}}
 
+        .hl-accent { color:#E8541A; font-style:italic; }
+        .hero-eyebrow-chip { margin-bottom: 22px; }
+        @media(max-width:640px){ .hero-eyebrow-chip { margin: 0 auto 18px; } }
         .hl-wrap  { display:block; overflow:hidden; padding-top:0.12em; margin-top:-0.12em; padding-bottom:0.18em; margin-bottom:-0.18em; }
         .hl-inner { display:block; }
 
@@ -500,7 +520,11 @@ export default function Hero() {
           style={{ width: '100%', maxWidth: '1280px', margin: '0 auto', padding: '120px 56px 72px', display: 'flex', alignItems: 'center', gap: '96px', position: 'relative', zIndex: 1, flex: '1 1 auto' }}
         >
           <div style={{ flex: '1 1 0', minWidth: 0 }}>
-            <div ref={eyebrowRef} />
+            <div ref={eyebrowRef}>
+              {copy?.eyebrow && (
+                <span className="hero-badge hero-eyebrow-chip"><span className="badge-dot" aria-hidden="true" />{copy.eyebrow}</span>
+              )}
+            </div>
 
             {/* Desktop headline — original 3-line stacked structure. Hidden on phone. */}
             <h1
@@ -508,10 +532,10 @@ export default function Hero() {
               className="hero-h1 hero-h1-desktop"
               style={{ fontFamily: 'Inter, sans-serif', fontSize: 'clamp(36px, 3.9vw, 56px)', fontWeight: 900, lineHeight: 1.04, letterSpacing: 'clamp(-1px, -0.035em, -2.4px)', margin: '0 0 24px' }}
             >
-              {[
+              {(copy?.lines ?? [
                 <>You run the business.</>,
                 <>We run <span style={{ color: '#E8541A', fontStyle: 'italic' }}>the content.</span></>,
-              ].map((line, i) => (
+              ]).map((line, i) => (
                 <span key={i} className="hl-wrap">
                   <span className="hl-inner">{line}</span>
                 </span>
@@ -527,8 +551,17 @@ export default function Hero() {
                 which meant every crawler saw TWO H1s on the homepage (CSS hides
                 one visually, but the DOM still carries both). One H1 per page. */}
             <div className="hero-h1-mobile hero-mobile-only" role="presentation" aria-hidden="true">
-              <span style={{ display: 'block' }}>You run the business.</span>
-              <span style={{ display: 'block' }}>We run <span className="accent">the content.</span></span>
+              {copy ? (
+                <>
+                  <span style={{ display: 'block' }}>{copy.lines[0]}</span>
+                  <span style={{ display: 'block' }}>{copy.lines[1]}</span>
+                </>
+              ) : (
+                <>
+                  <span style={{ display: 'block' }}>You run the business.</span>
+                  <span style={{ display: 'block' }}>We run <span className="accent">the content.</span></span>
+                </>
+              )}
             </div>
 
             {/* Keyword-bearing H2. The H1 above is pure brand copy — great for
@@ -541,11 +574,15 @@ export default function Hero() {
                   from lib/pricing.ts so it cannot drift), then the free start.
                   The same h2 serves phone and desktop; there is no separate
                   mobile subheading. */}
-              <span>
-                Videos, posts and your website, run every week from {PRESENCE.priceLabel} a month.
-                No contract.
-              </span>{' '}
-              <strong style={{ color: '#0C0C0B', fontWeight: 600 }}>Start with 2 free edits.</strong>
+              {copy ? copy.sub : (
+                <>
+                  <span>
+                    Videos, posts and your website, run every week from {PRESENCE.priceLabel} a month.
+                    No contract.
+                  </span>{' '}
+                  <strong style={{ color: '#0C0C0B', fontWeight: 600 }}>Start with 2 free edits.</strong>
+                </>
+              )}
             </h2>
 
             <div ref={actionsRef} className="hero-actions" style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '0', alignItems: 'center' }}>
@@ -563,7 +600,7 @@ export default function Hero() {
                 // accessible name on its own, so let it be the name.
                 data-cursor-hover
                 onClick={() => {
-                  trackCallClick('hero_primary');
+                  trackCallClick(copy ? `${copy.trackPrefix}_hero_primary` : 'hero_primary');
                   (window as unknown as { openBookCallModal?: () => void }).openBookCallModal?.();
                 }}
                 // Cursor is left to the .btn-p rule so the hover-device gate
@@ -578,7 +615,7 @@ export default function Hero() {
                 href={FREE_EDITS_URL}
                 className="btn-o"
                 data-cursor-hover
-                onClick={() => trackPilotClick('hero_secondary_free_edits')}
+                onClick={() => trackPilotClick(copy ? `${copy.trackPrefix}_hero_secondary_free_edits` : 'hero_secondary_free_edits')}
               >
                 {FREE_EDITS_LABEL}
               </a>
@@ -593,7 +630,7 @@ export default function Hero() {
         </div>
 
         {/* Full-width stats band */}
-        <StatsBand />
+        <StatsBand stats={copy?.stats} />
       </section>
 
     </>

@@ -126,3 +126,22 @@ Known gaps:
 - Step-by-step events inside the free-edits form (`free_edits_step`, `free_edits_error`) and video opens in the homepage work section (`components/OurWork.tsx`) are not tracked.
 - Country is on the lead but is not sent to GA4 as a user property.
 - `/order`, `/onboard` and checkout do not carry attribution.
+
+## Search landing pages (added 25 Nov 2026)
+
+`/affordable-personal-branding-for-founders` and `/done-for-you-social-media-management` are reached from search and AI answers only (not linked from the nav, footer or homepage). Every button on them carries a `location` with the page's prefix: `pb_` for personal branding, `smm_` for social media management.
+
+| Button | `location` |
+| --- | --- |
+| Hero, book a call | `pb_hero_primary` / `smm_hero_primary` |
+| Hero, free edits | `pb_hero_secondary_free_edits` / `smm_hero_secondary_free_edits` |
+| Under the price table | `pb_compare_book`, `pb_compare_free_edits` (and `smm_...`) |
+| Under the FAQ | `pb_faq_book`, `pb_faq_free_edits` (and `smm_...`) |
+| Proof links | `pb_proof` / `smm_proof` |
+
+How to see who converted from these pages in GA4:
+1. **Bookings:** Explore, Free form. Event name = `booking_confirmed`. Break down by `booked_from` (the page whose button was clicked) and `ft_landing` (the first page of the visit). A row with `ft_landing` = one of these paths is a buyer who arrived on that page, even if they booked from another page later.
+2. **Free edits sent:** same exploration with event `free_edits_submit`, broken down by `ft_landing`.
+3. **Which button:** event `book_call_click` or `free_edits_click`, broken down by `location`.
+4. **Traffic:** Reports, Engagement, Landing page, filter the two paths. AI referrals show as source chatgpt.com, perplexity.ai and so on.
+`booked_from`, `ft_landing` and `location` must be registered as custom dimensions (see the setup list above) for the breakdowns to appear.

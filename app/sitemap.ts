@@ -307,9 +307,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     .reduce((a, b) => Math.max(a, b), 0);
   if (newest > 0) blogIndex.lastModified = new Date(newest);
 
+  // Search landing pages (not linked from the site's nav on purpose).
+  const landingPages: MetadataRoute.Sitemap = [
+    'affordable-personal-branding-for-founders',
+    'done-for-you-social-media-management',
+  ].map((slug) => ({
+    url: `${SITE_URL}/${slug}`,
+    lastModified: new Date('2026-11-25'),
+    changeFrequency: 'monthly' as const,
+    priority: 0.85,
+  }));
+
   return [
     home,
     about,
+    ...landingPages,
     workPage,
     caseStudyIndex,
     ...caseStudyRoutes,
