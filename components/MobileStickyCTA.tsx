@@ -6,10 +6,10 @@
  *  Old version: two competing buttons ("$299 Pilot →" and "Book call") fighting
  *  for attention. Felt like a brutal hard-sell stacked on top of the content.
  *
- *  New version: ONE clear primary action ("Book a strategy call") that opens
- *  the in-page BookCallModal. Underneath sits one quiet secondary link to the
- *  free sample ("Or get 2 free edits", /free-edits), informative, not pushy.
- *  Smaller overall footprint, calmer presence.
+ *  New version: ONE action, the book-a-call button, which opens the in-page
+ *  BookCallModal. The "Or get 2 free edits" line under it was removed on
+ *  25 Nov 2026 at the owner's request: one button only on phones. The free
+ *  sample is still offered in the hero and on the pages themselves.
  *
  *  Also: auto-hides when the user scrolls UP (means they're reading, not
  *  shopping — no need to interrupt) and reappears when they scroll DOWN
@@ -19,9 +19,8 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { usePathname } from 'next/navigation';
-import Link from 'next/link';
-import { track, trackCallClick } from '@/lib/analytics';
-import { BOOK_CALL_LABEL, FREE_EDITS_LABEL, FREE_EDITS_URL } from '@/lib/links';
+import { trackCallClick } from '@/lib/analytics';
+import { BOOK_CALL_LABEL } from '@/lib/links';
 
 const SCROLL_TRIGGER_PX = 600;
 const KEYBOARD_HEIGHT_THRESHOLD = 0.75;
@@ -184,7 +183,6 @@ export default function MobileStickyCTA() {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        gap: '7px',
         transform: visible ? 'translateY(0)' : 'translateY(110%)',
         opacity: visible ? 1 : 0,
         transition: 'transform 0.4s cubic-bezier(0.16,1,0.3,1), opacity 0.3s ease',
@@ -226,32 +224,6 @@ export default function MobileStickyCTA() {
         <span aria-hidden="true" style={{ fontSize: '12px', opacity: 0.85 }}>→</span>
       </button>
 
-      {/* SECONDARY: the free sample, the lowest-friction ask on the site.
-          It was "Or see the $299 14-day Pilot" until Nov 2026, which pointed
-          a first-time visitor at the paid step. Label and URL come from
-          lib/links.ts so this never drifts from the hero and pricing CTAs.
-          A plain same-tab link to the internal /free-edits page. */}
-      <Link
-        href={FREE_EDITS_URL}
-        onClick={() => track('cta_free_edits_click', { location: 'mobile_sticky_secondary' })}
-        style={{
-          fontSize: '13px',
-          fontWeight: 500,
-          color: '#6E6B63',
-          textDecoration: 'none',
-          letterSpacing: '0.1px',
-          // A real second action, so it gets a full 44px thumb band. The
-          // negative bottom margin keeps the bar's overall height where it was.
-          padding: '0 16px',
-          minHeight: '44px',
-          margin: '-6px 0 -6px',
-          display: 'inline-flex',
-          alignItems: 'center',
-          touchAction: 'manipulation',
-        }}
-      >
-        Or <span style={{ color: '#C2410C', fontWeight: 700, marginLeft: 4 }}>{FREE_EDITS_LABEL.charAt(0).toLowerCase() + FREE_EDITS_LABEL.slice(1)}</span>
-      </Link>
     </div>
     </>
   );
