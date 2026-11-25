@@ -59,6 +59,9 @@ export const SLUG_ALIASES: Record<string, string> = {
 };
 
 export const BLOG_REDIRECTS: Record<string, string> = {
+  // 25 Nov 2026: the opinion post on AI Overviews is replaced by the sourced
+  // guide on the same question.
+  "ai-overviews-dominate-google-searches-content-framework-get-cited-2026": "/blog/how-to-get-cited-by-chatgpt",
   // Nov 24 2026 audit: the post at this slug was rewritten as "Ad Creative
   // Agency Pricing 2026", so the URL now matches the topic.
   "why-paid-media-roi-is-declining-funnel-architecture-fix-2026": "/blog/ad-creative-agency-pricing",
@@ -229,7 +232,7 @@ export const BLOG_REDIRECTS: Record<string, string> = {
   "the-vertical-video-monopoly-how-to-build-a-revenue-generating-content-engine-in-2026": `/blog/${SURVIVORS.batchProduction}`,
   "building-a-digital-presence-for-business-growth": "/blog/posting-content-vs-digital-presence",
   "what-90-of-founders-get-wrong-about-content": "/blog/why-founders-get-brand-positioning-wrong-2026",
-  "entity-based-seo-the-secret-to-dominating-ai-search-queries-in-2026": "/blog/ai-overviews-dominate-google-searches-content-framework-get-cited-2026",
+  "entity-based-seo-the-secret-to-dominating-ai-search-queries-in-2026": "/blog/how-to-get-cited-by-chatgpt",
 };
 
 /** Slugs that are still live. Used to avoid redirect chains from /blogs/*. */
